@@ -1,0 +1,10 @@
+{
+  "schema": "merit.flask_deploy.v1",
+  "project": "{{PROJECT_ID}}",
+  "vercel_team": "agentdraven",
+  "vercel_scope": "agentdraven",
+  "vercel_org_id": "",
+  "vercel_project_id": "",
+  "production_url": "https://{{PROJECT_ID}}.vercel.app",
+  "notes": "MERIT L1 §IX.E — always deploy with .\\scripts\\merit.ps1 deploy vercel -Project {{PROJECT_ID}}. Never bare vercel --prod without --scope from this file. whoami shows Vercel username (may differ from team slug)."
+}

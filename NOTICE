@@ -1,0 +1,10 @@
+merit-agent-skills
+
+Copyright 2026 MERIT LLC
+
+Licensed under the Apache License, Version 2.0.
+
+MERIT, AgentDraven, and merit-agent-skills are trademarks of MERIT LLC.
+This repository provides operational agent skill templates only; it does not
+grant access to merit-private-vault, certification attestation authority,
+or production meritstore/meritsubs credentials.
