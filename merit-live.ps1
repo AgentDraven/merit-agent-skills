@@ -3,7 +3,7 @@
 
 param()
 
-$MERIT_LIVE_VERSION = '0.2.0'
+$MERIT_LIVE_VERSION = '0.3.0'
 $ErrorActionPreference = 'Stop'
 $DistRoot = $PSScriptRoot
 
@@ -23,6 +23,7 @@ Commands:
   par scaffold         Copy PAR play shells + cfg/par_pins.json
   branding scaffold    Copy cfg/branding.json from template
   subs scaffold        Copy meritsubs/meritstore cfg templates
+  app scaffold         Copy Vercel consumer app skeleton (package.json, vercel.json, api/, scripts/)
   admin gate demo-init Placeholder .env.local keys for MeritAdminGate demo (local only)
   portal publish       Publish portal/ to here.now (BYOK: HERENOW_API_KEY)
   deploy vercel        Scoped production deploy via npx vercel
@@ -186,6 +187,13 @@ function Invoke-SubsScaffold {
     Write-Host "subs scaffold OK -> $cfg (edit consumer_id and register URL)"
 }
 
+function Invoke-AppScaffold {
+    param([string]$Root)
+    Write-Host "app scaffold: clone reference consumer Mr-PI-Bala/merit-demo or run:"
+    Write-Host "  git clone https://github.com/Mr-PI-Bala/merit-demo.git $Root"
+    Write-Host "Then: merit-live par scaffold, branding scaffold, subs scaffold"
+}
+
 function Invoke-AdminGateDemoInit {
     param([string]$Root)
     $envPath = Join-Path $Root '.env.local'
@@ -277,6 +285,11 @@ switch -Regex ($sub) {
     '^subs$' {
         if ($Rest[0] -ne 'scaffold') { Write-MeritLiveHelp; exit 1 }
         Invoke-SubsScaffold -Root $target
+        exit 0
+    }
+    '^app$' {
+        if (-not $Rest -or $Rest[0] -ne 'scaffold') { Write-MeritLiveHelp; exit 1 }
+        Invoke-AppScaffold -Root $target
         exit 0
     }
     '^admin$' {

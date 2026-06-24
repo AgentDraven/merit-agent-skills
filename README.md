@@ -56,7 +56,7 @@ Plus billing: $2.49/wk equivalent, monthly **$10.79** (round up); 20% off 6-mont
 
 Pre-GA: **`skills-v0.x.y`** (minor bumps in this program). GA **`1.0.0`** when HumanBala approves. Pin to tags, not floating `main`.
 
-Current: **`skills-v0.2.0`** (merit-live + freemium configs + merit-demo path).
+Current: **`skills-v0.3.0`** (merit-live 0.3.0 + merit-demo consumer app reference).
 
 ## Sync from vault
 
