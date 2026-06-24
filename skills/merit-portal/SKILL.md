@@ -21,3 +21,5 @@ Vault operators:
 ```
 
 Footer must include **MERIT Powered**; operator branding in header (SomaTune shell pattern).
+
+Include **`portal/legal.html`** and **`portal/terms.html`** in `portal/` (published to here.now). Vercel build copies them to `/legal.html` and `/legal/terms`.

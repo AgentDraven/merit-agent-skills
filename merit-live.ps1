@@ -3,7 +3,7 @@
 
 param()
 
-$MERIT_LIVE_VERSION = '0.3.0'
+$MERIT_LIVE_VERSION = '0.3.1'
 $ErrorActionPreference = 'Stop'
 $DistRoot = $PSScriptRoot
 
@@ -127,7 +127,17 @@ function Invoke-ParScaffold {
 "@
     }
 
-    $html = @"
+    $tplPath = Join-Path $DistRoot 'templates/consumer-static/play/index.html.template'
+    if (Test-Path $tplPath) {
+        $html = (Get-Content -LiteralPath $tplPath -Raw -Encoding UTF8) `
+            -replace '\{\{PRODUCT_NAME\}\}', 'MERIT Play' `
+            -replace '\{\{WORKBENCH_CSS_URL\}\}', $wb.artifacts.css.url `
+            -replace '\{\{WORKBENCH_CSS_SRI\}\}', $wb.artifacts.css.sri `
+            -replace '\{\{WORKBENCH_JS_URL\}\}', $wb.artifacts.js.url `
+            -replace '\{\{WORKBENCH_JS_SRI\}\}', $wb.artifacts.js.sri `
+            -replace '\{\{JOURNAL_TAGS\}\}', $journalTags
+    } else {
+        $html = @"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -145,7 +155,18 @@ $journalTags
 </body>
 </html>
 "@
+    }
     Set-Content -LiteralPath (Join-Path $playDir 'index.html') -Value $html -Encoding UTF8
+
+    $portalTpl = Join-Path $DistRoot 'templates/consumer-static/portal/index.html'
+    $portalDir = Join-Path $Root 'portal'
+    if (Test-Path $portalTpl) {
+        New-Item -ItemType Directory -Force -Path $portalDir | Out-Null
+        $portalHtml = (Get-Content -LiteralPath $portalTpl -Raw -Encoding UTF8) `
+            -replace '\{\{PRODUCT_NAME\}\}', 'My MERIT Product' `
+            -replace '\{\{PLAY_URL\}\}', '/play/'
+        Set-Content -LiteralPath (Join-Path $portalDir 'index.html') -Value $portalHtml -Encoding UTF8
+    }
     Write-Host "par scaffold OK ($Variant) -> $Root"
 }
 

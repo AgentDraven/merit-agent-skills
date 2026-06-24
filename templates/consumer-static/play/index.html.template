@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{PRODUCT_NAME}} — Play</title>
+  <link rel="stylesheet" href="{{WORKBENCH_CSS_URL}}" integrity="{{WORKBENCH_CSS_SRI}}" crossorigin="anonymous">
+</head>
+<body>
+  <header id="merit-header"><!-- operator branding via cfg/branding.json --></header>
+  <main id="merit-workbench-mount"></main>
+  <footer id="merit-footer"><small>MERIT Powered</small></footer>
+  <script src="{{WORKBENCH_JS_URL}}" integrity="{{WORKBENCH_JS_SRI}}" crossorigin="anonymous"></script>
+  {{JOURNAL_TAGS}}
+</body>
+</html>
