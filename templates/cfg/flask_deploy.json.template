@@ -6,5 +6,5 @@
   "vercel_org_id": "",
   "vercel_project_id": "",
   "production_url": "https://{{PROJECT_ID}}.vercel.app",
-  "notes": "MERIT L1 §IX.E — always deploy with .\\scripts\\merit.ps1 deploy vercel -Project {{PROJECT_ID}}. Never bare vercel --prod without --scope from this file. whoami shows Vercel username (may differ from team slug)."
+  "notes": "MERIT L1 §IX.E — deploy with .\\merit-live.ps1 deploy vercel --path <repo> (or vault merit.ps1 for operators). Never bare vercel --prod without --scope from this file."
 }

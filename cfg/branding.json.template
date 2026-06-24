@@ -1,0 +1,16 @@
+{
+  "schema": "merit.branding.v1",
+  "product_name": "{{PRODUCT_NAME}}",
+  "logo_url": "/portal/assets/logo.svg",
+  "primary_color": "#1d4ed8",
+  "header_style": "somatune_v1",
+  "guest_acknowledgment": true,
+  "footer": {
+    "show_merit_powered": true,
+    "merit_powered_label": "MERIT Powered",
+    "merit_powered_url": "https://github.com/AgentDraven/merit-agent-skills",
+    "operator_contact_email": "",
+    "abuse_report_email": "meritlabs@protonmail.com",
+    "notify_operator_on_abuse": true
+  }
+}

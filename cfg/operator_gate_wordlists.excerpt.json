@@ -1,0 +1,15 @@
+{
+  "schema": "merit.operator_gate.wordlists.v1",
+  "phrase_format": "{adjective}-{noun}-{####}",
+  "pin_rule": "Exactly four digits (0000-9999).",
+  "adjectives": [
+    "amber", "bold", "calm", "crisp", "dawn", "eager", "fair", "gentle", "hollow", "ivory",
+    "jade", "keen", "lunar", "mild", "noble", "opal", "prime", "quiet", "rapid", "solar",
+    "tidal", "ultra", "vivid", "warm", "zesty"
+  ],
+  "nouns": [
+    "anchor", "beacon", "cipher", "delta", "ember", "forge", "grove", "harbor", "index", "journey",
+    "kernel", "ledger", "matrix", "nexus", "oracle", "pillar", "quartz", "relay", "signal", "tensor",
+    "union", "vector", "window", "yield", "zenith"
+  ]
+}

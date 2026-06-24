@@ -1,0 +1,9 @@
+{
+  "schema": "merit.portals.v1",
+  "surfaces": [
+    { "id": "main", "path": "portal/", "slug": "{{MAIN_SLUG}}" },
+    { "id": "journal", "path": "portal/journal/", "slug": "{{JOURNAL_SLUG}}" },
+    { "id": "ama", "path": "portal/ama/", "slug": "{{AMA_SLUG}}" },
+    { "id": "subs", "path": "portal/subs/", "slug": "{{SUBS_SLUG}}" }
+  ]
+}

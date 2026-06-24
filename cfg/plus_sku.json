@@ -1,0 +1,24 @@
+{
+  "schema": "merit.plus_sku.v1",
+  "default": {
+    "name": "Plus",
+    "weekly_rate_usd": 2.49,
+    "monthly_billed_usd": 10.79,
+    "rounding": "round_up",
+    "covers": ["journal", "ama"],
+    "billing_options": [
+      { "id": "monthly", "label": "Monthly", "discount_percent": 0, "price_usd": 10.79 },
+      { "id": "six_month", "label": "6 months", "discount_percent": 20 },
+      { "id": "annual", "label": "Annual", "discount_percent": 50 }
+    ]
+  },
+  "revenue_split": {
+    "operator_share_percent": 90,
+    "platform_fee_percent": 10,
+    "processing_fee": { "percent": 4, "fixed_usd": 0.5, "note": "Deducted before operator/platform split" }
+  },
+  "operator_pricing": {
+    "flexible": true,
+    "description": "Operator-admin sets default and optional approved price points; subscribers choose from approved list."
+  }
+}

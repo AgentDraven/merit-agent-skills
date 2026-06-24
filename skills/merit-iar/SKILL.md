@@ -1,11 +1,17 @@
 ---
 name: merit-iar
-description: MERIT IAR Code of Honor, acceptance ID format, and cert integration handoffs.
+description: MERIT IAR acceptance IDs and cross-repo handoff rules.
 ---
 
 # merit-iar
 
-IDs: `{REQ}-{PRV}-{NN}` · validation `{REQ}-{PRV}-V{NN}` · blocked `{REQ}-BLK-{NN}`. Acronyms from vault `repo_acronyms`. Scope only in requester `{Name} docs/IAR/`. Escalate via AgentDraven.
+Acceptance IDs: `{ACRONYM}-{PROVIDER}-{NN}` (e.g. `STN-MSU-01`). Operational readiness requires requester-IAR ACCEPT.
+
+```powershell
+.\merit-live.ps1 verify --path <consumer-repo>
+```
+
+Vault operators:
 
 ```powershell
 .\scripts\merit.ps1 cert status <project-id>

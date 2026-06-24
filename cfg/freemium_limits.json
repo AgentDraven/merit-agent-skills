@@ -1,0 +1,18 @@
+{
+  "schema": "merit.freemium_limits.v1",
+  "guest_and_free": {
+    "journal_entries_per_day": 2,
+    "ama_questions_per_day": 2,
+    "ama_votes_per_day": 2,
+    "ama_responses_per_day": 2,
+    "ama_leaderboard_visible": 25
+  },
+  "plus_tier": {
+    "journal_entries_per_day": null,
+    "ama_questions_per_day": null,
+    "ama_votes_per_day": null,
+    "ama_responses_per_day": null,
+    "ama_leaderboard_visible": null
+  },
+  "notes": "null = uncapped. Enforce server-side via meritsubs entitlement keys."
+}

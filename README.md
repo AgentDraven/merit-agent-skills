@@ -1,8 +1,10 @@
 # merit-agent-skills
 
-Free **Cursor Agent Skills** for MERIT-shaped product repos. Operational recipes only — they teach your agent which shell commands to run; they do not include private vault policy, cert registry write access, or production secrets.
+Free **Cursor Agent Skills** and **`merit-live`** CLI for MERIT-shaped product repos. Operational recipes teach agents which commands to run; they do not include private vault policy, cert registry write access, or production secrets.
 
-**Authoritative product PRD** (private): `AgentDraven/merit-private-vault` → `docs/IAR/PRD_MERIT_AGENT_SKILLS_PLATFORM.md`
+**Start here (full stack):** [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo)
+
+**PRD** (private): `AgentDraven/merit-private-vault` → `docs/IAR/PRD_MERIT_AGENT_SKILLS_PLATFORM.md`
 
 ## Quick install
 
@@ -12,47 +14,50 @@ cd merit-agent-skills
 .\install.ps1 -Target Cursor
 ```
 
-Project-scoped install:
+## merit-live (public CLI)
 
 ```powershell
-.\install.ps1 -Target Project -Path C:\path\to\your-repo
+.\merit-live.ps1 par scaffold --path ..\merit-demo --variant workbench-journal
+.\merit-live.ps1 branding scaffold --path ..\merit-demo
+.\merit-live.ps1 subs scaffold --path ..\merit-demo
+.\merit-live.ps1 deploy vercel --path ..\merit-demo
+.\merit-live.ps1 portal publish --path ..\merit-demo --all
+.\merit-live.ps1 verify --path ..\merit-demo
 ```
 
-Then in Cursor: ask the agent to use a skill by name (e.g. `meritcert`, `merit-closeout`, `merit-deploy-vercel`).
+Linux/macOS: `./merit-live.sh` (requires `pwsh` or PowerShell).
 
-## What's included (free)
+## Skills
 
 | Skill | Purpose |
 |-------|---------|
-| `meritcert` | Certification vocabulary (`cert foundation`, `integration`, `status`, `validate`) |
-| `merit-closeout` | `mXin`, hygiene, 3-3 report |
-| `merit-iar` | IAR acceptance ID format and handoff rules |
-| `merit-deploy-vercel` | Scoped Vercel consumer deploy (Flask + static variants) |
-| `merit-operator-gate` | Vault operator gate hash workflow (operators only) |
-| `merit-onboard` | Persona, repo onboard, foundation cert |
-| `merit-portal` | here.now marketing portal publish |
+| `merit-live` / `merit-par-workbench` | PAR play shell (`merit_workbench@0.4.x`, `journal@0.2.x`) |
+| `merit-portal` | here.now marketing (`portal/` only); multi-surface |
+| `merit-subs` | meritsubs + meritstore funnel, freemium caps |
+| `merit-ama` | AMA Q&A + leaderboard (merit-demo) |
+| `merit-admin-gate` | MeritAdminGate phrase auth |
+| `merit-deploy-vercel` | Scoped Vercel deploy (your team scope) |
+| `merit-onboard` | OSS quickstart → merit-demo |
+| `meritcert`, `merit-closeout`, `merit-iar` | Vocabulary; vault operators run writes |
 
-Also: `templates/cfg/flask_deploy.json.template` for scoped Vercel deploy.
+All OSS skills use **`.\merit-live.ps1`** first; vault **`.\scripts\merit.ps1`** only in operator fallback blocks.
 
-## What's not included (paid / private)
+## Freemium vs Plus
 
-| Service | How you get it |
-|---------|----------------|
-| Full `merit.ps1` + cert registry | MERIT vault / invited operator access |
-| meritstore checkout | Production tenant on `meritstore.vercel.app` keyed by `consumer_id` |
-| meritsubs tiers | Embedded on **your** `{product}.vercel.app/api/meritsubs` |
-| PAR packages (`merit_workbench@1.0.x`) | meritsubs entitlement + pin on consumer host |
+| | Free | Plus ($10.79/mo) |
+|---|------|------------------|
+| Journal | 2 entries/day | Uncapped |
+| AMA | 2 ask/vote/response/day; top 25 | Uncapped |
+| PAR | OSS `@0.4.x` / `@0.2.x` | Commercial `@1.0.x` (when live) |
 
-Commerce identity is **`consumer_id`** (catalog project id), not your GitHub login.
-
-## Portability
-
-Skills are **authored for Cursor** (`~/.cursor/skills/`). The portable contract is documented PowerShell commands; other agent hosts can use the same text as runbook or system prompt.
+Plus billing: $2.49/wk equivalent, monthly **$10.79** (round up); 20% off 6-month; 50% off annual. ~90% to operator after **4% + $0.50** processing.
 
 ## Releases
 
-Pin to tags (e.g. `skills-v1.0.0`), not floating `main`, for production closeout.
+Pre-GA: **`skills-v0.x.y`** (minor bumps in this program). GA **`1.0.0`** when HumanBala approves. Pin to tags, not floating `main`.
+
+Current: **`skills-v0.2.0`** (merit-live + freemium configs + merit-demo path).
 
 ## Sync from vault
 
-This repo is exported from `merit-private-vault/templates/skills/` at release time. Do not fork certification logic into skills.
+Exported from `merit-private-vault/templates/skills/` at release time.

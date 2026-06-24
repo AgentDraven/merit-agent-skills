@@ -5,13 +5,19 @@ description: MERIT foundation certification, capability integration, graph statu
 
 # meritcert
 
-Invoke the HumanBala MERIT runtime; never fork certification logic.
+Vocabulary for certification commands. OSS users document status; vault operators run writes.
 
 ```powershell
-merit.ps1 cert foundation <project-id>
-merit.ps1 cert integration <provider> <consumer> --capability <id> --iar-ref "<path>" --pin <package@version>
-merit.ps1 cert status [project-id]
-merit.ps1 cert validate --json --diagram ascii
+.\merit-live.ps1 verify --path <consumer-repo>
+```
+
+Vault operators (cert registry writes):
+
+```powershell
+.\scripts\merit.ps1 cert foundation <project-id>
+.\scripts\merit.ps1 cert integration <provider> <consumer> --capability <id> --iar-ref "<path>" --pin <package@version>
+.\scripts\merit.ps1 cert status [project-id]
+.\scripts\merit.ps1 cert validate --json --diagram ascii
 ```
 
 All explicit technical approval goes through AgentDraven. Requester-IAR ACCEPT is required for operational readiness.

@@ -1,12 +1,18 @@
 ---
 name: merit-closeout
-description: MERIT git closeout, mXin, hygiene, and 3-3 report discipline.
+description: MERIT git closeout, mXin, hygiene, and 3-3 report.
 ---
 
 # merit-closeout
 
 ```powershell
+.\merit-live.ps1 verify --path .
+```
+
+Vault operators:
+
+```powershell
 .\scripts\merit.ps1 mXin -Message "feat: <summary>"
 ```
 
-Run smokes first. Stage no secrets. Report **Done · State · Next** (≤3 bullets each). Vault: `git in` then `runtime out`.
+Follow MERIT hygiene and 3-3 closeout before push.
