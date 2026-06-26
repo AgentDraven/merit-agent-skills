@@ -6,6 +6,9 @@ Free **Cursor Agent Skills** and **`merit-live`** CLI for MERIT-shaped product r
 
 | Goal | Path |
 |------|------|
+| **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** — 3 steps, no accounts night one |
+| **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
+| **LLD map (audit)** | [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md) |
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) — workbench, journal, AMA, subs, legal |
 | **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
 | **Skills only** | `.\install.ps1 -Target Cursor` below |
