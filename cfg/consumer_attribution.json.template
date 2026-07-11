@@ -2,11 +2,11 @@
   "schema": "merit.consumer_attribution.v1",
   "consumer_id": "YOUR_CONSUMER_ID",
   "affiliate_code": "YOUR_CONSUMER_ID",
-  "default_promocode": "FREEASINTRO",
+  "default_promocode": "MERITAGENT",
   "source": "merit-agent-skills",
   "notes": [
     "This file is non-secret and optional during local-only evaluation.",
     "Use a stable consumer_id before requesting meritstore tenant provisioning.",
-    "affiliate_code and default_promocode preserve attribution when a free user becomes a paid tenant."
+    "MERITAGENT is the default hosted intro promo. The hosted provider controls credit amount and enforcement."
   ]
 }

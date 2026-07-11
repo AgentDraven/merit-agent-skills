@@ -186,6 +186,10 @@ function Write-EnvLocal {
         '',
         "MERITSUBS_MOUNT_PREFIX=$mountPrefix",
         "MERITSUBS_PUBLIC_BASE_URL=$baseUrl",
+        "MERITSUBS_PROVIDER_BASE_URL=$(Get-Setting -Settings $Settings -Name 'meritsubs_provider_base_url' -Default 'https://meritstore.vercel.app/api/meritsubs')",
+        "MERITSTORE_BASE_URL=$(Get-Setting -Settings $Settings -Name 'meritstore_base_url' -Default 'https://meritstore.vercel.app')",
+        "MERIT_DEFAULT_PROMOCODE=$(Get-Setting -Settings $Settings -Name 'default_promocode' -Default 'MERITAGENT')",
+        "MERIT_INTRO_CREDIT_USD=$(Get-Setting -Settings $Settings -Name 'intro_credit_usd' -Default '25')",
         "MERITSUBS_JWT_SECRET=$jwt",
         "MERITSUBS_API_KEY=$api",
         "MERITSUBS_ADMIN_KEY=$admin"

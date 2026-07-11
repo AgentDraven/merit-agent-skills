@@ -5,13 +5,13 @@ description: meritsubs embed scaffold, meritstore registration funnel, freemium 
 
 # merit-subs
 
-meritsubs provides **subscriber_identity** on the consumer host (`/api/meritsubs`). Not a PAR package.
+meritsubs provides **subscriber_identity** and entitlement state through hosted MERIT services. Public consumers should expose only a thin `/api/meritsubs` relay and must not embed provider billing or usage-metering source code.
 
 ```powershell
 .\merit-live.ps1 subs scaffold --path <consumer-repo>
 ```
 
-Edit `cfg/merit-sync.json`: set `consumer_id` and `meritstore_register_url`.
+Edit `.merit_launch.md`: set `consumer_id`, hosted provider defaults, and secrets. `merit apply` generates the consumer config.
 
 Freemium caps: `cfg/freemium_limits.json` (journal 2/day; AMA 2 ask/vote/response/day; top 25 leaderboard).
 
@@ -28,14 +28,9 @@ Reference: **Mr-PI-Bala/merit-demo** + `meritstore.vercel.app/merit-demo/registe
 
 Vault templates: `merit-private-vault/templates/legal/MERIT_FREEMIUM_LEGAL.html`, `MERIT_SUBSCRIPTION_TERMS.html`.
 
-**Production meritsubs embed:**
+**Production boundary:**
 
-```powershell
-# From meritsubs repo
-.\scripts\embed-merit-demo.ps1
-# Or from consumer
-.\scripts\embed-meritsubs.ps1
-```
+Use hosted `meritstore.vercel.app` / MERIT provider endpoints for usage credits, promo validation, entitlements, and Square checkout. Default intro promo is `MERITAGENT`; hosted provider config owns the default $25 credit.
 
 See `api/meritsubs/README.md` on merit-demo.
 

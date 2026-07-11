@@ -71,7 +71,7 @@ Paid commerce         →  + meritstore tenant + payment    (platform onboarding
 | **PAR packages** `@0.4.x` / `@0.2.x` | `pkg-meritutils.vercel.app` | — |
 | **meritstore registration UI** | `meritstore.vercel.app/{consumer_id}/register` for **provisioned** tenants | Your `consumer_id` must be provisioned (not automatic on clone) |
 | **Checkout / Square** | Platform meritstore runs payment UI | Per-tenant payment provider + payout onboarding |
-| **meritsubs API** | Embedded on **your** consumer host (`/api/meritsubs`) | Your Vercel deploy + env |
+| **meritsubs / usage API** | Hosted MERIT authority for usage, credits, and entitlements | Your app calls the hosted provider; do not fork billing logic |
 | **Journal / AMA / subscriber DB** | **Not** a shared MERIT Supabase for your app | **Your** Supabase project (consumer-scoped data plane) |
 | **Marketing portal** | — | here.now + your `portal/` content |
 
@@ -105,7 +105,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.6 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.7 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -121,7 +121,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.6 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.7 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
@@ -161,12 +161,13 @@ Three roles — do not conflate them:
 1. **Guest** — OSS PAR loads from CDN; daily caps (`cfg/freemium_limits.json`).
 2. **Free register** — `meritstore.vercel.app/{consumer_id}/register` (platform-hosted UI for that tenant).
 3. **Cap hit** — UI prompts Plus upgrade.
-4. **Paid** — meritstore checkout → meritsubs tier upgrade on your consumer host → uncapped features (+ commercial PAR line in Phase 3).
+4. **Paid** — hosted meritstore checkout → hosted usage/entitlement update → uncapped features (+ commercial PAR line in Phase 3).
 
 ### Money and KYC
 
 - **Cloning OSS does not open a payout account.** Apache-2.0 skills are free; revenue is a **platform commerce** concern.
 - **Plus payments** are collected through **meritstore** (Square in production today). Platform fee and tenant payout rules are per `consumer_id` (see product PRD FR-COM-09/10 in vault).
+- **Intro usage** defaults to promo `MERITAGENT`; the hosted provider controls the credit amount, currently $25 by default.
 - **Your share** flows to the **tenant payment provider** configured for your meritstore tenant — after MERIT provisions the tenant (integration cert minimum) and you complete payment-provider onboarding (KYC as required by Square or successor).
 - Until that onboarding: subscribers may still pay on **existing provisioned demos** (e.g. `merit-demo`, `auravybe`); a **new** cloner does not automatically receive those funds.
 
