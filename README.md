@@ -1,4 +1,4 @@
-﻿# merit-agent-skills
+# merit-agent-skills
 
 Free **Cursor Agent Skills** and **`merit-live`** CLI for MERIT-shaped product repos.
 
@@ -81,7 +81,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current | **`skills-v0.3.2`** · merit-live **0.3.2** |
+| Current | **`skills-v0.3.3`** · merit-live **0.3.3** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit-live is pre-GA until dogfood smokes green.
 

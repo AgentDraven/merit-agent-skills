@@ -1,4 +1,4 @@
-﻿# HowToLaunch-Over-Dinner-Tutorial
+# HowToLaunch-Over-Dinner-Tutorial
 
 **Introductory tutorial for new Content Creators**  
 **Tagline:** Build your app over dinner; let MERIT publicize and promote you overnight.
@@ -24,7 +24,7 @@ This document is the **only** guide you need for night one. Technical permutatio
 |------|-------------|----------|
 | **1** | Download **merit-agent-skills** (this repo) and **merit-demo** (app shell) | None |
 | **2** | Personalize name, story, and Topics of Interest; preview on your laptop | None |
-| **3** | Register as Content Creator; submit one ToT pack; pick Journal or AMA for free overnight promotion | Free email signup |
+| **3** | Register as Content Creator; submit one ToI pack; pick Journal or AMA for free overnight promotion | Free email signup |
 
 ---
 
@@ -39,7 +39,7 @@ Tools, `merit-live` CLI, and optional Cursor agent skills.
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.2 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.3 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 ### 1B — merit-demo
@@ -92,7 +92,7 @@ If you use Cursor:
 
 > Update my main portal page for a journal about mindful parenting. Keep the MERIT layout.
 
-### 2C — Topics of Interest (ToT)
+### 2C — Topics of Interest (ToI)
 
 Create `merit-demo\MyTopics.txt` — one topic per line, 3–5 lines:
 
@@ -102,12 +102,12 @@ Evening reflection habits
 Community Q&A for new parents
 ```
 
-Each line can become **one ToT pack** in Step 3. Night one uses **one pack only**.
+Each line can become **one ToI pack** in Step 3. Night one uses **one pack only**.
 
 | Term | Meaning |
 |------|---------|
-| **ToT** | Topics of Interest — what you want to be known for |
-| **ToT pack** | One topic written up for MERIT discovery (who you help, tone, promise) |
+| **ToI** | Topics of Interest — what you want to be known for |
+| **ToI pack** | One topic written up for MERIT discovery (who you help, tone, promise) |
 
 ### 2D — Preview locally
 
@@ -128,13 +128,13 @@ npm run verify
 
 ## Step 3 — Register; MERIT promotes you overnight
 
-Join as **Content Creator (CC)** on the MERIT platform. Submit **one ToT pack** from your list. Choose **one free surface** (Journal or AMA). MERIT runs discovery while you sleep.
+Join as **Content Creator (CC)** on the MERIT platform. Submit **one ToI pack** from your list. Choose **one free surface** (Journal or AMA). MERIT runs discovery while you sleep.
 
 ### Overnight flow
 
 ```text
 Free CC registration
-  → you enter one ToT pack (one interest area)
+  → you enter one ToI pack (one interest area)
   → Chain of Content (CoC) runs overnight
   → DIRT matches your topic to readers
   → guests land on your Journal or AMA (merit-demo shell)
@@ -145,7 +145,7 @@ Free CC registration
 |------|---------|
 | **CC** | Content Creator — you |
 | **CoC** | Chain of Content — Topics → Areas → Content → Queue → publish |
-| **DIRT** | MERIT discovery engine — finds audience for your ToT |
+| **DIRT** | MERIT discovery engine — finds audience for your ToI |
 
 ### 3A — Free registration
 
@@ -161,11 +161,11 @@ Free CC registration
 
 `https://meritstore.vercel.app/YOUR_ID/register`
 
-### 3B — Submit one ToT pack
+### 3B — Submit one ToI pack
 
 1. Choose **one** line from `MyTopics.txt`.
 2. Complete the short prompts: what you teach, who you help, your voice.
-3. Submit as **one ToT pack** → one **interest area** on the platform.
+3. Submit as **one ToI pack** → one **interest area** on the platform.
 
 More packs can be added later. Night one: **one pack → one platform surface**.
 
@@ -197,7 +197,7 @@ Both are already in merit-demo. Most creators start with **Journal** or **AMA**.
 |-------|----------------|
 | **PAR CDN** | Free UI widgets (`merit_workbench`, `journal`) on `/play/` |
 | **meritstore** (platform) | Registration and checkout UI for provisioned creators |
-| **DIRT + CoC** | Overnight discovery and routing for your ToT |
+| **DIRT + CoC** | Overnight discovery and routing for your ToI |
 | **Free guest tier** | Visitors use Journal/AMA with daily freemium caps |
 
 ### You set up only when needed (lazy accounts)
@@ -262,8 +262,8 @@ After meritstore tenant provision and payment-provider onboarding for your consu
 | **merit-demo** | Your app shell |
 | **merit-live** | CLI in this repo (`merit-live.ps1`) |
 | **CC** | Content Creator |
-| **ToT** | Topics of Interest |
-| **ToT pack** | One topic lane for discovery |
+| **ToI** | Topics of Interest |
+| **ToI pack** | One topic lane for discovery |
 | **CoC** | Chain of Content — overnight publish pipeline |
 | **DIRT** | Discovery and content intelligence platform |
 | **consumer id** | Your MERIT creator key (e.g. `merit-demo`) |
@@ -286,7 +286,7 @@ Read only after the three steps.
 
 ## Checklist
 
-- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.2` and merit-demo
+- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.3` and merit-demo
 - [ ] Step 2 — Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
-- [ ] Step 3 — Registered as CC, one ToT pack, Journal or AMA selected
+- [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed
