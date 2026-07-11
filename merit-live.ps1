@@ -1,9 +1,9 @@
 # MERIT Live CLI — public freemium tooling (merit-agent-skills).
-# Version 0.3.3 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
+# Version 0.3.4 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
 
 param()
 
-$MERIT_LIVE_VERSION = '0.3.3'
+$MERIT_LIVE_VERSION = '0.3.4'
 $ErrorActionPreference = 'Stop'
 $DistRoot = $PSScriptRoot
 

@@ -39,7 +39,15 @@ Tools, `merit-live` CLI, and optional Cursor agent skills.
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.3 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
+```
+
+Linux/macOS:
+
+```bash
+mkdir -p ~/MyMeritApp
+cd ~/MyMeritApp
+git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 ### 1B — merit-demo
@@ -62,6 +70,13 @@ If you use [Cursor](https://cursor.com):
 ```powershell
 cd C:\MyMeritApp\merit-agent-skills
 .\install.ps1 -Target Cursor
+```
+
+Linux/macOS:
+
+```bash
+cd ~/MyMeritApp/merit-agent-skills
+./install.sh -Target Cursor
 ```
 
 Open the `merit-demo` folder in Cursor and ask it to help edit branding or portal text.
@@ -118,6 +133,14 @@ Optional (Node.js installed):
 
 ```powershell
 cd C:\MyMeritApp\merit-demo
+npm install
+npm run verify
+```
+
+Linux/macOS:
+
+```bash
+cd ~/MyMeritApp/merit-demo
 npm install
 npm run verify
 ```
@@ -286,7 +309,7 @@ Read only after the three steps.
 
 ## Checklist
 
-- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.3` and merit-demo
+- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.4` and merit-demo
 - [ ] Step 2 — Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
 - [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed

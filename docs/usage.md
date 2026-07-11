@@ -29,7 +29,7 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 | `git clone` public `merit-agent-skills` or `merit-demo` | **None** (anonymous HTTPS read) |
 | `merit-live par scaffold` + `verify` | **None** |
 | Open `play/index.html` locally (static PAR from CDN) | **None** |
-| `scripts/smoke-freemium.ps1` | **None** |
+| `scripts/smoke-freemium.ps1` / `scripts/smoke-freemium.sh` | **None** |
 | `merit-demo`: `npm install`, `npm run verify`, `npm run e2e` (PAR CDN HEAD) | **None** (network only) |
 
 **GitHub account is optional** for Tier-2. Use it only when you **fork**, **push** your own remote, open PRs, or use `gh` against private repos. Cloning and working locally does not require signing in.
@@ -104,13 +104,28 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.3 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
 .\merit-live.ps1 par scaffold --path ..\my-app --variant workbench-journal
 .\merit-live.ps1 branding scaffold --path ..\my-app
 .\merit-live.ps1 verify --path ..\my-app
+```
+
+Linux/macOS:
+
+```bash
+mkdir -p ~/MeritValidate
+cd ~/MeritValidate
+
+git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
+cd merit-agent-skills
+
+mkdir -p ../my-app
+./merit-live.sh par scaffold --path ../my-app --variant workbench-journal
+./merit-live.sh branding scaffold --path ../my-app
+./merit-live.sh verify --path ../my-app
 ```
 
 Optional canonical consumer (still no GitHub login):
@@ -175,9 +190,16 @@ See `cfg/meritstore_tenant.json` (`status: pending_platform_provision`) on merit
 .\merit-live.ps1 deploy vercel --path <dir>                              # BYOK Vercel scope
 ```
 
-Install skills to Cursor: `.\install.ps1 -Target Cursor`
+Linux/macOS equivalents use the shell wrapper:
 
-Smokes: `.\scripts\smoke-freemium.ps1`
+```bash
+./merit-live.sh par scaffold --path <dir> --variant workbench-journal
+./merit-live.sh verify --path <dir>
+```
+
+Install skills to Cursor: Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor`.
+
+Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-freemium.sh`.
 
 ---
 
@@ -199,4 +221,4 @@ No. You need a provisioned `consumer_id`, live consumer host with meritsubs embe
 [merit-demo OPERATOR_PROVISION.md](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md)
 
 **Operator validation?**
-MERIT vault operators run private validation separately. Public users should start with `.\scripts\smoke-freemium.ps1`.
+MERIT vault operators run private validation separately. Public users should start with `.\scripts\smoke-freemium.ps1` on Windows or `./scripts/smoke-freemium.sh` on Linux/macOS.

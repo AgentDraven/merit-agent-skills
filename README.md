@@ -11,16 +11,24 @@ Free **Cursor Agent Skills** and **`merit-live`** CLI for MERIT-shaped product r
 | **LLD map (audit)** | [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md) |
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) — workbench, journal, AMA, subs, legal |
 | **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
-| **Skills only** | `.\install.ps1 -Target Cursor` below |
+| **Skills only** | Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor` |
 
 **Live demos (Angle 3):** merit-demo deploy · portfolio refs AURAVYBE `/play/` · SomaTune `/play/` · register via `meritstore.vercel.app/{consumer}/register`
 
 ## Quick install
 
 ```powershell
-git clone https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
+```
+
+Linux/macOS:
+
+```bash
+git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
+cd merit-agent-skills
+./install.sh -Target Cursor
 ```
 
 ## merit-live (public CLI)
@@ -39,9 +47,18 @@ Optional BYOK publish/deploy:
 .\merit-live.ps1 portal publish --path ..\my-app --all
 ```
 
-Linux/macOS: `./merit-live.sh` (requires `pwsh` or PowerShell).
+Linux/macOS:
 
-Smokes: `.\scripts\smoke-freemium.ps1`
+```bash
+./merit-live.sh par scaffold --path ../my-app --variant workbench-journal
+./merit-live.sh branding scaffold --path ../my-app
+./merit-live.sh subs scaffold --path ../my-app
+./merit-live.sh verify --path ../my-app
+```
+
+Shell wrappers require `pwsh` or PowerShell.
+
+Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-freemium.sh`.
 
 ## Skills (10)
 
@@ -56,7 +73,7 @@ Smokes: `.\scripts\smoke-freemium.ps1`
 | `merit-onboard` | OSS quickstart → merit-demo |
 | `meritcert`, `merit-closeout`, `merit-iar` | Vocabulary; vault operators run writes |
 
-All OSS skills use **`.\merit-live.ps1`** first; vault **`.\scripts\merit.ps1`** only in operator fallback blocks.
+All OSS skills use **`.\merit-live.ps1`** / **`./merit-live.sh`** first; vault **`.\scripts\merit.ps1`** only in operator fallback blocks.
 
 ## Freemium vs Plus
 
@@ -81,7 +98,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current | **`skills-v0.3.3`** · merit-live **0.3.3** |
+| Current | **`skills-v0.3.4`** · merit-live **0.3.4** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit-live is pre-GA until dogfood smokes green.
 
