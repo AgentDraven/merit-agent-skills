@@ -1,4 +1,4 @@
-# Try bundles — merit-live freemium angles
+﻿# Try bundles — merit-live freemium angles
 
 Each bundle maps to a **merit-live** command sequence. **Accounts, tiers, payouts:** [usage.md](usage.md). Full stack: clone [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo).
 

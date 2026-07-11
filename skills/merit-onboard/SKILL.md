@@ -14,10 +14,16 @@ cd merit-agent-skills
 .\merit-live.ps1 par scaffold --path ..\merit-demo --variant workbench-journal
 .\merit-live.ps1 branding scaffold --path ..\merit-demo
 .\merit-live.ps1 subs scaffold --path ..\merit-demo
-.\merit-live.ps1 deploy vercel --path ..\merit-demo
+.\merit-live.ps1 verify --path ..\merit-demo
 ```
 
 Reference consumer: **Mr-PI-Bala/merit-demo**.
+
+Deploy is optional and BYOK:
+
+```powershell
+.\merit-live.ps1 deploy vercel --path ..\merit-demo
+```
 
 ## Vault operators
 

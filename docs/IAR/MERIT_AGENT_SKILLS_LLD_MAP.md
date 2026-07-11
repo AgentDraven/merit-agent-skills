@@ -1,14 +1,14 @@
-# merit-agent-skills — Low-Level Design Map (LLD_MAP)
+﻿# merit-agent-skills — Low-Level Design Map (LLD_MAP)
 
 **Document ID:** MAS-IAR-LLD-001  
 **Repo:** `AgentDraven/merit-agent-skills` (OSS public distribution)  
-**Platform PRD:** `merit-private-vault/docs/PRD_MERIT_AGENT_SKILLS_PLATFORM.md`  
+**Platform PRD:** vault-owned; public repo carries only OSS/export-facing guidance.
 **Usage:** [docs/usage.md](../usage.md) · [README.md](../../README.md)
 
 | Field | Value |
 |-------|-------|
 | **MERIT role** | **Enablement / scaffolding** — not a vault registry runtime provider |
-| **Exports from** | `merit-private-vault/templates/skills/` at release |
+| **Exports from** | MERIT vault release templates at release |
 | **Targets** | Any MERIT-shaped consumer repo + OSS adopters |
 
 ---
@@ -54,10 +54,10 @@ merit-agent-skills/
 |-------|---------------------|---------------------|
 | `merit-par-workbench` | PAR scaffold, pin `merit_workbench` | meritutils |
 | `merit-subs` | Subscriber embed scaffold | meritsubs |
-| `merit-onboard` | L1/L2/L3 instruction chain | vault |
-| `meritcert` | `merit.ps1 cert` interlock | vault |
-| `merit-closeout` | mXin/mXout hygiene | vault merit.ps1 |
-| `merit-iar` | IAR authoring pattern | vault templates |
+| `merit-onboard` | OSS quickstart; operator vocabulary in fallback | MERIT vault, optional |
+| `meritcert` | Certification vocabulary; OSS users document status | MERIT vault, optional |
+| `merit-closeout` | Public verify + 3-3 closeout vocabulary | MERIT vault, optional |
+| `merit-iar` | IAR authoring pattern | MERIT vault, optional |
 | `merit-deploy-vercel` | Consumer deploy | Vercel |
 | `merit-portal` | here.now portal publish | here.now |
 | `merit-admin-gate` | Admin verification flows | consumer-specific |
@@ -72,7 +72,7 @@ merit-agent-skills/
 flowchart TB
   SKILLS["merit-agent-skills OSS"]
   LIVE["merit-live.ps1 CLI"]
-  VAULT["merit-private-vault templates"]
+  VAULT["MERIT vault release templates"]
   AGENT["Cursor / Codex agent"]
   CONS["consumer repo dirt|somatune|…"]
 
@@ -132,9 +132,9 @@ install.ps1:
 
 | Peer | LLD_MAP |
 |------|---------|
-| vault | [VAULT_LLD_MAP](../../../merit-private-vault/docs/IAR/VAULT_LLD_MAP.md) |
-| DIRT | [DIRT_LLD_MAP](../../../dirt/DIRT%20docs/IAR/DIRT_LLD_MAP.md) |
-| meritutils | [MERITUTILS_LLD_MAP](../../../meritutils/Meritutils%20docs/IAR/MERITUTILS_LLD_MAP.md) |
+| vault | Operator-only private SSOT; not required for OSS users |
+| DIRT | [AgentDraven/dirt](https://github.com/AgentDraven/dirt) |
+| meritutils | [pkg-meritutils PAR CDN](https://pkg-meritutils.vercel.app) |
 
 ---
 
@@ -144,3 +144,4 @@ install.ps1:
 | Version | Date | Change |
 |---------|------|--------|
 | 1.0.0 | 2026-06-16 | Initial MERIT_AGENT_SKILLS_LLD_MAP |
+| 1.0.1 | 2026-07-11 | Public-safe peer links and attribution template |

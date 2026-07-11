@@ -1,4 +1,4 @@
-# merit-agent-skills
+﻿# merit-agent-skills
 
 Free **Cursor Agent Skills** and **`merit-live`** CLI for MERIT-shaped product repos.
 
@@ -29,9 +29,14 @@ cd merit-agent-skills
 .\merit-live.ps1 par scaffold --path ..\my-app --variant workbench-journal
 .\merit-live.ps1 branding scaffold --path ..\my-app
 .\merit-live.ps1 subs scaffold --path ..\my-app
+.\merit-live.ps1 verify --path ..\my-app
+```
+
+Optional BYOK publish/deploy:
+
+```powershell
 .\merit-live.ps1 deploy vercel --path ..\my-app
 .\merit-live.ps1 portal publish --path ..\my-app --all
-.\merit-live.ps1 verify --path ..\my-app
 ```
 
 Linux/macOS: `./merit-live.sh` (requires `pwsh` or PowerShell).
@@ -76,7 +81,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current | **`skills-v0.3.1`** · merit-live **0.3.1** |
+| Current | **`skills-v0.3.2`** · merit-live **0.3.2** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit-live is pre-GA until dogfood smokes green.
 

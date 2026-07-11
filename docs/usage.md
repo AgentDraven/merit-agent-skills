@@ -1,7 +1,7 @@
-# merit-agent-skills — usage
+﻿# merit-agent-skills — usage
 
-Operator-facing guide for the **public OSS** path: `merit-live.ps1`, skills, and freemium try bundles.  
-Vault operators use **merit-private-vault** `docs/vault_usage.md` for export tiers and HumanBala runtime.
+Public guide for the **OSS** path: `merit-live.ps1`, skills, and freemium try bundles.
+Operator-only vault workflows are optional and not required for a first-time public user.
 
 **Related:** [TRY_BUNDLES.md](TRY_BUNDLES.md) · [README](../README.md) · [LICENSING.md](../LICENSING.md) · canonical consumer [merit-demo usage](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md)
 
@@ -14,6 +14,7 @@ Vault operators use **merit-private-vault** `docs/vault_usage.md` for export tie
 | [Platform vs BYOK](#platform-vs-byok-what-merit-hosts-for-you) | PAR CDN, meritstore, meritsubs, data plane |
 | [Validation tiers](#validation-tiers) | Tier 1–4 on a clean machine |
 | [Commerce and payouts](#commerce-and-payouts-guest--creator--subscriber) | Who pays whom, KYC, Square |
+| [Attribution](#attribution-for-later-paid-conversion) | Optional consumer id, affiliate, promo |
 | [merit-live commands](#merit-live-commands) | CLI reference |
 | [FAQ](#faq) | Common misconceptions |
 
@@ -103,7 +104,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.1 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.2 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -123,7 +124,7 @@ npm run verify
 npm run e2e
 ```
 
-Avoid on Tier 2: HumanBala runtime, vault `merit.ps1 env out`, operator Vercel scopes you do not own.
+Avoid on Tier 2: private operator runtimes, vault `merit.ps1 env out`, or Vercel scopes you do not own.
 
 ---
 
@@ -197,5 +198,5 @@ No. You need a provisioned `consumer_id`, live consumer host with meritsubs embe
 **Where is the full deploy checklist?**  
 [merit-demo OPERATOR_PROVISION.md](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md)
 
-**Vault operator validation?**  
-[merit-private-vault docs/vault_usage.md](https://github.com/AgentDraven/merit-private-vault/blob/main/docs/vault_usage.md) § merit-agent-skills validation.
+**Operator validation?**
+MERIT vault operators run private validation separately. Public users should start with `.\scripts\smoke-freemium.ps1`.
