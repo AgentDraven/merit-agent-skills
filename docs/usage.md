@@ -1,6 +1,6 @@
 # merit-agent-skills — usage
 
-Public guide for the **OSS** path: `merit-live.ps1`, skills, and freemium try bundles.
+Public guide for the **OSS** path: `merit.ps1`, skills, and freemium try bundles.
 Operator-only vault workflows are optional and not required for a first-time public user.
 
 **Related:** [TRY_BUNDLES.md](TRY_BUNDLES.md) · [README](../README.md) · [LICENSING.md](../LICENSING.md) · canonical consumer [merit-demo usage](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md)
@@ -15,8 +15,8 @@ Operator-only vault workflows are optional and not required for a first-time pub
 | [Validation tiers](#validation-tiers) | Tier 1–4 on a clean machine |
 | [Commerce and payouts](#commerce-and-payouts-guest--creator--subscriber) | Who pays whom, KYC, Square |
 | [Attribution](#attribution-for-later-paid-conversion) | Optional consumer id, affiliate, promo |
-| [merit-live commands](#merit-live-commands) | CLI reference |
-| [Deploy profile](deploy.md) | One `MERIT_DEPLOY.md` PoV for Vercel and here.now |
+| [merit commands](#merit-commands) | CLI reference |
+| [Launch profile](deploy.md) | One local `.merit_launch.md` PoV for Vercel, here.now, and secrets |
 | [FAQ](#faq) | Common misconceptions |
 
 ---
@@ -28,7 +28,7 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 | Action | Accounts needed |
 |--------|-----------------|
 | `git clone` public `merit-agent-skills` or `merit-demo` | **None** (anonymous HTTPS read) |
-| `merit-live par scaffold` + `verify` | **None** |
+| `merit apply` + `verify` | **None** |
 | Open `play/index.html` locally (static PAR from CDN) | **None** |
 | `scripts/smoke-freemium.ps1` / `scripts/smoke-freemium.sh` | **None** |
 | `merit-demo`: `npm install`, `npm run verify`, `npm run e2e` (PAR CDN HEAD) | **None** (network only) |
@@ -53,7 +53,7 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 You do **not** need all three of here.now, Vercel, and Supabase to **start** Tier-2. They unlock different surfaces:
 
 ```text
-Tier 2 local only     →  git clone + merit-live + verify  (0 cloud accounts)
+Tier 2 local only     →  git clone + merit + verify       (0 cloud accounts)
 Angle 1 play          →  PAR CDN only                     (0 cloud accounts)
 Angle 2 marketing     →  + here.now                       (1 account)
 Live consumer app     →  + Vercel                         (1 account)
@@ -67,7 +67,7 @@ Paid commerce         →  + meritstore tenant + payment    (platform onboarding
 
 | Layer | Hosted by MERIT (freemium) | You bring (BYOK) |
 |-------|---------------------------|------------------|
-| **Skill templates + merit-live** | Public GitHub OSS | — |
+| **Skill templates + merit CLI** | Public GitHub OSS | — |
 | **PAR packages** `@0.4.x` / `@0.2.x` | `pkg-meritutils.vercel.app` | — |
 | **meritstore registration UI** | `meritstore.vercel.app/{consumer_id}/register` for **provisioned** tenants | Your `consumer_id` must be provisioned (not automatic on clone) |
 | **Checkout / Square** | Platform meritstore runs payment UI | Per-tenant payment provider + payout onboarding |
@@ -105,13 +105,14 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.5 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.6 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
-.\merit-live.ps1 par scaffold --path ..\my-app --variant workbench-journal
-.\merit-live.ps1 branding scaffold --path ..\my-app
-.\merit-live.ps1 verify --path ..\my-app
+.\merit.ps1 init --path ..\my-app
+# edit ..\my-app\.merit_launch.md
+.\merit.ps1 apply --path ..\my-app
+.\merit.ps1 verify --path ..\my-app
 ```
 
 Linux/macOS:
@@ -120,13 +121,14 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.5 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.6 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
-./merit-live.sh par scaffold --path ../my-app --variant workbench-journal
-./merit-live.sh branding scaffold --path ../my-app
-./merit-live.sh verify --path ../my-app
+./merit.sh init --path ../my-app
+# edit ../my-app/.merit_launch.md
+./merit.sh apply --path ../my-app
+./merit.sh verify --path ../my-app
 ```
 
 Optional canonical consumer (still no GitHub login):
@@ -178,35 +180,24 @@ See `cfg/meritstore_tenant.json` (`status: pending_platform_provision`) on merit
 
 ---
 
-## merit-live commands
+## merit commands
 
 ```powershell
-.\merit-live.ps1 par scaffold --path <dir> [--variant workbench|workbench-journal]
-.\merit-live.ps1 branding scaffold --path <dir>
-.\merit-live.ps1 subs scaffold --path <dir>
-.\merit-live.ps1 app scaffold --path <dir>
-.\merit-live.ps1 admin gate demo-init --path <dir>
-.\merit-live.ps1 verify --path <dir>
-.\merit-live.ps1 portal publish --path <dir> [--all | --surface <id>]   # BYOK here.now
-.\merit-live.ps1 deploy vercel --path <dir>                              # BYOK Vercel scope
-```
-
-Preferred deploy wrapper:
-
-```powershell
-.\merit-deploy.ps1 sync --path <dir>
-.\merit-deploy.ps1 vercel --path <dir>
-.\merit-deploy.ps1 portal --path <dir> --all
-.\merit-deploy.ps1 all --path <dir> --all
+.\merit.ps1 init --path <dir>
+.\merit.ps1 apply --path <dir>
+.\merit.ps1 verify --path <dir>
+.\merit.ps1 deploy --path <dir>
+.\merit.ps1 portal --path <dir>
+.\merit.ps1 all --path <dir>
 ```
 
 Linux/macOS equivalents use the shell wrapper:
 
 ```bash
-./merit-live.sh par scaffold --path <dir> --variant workbench-journal
-./merit-live.sh verify --path <dir>
-./merit-deploy.sh sync --path <dir>
-./merit-deploy.sh vercel --path <dir>
+./merit.sh init --path <dir>
+./merit.sh apply --path <dir>
+./merit.sh verify --path <dir>
+./merit.sh deploy --path <dir>
 ```
 
 Install skills to Cursor: Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor`.

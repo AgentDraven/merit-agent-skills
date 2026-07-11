@@ -1,3 +1,6 @@
 .DS_Store
 Thumbs.db
 *.swp
+/.merit_launch.md
+/.env.local
+/.vercel

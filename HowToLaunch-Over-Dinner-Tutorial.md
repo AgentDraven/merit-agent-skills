@@ -34,12 +34,12 @@ Use any folder (example: `C:\MyMeritApp`). You are **not** connecting this lapto
 
 ### 1A — merit-agent-skills
 
-Tools, `merit-live` CLI, and optional Cursor agent skills.
+Tools, `merit` CLI, and optional Cursor agent skills.
 
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.5 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.6 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 Linux/macOS:
@@ -47,7 +47,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.3.5 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.6 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 ### 1B — merit-demo
@@ -264,7 +264,7 @@ Cloning OSS does **not** open a bank account. Revenue from existing demos (e.g. 
 ## FAQ
 
 **Can I skip merit-agent-skills and only use merit-demo?**  
-Yes for preview. Keep merit-agent-skills for `merit-live` helpers and Cursor skills when you personalize or deploy.
+Yes for preview. Keep merit-agent-skills for the `merit` helper and Cursor skills when you personalize or deploy.
 
 **Do I need all of here.now, Vercel, and Supabase?**  
 No. Each unlocks a different surface. Steps 1–3 need none of them.
@@ -283,7 +283,7 @@ After meritstore tenant provision and payment-provider onboarding for your consu
 |------|----------------|
 | **merit-agent-skills** | Free public toolkit and skills (this repo) |
 | **merit-demo** | Your app shell |
-| **merit-live** | CLI in this repo (`merit-live.ps1`) |
+| **merit** | CLI in this repo (`merit.ps1`) |
 | **CC** | Content Creator |
 | **ToI** | Topics of Interest |
 | **ToI pack** | One topic lane for discovery |
@@ -309,7 +309,7 @@ Read only after the three steps.
 
 ## Checklist
 
-- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.5` and merit-demo
+- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.6` and merit-demo
 - [ ] Step 2 — Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
 - [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed

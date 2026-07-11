@@ -1,20 +1,20 @@
 # MERIT deploy PoV
 
-MERIT uses one human-edited deploy profile plus provider-owned machine files.
+MERIT uses one local launch file plus provider-owned machine files.
 
 ## Point of view
 
-`MERIT_DEPLOY.md` is the only file a public creator should edit for deploy shape: Vercel scope, project id, production branch, and here.now portal slugs.
+`.merit_launch.md` is the only file a public creator should edit for launch and deploy setup. It is local-only, gitignored, and may contain secrets.
 
 Provider CLIs still own a few generated files:
 
 | File | Owner | Why it exists |
 |------|-------|---------------|
-| `MERIT_DEPLOY.md` | MERIT / human editor | One readable deploy profile and checklist |
-| `cfg/flask_deploy.json` | Generated from `MERIT_DEPLOY.md` | `merit-live deploy vercel` needs machine-readable Vercel scope |
-| `cfg/portals.json` | Generated from `MERIT_DEPLOY.md` | `merit-live portal publish` needs machine-readable portal surfaces |
+| `.merit_launch.md` | Human editor | One local protected launch file |
+| `.env.local` | Generated from `.merit_launch.md` | Runtime secrets for local/dev use; do not commit |
+| `cfg/flask_deploy.json` | Generated from `.merit_launch.md` | Vercel scope for machine deploy |
+| `cfg/portals.json` | Generated from `.merit_launch.md` | here.now portal surfaces |
 | `.vercel/project.json` | Vercel CLI | Created by `npx vercel link`; do not commit |
-| `.env.local` | Human / provider dashboard | Secrets and runtime keys; do not commit |
 
 We do not try to replace `.vercel/project.json`; Vercel requires it to remember the linked project/org. The MERIT CLI makes this less annoying by syncing the MERIT profile first and then running the scoped deploy.
 
@@ -23,26 +23,28 @@ We do not try to replace `.vercel/project.json`; Vercel requires it to remember 
 Windows:
 
 ```powershell
-.\merit-deploy.ps1 sync --path ..\merit-demo
-.\merit-deploy.ps1 vercel --path ..\merit-demo
-.\merit-deploy.ps1 portal --path ..\merit-demo --all
-.\merit-deploy.ps1 all --path ..\merit-demo --all
+.\merit.ps1 init --path ..\merit-demo
+# edit ..\merit-demo\.merit_launch.md
+.\merit.ps1 apply --path ..\merit-demo
+.\merit.ps1 deploy --path ..\merit-demo
+.\merit.ps1 portal --path ..\merit-demo
 ```
 
 Linux/macOS:
 
 ```bash
-./merit-deploy.sh sync --path ../merit-demo
-./merit-deploy.sh vercel --path ../merit-demo
-./merit-deploy.sh portal --path ../merit-demo --all
-./merit-deploy.sh all --path ../merit-demo --all
+./merit.sh init --path ../merit-demo
+# edit ../merit-demo/.merit_launch.md
+./merit.sh apply --path ../merit-demo
+./merit.sh deploy --path ../merit-demo
+./merit.sh portal --path ../merit-demo
 ```
 
 ## One-time setup
 
-1. Copy `templates/MERIT_DEPLOY.md` into the consumer repo as `MERIT_DEPLOY.md`.
-2. Edit the two JSON blocks in `MERIT_DEPLOY.md`.
-3. Run `merit-deploy sync`.
+1. Run `merit init --path <repo>`.
+2. Edit the mandatory section at the top of `.merit_launch.md`.
+3. Run `merit apply --path <repo>`.
 4. Link Vercel once:
 
 ```powershell
@@ -53,25 +55,25 @@ npx vercel link --scope <your-vercel-scope>
 6. Deploy:
 
 ```powershell
-.\merit-deploy.ps1 vercel --path <repo>
-.\merit-deploy.ps1 portal --path <repo> --all
+.\merit.ps1 deploy --path <repo>
+.\merit.ps1 portal --path <repo>
 ```
 
 ## Credentials
 
-No secrets belong in `MERIT_DEPLOY.md`.
+Secrets are allowed only in local `.merit_launch.md` and generated `.env.local`. Both are gitignored.
 
 | System | Required for production | Where it belongs |
 |--------|--------------------------|------------------|
-| Vercel | Authenticated CLI session, linked project, `vercel_scope` | CLI session + `MERIT_DEPLOY.md`; `.vercel/project.json` generated locally |
-| here.now | `HERENOW_API_KEY` or `~/.herenow/credentials` | Environment or local credentials file |
-| Supabase | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | `.env.local` and Vercel env |
-| meritsubs | `MERITSUBS_PUBLIC_BASE_URL`, `MERITSUBS_JWT_SECRET`, `MERITSUBS_API_KEY`, `MERITSUBS_ADMIN_KEY` | `.env.local` and Vercel env |
-| MeritAdminGate | `OPERATOR_GATE_HASH_SLOT_1` | `.env.local` and Vercel env |
+| Vercel | Authenticated CLI session, linked project, `vercel_scope` | CLI session + `.merit_launch.md`; `.vercel/project.json` generated locally |
+| here.now | `HERENOW_API_KEY` or `~/.herenow/credentials` | `.merit_launch.md` or local credentials file |
+| Supabase | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | `.merit_launch.md` |
+| meritsubs | Optional secrets; generated when blank | `.merit_launch.md` / generated `.env.local` |
+| MeritAdminGate | `OPERATOR_GATE_HASH_SLOT_1` | Advanced field in `.merit_launch.md` |
 
 ## Closeout boundary
 
 `merit-closeout` does not deploy. Deploy commands are:
 
-- Public/free users: `merit-deploy.ps1` / `merit-deploy.sh`, which delegate to `merit-live`.
+- Public/free users: `merit.ps1` / `merit.sh`.
 - Vault operators: `scripts/merit.ps1 deploy vercel` and `scripts/merit.ps1 portal publish`.
