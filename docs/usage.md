@@ -16,6 +16,7 @@ Operator-only vault workflows are optional and not required for a first-time pub
 | [Commerce and payouts](#commerce-and-payouts-guest--creator--subscriber) | Who pays whom, KYC, Square |
 | [Attribution](#attribution-for-later-paid-conversion) | Optional consumer id, affiliate, promo |
 | [merit-live commands](#merit-live-commands) | CLI reference |
+| [Deploy profile](deploy.md) | One `MERIT_DEPLOY.md` PoV for Vercel and here.now |
 | [FAQ](#faq) | Common misconceptions |
 
 ---
@@ -104,7 +105,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.5 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -119,7 +120,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.5 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
@@ -190,11 +191,22 @@ See `cfg/meritstore_tenant.json` (`status: pending_platform_provision`) on merit
 .\merit-live.ps1 deploy vercel --path <dir>                              # BYOK Vercel scope
 ```
 
+Preferred deploy wrapper:
+
+```powershell
+.\merit-deploy.ps1 sync --path <dir>
+.\merit-deploy.ps1 vercel --path <dir>
+.\merit-deploy.ps1 portal --path <dir> --all
+.\merit-deploy.ps1 all --path <dir> --all
+```
+
 Linux/macOS equivalents use the shell wrapper:
 
 ```bash
 ./merit-live.sh par scaffold --path <dir> --variant workbench-journal
 ./merit-live.sh verify --path <dir>
+./merit-deploy.sh sync --path <dir>
+./merit-deploy.sh vercel --path <dir>
 ```
 
 Install skills to Cursor: Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor`.

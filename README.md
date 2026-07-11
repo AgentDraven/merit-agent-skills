@@ -8,6 +8,7 @@ Free **Cursor Agent Skills** and **`merit-live`** CLI for MERIT-shaped product r
 |------|------|
 | **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** — 3 steps, no accounts night one |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
+| **Deploy PoV** | [docs/deploy.md](docs/deploy.md) — one `MERIT_DEPLOY.md` profile, Vercel, here.now |
 | **LLD map (audit)** | [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md) |
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) — workbench, journal, AMA, subs, legal |
 | **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
@@ -18,7 +19,7 @@ Free **Cursor Agent Skills** and **`merit-live`** CLI for MERIT-shaped product r
 ## Quick install
 
 ```powershell
-git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.5 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 ```
@@ -26,7 +27,7 @@ cd merit-agent-skills
 Linux/macOS:
 
 ```bash
-git clone --branch skills-v0.3.4 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.5 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
@@ -43,8 +44,9 @@ cd merit-agent-skills
 Optional BYOK publish/deploy:
 
 ```powershell
-.\merit-live.ps1 deploy vercel --path ..\my-app
-.\merit-live.ps1 portal publish --path ..\my-app --all
+.\merit-deploy.ps1 sync --path ..\my-app
+.\merit-deploy.ps1 vercel --path ..\my-app
+.\merit-deploy.ps1 portal --path ..\my-app --all
 ```
 
 Linux/macOS:
@@ -57,6 +59,14 @@ Linux/macOS:
 ```
 
 Shell wrappers require `pwsh` or PowerShell.
+
+Deploy wrappers:
+
+```bash
+./merit-deploy.sh sync --path ../my-app
+./merit-deploy.sh vercel --path ../my-app
+./merit-deploy.sh portal --path ../my-app --all
+```
 
 Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-freemium.sh`.
 
@@ -98,7 +108,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current | **`skills-v0.3.4`** · merit-live **0.3.4** |
+| Current | **`skills-v0.3.5`** · merit-live **0.3.5** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit-live is pre-GA until dogfood smokes green.
 
