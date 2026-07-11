@@ -8,7 +8,7 @@ Each bundle maps to a **merit-live** command sequence. **Accounts, tiers, payout
 | **try-workbench-journal** | `par scaffold --variant workbench-journal` | 1 | `/play/` + `journal@0.2.x` |
 | **try-portal** | `branding scaffold` + edit `portal/` + `portal publish --surface main` | 2 | `{slug}.here.now` marketing |
 | **try-multi-portal** | `subs scaffold` + `portal publish --all` | 2 | Hub + journal/ama/subs slugs (`cfg/portals.json`) |
-| **try-subs** | `subs scaffold` + meritsubs embed on consumer | 3 → paid | `/api/meritsubs` + meritstore register CTA |
+| **try-subs** | `subs scaffold` + production meritsubs mount reference | 3 → paid | hosted meritsubs + meritstore register CTA |
 | **try-admin-gate** | `admin gate demo-init` | 2 / 4 | `/admin/` MeritAdminGate demo |
 | **try-full-shell** | Clone merit-demo + `verify` | 1–4 | All surfaces |
 | **try-live-demo** | Visit deployed merit-demo | 3 | Guest → register → Plus |

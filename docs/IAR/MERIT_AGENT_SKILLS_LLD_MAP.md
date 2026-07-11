@@ -53,7 +53,7 @@ merit-agent-skills/
 | Skill | Invokes / documents | Provider dependency |
 |-------|---------------------|---------------------|
 | `merit-par-workbench` | PAR scaffold, pin `merit_workbench` | meritutils |
-| `merit-subs` | Subscriber embed scaffold | meritsubs |
+| `merit-subs` | Subscriber production mount scaffold | meritsubs |
 | `merit-onboard` | OSS quickstart; operator vocabulary in fallback | MERIT vault, optional |
 | `meritcert` | Certification vocabulary; OSS users document status | MERIT vault, optional |
 | `merit-closeout` | Public verify + 3-3 closeout vocabulary | MERIT vault, optional |

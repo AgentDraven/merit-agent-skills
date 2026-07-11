@@ -1,9 +1,9 @@
 # MERIT Live CLI — public freemium tooling (merit-agent-skills).
-# Version 0.3.7 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
+# Version 0.3.8 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
 
 param()
 
-$MERIT_LIVE_VERSION = '0.3.7'
+$MERIT_LIVE_VERSION = '0.3.8'
 $ErrorActionPreference = 'Stop'
 $DistRoot = $PSScriptRoot
 
@@ -187,7 +187,8 @@ function Invoke-SubsScaffold {
     $sync = @{
         schema          = 'merit.merit_sync.v1'
         consumer_id     = 'YOUR_CONSUMER_ID'
-        meritsubs_base  = '/api/meritsubs'
+        metered_api_base = 'https://soulos.vercel.app'
+        meritsubs_base  = 'https://somatune.vercel.app/api/meritsubs'
         meritstore_register_url = 'https://meritstore.vercel.app/YOUR_CONSUMER_ID/register'
         freemium_limits = 'cfg/freemium_limits.json'
         plus_sku        = 'cfg/plus_sku.json'

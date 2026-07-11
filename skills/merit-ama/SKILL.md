@@ -5,7 +5,7 @@ description: MERIT AMA Q&A leaderboard on journal primitives; privacy modes and 
 
 # merit-ama
 
-AMA lives on the consumer host at `/ama/` (see **merit-demo**). Uses journal list patterns + merit-demo API for votes and leaderboard.
+AMA UI lives on the consumer host at `/ama/` (see **merit-demo**). Metered ask/vote/leaderboard calls must go to production MERIT provider mounts, not local public-repo API stubs.
 
 Privacy modes:
 - Anonymous local-only (no leaderboard)

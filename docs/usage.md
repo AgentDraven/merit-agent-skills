@@ -84,7 +84,7 @@ Paid commerce         →  + meritstore tenant + payment    (platform onboarding
 - **Supabase** stores **your** consumer’s journal entries, AMA activity, and meritsubs subscriber rows when you deploy. merit-demo’s SQL migrations run on **your** project.
 - **Square** runs on **meritstore** for subscriber checkout. Revenue attribution to **you** requires a provisioned meritstore tenant and linked payment provider — not merely cloning OSS.
 
-For **local-only** try bundles, journal/AMA may use stubs, caps, or limited behavior without Supabase. See merit-demo `npm run verify` vs full deploy in [OPERATOR_PROVISION](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md).
+For **local-only** try bundles, journal/AMA may render static UI, but metered utility calls use production MERIT provider mounts. Public clones must not ship local usage-metering stubs.
 
 ---
 
@@ -105,7 +105,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.7 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.8 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -121,7 +121,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.7 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.8 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
@@ -219,7 +219,7 @@ No. They are independent unlocks: local PAR (none), marketing (here.now), live a
 PAR CDN and meritstore **registration/checkout UI** are platform-hosted for provisioned tenants. **Your app database** is your Supabase. **Your payouts** require tenant provision and payment-provider onboarding — not included in a vanilla clone.
 
 **Can I collect Plus revenue right after clone?**  
-No. You need a provisioned `consumer_id`, live consumer host with meritsubs embed, and meritstore tenant payment config. Until then, use live demos (e.g. merit-demo) to see the subscriber path.
+No. You need a provisioned `consumer_id`, production MERIT metered-provider mounts, and meritstore tenant payment config. Until then, use live demos (e.g. merit-demo) to see the subscriber path.
 
 **Where is the full deploy checklist?**  
 [merit-demo OPERATOR_PROVISION.md](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md)
