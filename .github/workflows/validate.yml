@@ -1,0 +1,17 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  merit-agent-skills:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate MERIT public skills
+        shell: pwsh
+        run: ./merit.ps1 closeout --path .
+      - name: Freemium smoke
+        shell: bash
+        run: ./scripts/smoke-freemium.sh
