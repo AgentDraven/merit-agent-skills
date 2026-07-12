@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.12'
+$MERIT_VERSION = '0.3.13'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -22,6 +22,7 @@ Commands:
   deploy --path <repo>     Apply launch file, link Vercel if needed, deploy production
   portal --path <repo>     Apply launch file, then publish here.now portal targets
   all --path <repo>        Apply, deploy Vercel, then publish portal targets
+  closeout --path <repo>   Verify, run git whitespace check, and print git baseline
   par scaffold             Advanced: create play shell + cfg/par_pins.json
   branding scaffold        Advanced: create cfg/branding.json
   subs scaffold            Advanced: create meritsubs/meritstore cfg
@@ -223,6 +224,20 @@ function Invoke-Apply {
 function Invoke-Verify {
     param([string]$TargetRoot)
     $fail = @()
+    $isSkillsRepo = (Test-Path (Join-Path $TargetRoot 'skills')) -and
+        (Test-Path (Join-Path $TargetRoot 'templates')) -and
+        (Test-Path (Join-Path $TargetRoot 'merit.ps1'))
+    if ($isSkillsRepo) {
+        foreach ($rel in @('docs/usage.md', 'docs/deploy.md', 'docs/design.md', 'templates/.merit_launch.md', 'cfg/par_pins.free.json', 'scripts/smoke-freemium.ps1', 'scripts/smoke-freemium.sh', 'merit.sh')) {
+            if (-not (Test-Path (Join-Path $TargetRoot $rel))) { $fail += "missing $rel" }
+        }
+        if ($fail.Count) {
+            Write-Host "verify FAILED:`n$($fail -join "`n")"
+            exit 1
+        }
+        Write-Host "verify OK: merit-agent-skills repo"
+        return
+    }
     foreach ($rel in @('cfg/par_pins.json', 'cfg/branding.json')) {
         if (-not (Test-Path (Join-Path $TargetRoot $rel))) { $fail += "missing $rel" }
     }
@@ -383,6 +398,24 @@ function Invoke-PortalPublish {
     }
 }
 
+function Invoke-Closeout {
+    param([string]$TargetRoot)
+    Invoke-Verify -TargetRoot $TargetRoot
+    Push-Location $TargetRoot
+    try {
+        if (Get-Command git -ErrorAction SilentlyContinue) {
+            git diff --check
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            git status --short
+            git rev-parse --short HEAD
+        } else {
+            Write-Host 'closeout WARN: git not available on PATH'
+        }
+    } finally {
+        Pop-Location
+    }
+}
+
 $target = Resolve-TargetRoot -ArgList $Rest
 
 switch -Regex ($Command) {
@@ -395,6 +428,7 @@ switch -Regex ($Command) {
     '^vercel$' { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 }
     '^portal$' { Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 }
     '^all$' { Invoke-Deploy -TargetRoot $target -ArgList $Rest; Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 }
+    '^closeout$' { Invoke-Closeout -TargetRoot $target; exit 0 }
     '^par$' {
         if (-not $Rest -or $Rest[0] -ne 'scaffold') { Write-MeritHelp; exit 1 }
         $variant = Get-ArgValue -ArgList $Rest -Name '--variant'

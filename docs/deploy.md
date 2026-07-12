@@ -13,7 +13,7 @@ Create a clean working directory and clone the two public repos:
 ```powershell
 mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
-git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
@@ -24,7 +24,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MeritOverDinner
 cd ~/MeritOverDinner
-git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
@@ -98,6 +98,14 @@ git -C ../merit-demo push
 ```
 
 For MERIT operators, closeout is a governance action after deploy, not the deploy itself. Public creators use normal Git save/push; vault operators may additionally run their private `merit-closeout` workflow.
+
+For a public repo baseline, use the public wrapper:
+
+```powershell
+.\merit.ps1 closeout --path ..\merit-demo
+```
+
+That command runs scaffold verification, `git diff --check`, and prints the git baseline. Private vault mXin/mXout remains the operator governance path.
 
 ## One local file, generated machine files
 

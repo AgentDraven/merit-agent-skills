@@ -30,7 +30,7 @@ Create an empty directory, clone the pinned skills release, clone `merit-demo`, 
 ```powershell
 mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
-git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
@@ -82,7 +82,7 @@ There are two separate actions:
 
 | Action | When | Command |
 |--------|------|---------|
-| Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git` |
+| Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git` |
 | Install skills into Cursor/agent host | Optional, only when you want Cursor/Codex to see the skill instructions as installed skills | Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor` |
 
 You can run `merit.ps1` / `merit.sh` directly from the cloned repo without installing skills. Install is for agent authoring convenience, not for runtime deployment.
@@ -157,7 +157,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -173,7 +173,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
@@ -242,6 +242,7 @@ See `cfg/meritstore_tenant.json` (`status: pending_platform_provision`) on merit
 .\merit.ps1 deploy --path <dir>
 .\merit.ps1 portal --path <dir>
 .\merit.ps1 all --path <dir>
+.\merit.ps1 closeout --path <dir>
 ```
 
 Linux/macOS equivalents use the shell wrapper:
@@ -251,6 +252,7 @@ Linux/macOS equivalents use the shell wrapper:
 ./merit.sh apply --path <dir>
 ./merit.sh verify --path <dir>
 ./merit.sh deploy --path <dir>
+./merit.sh closeout --path <dir>
 ```
 
 Install skills to Cursor: Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor`.
