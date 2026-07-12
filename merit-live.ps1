@@ -1,9 +1,9 @@
-# MERIT Live CLI — public freemium tooling (merit-agent-skills).
-# Version 0.3.9 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
+﻿# MERIT Live CLI — public freemium tooling (merit-agent-skills).
+# Version 0.3.10 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
 
 param()
 
-$MERIT_LIVE_VERSION = '0.3.9'
+$MERIT_LIVE_VERSION = '0.3.10'
 $ErrorActionPreference = 'Stop'
 $DistRoot = $PSScriptRoot
 
@@ -23,7 +23,7 @@ Commands:
   par scaffold         Copy PAR play shells + cfg/par_pins.json
   branding scaffold    Copy cfg/branding.json from template
   subs scaffold        Copy meritsubs/meritstore cfg templates
-  portal scaffold      Copy the standard MERIT here.now portal kit into portal/
+  portal scaffold      Copy the standard MERIT Portal into portal/
   app scaffold         Copy Vercel consumer app skeleton (package.json, vercel.json, api/, scripts/)
   admin gate demo-init Placeholder .env.local keys for MeritAdminGate demo (local only)
   portal publish       Publish portal/ to here.now (BYOK: HERENOW_API_KEY)
@@ -212,8 +212,8 @@ function Invoke-SubsScaffold {
 
 function Invoke-PortalScaffold {
     param([string]$Root)
-    $src = Join-Path $DistRoot 'templates/merit-portal-kit'
-    if (-not (Test-Path $src)) { throw "missing portal kit template: $src" }
+    $src = Join-Path $DistRoot 'templates/portal'
+    if (-not (Test-Path $src)) { throw "missing Portal template: $src" }
     $dest = Join-Path $Root 'portal'
     if (Test-Path $dest) {
         Write-Host "portal scaffold skipped (exists): $dest"

@@ -1,4 +1,4 @@
-# merit-agent-skills — usage
+﻿# merit-agent-skills — usage
 
 Public guide for the **OSS** path: `merit.ps1`, skills, and freemium try bundles.
 Operator-only vault workflows are optional and not required for a first-time public user.
@@ -105,7 +105,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.10 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -121,7 +121,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.10 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app

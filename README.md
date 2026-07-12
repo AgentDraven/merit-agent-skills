@@ -1,4 +1,4 @@
-# merit-agent-skills
+﻿# merit-agent-skills
 
 Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 
@@ -19,7 +19,7 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 ## Quick install
 
 ```powershell
-git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.10 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 ```
@@ -27,7 +27,7 @@ cd merit-agent-skills
 Linux/macOS:
 
 ```bash
-git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.10 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
@@ -99,7 +99,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current | **`skills-v0.3.9`** · merit-live **0.3.9** |
+| Current | **`skills-v0.3.10`** · merit-live **0.3.10** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
 

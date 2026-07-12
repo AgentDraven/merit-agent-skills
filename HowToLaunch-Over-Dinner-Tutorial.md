@@ -1,4 +1,4 @@
-# HowToLaunch-Over-Dinner-Tutorial
+﻿# HowToLaunch-Over-Dinner-Tutorial
 
 **Introductory tutorial for new Content Creators**  
 **Tagline:** Build your app over dinner; let MERIT publicize and promote you overnight.
@@ -39,7 +39,7 @@ Tools, `merit` CLI, and optional Cursor agent skills.
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.10 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 Linux/macOS:
@@ -47,7 +47,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.10 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 ### 1B — merit-demo
@@ -309,7 +309,7 @@ Read only after the three steps.
 
 ## Checklist
 
-- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.9` and merit-demo
+- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.10` and merit-demo
 - [ ] Step 2 — Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
 - [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed
