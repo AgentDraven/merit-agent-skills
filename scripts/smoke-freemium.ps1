@@ -1,10 +1,14 @@
 ﻿# Freemium smoke - merit CLI PAR + verify (no BYOK required for local phase)
 param(
     [string]$SkillsRoot = "$PSScriptRoot\..",
-    [string]$ScratchRoot = "$env:TEMP\merit-smoke"
+    [string]$ScratchRoot = ''
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not $ScratchRoot) {
+    $baseTemp = if ($env:TEMP) { $env:TEMP } elseif ($env:TMPDIR) { $env:TMPDIR } else { [System.IO.Path]::GetTempPath() }
+    $ScratchRoot = Join-Path $baseTemp 'merit-smoke'
+}
 $merit = Join-Path $SkillsRoot 'merit.ps1'
 if (-not (Test-Path $merit)) { throw "merit.ps1 not found: $merit" }
 
