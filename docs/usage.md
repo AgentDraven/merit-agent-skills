@@ -43,7 +43,7 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 |---------|--------------|--------------|----------------|
 | **Git** (CLI) | Clone, local commits | Tier 2+ | Install only — no cloud account |
 | **GitHub** | Fork, push, PRs | Optional until you publish source | You |
-| **PAR CDN** (`pkg-meritutils.vercel.app`) | Free workbench/journal widgets | Angle 1 — always public | **Nobody** — MERIT provider CDN |
+| **MERIT package route** (`merit-prod.vercel.app/pkg/meritutils`) | Free workbench/journal widgets | Angle 1 — always public | **Nobody** — MERIT provider CDN behind gateway |
 | **Vercel** | Live app at `*.vercel.app` | Tier 4 / deploy | You (BYOK) |
 | **here.now** | Marketing at `{slug}.here.now` | Angle 2 / portal publish | You (BYOK `HERENOW_API_KEY`) |
 | **Supabase** | Persistent journal/AMA + meritsubs data on **your** deploy | Full merit-demo deploy | You (consumer project) |
@@ -68,8 +68,8 @@ Paid commerce         →  + meritstore tenant + payment    (platform onboarding
 | Layer | Hosted by MERIT (freemium) | You bring (BYOK) |
 |-------|---------------------------|------------------|
 | **Skill templates + merit CLI** | Public GitHub OSS | — |
-| **PAR packages** `@0.4.x` / `@0.2.x` | `pkg-meritutils.vercel.app` | — |
-| **meritstore registration UI** | `meritstore.vercel.app/{consumer_id}/register` for **provisioned** tenants | Your `consumer_id` must be provisioned (not automatic on clone) |
+| **PAR packages** `@0.4.x` / `@0.2.x` | `merit-prod.vercel.app/pkg/meritutils` | — |
+| **MERIT registration UI** | `merit-prod.vercel.app/store/{consumer_id}/register` for **provisioned** tenants | Your `consumer_id` must be provisioned (not automatic on clone) |
 | **Checkout / Square** | Platform meritstore runs payment UI | Per-tenant payment provider + payout onboarding |
 | **meritsubs / usage API** | Hosted MERIT authority for usage, credits, and entitlements | Your app calls the hosted provider; do not fork billing logic |
 | **Journal / AMA / subscriber DB** | **Not** a shared MERIT Supabase for your app | **Your** Supabase project (consumer-scoped data plane) |
@@ -105,7 +105,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.8 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -121,7 +121,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.8 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
@@ -159,7 +159,7 @@ Three roles — do not conflate them:
 ### Funnel (provisioned consumer)
 
 1. **Guest** — OSS PAR loads from CDN; daily caps (`cfg/freemium_limits.json`).
-2. **Free register** — `meritstore.vercel.app/{consumer_id}/register` (platform-hosted UI for that tenant).
+2. **Free register** — `merit-prod.vercel.app/store/{consumer_id}/register` (platform-hosted UI for that tenant).
 3. **Cap hit** — UI prompts Plus upgrade.
 4. **Paid** — hosted meritstore checkout → hosted usage/entitlement update → uncapped features (+ commercial PAR line in Phase 3).
 

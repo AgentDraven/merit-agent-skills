@@ -28,7 +28,7 @@ dist/
 $play = Join-Path $ScratchRoot 'play\index.html'
 if (-not (Test-Path $play)) { throw "missing play/index.html" }
 $html = Get-Content $play -Raw
-if ($html -notmatch 'pkg-meritutils\.vercel\.app') { throw "play shell missing PAR CDN URL" }
+if ($html -notmatch 'merit-prod\.vercel\.app/pkg/meritutils') { throw "play shell missing MERIT package gateway URL" }
 if ($html -notmatch 'journal') { throw "workbench-journal variant missing journal tags" }
 
 $pins = Get-Content (Join-Path $ScratchRoot 'cfg\par_pins.json') -Raw | ConvertFrom-Json

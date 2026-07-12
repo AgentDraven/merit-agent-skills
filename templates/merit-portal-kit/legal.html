@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M4FI &mdash; Legal &amp; Privacy</title>
+  <link rel="stylesheet" href="css/portal.css"/>
+</head>
+<body class="page-prose">
+
+  <div class="container">
+
+    <header class="page-header">
+      <p class="back"><a href="index.html">← M4FI Portal</a></p>
+      <h1>Legal &amp; Privacy</h1>
+      <p class="tagline" style="font-size:0.8125rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);">Cloud Centric Security First Solution</p>
+    </header>
+
+    <div class="prose-block">
+      <p><strong>MERIT for Financial Independence</strong> (M4FI) is a division of <strong>MERIT</strong>. Platform components from <strong>MERIT LLC</strong> are used under the terms below.</p>
+
+      <h2>1. Open-source components (merit-agent-skills)</h2>
+      <p>Agent skill recipes and merit-live CLI scaffolds may be derived from <a href="https://github.com/AgentDraven/merit-agent-skills">merit-agent-skills</a>, copyright MERIT LLC, licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>. A copy of the license is in the project repository LICENSE / THIRD_PARTY_NOTICES.</p>
+      <p>Apache-2.0 does <strong>not</strong> grant access to private vault assets, certification registry, or production meritstore/meritsubs credentials.</p>
+
+      <h2>2. Commercial platform (meritstore / meritsubs)</h2>
+      <p>Paid subscription features require registration on this Portal (<a href="upgrade.html">Register &amp; upgrade</a>) and acceptance of <a href="terms.html">Subscription Terms</a>. Subscriber identity, billing, and tier entitlements are managed via meritsubs on this product host when deployed.</p>
+
+      <h2>3. Freemium limits</h2>
+      <p>Free and trial tiers are subject to symbol caps, sync cadence, and refresh quotas as shown in the Portal. Paid checkout via meritsubs removes caps per active subscription SKU.</p>
+
+      <h2>4. Privacy &amp; operational analytics</h2>
+      <p>MERIT collects de-identified operational analytics required to run the platform. This processing is not optional and is not tied to your legal name unless you opt in to identity-linked features. Community features may show region at state level when enabled.</p>
+
+      <h2 id="security-first">5. Security First &mdash; PII, KYC, broker keys &amp; BYOK</h2>
+      <div class="security-callout">
+        <p><strong>Our motto:</strong> Cloud Centric Security First. We treat subscriber secrets with institutional discipline &mdash; minimum exposure, encryption at rest, explicit authorization for writes.</p>
+      </div>
+      <ul>
+        <li><strong>PII (email, legal name, contact):</strong> Stored in meritsubs only. M4FI receives a <code>sub_handle</code> and tier flags &mdash; not identity documents.</li>
+        <li><strong>KYC:</strong> Required for paid tiers and community write access. Verification documents remain in meritsubs; M4FI reads entitlement flags only.</li>
+        <li><strong>Broker API keys:</strong> <strong>Read-only</strong> sync for chart geometry. Encrypted with your meritsubs pass-token (FR-038). Never embedded in TradingView Pine or public logs.</li>
+        <li><strong>BYOK:</strong> LLM and optional execute tokens stored in the same encrypted vault. Keys unlock only for authorized sessions.</li>
+        <li><strong>Orders / writes:</strong> Live broker orders require explicit Portal authorization (Execute w/AI). Default is read-only sync.</li>
+      </ul>
+      <p>Full technical architecture: <a href="security.html"><strong>Security architecture</strong></a>.</p>
+
+      <h2>6. AI, derivatives &amp; excerpts</h2>
+      <p>See portal footer (L1 §E.1.1): no AI/ML training license; no derivative or usage rights except in writing; brief excerpts only for good-faith reviews with attribution.</p>
+
+      <h2>7. Abuse</h2>
+      <p>Report abuse to <a href="mailto:meritlabs@protonmail.com">meritlabs@protonmail.com</a>.</p>
+
+      <h2>8. Trademarks</h2>
+      <p>M4FI is MERIT for Financial Independence, a division of MERIT. MERIT, merit-agent-skills, and MERIT Powered are trademarks of MERIT LLC.</p>
+
+      <p style="margin-top:2rem;font-size:0.8125rem;"><a href="security.html">Security architecture →</a> &middot; <a href="terms.html">Subscription terms →</a></p>
+    </div>
+
+  </div>
+  <div id="portal-dock-mount" data-portal-page="prose"></div>
+  <script src="portal-dock.js"></script>
+</body>
+</html>

@@ -134,7 +134,7 @@ install.ps1:
 |------|---------|
 | vault | Operator-only private SSOT; not required for OSS users |
 | DIRT | [AgentDraven/dirt](https://github.com/AgentDraven/dirt) |
-| meritutils | [pkg-meritutils PAR CDN](https://pkg-meritutils.vercel.app) |
+| meritutils | [MERIT package gateway](https://merit-prod.vercel.app/pkg/meritutils/registry.json) |
 
 ---
 

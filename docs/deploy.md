@@ -75,7 +75,7 @@ Secrets are allowed only in local `.merit_launch.md` and generated `.env.local`.
 
 The public consumer repo is not the billing or usage-metering authority.
 
-- Usage credits, promo validation, and Square checkout live behind hosted MERIT services such as `meritstore.vercel.app`.
+- Usage credits, promo validation, and Square checkout live behind the hosted MERIT production gateway `merit-prod.vercel.app`.
 - The default intro promo is `MERITAGENT`.
 - The default intro credit budget is $25, controlled by hosted provider configuration.
 - A consumer may display usage state, but changing local repo code must not create paid entitlements or bypass hosted metering.

@@ -33,9 +33,9 @@ Angle 1 + edit `portal/` + set `HERENOW_API_KEY` + `portal publish --all`.
 
 | Demo | Guest play | Register |
 |------|------------|----------|
-| **merit-demo** (canonical) | [merit-demo](https://github.com/Mr-PI-Bala/merit-demo) deploy URL | `meritstore.vercel.app/merit-demo/register` |
-| AURAVYBE (portfolio) | AURAVYBE `/play/` | `meritstore.vercel.app/auravybe/register` |
-| SomaTune (portfolio) | SomaTune `/play/` | `meritstore.vercel.app/somatune/register` |
+| **merit-demo** (canonical) | [merit-demo](https://github.com/Mr-PI-Bala/merit-demo) deploy URL | `merit-prod.vercel.app/store/merit-demo/register` |
+| AURAVYBE (portfolio) | AURAVYBE `/play/` | `merit-prod.vercel.app/store/auravybe/register` |
+| SomaTune (portfolio) | SomaTune `/play/` | `merit-prod.vercel.app/store/somatune/register` |
 
 Freemium caps: journal 2/day; AMA 2 ask/vote/response/day. Upgrade **Plus** $10.79/mo.
 
@@ -48,6 +48,6 @@ Fork merit-demo pattern → MERIT assigns `consumer_id` → integration cert →
 1. **Guest** — OSS PAR on `/play/`, `/journal/`, `/ama/` with daily caps  
 2. **Free register** — meritstore free SKU / OAuth → meritsubs guest+registered tier  
 3. **Cap hit** — UI CTA to Plus  
-4. **Paid** — `meritstore.vercel.app/{consumer_id}/register` → meritsubs Plus entitlements → uncapped + `@1.0.x` PAR (Phase 3)
+4. **Paid** — `merit-prod.vercel.app/store/{consumer_id}/register` → meritsubs Plus entitlements → uncapped + `@1.0.x` PAR (Phase 3)
 
 See `cfg/freemium_limits.json` and `cfg/plus_sku.json` on consumer repos.

@@ -1,0 +1,174 @@
+{
+  "schema": "m4fi.portal.v1",
+  "source": "MERIT portal kit skeleton — replace copy, brand, appBaseUrl, tiers",
+  "marque": {
+    "id": "kit",
+    "name": "Portal Kit",
+    "appBaseUrl": "https://EXAMPLE.vercel.app",
+    "defaultTier": "free",
+    "theme": {
+      "bodyClass": "theme-floor-pulse",
+      "fonts": {
+        "display": "'Unbounded', system-ui, sans-serif",
+        "body": "'Plus Jakarta Sans', system-ui, sans-serif"
+      },
+      "colors": {
+        "bg": "#061a1a",
+        "ink": "#e8f2f0",
+        "accent": "#c4784a",
+        "muted": "rgba(232,242,240,0.68)",
+        "surface": "rgba(255,255,255,0.04)",
+        "line": "rgba(196,120,74,0.4)",
+        "footer": "#7a9490"
+      },
+      "watermark": {
+        "src": "img/banner.jpg",
+        "fallback": "img/logo.jpg",
+        "opacity": 0.14
+      },
+      "brandAssets": {
+        "logo": "img/logo.jpg",
+        "banner": "img/banner.jpg"
+      }
+    },
+    "copy": {
+      "brand": "YOURPRODUCT",
+      "subhead": "Your promise in one line.",
+      "subheadHtml": "Your promise<br>in one line.",
+      "lede": "One supporting sentence about the pathway you offer.",
+      "ledeCloser": "You control the outcome; we show the map.",
+      "ctaPrimary": "Try it Out",
+      "ctaSecondary": "Join Free",
+      "loginPrompt": "If you already have an account...",
+      "ctaLogin": "Login",
+      "tiersTitle": "Your pathway",
+      "tiersHint": "Choose depth — and how independently you want to run.",
+      "plansBtn": "Full subscription details",
+      "footerLegal": "Legal",
+      "footerNoteHtml": "&copy; 2026 YOURPRODUCT &middot; Powered by MERIT",
+      "marquee": [
+        "Clear insight",
+        "Predictable progress",
+        "You control the path"
+      ]
+    }
+  },
+  "brand": {
+    "wordmark": {
+      "fontFamily": "'Fraunces', Georgia, serif",
+      "flanks": {
+        "left": { "src": "img/flank.svg", "mirror": false },
+        "right": { "src": "img/flank.svg", "mirror": true }
+      }
+    },
+    "assets": {
+      "logo": "img/logo.jpg",
+      "banner": "img/banner.jpg"
+    }
+  },
+  "ctas": {
+    "layout": "pair_plus_prompt",
+    "default": "try",
+    "max": 3,
+    "stack": { "maxWidth": "32rem", "gap": "1.1rem" },
+    "primary": { "columns": 2, "gap": "0.65rem" },
+    "prompt": {
+      "align": "spread",
+      "matchPrimaryWidth": true,
+      "gap": "0.65rem"
+    },
+    "slots": {
+      "stack": "#cta-stack",
+      "primary": "#cta-primary",
+      "prompt": "#cta-prompt"
+    },
+    "items": [
+      {
+        "id": "try",
+        "label": "Try it Out",
+        "hrefKey": "try",
+        "shell": "try.html",
+        "placement": "primary",
+        "style": "solid",
+        "order": 1,
+        "enabled": true
+      },
+      {
+        "id": "join",
+        "label": "Join Free",
+        "hrefKey": "join",
+        "shell": "join.html",
+        "placement": "primary",
+        "style": "ghost",
+        "order": 2,
+        "enabled": true
+      },
+      {
+        "id": "login",
+        "label": "Login",
+        "hrefKey": "login",
+        "shell": null,
+        "placement": "prompt",
+        "style": "ghost",
+        "promptCopyKey": "loginPrompt",
+        "order": 3,
+        "enabled": true
+      },
+      {
+        "id": "upgrade",
+        "label": "Upgrade",
+        "hrefKey": "upgrade",
+        "shell": "upgrade.html",
+        "placement": "primary",
+        "style": "ghost",
+        "order": 4,
+        "enabled": false,
+        "comment": "Example fourth slot — copy upgrade.html.example → upgrade.html; enable only if you disable another CTA (max 3)"
+      }
+    ]
+  },
+  "pathway": {
+    "enabled": true,
+    "default_current": "free",
+    "visible_columns": 3,
+    "column_roles": ["now", "next", "next2"],
+    "mounts": { "pills": "#tier-steps", "columns": "#tier-ladder" },
+    "titleKey": "tiersTitle",
+    "hintKey": "tiersHint"
+  },
+  "tier_ladder": {
+    "schema": "m4fi.portal.tier_ladder.v1",
+    "plans_image": "img/plans.jpg",
+    "default_current": "free",
+    "ladder": [
+      {
+        "id": "free",
+        "title": "Free",
+        "badge": "T0",
+        "symbols": 1,
+        "price_label": "Free",
+        "now_gains": ["free forever", "no registration required", "Come back with handle + pass-phrase"]
+      },
+      {
+        "id": "freemium",
+        "title": "Freemium",
+        "badge": "T1",
+        "symbols": 2,
+        "price_label": "Free",
+        "now_gains": [{ "kind": "price", "intro": "Free" }, "2 symbols", "regular sync"]
+      },
+      {
+        "id": "paid",
+        "title": "Subscriber",
+        "badge": "T2",
+        "symbols": 15,
+        "intro_week": 1.79,
+        "std_week": 3.58,
+        "ask_ai": true,
+        "decide_ai": true,
+        "packs": true,
+        "now_gains": []
+      }
+    ]
+  }
+}

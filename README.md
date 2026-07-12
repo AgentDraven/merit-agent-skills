@@ -14,12 +14,12 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 | **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
 | **Skills only** | Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor` |
 
-**Live demos (Angle 3):** merit-demo deploy · portfolio refs AURAVYBE `/play/` · SomaTune `/play/` · register via `meritstore.vercel.app/{consumer}/register`
+**Production MERIT base:** `https://merit-prod.vercel.app` for metered APIs, packages, and register paths. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
 
 ## Quick install
 
 ```powershell
-git clone --branch skills-v0.3.8 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 ```
@@ -27,7 +27,7 @@ cd merit-agent-skills
 Linux/macOS:
 
 ```bash
-git clone --branch skills-v0.3.8 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
@@ -99,7 +99,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current | **`skills-v0.3.8`** · merit-live **0.3.8** |
+| Current | **`skills-v0.3.9`** · merit-live **0.3.9** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
 

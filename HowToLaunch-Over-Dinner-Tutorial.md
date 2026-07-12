@@ -39,7 +39,7 @@ Tools, `merit` CLI, and optional Cursor agent skills.
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.8 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 Linux/macOS:
@@ -47,7 +47,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.3.8 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.9 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 ### 1B — merit-demo
@@ -178,11 +178,11 @@ Free CC registration
 
 **Pattern example** (canonical demo, not your app):
 
-`https://meritstore.vercel.app/merit-demo/register`
+`https://merit-prod.vercel.app/store/merit-demo/register`
 
 **Your URL** (after MERIT assigns your id):
 
-`https://meritstore.vercel.app/YOUR_ID/register`
+`https://merit-prod.vercel.app/store/YOUR_ID/register`
 
 ### 3B — Submit one ToI pack
 
@@ -309,7 +309,7 @@ Read only after the three steps.
 
 ## Checklist
 
-- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.8` and merit-demo
+- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.9` and merit-demo
 - [ ] Step 2 — Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
 - [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed

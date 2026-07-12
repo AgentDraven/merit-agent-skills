@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upgrade (example shell) — enable via portal.json</title>
+  <!--
+    Fourth-slot CTA pattern — NOT live (max 3 CTAs on marque).
+    To enable as a replacement for one of Try/Join/Login:
+      1. Copy to upgrade.html
+      2. Add ctas.items entry with enabled:true (and disable another to stay ≤3)
+      3. Set shell: "upgrade.html" and hrefKey matching wireCtas (or extend wireCtas)
+  -->
+  <meta http-equiv="refresh" content="0;url=https://EXAMPLE.vercel.app/app/upgrade.html">
+  <script>location.replace('https://EXAMPLE.vercel.app/app/upgrade.html');</script>
+</head>
+<body>
+  <p><a href="https://EXAMPLE.vercel.app/app/upgrade.html">Continue to Upgrade</a> &middot; <a href="index.html">Marketing home</a></p>
+</body>
+</html>

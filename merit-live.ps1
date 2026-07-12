@@ -1,9 +1,9 @@
 # MERIT Live CLI — public freemium tooling (merit-agent-skills).
-# Version 0.3.8 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
+# Version 0.3.9 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
 
 param()
 
-$MERIT_LIVE_VERSION = '0.3.8'
+$MERIT_LIVE_VERSION = '0.3.9'
 $ErrorActionPreference = 'Stop'
 $DistRoot = $PSScriptRoot
 
@@ -23,6 +23,7 @@ Commands:
   par scaffold         Copy PAR play shells + cfg/par_pins.json
   branding scaffold    Copy cfg/branding.json from template
   subs scaffold        Copy meritsubs/meritstore cfg templates
+  portal scaffold      Copy the standard MERIT here.now portal kit into portal/
   app scaffold         Copy Vercel consumer app skeleton (package.json, vercel.json, api/, scripts/)
   admin gate demo-init Placeholder .env.local keys for MeritAdminGate demo (local only)
   portal publish       Publish portal/ to here.now (BYOK: HERENOW_API_KEY)
@@ -187,9 +188,9 @@ function Invoke-SubsScaffold {
     $sync = @{
         schema          = 'merit.merit_sync.v1'
         consumer_id     = 'YOUR_CONSUMER_ID'
-        metered_api_base = 'https://soulos.vercel.app'
-        meritsubs_base  = 'https://somatune.vercel.app/api/meritsubs'
-        meritstore_register_url = 'https://meritstore.vercel.app/YOUR_CONSUMER_ID/register'
+        metered_api_base = 'https://merit-prod.vercel.app'
+        meritsubs_base  = 'https://merit-prod.vercel.app/api/meritsubs'
+        meritstore_register_url = 'https://merit-prod.vercel.app/store/YOUR_CONSUMER_ID/register'
         freemium_limits = 'cfg/freemium_limits.json'
         plus_sku        = 'cfg/plus_sku.json'
     }
@@ -209,11 +210,26 @@ function Invoke-SubsScaffold {
     Write-Host "subs scaffold OK -> $cfg (edit consumer_id and register URL)"
 }
 
+function Invoke-PortalScaffold {
+    param([string]$Root)
+    $src = Join-Path $DistRoot 'templates/merit-portal-kit'
+    if (-not (Test-Path $src)) { throw "missing portal kit template: $src" }
+    $dest = Join-Path $Root 'portal'
+    if (Test-Path $dest) {
+        Write-Host "portal scaffold skipped (exists): $dest"
+        Write-Host "Move or archive the existing portal/ if you want to replace it."
+        return
+    }
+    Copy-Item -LiteralPath $src -Destination $dest -Recurse
+    Write-Host "portal scaffold OK -> $dest"
+    Write-Host "Edit portal/portal.json, legal.html, terms.html, security.html, then publish portal/ to here.now."
+}
+
 function Invoke-AppScaffold {
     param([string]$Root)
     Write-Host "app scaffold: clone reference consumer Mr-PI-Bala/merit-demo or run:"
     Write-Host "  git clone https://github.com/Mr-PI-Bala/merit-demo.git $Root"
-    Write-Host "Then: merit-live par scaffold, branding scaffold, subs scaffold"
+    Write-Host "Then: merit-live par scaffold, branding scaffold, subs scaffold, portal scaffold"
 }
 
 function Invoke-AdminGateDemoInit {
@@ -320,6 +336,10 @@ switch -Regex ($sub) {
         exit 0
     }
     '^portal$' {
+        if ($Rest[0] -eq 'scaffold') {
+            Invoke-PortalScaffold -Root $target
+            exit 0
+        }
         if ($Rest[0] -ne 'publish') { Write-MeritLiveHelp; exit 1 }
         Invoke-PortalPublish -Root $target -ArgList $Rest
         exit 0

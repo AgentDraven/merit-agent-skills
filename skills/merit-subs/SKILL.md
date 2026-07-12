@@ -17,7 +17,7 @@ Freemium caps: `cfg/freemium_limits.json` (journal 2/day; AMA 2 ask/vote/respons
 
 Plus SKU default: **$10.79/mo** ($2.49/wk, round up); 20% off 6-month; 50% off annual. ~90% to operator after 4% + $0.50 processing.
 
-Reference: **Mr-PI-Bala/merit-demo** + `meritstore.vercel.app/merit-demo/register`.
+Reference: **Mr-PI-Bala/merit-demo** + `merit-prod.vercel.app/store/merit-demo/register`.
 
 ## Legal (required for operators)
 
@@ -30,7 +30,7 @@ Vault templates: `merit-private-vault/templates/legal/MERIT_FREEMIUM_LEGAL.html`
 
 **Production boundary:**
 
-Use hosted `meritstore.vercel.app` / MERIT provider endpoints for usage credits, promo validation, entitlements, and Square checkout. Default intro promo is `MERITAGENT`; hosted provider config owns the default $25 credit.
+Use hosted `merit-prod.vercel.app` MERIT provider endpoints for usage credits, promo validation, entitlements, and Square checkout. Default intro promo is `MERITAGENT`; hosted provider config owns the default $25 credit.
 
 For public `merit-demo`, verify no `api/meritsubs`, `api/ama`, or `api/journal` metered handlers are shipped.
 

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M4FI &mdash; Security Architecture</title>
+  <link rel="stylesheet" href="css/portal.css"/>
+</head>
+<body class="page-prose">
+
+  <div class="container">
+
+    <header class="page-header">
+      <p class="back"><a href="index.html">← M4FI Portal</a> &middot; <a href="legal.html#security-first">Legal summary</a></p>
+      <h1>Security Architecture</h1>
+      <p class="tagline" style="font-size:0.8125rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);">Cloud Centric Security First Solution</p>
+    </header>
+
+    <div class="prose-block">
+      <p>M4FI is <strong>cloud-first</strong>: this Portal is the subscriber entry. Chart apps receive paste files only &mdash; never your pass-token or raw vault.</p>
+
+      <h2>Data compartmentalization</h2>
+      <table>
+        <tr><th>Data</th><th>System</th><th>M4FI access</th></tr>
+        <tr><td>Email, legal name, KYC documents</td><td><strong>meritsubs</strong></td><td>Never copied to Pine or git</td></tr>
+        <tr><td>Subscription tier, SKU</td><td><strong>meritstore</strong> + MSU</td><td>Entitlement flags only</td></tr>
+        <tr><td>Broker read tokens, BYOK LLM keys</td><td><strong>M4FI vault</strong> (FR-038)</td><td>AES-256-GCM per subscriber</td></tr>
+        <tr><td>Positions, spreads, HUD constants</td><td>Snapshot + DataLayer</td><td>Derived from reads &mdash; no PII</td></tr>
+      </table>
+
+      <h2>Pass-token encryption (FR-038)</h2>
+      <p>Broker and BYOK secrets encrypt with your <strong>meritsubs pass-token</strong> (two four-word phrases + four-digit pin). PBKDF2-SHA256 + AES-256-GCM. We never store your pass-token.</p>
+
+      <h2>Broker API keys &mdash; read vs write</h2>
+      <ul>
+        <li><strong>Sync (default):</strong> Read-only position and fill access.</li>
+        <li><strong>Execute w/AI (Pro):</strong> Orders only with explicit Portal authorization.</li>
+      </ul>
+
+      <h2>Admin laptop mode</h2>
+      <p>Local CLI sync is for platform admin validation only &mdash; not the subscriber default.</p>
+
+      <p style="margin-top:2rem;"><a href="legal.html#security-first">← Legal Security First summary</a> &middot; <a href="index.html">Portal home</a></p>
+    </div>
+
+  </div>
+  <div id="portal-dock-mount" data-portal-page="prose"></div>
+  <script src="portal-dock.js"></script>
+</body>
+</html>
