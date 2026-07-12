@@ -19,7 +19,7 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 ## Quick install
 
 ```powershell
-git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 ```
@@ -27,7 +27,7 @@ cd merit-agent-skills
 Linux/macOS:
 
 ```bash
-git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
@@ -74,7 +74,7 @@ Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-fre
 | `merit-onboard` | OSS quickstart → merit-demo |
 | `meritcert`, `merit-closeout`, `merit-iar` | Vocabulary; vault operators run writes |
 
-All OSS user docs use **`.\merit.ps1`** / **`./merit.sh`** first. `merit-live.*` and `merit-deploy.*` are deprecated compatibility plumbing scheduled for removal before GA. Vault **`.\scripts\merit.ps1`** is only for private operator workflows.
+All OSS user docs use **`.\merit.ps1`** / **`./merit.sh`**. There are no public shim scripts.
 
 ## Freemium vs Plus
 
@@ -99,7 +99,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current | **`skills-v0.3.11`** · merit **0.3.11** |
+| Current | **`skills-v0.3.12`** · merit **0.3.12** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
 

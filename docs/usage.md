@@ -30,7 +30,7 @@ Create an empty directory, clone the pinned skills release, clone `merit-demo`, 
 ```powershell
 mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
-git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
@@ -39,13 +39,12 @@ cd merit-agent-skills
 
 ### 2. Initialize The Repository
 
-Run `init`, edit only the mandatory section of `.merit_launch.md`, then run `apply`. `apply` creates `.env.local`, `cfg/flask_deploy.json`, and `cfg/portals.json`; Vercel still requires its own one-time `npx vercel link` before the first deploy.
+Run `init`, edit only the mandatory section of `.merit_launch.md`, then run `apply`. `apply` creates `.env.local`, `cfg/flask_deploy.json`, and `cfg/portals.json`; `merit deploy` auto-links Vercel when `.vercel/project.json` is missing.
 
 ```powershell
 .\merit.ps1 init --path ..\merit-demo
 # edit ..\merit-demo\.merit_launch.md
 .\merit.ps1 apply --path ..\merit-demo
-npx vercel link --scope <your-vercel-scope>
 .\merit.ps1 deploy --path ..\merit-demo
 ```
 
@@ -76,6 +75,17 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 | `merit-demo`: `npm install`, `npm run verify`, `npm run e2e` (PAR CDN HEAD) | **None** (network only) |
 
 **GitHub account is optional** for Tier-2. Use it only when you **fork**, **push** your own remote, open PRs, or use `gh` against private repos. Cloning and working locally does not require signing in.
+
+## When skills are downloaded and installed
+
+There are two separate actions:
+
+| Action | When | Command |
+|--------|------|---------|
+| Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git` |
+| Install skills into Cursor/agent host | Optional, only when you want Cursor/Codex to see the skill instructions as installed skills | Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor` |
+
+You can run `merit.ps1` / `merit.sh` directly from the cloned repo without installing skills. Install is for agent authoring convenience, not for runtime deployment.
 
 ---
 
@@ -147,7 +157,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -163,7 +173,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app

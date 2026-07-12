@@ -146,3 +146,4 @@ install.ps1:
 | 1.0.0 | 2026-06-16 | Initial MERIT_AGENT_SKILLS_LLD_MAP |
 | 1.0.1 | 2026-07-11 | Public-safe peer links and attribution template |
 | 1.0.2 | 2026-07-11 | v0.3.11 cleanup: Portal implementation removed from skills repo; merit.ps1 is public command surface |
+| 1.0.3 | 2026-07-12 | v0.3.12 cleanup: shim scripts removed; merit.ps1 is self-contained |

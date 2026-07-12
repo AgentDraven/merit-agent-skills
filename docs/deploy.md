@@ -13,7 +13,7 @@ Create a clean working directory and clone the two public repos:
 ```powershell
 mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
-git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
@@ -24,7 +24,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MeritOverDinner
 cd ~/MeritOverDinner
-git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.12 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
@@ -44,13 +44,12 @@ For Linux/macOS:
 
 ### 2. Initialize The Repository
 
-Run init, edit the mandatory launch values, apply, link Vercel once, and deploy:
+Run init, edit the mandatory launch values, apply, and deploy. `merit deploy` handles the one-time Vercel link when `.vercel/project.json` is missing:
 
 ```powershell
 .\merit.ps1 init --path ..\merit-demo
 # edit ..\merit-demo\.merit_launch.md
 .\merit.ps1 apply --path ..\merit-demo
-npx vercel link --scope <your-vercel-scope>
 .\merit.ps1 deploy --path ..\merit-demo
 ```
 
@@ -60,7 +59,6 @@ Linux/macOS:
 ./merit.sh init --path ../merit-demo
 # edit ../merit-demo/.merit_launch.md
 ./merit.sh apply --path ../merit-demo
-npx vercel link --scope <your-vercel-scope>
 ./merit.sh deploy --path ../merit-demo
 ```
 
@@ -73,7 +71,7 @@ What `apply` creates:
 | `cfg/portals.json` | here.now portal surfaces |
 | `.gitignore` entries | Protect `.merit_launch.md`, `.env.local`, and `.vercel` |
 
-Vercel still requires `.vercel/project.json`. MERIT does not replace that file because Vercel owns it. The first deploy needs `npx vercel link --scope <your-vercel-scope>`; after that, `merit deploy` can reuse the local Vercel link.
+Vercel still requires `.vercel/project.json`. MERIT does not replace that file because Vercel owns it. `merit deploy` now runs `npx vercel link --yes --scope <your-vercel-scope>` automatically when `.vercel/project.json` is missing, then records local state tags in `.env.local` (`MERIT_VERCEL_LINKED`, `MERIT_VERCEL_DEPLOYED`, `MERIT_VERCEL_DEPLOYED_AT`).
 
 ### 3. Add Marketing Front-End & Save
 
@@ -130,6 +128,6 @@ The public consumer repo is not the billing or usage-metering authority.
 - The default intro credit budget is $25 and is controlled by hosted provider configuration.
 - A consumer may display usage state, but changing local repo code must not create paid entitlements or bypass hosted metering.
 
-## Compatibility scripts
+## Script policy
 
-Use `merit.ps1` / `merit.sh` in docs and support. `merit-live.*` and `merit-deploy.*` are temporary compatibility plumbing and are scheduled for removal before GA.
+Use `merit.ps1` / `merit.sh` in docs and support. Shim scripts are not part of the public surface.
