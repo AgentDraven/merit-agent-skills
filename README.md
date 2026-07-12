@@ -19,7 +19,7 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 ## Quick install
 
 ```powershell
-git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 ```
@@ -27,10 +27,27 @@ cd merit-agent-skills
 Linux/macOS:
 
 ```bash
-git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
+
+## 3 Steps Over Dinner cheatsheet
+
+Use this review order for human validation once code, docs, and E2E are complete:
+
+1. **Start here:** [HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)
+   - Goal: confirm the zero-account, first-night story makes sense.
+2. **Understand the commands:** [docs/usage.md](docs/usage.md)
+   - Goal: verify clone, install, `init`, `apply`, `verify`, optional `e2e`, and optional `deploy`.
+3. **Deploy PoV:** [docs/deploy.md](docs/deploy.md)
+   - Goal: confirm `.merit_launch.md` is the one user-edited launch profile and generated files are explained.
+4. **Demo proof:** [merit-demo usage](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md)
+   - Goal: validate the hello-world consumer, screenshots, hosted provider links, and no local metered provider source.
+5. **Release/audit map:** [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md)
+   - Goal: confirm the public skills repo is standalone, skills-only, and aligned to MERIT Prod.
+
+Optional confidence pass: run **E2E Testing Using Playwright** in `merit-demo` after `npm install`; screenshots prove the local routes and responsive flows, while provider checks prove the hosted MERIT boundary.
 
 ## One public CLI
 
@@ -60,6 +77,24 @@ Linux/macOS:
 Shell wrappers require `pwsh` or PowerShell.
 
 Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-freemium.sh`.
+
+## E2E Testing Using Playwright (optional)
+
+The public quickstart does not require Node dependencies, but full visual validation does. In `merit-demo`, run:
+
+```powershell
+npm install
+.\merit.ps1 e2e
+```
+
+Linux/macOS:
+
+```bash
+npm install
+./merit.sh e2e
+```
+
+`npm install` installs the demo’s declared Node dev tooling, including `@playwright/test`; the repo postinstall attempts to install the Chromium browser used for screenshots. The MERIT wrapper then runs the route/provider checks and writes screenshots under `merit-demo docs/evidence/`. If dependencies are not installed, `verify` can still pass, but screenshot capture is skipped.
 
 ## Skills (10)
 
@@ -99,7 +134,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current | **`skills-v0.3.13`** · merit **0.3.13** |
+| Current human-validation baseline | **`skills-v0.3.11`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
 

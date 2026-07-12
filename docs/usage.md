@@ -30,7 +30,7 @@ Create an empty directory, clone the pinned skills release, clone `merit-demo`, 
 ```powershell
 mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
-git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
@@ -82,10 +82,34 @@ There are two separate actions:
 
 | Action | When | Command |
 |--------|------|---------|
-| Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git` |
+| Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git` |
 | Install skills into Cursor/agent host | Optional, only when you want Cursor/Codex to see the skill instructions as installed skills | Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor` |
 
 You can run `merit.ps1` / `merit.sh` directly from the cloned repo without installing skills. Install is for agent authoring convenience, not for runtime deployment.
+
+---
+
+## E2E Testing Using Playwright (optional)
+
+The dinner-path baseline only needs `merit verify`. Full screenshot validation is optional and requires Node dependencies in the consumer repo:
+
+```powershell
+cd ..\merit-demo
+npm install
+.\merit.ps1 e2e
+```
+
+Linux/macOS:
+
+```bash
+cd ../merit-demo
+npm install
+./merit.sh e2e
+```
+
+What gets installed: `npm install` reads `merit-demo/package.json` and installs the declared dev tooling, including `@playwright/test`; the repo postinstall attempts to install the Chromium browser used for screenshots. The E2E wrapper checks local demo routes, hosted provider links, metered-source boundaries, and responsive screenshots under `merit-demo docs/evidence/`.
+
+If `npm install` has not been run, the MERIT wrapper still performs non-visual checks and reports that Playwright screenshots were skipped. That is acceptable for a lightweight first pass, but not for launch proof.
 
 ---
 
@@ -157,7 +181,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -173,7 +197,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.13 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
