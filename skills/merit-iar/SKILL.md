@@ -8,7 +8,7 @@ description: MERIT IAR acceptance IDs and cross-repo handoff rules.
 Acceptance IDs: `{ACRONYM}-{PROVIDER}-{NN}` (e.g. `STN-MSU-01`). Operational readiness requires requester-IAR ACCEPT.
 
 ```powershell
-.\merit-live.ps1 verify --path <consumer-repo>
+.\merit.ps1 verify --path <consumer-repo>
 ```
 
 Vault operators:

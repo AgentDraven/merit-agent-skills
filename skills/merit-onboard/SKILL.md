@@ -8,13 +8,13 @@ description: MERIT OSS quickstart and vault persona/repo onboard.
 ## OSS quickstart (no vault)
 
 ```powershell
-git clone https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
-.\merit-live.ps1 par scaffold --path ..\merit-demo --variant workbench-journal
-.\merit-live.ps1 branding scaffold --path ..\merit-demo
-.\merit-live.ps1 subs scaffold --path ..\merit-demo
-.\merit-live.ps1 verify --path ..\merit-demo
+.\merit.ps1 init --path ..\merit-demo
+# edit ..\merit-demo\.merit_launch.md
+.\merit.ps1 apply --path ..\merit-demo
+.\merit.ps1 verify --path ..\merit-demo
 ```
 
 Reference consumer: **Mr-PI-Bala/merit-demo**.
@@ -22,7 +22,7 @@ Reference consumer: **Mr-PI-Bala/merit-demo**.
 Deploy is optional and BYOK:
 
 ```powershell
-.\merit-live.ps1 deploy vercel --path ..\merit-demo
+.\merit.ps1 deploy --path ..\merit-demo
 ```
 
 ## Vault operators

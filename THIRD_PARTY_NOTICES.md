@@ -24,7 +24,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-**Trademarks:** MERIT, merit-agent-skills, merit-live, and MERIT Powered are trademarks of MERIT LLC. This notice does not grant trademark rights beyond describing origin.
+**Trademarks:** MERIT, merit-agent-skills, and MERIT Powered are trademarks of MERIT LLC. This notice does not grant trademark rights beyond describing origin.
 
 **Not included in Apache grant:** merit-private-vault, certification attestation authority, production meritstore/meritsubs operator credentials, or paid PAR packages (`@1.0.x`) — those require a **meritstore** tenant and applicable subscription terms.
 

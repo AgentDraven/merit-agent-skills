@@ -1,9 +1,9 @@
 ﻿# MERIT Live CLI — public freemium tooling (merit-agent-skills).
-# Version 0.3.10 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
+# Version 0.3.11 — pre-1.0.0 GA; minor bumps until HumanBala approves 1.0.0.
 
 param()
 
-$MERIT_LIVE_VERSION = '0.3.10'
+$MERIT_LIVE_VERSION = '0.3.11'
 $ErrorActionPreference = 'Stop'
 $DistRoot = $PSScriptRoot
 
@@ -12,7 +12,11 @@ $Rest = if ($args.Count -gt 1) { @($args[1..($args.Count - 1)]) } else { @() }
 
 function Write-MeritLiveHelp {
     Write-Host @"
-merit-live.ps1 v$MERIT_LIVE_VERSION — public MERIT freemium CLI
+merit-live.ps1 v$MERIT_LIVE_VERSION — deprecated compatibility CLI
+
+DEPRECATED:
+  Public users should run .\merit.ps1 instead. merit-live is compatibility
+  plumbing only and is scheduled for removal before GA.
 
 Usage:
   .\merit-live.ps1 <command> [options]
@@ -23,7 +27,6 @@ Commands:
   par scaffold         Copy PAR play shells + cfg/par_pins.json
   branding scaffold    Copy cfg/branding.json from template
   subs scaffold        Copy meritsubs/meritstore cfg templates
-  portal scaffold      Copy the standard MERIT Portal into portal/
   app scaffold         Copy Vercel consumer app skeleton (package.json, vercel.json, api/, scripts/)
   admin gate demo-init Placeholder .env.local keys for MeritAdminGate demo (local only)
   portal publish       Publish portal/ to here.now (BYOK: HERENOW_API_KEY)
@@ -34,9 +37,9 @@ Global:
   --variant <name>     par scaffold: workbench | workbench-journal
 
 Examples:
-  .\merit-live.ps1 par scaffold --path C:\repos\merit-demo --variant workbench-journal
-  .\merit-live.ps1 portal publish --path C:\repos\merit-demo --all
-  .\merit-live.ps1 deploy vercel --path C:\repos\merit-demo
+  .\merit.ps1 par scaffold --path C:\repos\merit-demo --variant workbench-journal
+  .\merit.ps1 portal --path C:\repos\merit-demo
+  .\merit.ps1 deploy --path C:\repos\merit-demo
 
 Vault operators: use merit-private-vault scripts\merit.ps1 for cert, env SSOT, operator-gate hash.
 "@
@@ -61,6 +64,9 @@ function Resolve-TargetRoot {
     param([string[]]$ArgList)
     $p = Get-ArgValue -ArgList $ArgList -Name '--path'
     if ($p) {
+        if (-not (Test-Path $p)) {
+            New-Item -ItemType Directory -Force -Path $p | Out-Null
+        }
         return (Resolve-Path $p).Path
     }
     return (Get-Location).Path
@@ -159,15 +165,6 @@ $journalTags
     }
     Set-Content -LiteralPath (Join-Path $playDir 'index.html') -Value $html -Encoding UTF8
 
-    $portalTpl = Join-Path $DistRoot 'templates/consumer-static/portal/index.html'
-    $portalDir = Join-Path $Root 'portal'
-    if (Test-Path $portalTpl) {
-        New-Item -ItemType Directory -Force -Path $portalDir | Out-Null
-        $portalHtml = (Get-Content -LiteralPath $portalTpl -Raw -Encoding UTF8) `
-            -replace '\{\{PRODUCT_NAME\}\}', 'My MERIT Product' `
-            -replace '\{\{PLAY_URL\}\}', '/play/'
-        Set-Content -LiteralPath (Join-Path $portalDir 'index.html') -Value $portalHtml -Encoding UTF8
-    }
     Write-Host "par scaffold OK ($Variant) -> $Root"
 }
 
@@ -210,26 +207,11 @@ function Invoke-SubsScaffold {
     Write-Host "subs scaffold OK -> $cfg (edit consumer_id and register URL)"
 }
 
-function Invoke-PortalScaffold {
-    param([string]$Root)
-    $src = Join-Path $DistRoot 'templates/portal'
-    if (-not (Test-Path $src)) { throw "missing Portal template: $src" }
-    $dest = Join-Path $Root 'portal'
-    if (Test-Path $dest) {
-        Write-Host "portal scaffold skipped (exists): $dest"
-        Write-Host "Move or archive the existing portal/ if you want to replace it."
-        return
-    }
-    Copy-Item -LiteralPath $src -Destination $dest -Recurse
-    Write-Host "portal scaffold OK -> $dest"
-    Write-Host "Edit portal/portal.json, legal.html, terms.html, security.html, then publish portal/ to here.now."
-}
-
 function Invoke-AppScaffold {
     param([string]$Root)
     Write-Host "app scaffold: clone reference consumer Mr-PI-Bala/merit-demo or run:"
     Write-Host "  git clone https://github.com/Mr-PI-Bala/merit-demo.git $Root"
-    Write-Host "Then: merit-live par scaffold, branding scaffold, subs scaffold, portal scaffold"
+    Write-Host "Then use merit.ps1 init/apply/verify/deploy."
 }
 
 function Invoke-AdminGateDemoInit {
@@ -272,7 +254,7 @@ function Invoke-PortalPublish {
         $sub = if ($surface) { "portal/$surface/" } else { 'portal/' }
         Write-Host "publish $sub from $Root (use here.now CLI: npx skills add heredotnow/skill --skill here-now -g)"
     }
-    Write-Host 'portal publish: invoke here.now publish per surface; merit-live documents BYOK workflow.'
+    Write-Host 'portal publish: invoke here.now publish per surface; merit compatibility plumbing documents BYOK workflow.'
 }
 
 function Invoke-DeployVercel {
@@ -336,10 +318,6 @@ switch -Regex ($sub) {
         exit 0
     }
     '^portal$' {
-        if ($Rest[0] -eq 'scaffold') {
-            Invoke-PortalScaffold -Root $target
-            exit 0
-        }
         if ($Rest[0] -ne 'publish') { Write-MeritLiveHelp; exit 1 }
         Invoke-PortalPublish -Root $target -ArgList $Rest
         exit 0

@@ -1,4 +1,4 @@
-# MERIT Deploy CLI â€” public deploy convenience wrapper.
+﻿# MERIT Deploy CLI â€” public deploy convenience wrapper.
 # Preferred UX: .merit_launch.md is the one local user-edited file.
 
 param()
@@ -12,7 +12,11 @@ $Rest = if ($args.Count -gt 1) { @($args[1..($args.Count - 1)]) } else { @() }
 
 function Write-MeritDeployHelp {
     Write-Host @"
-merit-deploy.ps1 â€” public MERIT deploy wrapper
+merit-deploy.ps1 â€” deprecated MERIT deploy wrapper
+
+DEPRECATED:
+  Public users should run .\merit.ps1. merit-deploy is compatibility plumbing
+  only and is scheduled for removal before GA.
 
 Usage:
   .\merit-deploy.ps1 <command> [options]

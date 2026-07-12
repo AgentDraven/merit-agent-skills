@@ -16,7 +16,7 @@
 <a id="purpose"></a>
 ## 1. Purpose & scope ^purpose
 
-LLD map for the **public agent skills layer**: Cursor/Codex skill files, `merit-live` CLI, consumer static templates, freemium cfg — wiring agents to meritsubs, meritutils PAR, meritstore, here.now, Vercel.
+LLD map for the **public agent skills layer**: Cursor/Codex skill files, the `merit` CLI, launch config templates, and freemium cfg — wiring agents to meritsubs, meritutils PAR, meritstore, here.now, and Vercel.
 
 ---
 
@@ -36,12 +36,12 @@ merit-agent-skills/
 │   ├── meritcert/
 │   ├── merit-closeout/
 │   └── merit-iar/
-├── templates/consumer-static/   # play/, portal/ scaffolds
+├── templates/consumer-static/   # play/ shell scaffolds only
 ├── cfg/                         # freemium_limits, plus_sku, par_pins templates
 ├── docs/                        # usage.md TRY_BUNDLES.md
 ├── docs/IAR/                    # this LLD_MAP
 ├── scripts/                     # smoke-freemium.ps1
-├── merit-live.ps1 merit-live.sh install.ps1
+├── merit.ps1 merit.sh install.ps1
 └── LICENSING.md LICENSE
 ```
 
@@ -71,7 +71,7 @@ merit-agent-skills/
 ```mermaid
 flowchart TB
   SKILLS["merit-agent-skills OSS"]
-  LIVE["merit-live.ps1 CLI"]
+  LIVE["merit.ps1 CLI"]
   VAULT["MERIT vault release templates"]
   AGENT["Cursor / Codex agent"]
   CONS["consumer repo dirt|somatune|…"]
@@ -88,24 +88,24 @@ flowchart TB
 ---
 
 <a id="api-catalog"></a>
-## 5. merit-live CLI catalog ^api-catalog
+## 5. merit CLI catalog ^api-catalog
 
 ```yaml
-merit-live verify --path <repo>:
+merit verify --path <repo>:
   summary: Run consumer MERIT foundation checks
   output: pass/fail + checklist IDs
   skill: meritcert/SKILL.md
 
-merit-live par scaffold:
+merit par scaffold:
   summary: Inject PAR pin + adapter stub into consumer
   outputs: cfg par_pins snippet, static adapter template
   provider: meritutils
 
-merit-live subs scaffold:
+merit subs scaffold:
   summary: Embed meritsubs mount instructions + env template
   provider: meritsubs
 
-merit-live deploy vercel:
+merit deploy:
   summary: Deploy consumer static/portal surfaces
   skill: merit-deploy-vercel/SKILL.md
 
@@ -123,7 +123,7 @@ install.ps1:
 | `cfg/freemium_limits.json` | Showcase tier caps for TRY_BUNDLES |
 | `cfg/plus_sku.json` | Plus SKU template → meritstore |
 | `cfg/par_pins.json` | Default PAR pin examples |
-| `templates/consumer-static/cfg/` | New repo bootstrap |
+| `templates/consumer-static/play/` | New repo play-shell bootstrap |
 
 ---
 
@@ -145,3 +145,4 @@ install.ps1:
 |---------|------|--------|
 | 1.0.0 | 2026-06-16 | Initial MERIT_AGENT_SKILLS_LLD_MAP |
 | 1.0.1 | 2026-07-11 | Public-safe peer links and attribution template |
+| 1.0.2 | 2026-07-11 | v0.3.11 cleanup: Portal implementation removed from skills repo; merit.ps1 is public command surface |

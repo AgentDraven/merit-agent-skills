@@ -8,7 +8,7 @@ description: meritsubs production mount reference, meritstore registration funne
 meritsubs provides **subscriber_identity** and entitlement state through production MERIT Vercel mounts. Public consumers must not expose local `/api/meritsubs` stubs, relays, or embedded provider billing/usage-metering source code.
 
 ```powershell
-.\merit-live.ps1 subs scaffold --path <consumer-repo>
+.\merit.ps1 subs scaffold --path <consumer-repo>
 ```
 
 Edit `.merit_launch.md`: set `consumer_id`, keep the production metered-provider defaults unless MERIT gives you dedicated URLs, and run `merit apply` to generate consumer config.

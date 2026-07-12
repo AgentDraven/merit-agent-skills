@@ -15,7 +15,7 @@ Privacy modes:
 Freemium: 2 questions, 2 votes, 2 responses per day; top 25 visible. Plus SKU uncaps.
 
 ```powershell
-.\merit-live.ps1 subs scaffold --path <consumer-repo>
+.\merit.ps1 subs scaffold --path <consumer-repo>
 ```
 
 Report abuse: `meritlabs@protonmail.com` (+ operator email if configured in `cfg/branding.json`).

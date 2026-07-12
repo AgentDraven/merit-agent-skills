@@ -1,18 +1,17 @@
-# Freemium smoke — merit-live PAR + verify (no BYOK required for local phase)
+﻿# Freemium smoke - merit CLI PAR + verify (no BYOK required for local phase)
 param(
     [string]$SkillsRoot = "$PSScriptRoot\..",
-    [string]$ScratchRoot = "$env:TEMP\merit-live-smoke"
+    [string]$ScratchRoot = "$env:TEMP\merit-smoke"
 )
 
 $ErrorActionPreference = 'Stop'
-$live = Join-Path $SkillsRoot 'merit-live.ps1'
-if (-not (Test-Path $live)) { throw "merit-live.ps1 not found: $live" }
+$merit = Join-Path $SkillsRoot 'merit.ps1'
+if (-not (Test-Path $merit)) { throw "merit.ps1 not found: $merit" }
 
-Write-Host "=== merit-live freemium smoke ===" -ForegroundColor Cyan
+Write-Host "=== merit freemium smoke ===" -ForegroundColor Cyan
 if (Test-Path $ScratchRoot) { Remove-Item -Recurse -Force $ScratchRoot }
 New-Item -ItemType Directory -Force -Path $ScratchRoot | Out-Null
 
-# Minimal consumer gitignore
 @"
 .env.local
 .vercel
@@ -20,10 +19,10 @@ node_modules/
 dist/
 "@ | Set-Content (Join-Path $ScratchRoot '.gitignore') -Encoding UTF8
 
-& $live par scaffold --path $ScratchRoot --variant workbench-journal
-& $live branding scaffold --path $ScratchRoot
-& $live subs scaffold --path $ScratchRoot
-& $live verify --path $ScratchRoot
+& $merit par scaffold --path $ScratchRoot --variant workbench-journal
+& $merit branding scaffold --path $ScratchRoot
+& $merit subs scaffold --path $ScratchRoot
+& $merit verify --path $ScratchRoot
 
 $play = Join-Path $ScratchRoot 'play\index.html'
 if (-not (Test-Path $play)) { throw "missing play/index.html" }
@@ -42,4 +41,4 @@ try {
 }
 
 Write-Host "[OK] freemium smoke passed" -ForegroundColor Green
-Write-Host "here.now publish: set HERENOW_API_KEY and run portal publish --all on a consumer with portal/"
+Write-Host "here.now publish: set HERENOW_API_KEY and run merit portal on a consumer with portal/"

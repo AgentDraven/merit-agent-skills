@@ -6,9 +6,9 @@ MERIT uses a **product fork**: open adoption for skills, commercial terms for pl
 
 | You may | You may not (license alone) |
 |---------|----------------------------|
-| Clone, use, and modify **SKILL.md** recipes and **merit-live** scripts | Access **merit-private-vault**, cert registry write, or operator env SSOT |
+| Clone, use, and modify **SKILL.md** recipes and **merit.ps1 / merit.sh** helpers | Access **merit-private-vault**, cert registry write, or operator env SSOT |
 | Redistribute with attribution and a copy of Apache-2.0 | Use **MERIT** trademarks beyond reasonable attribution (see `NOTICE`) |
-| Build products that **call** merit-live or follow skill recipes | Imply MERIT endorsement without agreement |
+| Build products that **call** merit.ps1 or follow skill recipes | Imply MERIT endorsement without agreement |
 
 **Derivatives:** Apache 2.0 **allows** derivative works of this repo’s source. Monetization is **not** via restricting forks — it is via **meritstore**, **meritsubs**, and paid PAR pins on **your** consumer host.
 

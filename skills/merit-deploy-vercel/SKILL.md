@@ -6,7 +6,7 @@ description: Scoped MERIT consumer Vercel production deploy (Flask and static va
 # merit-deploy-vercel
 
 ```powershell
-.\merit-live.ps1 deploy vercel --path <consumer-repo>
+.\merit.ps1 deploy --path <consumer-repo>
 ```
 
 Requires `cfg/flask_deploy.json` with `vercel_scope` and `.vercel/project.json`. Never bare `vercel --prod` without scope.

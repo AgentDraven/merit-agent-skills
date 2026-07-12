@@ -6,7 +6,7 @@ description: MERIT git closeout, mXin, hygiene, and 3-3 report.
 # merit-closeout
 
 ```powershell
-.\merit-live.ps1 verify --path .
+.\merit.ps1 verify --path .
 ```
 
 Vault operators:

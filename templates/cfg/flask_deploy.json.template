@@ -6,5 +6,5 @@
   "vercel_org_id": "",
   "vercel_project_id": "",
   "production_url": "https://{{PROJECT_ID}}.vercel.app",
-  "notes": "MERIT L1 §IX.E — deploy with .\\merit-live.ps1 deploy vercel --path <repo> (or vault merit.ps1 for operators). Never bare vercel --prod without --scope from this file."
+  "notes": "MERIT L1 deploy rule — deploy with .\\merit.ps1 deploy --path <repo> (or vault merit.ps1 for operators). Never bare vercel --prod without --scope from this file."
 }

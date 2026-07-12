@@ -1,6 +1,8 @@
-#!/usr/bin/env bash
-# merit-deploy.sh — bash wrapper for merit-deploy.ps1.
+﻿#!/usr/bin/env bash
+# merit-deploy.sh - deprecated bash wrapper for merit-deploy.ps1.
 set -euo pipefail
+
+echo "DEPRECATED: use ./merit.sh. merit-deploy.sh is scheduled for removal before GA." >&2
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

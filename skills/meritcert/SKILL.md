@@ -8,7 +8,7 @@ description: MERIT foundation certification, capability integration, graph statu
 Vocabulary for certification commands. OSS users document status; vault operators run writes.
 
 ```powershell
-.\merit-live.ps1 verify --path <consumer-repo>
+.\merit.ps1 verify --path <consumer-repo>
 ```
 
 Vault operators (cert registry writes):

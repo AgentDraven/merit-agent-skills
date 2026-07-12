@@ -1,6 +1,6 @@
-﻿# Try bundles — merit-live freemium angles
+﻿# Try bundles — merit freemium angles
 
-Each bundle maps to a **merit-live** command sequence. **Accounts, tiers, payouts:** [usage.md](usage.md). Full stack: clone [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo).
+Each bundle maps to a **merit** command sequence. **Accounts, tiers, payouts:** [usage.md](usage.md). Full stack: clone [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo).
 
 | Bundle | Command(s) | Angle | Outcome |
 |--------|------------|-------|---------|
@@ -18,16 +18,16 @@ Each bundle maps to a **merit-live** command sequence. **Accounts, tiers, payout
 ```powershell
 mkdir my-merit-app; cd my-merit-app
 git init
-..\merit-agent-skills\merit-live.ps1 par scaffold --variant workbench-journal
-..\merit-agent-skills\merit-live.ps1 branding scaffold
-..\merit-agent-skills\merit-live.ps1 verify
+..\merit-agent-skills\merit.ps1 par scaffold --variant workbench-journal
+..\merit-agent-skills\merit.ps1 branding scaffold
+..\merit-agent-skills\merit.ps1 verify
 ```
 
-Open `play/index.html` locally or `deploy vercel`.
+Open `play/index.html` locally or run `merit.ps1 deploy --path <repo>` after launch setup.
 
 ## Angle 2 — creator (marketing + app)
 
-Angle 1 + edit `portal/` + set `HERENOW_API_KEY` + `portal publish --all`.
+Angle 1 + create or edit the consumer-owned `portal/` + set `HERENOW_API_KEY` + `merit.ps1 portal --path <repo>`.
 
 ## Angle 3 — subscriber (live demos)
 

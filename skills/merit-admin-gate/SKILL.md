@@ -1,6 +1,6 @@
 ---
 name: merit-admin-gate
-description: MeritAdminGate phrase auth (adj-noun-pin); demo init via merit-live; vault hash for operators.
+description: MeritAdminGate phrase auth (adj-noun-pin); demo init via merit CLI; vault hash for operators.
 ---
 
 # merit-admin-gate
@@ -8,7 +8,7 @@ description: MeritAdminGate phrase auth (adj-noun-pin); demo init via merit-live
 Phrase format: `{adjective}-{noun}-{####}` (four digits). Wordlists are public; hashes are never in git.
 
 ```powershell
-.\merit-live.ps1 admin gate demo-init --path <consumer-repo>
+.\merit.ps1 admin gate demo-init --path <consumer-repo>
 ```
 
 Vault operators (production hash slots + Vercel sync):

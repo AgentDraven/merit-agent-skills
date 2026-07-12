@@ -21,6 +21,48 @@ Operator-only vault workflows are optional and not required for a first-time pub
 
 ---
 
+## 3 Steps Over Dinner
+
+### 1. Local Setup
+
+Create an empty directory, clone the pinned skills release, clone `merit-demo`, install the skills, and verify the baseline:
+
+```powershell
+mkdir C:\MeritOverDinner
+cd C:\MeritOverDinner
+git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
+git clone https://github.com/Mr-PI-Bala/merit-demo.git
+cd merit-agent-skills
+.\install.ps1 -Target Cursor
+.\merit.ps1 verify --path ..\merit-demo
+```
+
+### 2. Initialize The Repository
+
+Run `init`, edit only the mandatory section of `.merit_launch.md`, then run `apply`. `apply` creates `.env.local`, `cfg/flask_deploy.json`, and `cfg/portals.json`; Vercel still requires its own one-time `npx vercel link` before the first deploy.
+
+```powershell
+.\merit.ps1 init --path ..\merit-demo
+# edit ..\merit-demo\.merit_launch.md
+.\merit.ps1 apply --path ..\merit-demo
+npx vercel link --scope <your-vercel-scope>
+.\merit.ps1 deploy --path ..\merit-demo
+```
+
+### 3. Add Marketing Front-End & Save
+
+Edit the consumer-owned `portal/` folder, publish it when ready, then save the repo with normal Git. Vault operators may add `merit-closeout`; public users do not need vault closeout.
+
+```powershell
+# edit ..\merit-demo\portal\
+.\merit.ps1 portal --path ..\merit-demo
+git -C ..\merit-demo add .
+git -C ..\merit-demo commit -m "launch: update Portal"
+git -C ..\merit-demo push
+```
+
+---
+
 ## What is free without any account
 
 You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or Supabase:
@@ -105,7 +147,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.10 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -121,7 +163,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.10 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.11 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
