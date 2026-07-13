@@ -147,4 +147,5 @@ install.ps1:
 | 1.0.1 | 2026-07-11 | Public-safe peer links and attribution template |
 | 1.0.2 | 2026-07-11 | v0.3.11 cleanup: Portal implementation removed from skills repo; merit.ps1 is public command surface |
 | 1.0.4 | 2026-07-12 | v0.3.13 launch validation: closeout command and public design doc |
+| 1.0.5 | 2026-07-13 | v0.3.14 monotonic patch release: merit-demo Hello World and merit-test clean-clone proof |
 | 1.0.3 | 2026-07-12 | v0.3.12 cleanup: shim scripts removed; merit.ps1 is self-contained |
