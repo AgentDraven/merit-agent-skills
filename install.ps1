@@ -25,9 +25,9 @@ if ($Target -eq 'Cursor') {
 New-Item -ItemType Directory -Force -Path $destRoot | Out-Null
 $count = 0
 Get-ChildItem -LiteralPath $skillsSrc -Directory | ForEach-Object {
-    $target = Join-Path $destRoot $_.Name
-    Write-Host "install $($_.Name) -> $target"
-    Copy-Item -LiteralPath $_.FullName -Destination $target -Recurse -Force
+    $destSkill = Join-Path $destRoot $_.Name
+    Write-Host "install $($_.Name) -> $destSkill"
+    Copy-Item -LiteralPath $_.FullName -Destination $destSkill -Recurse -Force
     $count++
 }
 Write-Host "Installed $count skills to $destRoot"

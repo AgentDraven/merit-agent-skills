@@ -26,6 +26,8 @@ Commands:
   par scaffold             Advanced: create play shell + cfg/par_pins.json
   branding scaffold        Advanced: create cfg/branding.json
   subs scaffold            Advanced: create meritsubs/meritstore cfg
+  livealpha --path <repo>  Elevate consumer toward live alpha (Research + Baseline scaffold)
+  baseline --path <repo>   Alias for livealpha
   admin gate demo-init     Advanced: create local demo operator-gate placeholders
   app scaffold             Print merit-demo clone guidance
   version                  Print version
@@ -317,6 +319,116 @@ function Invoke-SubsScaffold {
     Write-Host "subs scaffold OK -> $cfg (edit consumer_id and register URL)"
 }
 
+function Get-ConsumerIdFromRepo {
+    param([string]$TargetRoot)
+    $syncPath = Join-Path $TargetRoot 'cfg/merit-sync.json'
+    if (Test-Path $syncPath) {
+        $sync = Read-JsonFile $syncPath
+        if ($sync.consumer_id) { return [string]$sync.consumer_id }
+    }
+    return $null
+}
+
+function ConvertTo-ConsumerTitle {
+    param([string]$ConsumerId)
+    $parts = $ConsumerId -split '[-_]' | Where-Object { $_ }
+    return (($parts | ForEach-Object { $_.Substring(0,1).ToUpperInvariant() + $_.Substring(1) }) -join ' ')
+}
+
+function Copy-LiveAlphaTemplateIfMissing {
+    param([string]$Source, [string]$Dest, [hashtable]$Replacements, [switch]$Force)
+    if ((Test-Path $Dest) -and -not $Force) {
+        Write-Host "  keep $Dest"
+        return $false
+    }
+    $dir = Split-Path -Parent $Dest
+    if ($dir -and -not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+    $text = Get-Content -LiteralPath $Source -Raw -Encoding UTF8
+    foreach ($key in $Replacements.Keys) {
+        $text = $text.Replace("{{$key}}", [string]$Replacements[$key])
+    }
+    [System.IO.File]::WriteAllText($Dest, $text, [System.Text.UTF8Encoding]::new($false))
+    Write-Host "  write $Dest"
+    return $true
+}
+
+function Invoke-LiveAlpha {
+    param([string]$TargetRoot, [string[]]$ArgList)
+    $mode = 'scaffold'
+    if ($ArgList.Count -gt 0 -and $ArgList[0] -notlike '--*') {
+        $mode = "$($ArgList[0])".ToLowerInvariant()
+    }
+    $force = Test-ArgFlag -ArgList $ArgList -Name '--force'
+    $consumerId = Get-ConsumerIdFromRepo -TargetRoot $TargetRoot
+    if (-not $consumerId) {
+        throw "livealpha needs cfg/merit-sync.json with consumer_id. Run merit init/apply or set consumer_id first. Path: $TargetRoot"
+    }
+    $title = ConvertTo-ConsumerTitle -ConsumerId $consumerId
+    $date = (Get-Date).ToString('yyyy-MM-dd')
+    $repl = @{
+        CONSUMER_ID = $consumerId
+        CONSUMER_TITLE = $title
+        DATE = $date
+    }
+    $tplRoot = Join-Path $Root 'templates/livealpha'
+    $cfg = Join-Path $TargetRoot 'cfg'
+    $iar = Join-Path $TargetRoot 'docs/IAR'
+    New-Item -ItemType Directory -Force -Path $cfg | Out-Null
+    New-Item -ItemType Directory -Force -Path $iar | Out-Null
+
+    if ($mode -eq 'status') {
+        Write-Host "livealpha status -> $TargetRoot ($consumerId)"
+        $cross = Join-Path $cfg 'research_crossrefs.json'
+        $research = Join-Path $iar (($consumerId -replace '-', '_') + '_BASELINE_RESEARCH.md')
+        $edgeCount = 0
+        $catCount = 0
+        if (Test-Path $cross) {
+            $cx = Read-JsonFile $cross
+            if ($cx.categories) { $catCount = @($cx.categories).Count }
+            if ($cx.edges) { $edgeCount = @($cx.edges).Count }
+        }
+        Write-Host "  research_iar: $(Test-Path $research)"
+        Write-Host "  categories: $catCount (floor 10)"
+        Write-Host "  crossref_edges: $edgeCount (floor 50)"
+        Write-Host "  freemium_limits: $(Test-Path (Join-Path $cfg 'freemium_limits.json'))"
+        Write-Host "  plus_sku: $(Test-Path (Join-Path $cfg 'plus_sku.json'))"
+        Write-Host "  meritsubs_consumer: $(Test-Path (Join-Path $cfg 'meritsubs_consumer.json'))"
+        if ($catCount -ge 10 -and $edgeCount -ge 50) {
+            Write-Host '  floors: PASS (structure)'
+        } else {
+            Write-Host '  floors: FAIL or incomplete — fill APA refs + ≥50 edges; see skill merit-livealpha'
+        }
+        Write-Host "Next: /merit-livealpha in Cursor on this repo"
+        return
+    }
+
+    Write-Host "livealpha $mode -> $TargetRoot ($consumerId)"
+    $researchName = ($consumerId -replace '-', '_') + '_BASELINE_RESEARCH.md'
+    $forceSwitch = $force
+    Copy-LiveAlphaTemplateIfMissing -Source (Join-Path $tplRoot 'research_crossrefs.json.template') `
+        -Dest (Join-Path $cfg 'research_crossrefs.json') -Replacements $repl -Force:$forceSwitch | Out-Null
+    Copy-LiveAlphaTemplateIfMissing -Source (Join-Path $tplRoot 'BASELINE_RESEARCH.md.template') `
+        -Dest (Join-Path $iar $researchName) -Replacements $repl -Force:$forceSwitch | Out-Null
+    Copy-LiveAlphaTemplateIfMissing -Source (Join-Path $tplRoot 'meritsubs_consumer.json.template') `
+        -Dest (Join-Path $cfg 'meritsubs_consumer.json') -Replacements $repl -Force:$forceSwitch | Out-Null
+    foreach ($name in @('freemium_limits.json', 'plus_sku.json')) {
+        $dest = Join-Path $cfg $name
+        if ((Test-Path $dest) -and -not $force) {
+            Write-Host "  keep $dest"
+        } else {
+            Copy-Item -LiteralPath (Join-Path $Root "cfg/$name") -Destination $dest -Force
+            Write-Host "  write $dest"
+        }
+    }
+    if ($mode -eq 'research') {
+        Write-Host 'livealpha research pack OK'
+    } else {
+        Write-Host 'livealpha scaffold OK'
+    }
+    Write-Host 'Next: open Cursor on this consumer and run /merit-livealpha …'
+    Write-Host '  Or: .\merit.ps1 livealpha status --path <repo>'
+}
+
 function Invoke-AdminGateDemoInit {
     param([string]$TargetRoot)
     $envPath = Join-Path $TargetRoot '.env.local'
@@ -444,6 +556,10 @@ switch -Regex ($Command) {
     '^subs$' {
         if (-not $Rest -or $Rest[0] -ne 'scaffold') { Write-MeritHelp; exit 1 }
         Invoke-SubsScaffold -TargetRoot $target
+        exit 0
+    }
+    '^(livealpha|baseline)$' {
+        Invoke-LiveAlpha -TargetRoot $target -ArgList $Rest
         exit 0
     }
     '^admin$' {

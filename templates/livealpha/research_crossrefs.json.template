@@ -1,0 +1,23 @@
+{
+  "schema": "merit.research_crossrefs.v1",
+  "consumer_id": "{{CONSUMER_ID}}",
+  "floors": {
+    "categories": 10,
+    "refs_per_category": 10,
+    "crossref_edges": 50
+  },
+  "categories": [
+    "a11y",
+    "pwa",
+    "privacy",
+    "identity",
+    "freemium",
+    "community",
+    "rooms",
+    "alerts",
+    "safety",
+    "tenancy"
+  ],
+  "edges": [],
+  "notes": "Fill ≥50 distinct edges: claim_id + artifact + primary_ref + optional supporting_refs[]. primary_ref must match #ref-{category}-{nn} in the Research IAR. No invented citations."
+}

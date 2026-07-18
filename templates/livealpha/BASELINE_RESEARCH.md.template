@@ -1,0 +1,362 @@
+# {{CONSUMER_TITLE}} — Baseline Research (MERIT Research Full)
+
+**Consumer ID:** `{{CONSUMER_ID}}`  
+**Tier:** Full MERIT Research (L1 §VII.E floors)  
+**Floors:** ≥10 categories × ≥10 APA 7 refs · ≥50 cross-ref validations in `cfg/research_crossrefs.json`
+
+## Purpose
+
+External evidence (*why*) for production-worthy **live alpha** Baseline App behavior. Complements design Technical SSOT. **No invented citations** — UNBOUND slots must be filled with real APA 7 sources or the claim must be deferred.
+
+## Categories
+
+| ID | Scope |
+|----|--------|
+| a11y | Accessibility & inclusive design |
+| pwa | Installable web, service workers, Home Screen |
+| privacy | Local-first, minimization, consent, export/delete |
+| identity | Subscriber identity, entitlements |
+| freemium | Caps, honest monetization |
+| community | Prompts, AMA, journaling habits |
+| rooms | Conferencing, breakouts, capacity |
+| alerts | Email, Web Push, unsubscribe |
+| safety | Moderation, edu-not-clinical |
+| tenancy | Multi-tenant isolation, RLS, consumer dataplane |
+
+---
+
+## a11y
+
+<a id="ref-a11y-01"></a>
+**ref-a11y-01** — UNBOUND
+
+<a id="ref-a11y-02"></a>
+**ref-a11y-02** — UNBOUND
+
+<a id="ref-a11y-03"></a>
+**ref-a11y-03** — UNBOUND
+
+<a id="ref-a11y-04"></a>
+**ref-a11y-04** — UNBOUND
+
+<a id="ref-a11y-05"></a>
+**ref-a11y-05** — UNBOUND
+
+<a id="ref-a11y-06"></a>
+**ref-a11y-06** — UNBOUND
+
+<a id="ref-a11y-07"></a>
+**ref-a11y-07** — UNBOUND
+
+<a id="ref-a11y-08"></a>
+**ref-a11y-08** — UNBOUND
+
+<a id="ref-a11y-09"></a>
+**ref-a11y-09** — UNBOUND
+
+<a id="ref-a11y-10"></a>
+**ref-a11y-10** — UNBOUND
+
+## pwa
+
+<a id="ref-pwa-01"></a>
+**ref-pwa-01** — UNBOUND
+
+<a id="ref-pwa-02"></a>
+**ref-pwa-02** — UNBOUND
+
+<a id="ref-pwa-03"></a>
+**ref-pwa-03** — UNBOUND
+
+<a id="ref-pwa-04"></a>
+**ref-pwa-04** — UNBOUND
+
+<a id="ref-pwa-05"></a>
+**ref-pwa-05** — UNBOUND
+
+<a id="ref-pwa-06"></a>
+**ref-pwa-06** — UNBOUND
+
+<a id="ref-pwa-07"></a>
+**ref-pwa-07** — UNBOUND
+
+<a id="ref-pwa-08"></a>
+**ref-pwa-08** — UNBOUND
+
+<a id="ref-pwa-09"></a>
+**ref-pwa-09** — UNBOUND
+
+<a id="ref-pwa-10"></a>
+**ref-pwa-10** — UNBOUND
+
+## privacy
+
+<a id="ref-privacy-01"></a>
+**ref-privacy-01** — UNBOUND
+
+<a id="ref-privacy-02"></a>
+**ref-privacy-02** — UNBOUND
+
+<a id="ref-privacy-03"></a>
+**ref-privacy-03** — UNBOUND
+
+<a id="ref-privacy-04"></a>
+**ref-privacy-04** — UNBOUND
+
+<a id="ref-privacy-05"></a>
+**ref-privacy-05** — UNBOUND
+
+<a id="ref-privacy-06"></a>
+**ref-privacy-06** — UNBOUND
+
+<a id="ref-privacy-07"></a>
+**ref-privacy-07** — UNBOUND
+
+<a id="ref-privacy-08"></a>
+**ref-privacy-08** — UNBOUND
+
+<a id="ref-privacy-09"></a>
+**ref-privacy-09** — UNBOUND
+
+<a id="ref-privacy-10"></a>
+**ref-privacy-10** — UNBOUND
+
+## identity
+
+<a id="ref-identity-01"></a>
+**ref-identity-01** — UNBOUND
+
+<a id="ref-identity-02"></a>
+**ref-identity-02** — UNBOUND
+
+<a id="ref-identity-03"></a>
+**ref-identity-03** — UNBOUND
+
+<a id="ref-identity-04"></a>
+**ref-identity-04** — UNBOUND
+
+<a id="ref-identity-05"></a>
+**ref-identity-05** — UNBOUND
+
+<a id="ref-identity-06"></a>
+**ref-identity-06** — UNBOUND
+
+<a id="ref-identity-07"></a>
+**ref-identity-07** — UNBOUND
+
+<a id="ref-identity-08"></a>
+**ref-identity-08** — UNBOUND
+
+<a id="ref-identity-09"></a>
+**ref-identity-09** — UNBOUND
+
+<a id="ref-identity-10"></a>
+**ref-identity-10** — UNBOUND
+
+## freemium
+
+<a id="ref-freemium-01"></a>
+**ref-freemium-01** — UNBOUND
+
+<a id="ref-freemium-02"></a>
+**ref-freemium-02** — UNBOUND
+
+<a id="ref-freemium-03"></a>
+**ref-freemium-03** — UNBOUND
+
+<a id="ref-freemium-04"></a>
+**ref-freemium-04** — UNBOUND
+
+<a id="ref-freemium-05"></a>
+**ref-freemium-05** — UNBOUND
+
+<a id="ref-freemium-06"></a>
+**ref-freemium-06** — UNBOUND
+
+<a id="ref-freemium-07"></a>
+**ref-freemium-07** — UNBOUND
+
+<a id="ref-freemium-08"></a>
+**ref-freemium-08** — UNBOUND
+
+<a id="ref-freemium-09"></a>
+**ref-freemium-09** — UNBOUND
+
+<a id="ref-freemium-10"></a>
+**ref-freemium-10** — UNBOUND
+
+## community
+
+<a id="ref-community-01"></a>
+**ref-community-01** — UNBOUND
+
+<a id="ref-community-02"></a>
+**ref-community-02** — UNBOUND
+
+<a id="ref-community-03"></a>
+**ref-community-03** — UNBOUND
+
+<a id="ref-community-04"></a>
+**ref-community-04** — UNBOUND
+
+<a id="ref-community-05"></a>
+**ref-community-05** — UNBOUND
+
+<a id="ref-community-06"></a>
+**ref-community-06** — UNBOUND
+
+<a id="ref-community-07"></a>
+**ref-community-07** — UNBOUND
+
+<a id="ref-community-08"></a>
+**ref-community-08** — UNBOUND
+
+<a id="ref-community-09"></a>
+**ref-community-09** — UNBOUND
+
+<a id="ref-community-10"></a>
+**ref-community-10** — UNBOUND
+
+## rooms
+
+<a id="ref-rooms-01"></a>
+**ref-rooms-01** — UNBOUND
+
+<a id="ref-rooms-02"></a>
+**ref-rooms-02** — UNBOUND
+
+<a id="ref-rooms-03"></a>
+**ref-rooms-03** — UNBOUND
+
+<a id="ref-rooms-04"></a>
+**ref-rooms-04** — UNBOUND
+
+<a id="ref-rooms-05"></a>
+**ref-rooms-05** — UNBOUND
+
+<a id="ref-rooms-06"></a>
+**ref-rooms-06** — UNBOUND
+
+<a id="ref-rooms-07"></a>
+**ref-rooms-07** — UNBOUND
+
+<a id="ref-rooms-08"></a>
+**ref-rooms-08** — UNBOUND
+
+<a id="ref-rooms-09"></a>
+**ref-rooms-09** — UNBOUND
+
+<a id="ref-rooms-10"></a>
+**ref-rooms-10** — UNBOUND
+
+## alerts
+
+<a id="ref-alerts-01"></a>
+**ref-alerts-01** — UNBOUND
+
+<a id="ref-alerts-02"></a>
+**ref-alerts-02** — UNBOUND
+
+<a id="ref-alerts-03"></a>
+**ref-alerts-03** — UNBOUND
+
+<a id="ref-alerts-04"></a>
+**ref-alerts-04** — UNBOUND
+
+<a id="ref-alerts-05"></a>
+**ref-alerts-05** — UNBOUND
+
+<a id="ref-alerts-06"></a>
+**ref-alerts-06** — UNBOUND
+
+<a id="ref-alerts-07"></a>
+**ref-alerts-07** — UNBOUND
+
+<a id="ref-alerts-08"></a>
+**ref-alerts-08** — UNBOUND
+
+<a id="ref-alerts-09"></a>
+**ref-alerts-09** — UNBOUND
+
+<a id="ref-alerts-10"></a>
+**ref-alerts-10** — UNBOUND
+
+## safety
+
+<a id="ref-safety-01"></a>
+**ref-safety-01** — UNBOUND
+
+<a id="ref-safety-02"></a>
+**ref-safety-02** — UNBOUND
+
+<a id="ref-safety-03"></a>
+**ref-safety-03** — UNBOUND
+
+<a id="ref-safety-04"></a>
+**ref-safety-04** — UNBOUND
+
+<a id="ref-safety-05"></a>
+**ref-safety-05** — UNBOUND
+
+<a id="ref-safety-06"></a>
+**ref-safety-06** — UNBOUND
+
+<a id="ref-safety-07"></a>
+**ref-safety-07** — UNBOUND
+
+<a id="ref-safety-08"></a>
+**ref-safety-08** — UNBOUND
+
+<a id="ref-safety-09"></a>
+**ref-safety-09** — UNBOUND
+
+<a id="ref-safety-10"></a>
+**ref-safety-10** — UNBOUND
+
+## tenancy
+
+<a id="ref-tenancy-01"></a>
+**ref-tenancy-01** — UNBOUND
+
+<a id="ref-tenancy-02"></a>
+**ref-tenancy-02** — UNBOUND
+
+<a id="ref-tenancy-03"></a>
+**ref-tenancy-03** — UNBOUND
+
+<a id="ref-tenancy-04"></a>
+**ref-tenancy-04** — UNBOUND
+
+<a id="ref-tenancy-05"></a>
+**ref-tenancy-05** — UNBOUND
+
+<a id="ref-tenancy-06"></a>
+**ref-tenancy-06** — UNBOUND
+
+<a id="ref-tenancy-07"></a>
+**ref-tenancy-07** — UNBOUND
+
+<a id="ref-tenancy-08"></a>
+**ref-tenancy-08** — UNBOUND
+
+<a id="ref-tenancy-09"></a>
+**ref-tenancy-09** — UNBOUND
+
+<a id="ref-tenancy-10"></a>
+**ref-tenancy-10** — UNBOUND
+
+---
+
+## Critique backlog
+
+| Gap | Action |
+|-----|--------|
+| UNBOUND refs | Replace with APA 7 or defer related product claims |
+| Cross-ref edges &lt; 50 | Add rows in `cfg/research_crossrefs.json` |
+| Contested claims (Jaas JWT, E2E journal crypto, websocket feed) | Keep listed until evidenced or honest-defer |
+
+## Revision history
+
+| Date | Change |
+|------|--------|
+| {{DATE}} | Scaffolded by `merit.ps1 livealpha` |

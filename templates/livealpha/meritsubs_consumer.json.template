@@ -1,0 +1,10 @@
+{
+  "schema": "merit.meritsubs_consumer.v1",
+  "consumer_id": "{{CONSUMER_ID}}",
+  "meritsubs_base": "https://merit-prod.vercel.app/api/meritsubs",
+  "onboard": {
+    "guest": true,
+    "email": true
+  },
+  "notes": "Token in client storage; entitlements via Bearer. No local /api/meritsubs stubs on public consumers."
+}

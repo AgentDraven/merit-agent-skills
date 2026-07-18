@@ -26,6 +26,7 @@ LLD map for the **public agent skills layer**: Cursor/Codex skill files, the `me
 ```
 merit-agent-skills/
 ├── skills/                      # One folder per skill (SKILL.md)
+│   ├── merit-livealpha/
 │   ├── merit-par-workbench/
 │   ├── merit-portal/
 │   ├── merit-subs/
