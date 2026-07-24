@@ -14,6 +14,7 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 | **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) — independent consumer ID using the same hosted providers |
 | **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
 | **Skills only** | Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor` |
+| **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** — gap analysis → FR/AGENT_REQ (no vault) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha …` |
 
 **Production MERIT base:** `https://merit-prod.vercel.app` for metered APIs, packages, and register paths. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.

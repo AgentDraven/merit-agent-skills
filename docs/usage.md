@@ -1,4 +1,4 @@
-﻿# merit-agent-skills — usage
+# merit-agent-skills — usage
 
 Public guide for the **OSS** path: `merit.ps1`, skills, and freemium try bundles.
 Operator-only vault workflows are optional and not required for a first-time public user.
