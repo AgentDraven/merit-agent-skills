@@ -13,8 +13,9 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) — workbench, journal, AMA, subs, legal |
 | **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) — independent consumer ID using the same hosted providers |
 | **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
-| **Skills only** | Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor` |
+| **Skills only** | Windows `.\install.ps1 -Target Cursor|Agents|Claude|Codex`; Linux/macOS `./install.sh -Target …` |
 | **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** — gap analysis → FR/AGENT_REQ (no vault) |
+| **Affiliate / design partner** | [`skills/merit-affiliate`](skills/merit-affiliate/SKILL.md) — free attribution + portal recipes (no billing) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha …` |
 
 **Production MERIT base:** `https://merit-prod.vercel.app` for metered APIs, packages, and register paths. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
@@ -34,6 +35,19 @@ git clone --branch skills-v0.3.14 https://github.com/AgentDraven/merit-agent-ski
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
+
+## Multi-runtime install (same `skills/` tree)
+
+| Runtime | Install |
+|---------|---------|
+| **Cursor** | `.\install.ps1 -Target Cursor` → `~/.cursor/skills` |
+| **Codex / Agents** | `.\install.ps1 -Target Agents` → `~/.agents/skills` · or `-Target Codex` → `~/.codex/skills` |
+| **Claude Code** | `.\install.ps1 -Target Claude` → `~/.claude/skills` · or copy into `<repo>/.claude/skills/` |
+| **Hermes** | `hermes skills tap add AgentDraven/merit-agent-skills` · or copy into `~/.hermes/skills` / scan `~/.agents/skills` |
+| **OpenClaw** | `openclaw skills install ./skills/merit-mm-upgrade` · ClawHub publish if desired (license: Apache-2.0 here) |
+| **Project (Cursor)** | `.\install.ps1 -Target Project -Path <repo>` → `<repo>/.cursor/skills` |
+
+**mmUpgrade** is public freeware (`merit-mm-upgrade`). Full **`merit-upgrade`** (IAR / hygiene / maturity / closeout) stays vault-only via `merit.ps1 runtime out` — not in this OSS tree.
 
 ## 3 Steps Over Dinner cheatsheet
 
@@ -139,7 +153,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current human-validation baseline | **`skills-v0.3.14`** |
+| Current human-validation baseline | **`skills-v0.3.15`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
 

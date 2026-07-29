@@ -3,10 +3,14 @@
   "consumer_id": "YOUR_CONSUMER_ID",
   "affiliate_code": "YOUR_CONSUMER_ID",
   "default_promocode": "MERITAGENT",
+  "partner_kind": "affiliate",
   "source": "merit-agent-skills",
   "notes": [
     "This file is non-secret and optional during local-only evaluation.",
     "Use a stable consumer_id before requesting meritstore tenant provisioning.",
-    "MERITAGENT is the default hosted intro promo. The hosted provider controls credit amount and enforcement."
-  ]
+    "MERITAGENT is the default hosted intro promo. The hosted provider controls credit amount and enforcement.",
+    "partner_kind is a hint for marketing copy only — cohort membership is granted on meritsubs (not by this file).",
+    "affiliate_code is checkout attribution on meritstore — distinct from partner_kinds and from runtime MERIT_AFFILIATE."
+  ],
+  "register_url_template": "https://meritstore.vercel.app/{consumer_id}/register?affiliate={affiliate_code}&utm_source={utm_source}&utm_medium={utm_medium}&utm_campaign={utm_campaign}"
 }

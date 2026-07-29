@@ -229,6 +229,27 @@ Avoid on Tier 2: private operator runtimes, vault `merit.ps1 env out`, or Vercel
 
 ## Commerce and payouts (guest → creator → subscriber)
 
+### Attribution for later paid conversion
+
+Optional non-secret cfg: copy [`cfg/consumer_attribution.json.template`](../cfg/consumer_attribution.json.template) into your consumer as `cfg/consumer_attribution.json`.
+
+| Field | Role |
+|-------|------|
+| `consumer_id` | Stable consumer / tenant id |
+| `affiliate_code` | Checkout attribution on **meritstore** register URLs |
+| `default_promocode` | Usually `MERITAGENT` (platform-enforced) |
+| `partner_kind` | Marketing hint only (`affiliate` \| `design_partner`) — cohort is granted on **meritsubs** |
+
+Register URL shape:
+
+```text
+https://meritstore.vercel.app/{consumer_id}/register?affiliate={affiliate_code}&utm_source=…&utm_medium=…&utm_campaign=…
+```
+
+Skill: [`skills/merit-affiliate`](../skills/merit-affiliate/SKILL.md) · Portal recipe: [`docs/recipes/affiliate-portal.md`](recipes/affiliate-portal.md).
+
+**Do not confuse:** `affiliate_code` (attribution) ≠ meritsubs `partner_kinds` (cohort) ≠ runtime `MERIT_AFFILIATE` (operator folder).
+
 Three roles — do not conflate them:
 
 | Role | Who | Pays / earns |
