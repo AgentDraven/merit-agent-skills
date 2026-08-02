@@ -132,7 +132,7 @@ npm install
 | `merit-onboard` | OSS quickstart → merit-demo |
 | `meritcert`, `merit-closeout`, `merit-iar` | Vocabulary; vault operators run writes |
 
-`merit.ps1 create` (v0.3.26+): **Cloud First** — always a live cloud URL (`merit-prod` `/apps/<app>/play` by default). Own-host: `--deploy --vercel-scope <team>`. Local-only deploy flags error.
+`merit.ps1 create` (v0.3.27+): **Cloud First** — always a live cloud URL (`merit-prod` `/apps/<app>/play` by default). Own-host: `--deploy --vercel-scope <team>`. Local-only deploy flags error. Phase 8 prints pack/upload progress (re-run safe).
 
 All OSS user docs use **`.\merit.ps1`** / **`./merit.sh`**. There are no public shim scripts.
 
@@ -159,7 +159,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` (L1 §E.0 / FR-SK-14) |
-| Current tip (Portal pin) | **`skills-v0.3.26`** |
+| Current tip (Portal pin) | **`skills-v0.3.27`** |
 | Current human-validation baseline | **`skills-v0.3.22`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.

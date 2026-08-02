@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.26'
+$MERIT_VERSION = '0.3.27'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -724,7 +724,9 @@ function Invoke-AppsPublish {
         [string]$ConsumerId,
         [string]$Gateway = 'https://merit-prod.vercel.app'
     )
+    Write-Host "Packing play/ + cfg/ for $Gateway/apps/$ConsumerId/play (usually a few seconds)..."
     $files = [System.Collections.Generic.List[object]]::new()
+    $totalBytes = 0
     foreach ($folder in @('play', 'cfg')) {
         $root = Join-Path $TargetRoot $folder
         if (-not (Test-Path -LiteralPath $root)) { continue }
@@ -733,6 +735,7 @@ function Invoke-AppsPublish {
             if ($rel -notmatch '\.(html?|css|js|mjs|json|svg|txt|md)$') { return }
             $content = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8
             if ($null -eq $content) { $content = '' }
+            $totalBytes += [System.Text.Encoding]::UTF8.GetByteCount($content)
             $files.Add([ordered]@{
                 path = $rel
                 content = $content
@@ -743,12 +746,27 @@ function Invoke-AppsPublish {
     if ($files.Count -lt 1) {
         throw "apps publish: no play/ or cfg/ files under $TargetRoot"
     }
+    $kb = [math]::Max(1, [math]::Round($totalBytes / 1KB, 1))
+    Write-Host "Packed $($files.Count) file(s) (~$kb KB). Building upload payload..."
     $payload = @{ consumerId = $ConsumerId; files = @($files.ToArray()) } | ConvertTo-Json -Depth 8 -Compress
-    Write-Host "Publishing $($files.Count) file(s) to $Gateway/apps/$ConsumerId/play ..."
+    Write-Host "Uploading to $Gateway/api/apps/publish (usually <15s; hard timeout 60s). Safe to Ctrl+C and re-run create if this hangs..."
     try {
-        $resp = Invoke-RestMethod -Uri "$Gateway/api/apps/publish" -Method Post -Body $payload -ContentType 'application/json; charset=utf-8' -TimeoutSec 60
+        # HttpClient honors Timeout more reliably than Invoke-RestMethod on some Windows hosts.
+        $handler = [System.Net.Http.HttpClientHandler]::new()
+        $client = [System.Net.Http.HttpClient]::new($handler)
+        $client.Timeout = [TimeSpan]::FromSeconds(60)
+        $content = [System.Net.Http.StringContent]::new($payload, [System.Text.Encoding]::UTF8, 'application/json')
+        $response = $client.PostAsync("$Gateway/api/apps/publish", $content).GetAwaiter().GetResult()
+        $bodyText = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+        if (-not $response.IsSuccessStatusCode) {
+            throw "HTTP $([int]$response.StatusCode): $bodyText"
+        }
+        $resp = $bodyText | ConvertFrom-Json
     } catch {
-        throw "apps publish failed ($Gateway/api/apps/publish). Deploy merit-prod with /apps host, then re-run create. $_"
+        throw "apps publish failed ($Gateway/api/apps/publish). Check network / merit-prod /apps host, then re-run create (safe + idempotent). $_"
+    } finally {
+        if ($client) { $client.Dispose() }
+        if ($handler) { $handler.Dispose() }
     }
     if (-not $resp.ok -or -not $resp.appUrl) {
         throw "apps publish rejected: $($resp | ConvertTo-Json -Compress)"
@@ -860,7 +878,8 @@ function Invoke-Create {
             $settings = Get-LaunchSettings -Path $launch
             $cid = Require-Setting -Settings $settings -Name 'consumer_id'
             Write-Host "Rails wired for consumer_id=$cid (store/auth via $gateway)"
-            Write-Host "Register path (after tenant): $gateway/store/$cid/register"
+            Write-Host "Register path (after your store is live): $gateway/store/$cid/register"
+            Write-Host 'Phase 8 next: publish UI to merit-prod /apps (re-run create is safe if this step hangs).'
             $script:CreateAppUrl = Invoke-AppsPublish -TargetRoot $TargetRoot -ConsumerId $cid -Gateway $gateway
             if (-not $script:CreateAppUrl) {
                 throw 'create: cloud publish returned no app URL (Cloud First Security Centric). Fix merit-prod /api/apps/publish, then re-run create.'
