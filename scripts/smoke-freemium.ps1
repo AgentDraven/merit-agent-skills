@@ -33,6 +33,10 @@ if (-not (Test-Path $play)) { throw "missing play/index.html" }
 $html = Get-Content $play -Raw
 if ($html -notmatch 'merit-prod\.vercel\.app/pkg/meritutils') { throw "play shell missing MERIT package gateway URL" }
 if ($html -notmatch 'journal') { throw "workbench-journal variant missing journal tags" }
+if ($html -notmatch 'mountMeritWorkbenchPanel') { throw "play shell missing workbench boot (mountMeritWorkbenchPanel)" }
+if ($html -notmatch 'Your MERIT rails') { throw "play shell missing Step 2 capability tour (Your MERIT rails)" }
+if ($html -notmatch 'app_logic') { throw "play shell missing app_logic next-step callout" }
+if ($html -notmatch '/store/.*/register') { throw "play shell missing store register path for this app" }
 
 $pins = Get-Content (Join-Path $ScratchRoot 'cfg\par_pins.json') -Raw | ConvertFrom-Json
 $wbUrl = $pins.packages.merit_workbench.artifacts.js.url
