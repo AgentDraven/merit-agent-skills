@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.16'
+$MERIT_VERSION = '0.3.22'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -30,15 +30,16 @@ Commands:
   baseline --path <repo>   Alias for livealpha
   admin gate demo-init     Advanced: create local demo operator-gate placeholders
   app scaffold             Print merit-demo clone guidance
-  create                   Not shipped yet (prints notice; use init/apply/… for now)
+  create --path <repo>     AutoMagic fullstack-consumer pipeline (init→deploy)
+                           [--profile fullstack-consumer] [--scaffold-only]
+                           [--vercel-scope <slug>] [--product-name <name>]
   version                  Print version
   help                     Print help
 
-Typical flow:
-  .\merit.ps1 init --path ..\merit-demo
-  # edit ..\merit-demo\.merit_launch.md
-  .\merit.ps1 apply --path ..\merit-demo
-  .\merit.ps1 deploy --path ..\merit-demo
+Typical flow (AutoMagic):
+  .\merit.ps1 create --path ..\my-app --profile fullstack-consumer --vercel-scope <your-team>
+
+Redo a single phase anytime with init / apply / par scaffold / verify / deploy.
 "@
 }
 
@@ -123,6 +124,31 @@ function Require-Setting {
     $value = Get-Setting -Settings $Settings -Name $Name
     if (-not $value) { throw ".merit_launch.md missing mandatory value: $Name" }
     return $value
+}
+
+function Set-LaunchIniValue {
+    param([string]$Path, [string]$Name, [string]$Value)
+    if (-not (Test-Path $Path)) { throw "Launch file not found: $Path" }
+    $key = $Name.Trim()
+    $lines = @(Get-Content -LiteralPath $Path -Encoding UTF8)
+    $found = $false
+    $out = foreach ($line in $lines) {
+        if ($line -match("^\s*$([regex]::Escape($key))\s*=")) {
+            $found = $true
+            "$key = $Value"
+        } else {
+            $line
+        }
+    }
+    if (-not $found) { $out += "$key = $Value" }
+    Set-Content -LiteralPath $Path -Value $out -Encoding UTF8
+}
+
+function ConvertTo-ConsumerSlug {
+    param([string]$Name)
+    $s = $Name.ToLowerInvariant() -replace '[^a-z0-9]+', '-' -replace '^-+|-+$', ''
+    if (-not $s) { $s = 'my-app' }
+    return $s
 }
 
 function Set-EnvLocalValue {
@@ -236,10 +262,10 @@ function Invoke-Verify {
         }
         if ($fail.Count) {
             Write-Host "verify FAILED:`n$($fail -join "`n")"
-            exit 1
+            return $false
         }
         Write-Host "verify OK: merit-agent-skills repo"
-        return
+        return $true
     }
     foreach ($rel in @('cfg/par_pins.json', 'cfg/branding.json')) {
         if (-not (Test-Path (Join-Path $TargetRoot $rel))) { $fail += "missing $rel" }
@@ -255,9 +281,10 @@ function Invoke-Verify {
     }
     if ($fail.Count) {
         Write-Host "verify FAILED:`n$($fail -join "`n")"
-        exit 1
+        return $false
     }
     Write-Host "verify OK: $TargetRoot"
+    return $true
 }
 
 function Invoke-ParScaffold {
@@ -467,7 +494,7 @@ function Ensure-VercelLinked {
     try {
         Write-Host "vercel link: npx vercel link --yes --scope $Scope"
         & npx vercel link --yes --scope $Scope
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        if ($LASTEXITCODE -ne 0) { throw "vercel link failed (exit $LASTEXITCODE). Log in with vercel login, check --vercel-scope / vercel_scope, then retry." }
     } finally {
         Pop-Location
     }
@@ -481,10 +508,13 @@ function Invoke-Deploy {
     Ensure-VercelLinked -TargetRoot $TargetRoot -Scope $scope
     Push-Location $TargetRoot
     try {
-        if (Test-Path 'package.json') { npm run build }
+        if (Test-Path 'package.json') {
+            npm run build
+            if ($LASTEXITCODE -ne 0) { throw "npm run build failed (exit $LASTEXITCODE). Fix build errors, then retry deploy or create." }
+        }
         Write-Host "npx vercel --prod --scope $scope"
         & npx vercel --prod --scope $scope
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        if ($LASTEXITCODE -ne 0) { throw "vercel --prod failed (exit $LASTEXITCODE). Fix the Vercel error above, then: .\merit.ps1 deploy --path <repo>" }
     } finally {
         Pop-Location
     }
@@ -496,8 +526,7 @@ function Invoke-PortalPublish {
     param([string]$TargetRoot, [string[]]$ArgList)
     Invoke-Apply -TargetRoot $TargetRoot -ArgList $ArgList
     if (-not $env:HERENOW_API_KEY -and -not (Test-Path "$env:USERPROFILE\.herenow\credentials")) {
-        Write-Host 'portal publish: set HERENOW_API_KEY or ~/.herenow/credentials (BYOK).'
-        exit 1
+        throw 'portal publish: set HERENOW_API_KEY or ~/.herenow/credentials (BYOK).'
     }
     $portalsPath = Join-Path $TargetRoot 'cfg/portals.json'
     if (Test-Path $portalsPath) {
@@ -513,12 +542,12 @@ function Invoke-PortalPublish {
 
 function Invoke-Closeout {
     param([string]$TargetRoot)
-    Invoke-Verify -TargetRoot $TargetRoot
+    if (-not (Invoke-Verify -TargetRoot $TargetRoot)) { throw 'closeout blocked: verify FAILED' }
     Push-Location $TargetRoot
     try {
         if (Get-Command git -ErrorAction SilentlyContinue) {
             git diff --check
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            if ($LASTEXITCODE -ne 0) { throw "git diff --check failed (exit $LASTEXITCODE)" }
             git status --short
             git rev-parse --short HEAD
         } else {
@@ -529,6 +558,234 @@ function Invoke-Closeout {
     }
 }
 
+function Ensure-CreateLaunchDefaults {
+    param([string]$TargetRoot, [string[]]$ArgList)
+    $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
+    $settings = Get-LaunchSettings -Path $launch
+    $folderLeaf = Split-Path -Leaf $TargetRoot
+    $slug = ConvertTo-ConsumerSlug $folderLeaf
+
+    $consumerId = Get-ArgValue -ArgList $ArgList -Name '--consumer-id'
+    if (-not $consumerId) { $consumerId = Get-Setting -Settings $settings -Name 'consumer_id' }
+    if (-not $consumerId) { $consumerId = $slug }
+
+    $productName = Get-ArgValue -ArgList $ArgList -Name '--product-name'
+    if (-not $productName) { $productName = Get-Setting -Settings $settings -Name 'product_name' }
+    if (-not $productName) { $productName = ConvertTo-ConsumerTitle $consumerId }
+
+    $scope = Get-ArgValue -ArgList $ArgList -Name '--vercel-scope'
+    if (-not $scope) { $scope = Get-Setting -Settings $settings -Name 'vercel_scope' }
+    if (-not $scope) { $scope = $env:VERCEL_SCOPE }
+    if (-not $scope) { $scope = $env:VERCEL_ORG_ID }
+    if (-not $scope) {
+        throw @"
+create needs a Vercel team/account slug.
+Pass:  --vercel-scope <your-team>
+Or set: vercel_scope= in .merit_launch.md, or env VERCEL_SCOPE
+Find it in Vercel team settings (not a token).
+"@
+    }
+
+    $sbUrl = Get-Setting -Settings $settings -Name 'supabase_url'
+    $sbAnon = Get-Setting -Settings $settings -Name 'supabase_anon_key'
+    $sbSvc = Get-Setting -Settings $settings -Name 'supabase_service_role_key'
+    if (-not $sbUrl) { $sbUrl = if ($env:SUPABASE_URL) { $env:SUPABASE_URL } else { 'https://platform-defaults.merit.local' } }
+    if (-not $sbAnon) { $sbAnon = if ($env:SUPABASE_ANON_KEY) { $env:SUPABASE_ANON_KEY } else { 'create-pending-replace-with-supabase-anon-key' } }
+    if (-not $sbSvc) { $sbSvc = if ($env:SUPABASE_SERVICE_ROLE_KEY) { $env:SUPABASE_SERVICE_ROLE_KEY } else { 'create-pending-replace-with-supabase-service-role-key' } }
+
+    Set-LaunchIniValue -Path $launch -Name 'product_name' -Value $productName
+    Set-LaunchIniValue -Path $launch -Name 'consumer_id' -Value $consumerId
+    Set-LaunchIniValue -Path $launch -Name 'vercel_scope' -Value $scope
+    Set-LaunchIniValue -Path $launch -Name 'supabase_url' -Value $sbUrl
+    Set-LaunchIniValue -Path $launch -Name 'supabase_anon_key' -Value $sbAnon
+    Set-LaunchIniValue -Path $launch -Name 'supabase_service_role_key' -Value $sbSvc
+    if (-not (Get-Setting -Settings $settings -Name 'here_now_slug')) {
+        Set-LaunchIniValue -Path $launch -Name 'here_now_slug' -Value $consumerId
+    }
+    Write-Host "create launch defaults: consumer_id=$consumerId product_name=$productName vercel_scope=$scope"
+    if ($sbUrl -eq 'https://platform-defaults.merit.local') {
+        Write-Host 'create NOTE: supabase_* are scaffold placeholders — replace in .merit_launch.md before relying on cloud journal/AMA data.'
+    }
+}
+
+function Invoke-PortalScaffold {
+    param([string]$TargetRoot, [string]$ProductName, [string]$ConsumerId)
+    $portalDir = Join-Path $TargetRoot 'portal'
+    New-Item -ItemType Directory -Force -Path $portalDir | Out-Null
+    $indexPath = Join-Path $portalDir 'index.html'
+    if (-not (Test-Path $indexPath)) {
+        $html = @"
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$ProductName</title>
+  <meta name="description" content="$ProductName — MERIT-powered marketing portal stub.">
+  <style>
+    body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #0c1220; color: #f4f1ea; }
+    main { max-width: 40rem; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+    h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); line-height: 1.05; margin: 0 0 1rem; }
+    p { color: #c9d0dc; line-height: 1.5; }
+    .cta { display: inline-block; margin-top: 1.5rem; color: #0c1220; background: #e8dcc8; padding: 0.7rem 1.1rem; text-decoration: none; font-weight: 700; }
+    footer { margin-top: 3rem; color: #8b93a3; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>$ProductName</h1>
+    <p>Marketing portal stub from <code>merit.ps1 create</code>. Edit brand and CTAs, then publish with <code>merit.ps1 portal</code> (portal/ only).</p>
+    <a class="cta" href="/play/">Open the app</a>
+    <footer>MERIT Powered · consumer_id=$ConsumerId · checkout later at /store/$ConsumerId/register</footer>
+  </main>
+</body>
+</html>
+"@
+        Set-Content -LiteralPath $indexPath -Value $html -Encoding UTF8
+        Write-Host "portal scaffold OK -> $indexPath"
+    } else {
+        Write-Host "portal scaffold skipped (exists): $indexPath"
+    }
+
+    $logicDir = Join-Path $TargetRoot 'app_logic'
+    New-Item -ItemType Directory -Force -Path $logicDir | Out-Null
+    $readme = Join-Path $logicDir 'README.md'
+    if (-not (Test-Path $readme)) {
+        Set-Content -LiteralPath $readme -Value @"
+# app_logic/
+
+Put **your** product features here only.
+
+- Do not fork MERIT provider code into this folder.
+- Login, store, and payments stay on `merit-prod.vercel.app` rails (isolated by ``consumer_id`` = ``$ConsumerId``).
+- After dinner Step 2 create/deploy, customize ``portal/`` and run ``merit.ps1 portal`` when ready to publish marketing.
+
+Generated by ``merit.ps1 create``.
+"@ -Encoding UTF8
+        Write-Host "app_logic guidance OK -> $readme"
+    } else {
+        Write-Host "app_logic guidance skipped (exists): $readme"
+    }
+}
+
+function Invoke-Create {
+    param([string]$TargetRoot, [string[]]$ArgList)
+
+    $profile = Get-ArgValue -ArgList $ArgList -Name '--profile'
+    if (-not $profile) { $profile = 'fullstack-consumer' }
+    if ($profile -ne 'fullstack-consumer') {
+        throw "create: unknown --profile '$profile'. Supported: fullstack-consumer"
+    }
+    $scaffoldOnly = Test-ArgFlag -ArgList $ArgList -Name '--scaffold-only'
+    $theme = Get-ArgValue -ArgList $ArgList -Name '--theme'
+    if ($theme) { Write-Host "create NOTE: --theme $theme recorded for GlossPack when available; branding scaffold uses defaults today." }
+
+    Write-Host ""
+    Write-Host "============================================================"
+    Write-Host " MERIT AutoMagic create  v$MERIT_VERSION"
+    Write-Host " profile=$profile"
+    Write-Host " path=$TargetRoot"
+    if ($scaffoldOnly) { Write-Host ' mode=scaffold-only (deploy skipped)' } else { Write-Host ' mode=full (includes deploy)' }
+    Write-Host "============================================================"
+
+    $phases = @(
+        @{ n = 1; title = 'Repo skeleton and MERIT wiring (init + apply)'; script = {
+            Invoke-Init -TargetRoot $TargetRoot -ArgList $ArgList
+            Ensure-CreateLaunchDefaults -TargetRoot $TargetRoot -ArgList $ArgList
+            Invoke-Apply -TargetRoot $TargetRoot -ArgList $ArgList
+        }},
+        @{ n = 2; title = 'Shared UI chrome — workbench / journal (par scaffold)'; script = {
+            Invoke-ParScaffold -TargetRoot $TargetRoot -Variant 'workbench-journal'
+        }},
+        @{ n = 3; title = 'Starter look (branding scaffold)'; script = {
+            Invoke-BrandingScaffold -TargetRoot $TargetRoot
+            $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
+            Update-Branding -TargetRoot $TargetRoot -Settings (Get-LaunchSettings -Path $launch)
+        }},
+        @{ n = 4; title = 'Free / Plus subscriber embed (subs scaffold)'; script = {
+            Invoke-SubsScaffold -TargetRoot $TargetRoot
+            $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
+            $settings = Get-LaunchSettings -Path $launch
+            $cid = Require-Setting -Settings $settings -Name 'consumer_id'
+            $syncPath = Join-Path $TargetRoot 'cfg/merit-sync.json'
+            if (Test-Path $syncPath) {
+                $sync = Read-JsonFile $syncPath
+                $sync.consumer_id = $cid
+                $sync.meritstore_register_url = "https://merit-prod.vercel.app/store/$cid/register"
+                Write-JsonFile -Path $syncPath -Object $sync
+            }
+        }},
+        @{ n = 5; title = 'Local demo admin gate (admin gate demo-init)'; script = {
+            Invoke-AdminGateDemoInit -TargetRoot $TargetRoot
+        }},
+        @{ n = 6; title = 'Local health check (verify)'; script = {
+            if (-not (Invoke-Verify -TargetRoot $TargetRoot)) {
+                throw 'verify FAILED. Fix the missing files listed above, then re-run create or: .\merit.ps1 verify --path <repo>'
+            }
+        }},
+        @{ n = 7; title = 'Marketing portal stub + app_logic guidance'; script = {
+            $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
+            $settings = Get-LaunchSettings -Path $launch
+            $cid = Require-Setting -Settings $settings -Name 'consumer_id'
+            $pname = Get-Setting -Settings $settings -Name 'product_name' -Default $cid
+            Invoke-PortalScaffold -TargetRoot $TargetRoot -ProductName $pname -ConsumerId $cid
+        }},
+        @{ n = 8; title = 'Live deploy on your Vercel (deploy)'; script = {
+            if ($scaffoldOnly) {
+                Write-Host 'scaffold-only: skipping deploy'
+            } else {
+                Invoke-Deploy -TargetRoot $TargetRoot -ArgList $ArgList
+            }
+        }},
+        @{ n = 9; title = 'Success banner'; script = {
+            $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
+            $settings = Get-LaunchSettings -Path $launch
+            $cid = Get-Setting -Settings $settings -Name 'consumer_id' -Default (Split-Path -Leaf $TargetRoot)
+            Write-Host ''
+            Write-Host '------------------------------------------------------------'
+            if ($scaffoldOnly) {
+                Write-Host " Your MERIT shell is scaffolded for consumer_id=$cid"
+                Write-Host ' Next: fill real supabase_* if needed, then:'
+                Write-Host "   .\merit.ps1 deploy --path $TargetRoot"
+            } else {
+                Write-Host ' Your app is live on the MERIT rails — shell ready for'
+                Write-Host ' app_logic/ and your portal. Enjoy dinner.'
+                Write-Host " consumer_id=$cid"
+                Write-Host ' Next: shape portal/ then .\merit.ps1 portal --path <repo>'
+                Write-Host " Checkout later: /store/$cid/register (after tenant provision)"
+            }
+            Write-Host '------------------------------------------------------------'
+        }}
+    )
+
+    foreach ($phase in $phases) {
+        if ($scaffoldOnly -and $phase.n -eq 8) {
+            Write-Host ""
+            Write-Host "======== CREATE phase $($phase.n)/9: $($phase.title) ========"
+            Write-Host 'scaffold-only: skipped'
+            continue
+        }
+        Write-Host ""
+        Write-Host "======== CREATE phase $($phase.n)/9: $($phase.title) ========"
+        try {
+            & $phase.script
+            Write-Host "OK phase $($phase.n)/9"
+        } catch {
+            Write-Host ""
+            Write-Host "FAILED phase $($phase.n)/9 — $($phase.title)" -ForegroundColor Red
+            Write-Host $_.Exception.Message
+            Write-Host ""
+            Write-Host 'Recovery tips:'
+            Write-Host "  • Re-run create (idempotent where safe): .\merit.ps1 create --path `"$TargetRoot`" --profile fullstack-consumer"
+            Write-Host "  • Or redo this phase alone, then continue from the next verb"
+            Write-Host "  • Dinner guide: https://merit-prod.vercel.app/portal/developers/full-app/"
+            throw "create stopped at phase $($phase.n)/9"
+        }
+    }
+    Write-Host ""
+    Write-Host "create OK: AutoMagic fullstack-consumer finished for $TargetRoot"
+}
+
 $target = Resolve-TargetRoot -ArgList $Rest
 
 switch -Regex ($Command) {
@@ -536,12 +793,21 @@ switch -Regex ($Command) {
     '^version$' { Write-Host "merit $MERIT_VERSION"; exit 0 }
     '^init$' { Invoke-Init -TargetRoot $target -ArgList $Rest; exit 0 }
     '^apply$' { Invoke-Apply -TargetRoot $target -ArgList $Rest; exit 0 }
-    '^verify$' { Invoke-Verify -TargetRoot $target; exit 0 }
-    '^deploy$' { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 }
-    '^vercel$' { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 }
-    '^portal$' { Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 }
-    '^all$' { Invoke-Deploy -TargetRoot $target -ArgList $Rest; Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 }
-    '^closeout$' { Invoke-Closeout -TargetRoot $target; exit 0 }
+    '^verify$' { if (-not (Invoke-Verify -TargetRoot $target)) { exit 1 }; exit 0 }
+    '^deploy$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^vercel$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^portal$' { try { Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^all$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^closeout$' { try { Invoke-Closeout -TargetRoot $target; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^create$' {
+        try {
+            Invoke-Create -TargetRoot $target -ArgList $Rest
+            exit 0
+        } catch {
+            Write-Host $_.Exception.Message
+            exit 1
+        }
+    }
     '^par$' {
         if (-not $Rest -or $Rest[0] -ne 'scaffold') { Write-MeritHelp; exit 1 }
         $variant = Get-ArgValue -ArgList $Rest -Name '--variant'
@@ -572,17 +838,6 @@ switch -Regex ($Command) {
         Write-Host "app scaffold: clone the reference consumer:"
         Write-Host "  git clone https://github.com/Mr-PI-Bala/merit-demo.git <target>"
         exit 0
-    }
-    '^create$' {
-        Write-Host @"
-merit.ps1 create — not shipped yet (AutoMagic / FR-MPD-07).
-
-Do not expect create to scaffold or deploy. Until it ships, run the dinner Step 2
-commands from the Portal full-app guide (init, apply, scaffolds, verify, deploy).
-
-See: https://merit-prod.vercel.app/portal/developers/full-app/
-"@
-        exit 1
     }
     default { Write-MeritHelp; exit 1 }
 }

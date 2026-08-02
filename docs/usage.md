@@ -30,14 +30,22 @@ Create an empty directory, clone the pinned skills release, clone `merit-demo`, 
 ```powershell
 mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
-git clone --branch skills-v0.3.19 https://github.com/AgentDraven/merit-agent-skills.git
-git clone https://github.com/Mr-PI-Bala/merit-demo.git
+git clone --branch skills-v0.3.22 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
-.\merit.ps1 verify --path ..\merit-demo
 ```
 
-### 2. Initialize The Repository
+### 2. AutoMagic create (preferred)
+
+```powershell
+.\merit.ps1 create --path ..\my-app --profile fullstack-consumer --vercel-scope <your-team>
+# optional CI / local shell only:
+.\merit.ps1 create --path ..\my-app --profile fullstack-consumer --vercel-scope <your-team> --scaffold-only
+```
+
+Phases print as `CREATE phase N/9`. On failure the CLI stops with recovery tips.
+
+### 2b. Initialize manually (optional redo)
 
 Run `init`, edit only the mandatory section of `.merit_launch.md`, then run `apply`. `apply` creates `.env.local`, `cfg/flask_deploy.json`, and `cfg/portals.json`; `merit deploy` auto-links Vercel when `.vercel/project.json` is missing.
 
