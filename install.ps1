@@ -1,14 +1,54 @@
 # Install MERIT agent skills into an AI IDE host (or a project repo).
+# No default target — omit -Target to print usage (same pattern as merit.ps1 help).
 [CmdletBinding()]
 param(
-    # Canonical: Cursor | ClaudeCode | Codex | VSCode | Project
-    # Aliases:   Claude (=ClaudeCode) | Agents (=VSCode)
-    [ValidateSet('Cursor', 'ClaudeCode', 'Claude', 'Codex', 'VSCode', 'Agents', 'Project')]
-    [string]$Target = 'Cursor',
-    [string]$Path = ''
+    [string]$Target,
+    [string]$Path = '',
+    [switch]$Help
 )
 
 $ErrorActionPreference = 'Stop'
+
+function Write-InstallUsage {
+    Write-Host @"
+install.ps1 - install MERIT agent skills into an AI IDE host
+
+Usage:
+  .\install.ps1 -Target <host>
+  .\install.ps1 -Target Project -Path <repo-root>
+  ./install.sh -Target <host>          # Linux/macOS (requires pwsh/powershell)
+
+Targets:
+  Cursor       -> ~/.cursor/skills
+  ClaudeCode   -> ~/.claude/skills     (alias: Claude)
+  Codex        -> ~/.codex/skills      (or `$CODEX_HOME/skills)
+  VSCode       -> ~/.agents/skills     (alias: Agents)
+  Project      -> <repo>/.cursor/skills  (requires -Path)
+
+Examples:
+  .\install.ps1 -Target Cursor
+  .\install.ps1 -Target ClaudeCode
+  .\install.ps1 -Target Codex
+  .\install.ps1 -Target VSCode
+  .\install.ps1 -Target Project -Path ..\my-app
+
+Re-run after git pull to refresh installed skills. Existing skill folders are replaced (not nested).
+"@
+}
+
+$known = @('Cursor', 'ClaudeCode', 'Claude', 'Codex', 'VSCode', 'Agents', 'Project')
+
+if ($Help -or [string]::IsNullOrWhiteSpace($Target)) {
+    Write-InstallUsage
+    if ($Help) { exit 0 }
+    exit 1
+}
+
+if ($known -notcontains $Target) {
+    Write-InstallUsage
+    Write-Error "Unknown -Target '$Target'. Use one of: $($known -join ', ')"
+}
+
 $repoRoot = $PSScriptRoot
 $skillsSrc = Join-Path $repoRoot 'skills'
 if (-not (Test-Path $skillsSrc)) {
@@ -43,6 +83,7 @@ switch ($resolved) {
     }
     'Project' {
         if (-not $Path) {
+            Write-InstallUsage
             Write-Error 'Project install requires -Path <repo-root>'
         }
         $destRoot = Join-Path (Resolve-Path $Path).Path '.cursor\skills'
