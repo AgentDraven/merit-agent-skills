@@ -117,11 +117,12 @@ npm install
 
 `npm install` installs the demo’s declared Node dev tooling, including `@playwright/test`; the repo postinstall attempts to install the Chromium browser used for screenshots. The MERIT wrapper then runs the route/provider checks and writes screenshots under `merit-demo docs/evidence/`. If dependencies are not installed, `verify` can still pass, but screenshot capture is skipped.
 
-## Skills (10)
+## Skills (11)
 
 | Skill | Purpose |
 |-------|---------|
 | `merit-par-workbench` | PAR play shell (`merit_workbench@0.4.x`, `journal@0.2.x`) |
+| `merit-prd` | Bake `*prd.md` (marketing + FR matrix) before portal / `app_logic/` |
 | `merit-portal` | here.now marketing (`portal/` only); multi-surface |
 | `merit-subs` | meritsubs + meritstore funnel, freemium caps |
 | `merit-ama` | AMA Q&A + leaderboard (merit-demo) |

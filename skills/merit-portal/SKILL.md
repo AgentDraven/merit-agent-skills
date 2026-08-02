@@ -1,11 +1,19 @@
 ---
 name: merit-portal
-description: Publish MERIT marketing portal to here.now (portal/ only); multi-surface support.
+description: >-
+  Shape and publish MERIT marketing portal to here.now (portal/ only); multi-surface
+  support. Prefer copy from docs/PRODUCT.prd.md § Marketing portal (see /merit-prd).
 ---
 
 # merit-portal
 
 here.now only — not Vercel app deploy. Operator white-label branding in `portal/` + `cfg/branding.json`.
+
+## Before publish
+
+1. Prefer a filled `docs/PRODUCT.prd.md` (or `*prd.md`) — use **`/merit-prd`** if empty.  
+2. Map § **Marketing portal** (hero, CTAs, sections) into `portal/` / `portal.json`.  
+3. Optional: `*usage.md` / `*design.md` for tone — still no secrets in `portal/`.
 
 ```powershell
 .\merit.ps1 portal --path <consumer-repo>
