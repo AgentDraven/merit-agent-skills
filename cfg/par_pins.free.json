@@ -17,16 +17,46 @@
       }
     },
     "journal": {
-      "version": "0.2.2",
+      "version": "0.2.3",
       "cdn_base": "https://merit-prod.vercel.app/pkg/meritutils",
       "artifacts": {
         "mjs": {
-          "url": "https://merit-prod.vercel.app/pkg/meritutils/journal/0.2.2/journal.mjs",
-          "sri": "sha384-uN5FVzY4tGN5Z4CtuSNyfe3pZKmC/3Fu5Ht9ArYIFFpPKHzJmOHTlUo9EbWSabwm"
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/journal/0.2.3/journal.mjs",
+          "sri": "sha384-FxUXqIq2C91mGzV75nw+PN6VwO4cFYNVRQrm3V4Z54kLy39KyK0SRsHN3/NsiUJo"
         },
         "css": {
-          "url": "https://merit-prod.vercel.app/pkg/meritutils/journal/0.2.2/journal.css",
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/journal/0.2.3/journal.css",
           "sri": "sha384-5yxx9KbJ9X6gcIyv2XdjIbc5GyCn5N0KRHwmWIIWG9mI3Z7+iwu6IwJGqd+Pxdj2"
+        }
+      }
+    },
+    "merit_ama": {
+      "version": "0.1.1",
+      "cdn_base": "https://merit-prod.vercel.app/pkg/meritutils",
+      "artifacts": {
+        "mjs": {
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ama/0.1.1/merit_ama.mjs",
+          "sri": "sha384-wtzZpRek3zZifvkWISOUOnXMcXJhXfteZkKiBO1gPTihIvhZ7/z06QkzPqq0fppQ"
+        }
+      }
+    },
+    "merit_calendar": {
+      "version": "0.1.0",
+      "cdn_base": "https://merit-prod.vercel.app/pkg/meritutils",
+      "artifacts": {
+        "mjs": {
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_calendar/0.1.0/merit_calendar.mjs",
+          "sri": "sha384-/Cev50sSLIIrcUqDm/orMYrnsSPJeK5xWRgiJs442g9vjCDquGTpFskhvv7GZ72Y"
+        }
+      }
+    },
+    "merit_video": {
+      "version": "0.1.0",
+      "cdn_base": "https://merit-prod.vercel.app/pkg/meritutils",
+      "artifacts": {
+        "mjs": {
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_video/0.1.0/merit_video.mjs",
+          "sri": "sha384-z8Ulf3CF/lEYUub5mAOXtRYI4bT2VeOuZBDtfrj6TTSDX6Rl2SaAzohjAMLlQtoZ"
         }
       }
     }
