@@ -201,10 +201,11 @@ Prove on {{APP_URL}}.
 
 | Name | Expansion / role | Live |
 |------|------------------|------|
-| CAST | Create Audio Shows & Talks (podcast / show toolchain) | https://merit-prod.vercel.app/apps/cast/play |
+| CAST | Cloud-Assisted Autonomous Synth-Podcast Theatre (helps Create Audio Shows and Talks) | https://merit-prod.vercel.app/apps/cast/play |
 | DIRT | Digital Income Revenue Toolkit / ToolChain | https://dirt-agentdraven.vercel.app |
 | SomaTune | Branded consumer on MERIT rails | https://somatune-agentdraven.vercel.app |
 | M4FI | Polished field / Gloss-friendly consumer | https://m4fi.vercel.app |
+| Tranquil Balance | White-label community + collaboration audio/video rooms | https://tranquil-balance.vercel.app |
 
 Guides: https://merit-prod.vercel.app/portal/developers/ · PAR: https://merit-prod.vercel.app/portal/developers/par-packages/ · Registry: https://merit-prod.vercel.app/pkg/meritutils/registry.json
 
