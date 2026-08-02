@@ -4,7 +4,7 @@ Copy this file into your app as `docs/PRODUCT.prd.md` (or `{Name}.prd.md`). Fill
 
 1. **`/merit-prd`** — bake and refine the brief in your AI IDE  
 2. **`/merit-portal`** — turn § Marketing portal into `portal/` copy and publish  
-3. **Dinner Step 4** — implement Must FRs only under `app_logic/`
+3. **`/merit-applogic`** (dinner Step 4) — implement Must FRs under `app_logic/` on merit-prod rails
 
 Marketing only in `portal/` — no secrets, no app code. Product features only in `app_logic/`. Login, store, and payments stay on `merit-prod.vercel.app` rails (isolated by `consumer_id`).
 

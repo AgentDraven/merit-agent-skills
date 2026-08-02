@@ -4,7 +4,7 @@ description: >-
   Draft or refine a consumer-app PRD from *prd.md (and optional *usage.md /
   *design.md). Use when the user says /merit-prd, bake the PRD, fill PRODUCT.prd.md,
   or prepare marketing copy before merit-portal. Public freeware — no vault required.
-  Feeds portal/ marketing; app_logic/ comes after the PRD is clear.
+  Feeds portal/ marketing; then /merit-applogic implements Must FRs under app_logic/.
 ---
 
 # merit-prd
@@ -32,7 +32,7 @@ Help the builder **write the product story first** (dinner Step 3 → Step 4). Y
 3. **Marketing slice** — § Marketing portal must be concrete enough for `/merit-portal` (hero, headline, supporting line, CTAs, section copy). No secrets, no provider keys.
 4. **FR matrix** — MoSCoW rows with stable IDs (`FR-01`…). Prefer small, testable Musts for dinner; park Coulds.
 5. **Boundary** — § `app_logic/` lists only product features; auth/store/payments stay on MERIT rails (`merit-prod.vercel.app`).
-6. **Handoff** — tell the user: tweak `portal/` with `/merit-portal` (or edit `portal/` then `.\merit.ps1 portal`), then implement Must FRs under `app_logic/`.
+6. **Handoff** — tweak `portal/` with `/merit-portal` (or `.\merit.ps1 portal`), then implement Must FRs with **`/merit-applogic`**.
 
 ## Do / don’t
 
@@ -46,5 +46,6 @@ Help the builder **write the product story first** (dinner Step 3 → Step 4). Y
 ## Related skills
 
 - **`merit-portal`** — push marketing from the PRD into `portal/` and publish (portal folder only).
+- **`merit-applogic`** — implement Must FRs under `app_logic/` on merit-prod rails.
 - **`merit-mm-upgrade`** — gap → FR packets for an *existing* codebase (different trigger).
 - Dinner guide: https://merit-prod.vercel.app/portal/developers/full-app/
