@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.33'
+$MERIT_VERSION = '0.3.34'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -471,7 +471,7 @@ function Invoke-LiveAlpha {
         if ($catCount -ge 10 -and $edgeCount -ge 50) {
             Write-Host '  floors: PASS (structure)'
         } else {
-            Write-Host '  floors: FAIL or incomplete - fill APA refs + ≥50 edges; see skill merit-livealpha'
+            Write-Host '  floors: FAIL or incomplete - fill APA refs + >=50 edges; see skill merit-livealpha'
         }
         Write-Host "Next: /merit-livealpha in Cursor on this repo"
         return
@@ -500,7 +500,7 @@ function Invoke-LiveAlpha {
     } else {
         Write-Host 'livealpha scaffold OK'
     }
-    Write-Host 'Next: open Cursor on this consumer and run /merit-livealpha …'
+    Write-Host 'Next: open Cursor on this consumer and run /merit-livealpha ...'
     Write-Host '  Or: .\merit.ps1 livealpha status --path <repo>'
 }
 
@@ -1040,7 +1040,7 @@ function Invoke-HereNowDeleteSite {
     try {
         Invoke-RestMethod -Uri "$BaseUrl/api/v1/publish/$Slug" -Method Delete -Headers $headers -TimeoutSec 60 | Out-Null
     } catch {
-        throw "here.now delete failed for $Slug: $_"
+        throw "here.now delete failed for ${Slug}: $_"
     }
     Write-Host "here.now deleted: https://$Slug.here.now/"
     return "https://$Slug.here.now/"
@@ -1427,7 +1427,7 @@ switch -Regex ($Command) {
                 $pathArg = Get-ArgValue -ArgList $Rest -Name '--path'
                 if ($pathArg) {
                     if (-not (Test-Path -LiteralPath $pathArg)) {
-                        throw "apps remove: path not found: $pathArg — after deleting the folder use: .\merit.ps1 apps remove --consumer-id <id> --yes"
+                        throw "apps remove: path not found: $pathArg - after deleting the folder use: .\merit.ps1 apps remove --consumer-id <id> --yes"
                     }
                     $rootForRemove = (Resolve-Path -LiteralPath $pathArg).Path
                     if (-not $cid) {
