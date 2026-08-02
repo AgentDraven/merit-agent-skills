@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.27'
+$MERIT_VERSION = '0.3.28'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -34,19 +34,28 @@ Commands:
                            [--profile fullstack-consumer] [--deploy]
                            [--vercel-scope <slug>] [--product-name <name>]
                            [--scaffold-only]  (alias of default platform mode)
+  apps publish --path <repo>  Upload play/+cfg/ to merit-prod /apps/<app>/play (create phase 8)
   version                  Print version
-  help                     Print help
+  help                     Print help (includes create phase redo map)
 
 Typical flow (AutoMagic — live on merit-prod):
+  .\merit.ps1 create --path ..\<app> --profile fullstack-consumer
+
+Create phase redo map (after a failed phase):
+  .\merit.ps1 help
+  # prints every verb + the 9-phase redo commands below
+  .\merit.ps1 apps publish --path ..\my-app
+  # example: redo phase 8 alone after a publish failure
   .\merit.ps1 create --path ..\my-app --profile fullstack-consumer
-  # opens https://merit-prod.vercel.app/apps/<app>/play
+  # or re-run full create (idempotent); opens https://merit-prod.vercel.app/apps/<app>/play
 
 Optional later (your own Vercel host):
   .\merit.ps1 create --path ..\my-app --profile fullstack-consumer --deploy --vercel-scope <your-team>
   # or: .\merit.ps1 deploy --path ..\my-app
 
-Redo a single phase anytime with init / apply / par scaffold / verify / deploy.
+Redo a single phase anytime — phase map is printed below on help, and again in Recovery tips after a failure.
 "@
+    Write-CreatePhaseGuide -TargetRoot '..\<app>'
 }
 
 function Get-ArgValue {
@@ -718,13 +727,44 @@ function Get-ContentTypeForPublish {
     return 'text/plain; charset=utf-8'
 }
 
+function ConvertTo-JsonEscapedString {
+    param([AllowNull()][string]$Value)
+    if ($null -eq $Value) { return '""' }
+    # Avoid ConvertTo-Json on large trees (Windows PowerShell can hang / bloat). Escape one string safely.
+    $sb = [System.Text.StringBuilder]::new($Value.Length + 16)
+    [void]$sb.Append('"')
+    foreach ($ch in $Value.ToCharArray()) {
+        switch ($ch) {
+            '"' { [void]$sb.Append('\"') }
+            '\' { [void]$sb.Append('\\') }
+            "`b" { [void]$sb.Append('\b') }
+            "`f" { [void]$sb.Append('\f') }
+            "`n" { [void]$sb.Append('\n') }
+            "`r" { [void]$sb.Append('\r') }
+            "`t" { [void]$sb.Append('\t') }
+            default {
+                $code = [int][char]$ch
+                if ($code -lt 0x20) {
+                    [void]$sb.AppendFormat('\u{0:x4}', $code)
+                } else {
+                    [void]$sb.Append($ch)
+                }
+            }
+        }
+    }
+    [void]$sb.Append('"')
+    return $sb.ToString()
+}
+
 function Invoke-AppsPublish {
     param(
         [string]$TargetRoot,
         [string]$ConsumerId,
         [string]$Gateway = 'https://merit-prod.vercel.app'
     )
-    Write-Host "Packing play/ + cfg/ for $Gateway/apps/$ConsumerId/play (usually a few seconds)..."
+    # Vercel Functions reject bodies > ~4.5MB (413 FUNCTION_PAYLOAD_TOO_LARGE).
+    # Upload one file per request so dinner create never hits that ceiling.
+    Write-Host "Packing play/ + cfg/ for $Gateway/apps/$ConsumerId/play ..."
     $files = [System.Collections.Generic.List[object]]::new()
     $totalBytes = 0
     foreach ($folder in @('play', 'cfg')) {
@@ -735,11 +775,16 @@ function Invoke-AppsPublish {
             if ($rel -notmatch '\.(html?|css|js|mjs|json|svg|txt|md)$') { return }
             $content = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8
             if ($null -eq $content) { $content = '' }
-            $totalBytes += [System.Text.Encoding]::UTF8.GetByteCount($content)
+            $bytes = [System.Text.Encoding]::UTF8.GetByteCount($content)
+            if ($bytes -gt 200000) {
+                throw "apps publish: $rel is $bytes bytes (max 200000). Shrink the file or exclude it from play/cfg."
+            }
+            $totalBytes += $bytes
             $files.Add([ordered]@{
                 path = $rel
                 content = $content
                 contentType = (Get-ContentTypeForPublish -RelPath $rel)
+                bytes = $bytes
             })
         }
     }
@@ -747,32 +792,89 @@ function Invoke-AppsPublish {
         throw "apps publish: no play/ or cfg/ files under $TargetRoot"
     }
     $kb = [math]::Max(1, [math]::Round($totalBytes / 1KB, 1))
-    Write-Host "Packed $($files.Count) file(s) (~$kb KB). Building upload payload..."
-    $payload = @{ consumerId = $ConsumerId; files = @($files.ToArray()) } | ConvertTo-Json -Depth 8 -Compress
-    Write-Host "Uploading to $Gateway/api/apps/publish (usually <15s; hard timeout 60s). Safe to Ctrl+C and re-run create if this hangs..."
-    try {
-        # HttpClient honors Timeout more reliably than Invoke-RestMethod on some Windows hosts.
-        $handler = [System.Net.Http.HttpClientHandler]::new()
-        $client = [System.Net.Http.HttpClient]::new($handler)
-        $client.Timeout = [TimeSpan]::FromSeconds(60)
-        $content = [System.Net.Http.StringContent]::new($payload, [System.Text.Encoding]::UTF8, 'application/json')
-        $response = $client.PostAsync("$Gateway/api/apps/publish", $content).GetAwaiter().GetResult()
-        $bodyText = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
-        if (-not $response.IsSuccessStatusCode) {
-            throw "HTTP $([int]$response.StatusCode): $bodyText"
+    Write-Host "Packed $($files.Count) file(s) (~$kb KB). Uploading one file at a time (avoids Vercel 4.5MB body limit)..."
+
+    # Invoke-WebRequest: works on Windows PowerShell 5.1 without System.Net.Http assembly load.
+    $appUrl = $null
+    $n = 0
+    foreach ($file in $files) {
+        $n++
+        Write-Host "  [$n/$($files.Count)] $($file.path) ($($file.bytes) bytes)..."
+        $payload = '{"consumerId":' + (ConvertTo-JsonEscapedString $ConsumerId) +
+            ',"files":[{"path":' + (ConvertTo-JsonEscapedString $file.path) +
+            ',"content":' + (ConvertTo-JsonEscapedString $file.content) +
+            ',"contentType":' + (ConvertTo-JsonEscapedString $file.contentType) + '}]}'
+        $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
+        try {
+            $wr = Invoke-WebRequest -Uri "$Gateway/api/apps/publish" -Method Post -Body $bodyBytes -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 60
+            $resp = $wr.Content | ConvertFrom-Json
+        } catch {
+            throw "apps publish failed on $($file.path) ($Gateway/api/apps/publish). Re-run: .\merit.ps1 apps publish --path `"$TargetRoot`" (safe + idempotent). $_"
         }
-        $resp = $bodyText | ConvertFrom-Json
-    } catch {
-        throw "apps publish failed ($Gateway/api/apps/publish). Check network / merit-prod /apps host, then re-run create (safe + idempotent). $_"
-    } finally {
-        if ($client) { $client.Dispose() }
-        if ($handler) { $handler.Dispose() }
+        if (-not $resp.ok -or -not $resp.appUrl) {
+            throw "apps publish rejected for $($file.path): $($wr.Content)"
+        }
+        $appUrl = [string]$resp.appUrl
     }
-    if (-not $resp.ok -or -not $resp.appUrl) {
-        throw "apps publish rejected: $($resp | ConvertTo-Json -Compress)"
+    if (-not $appUrl) {
+        throw 'apps publish returned no appUrl'
     }
-    Write-Host "Live app URL: $($resp.appUrl)"
-    return [string]$resp.appUrl
+    Write-Host "Live app URL: $appUrl"
+    return $appUrl
+}
+
+function Write-CreatePhaseGuide {
+    param(
+        [string]$TargetRoot,
+        [int]$FromPhase = 1
+    )
+    Write-Host 'Create phases -> independent redo commands (run from merit-agent-skills):'
+    $lines = @(
+        @{ n = 1; text = ".\merit.ps1 init --path `"$TargetRoot`"; .\merit.ps1 apply --path `"$TargetRoot`"" },
+        @{ n = 2; text = ".\merit.ps1 par scaffold --path `"$TargetRoot`" --variant workbench-journal" },
+        @{ n = 3; text = ".\merit.ps1 branding scaffold --path `"$TargetRoot`"" },
+        @{ n = 4; text = ".\merit.ps1 subs scaffold --path `"$TargetRoot`"" },
+        @{ n = 5; text = ".\merit.ps1 admin gate demo-init --path `"$TargetRoot`"" },
+        @{ n = 6; text = ".\merit.ps1 verify --path `"$TargetRoot`"" },
+        @{ n = 7; text = "re-run create (portal stub is bundled) OR continue to phase 8 if portal/ already exists" },
+        @{ n = 8; text = ".\merit.ps1 apps publish --path `"$TargetRoot`"" },
+        @{ n = 9; text = "(success banner - automatic after phase 8 OK; no separate command)" }
+    )
+    foreach ($row in $lines) {
+        if ($row.n -lt $FromPhase) { continue }
+        Write-Host ("  {0}  {1}" -f $row.n, $row.text)
+    }
+    Write-Host 'See all CLI verbs anytime: .\merit.ps1 help'
+}
+
+function Write-CreateRecoveryTips {
+    param(
+        [string]$TargetRoot,
+        [int]$FailedPhase
+    )
+    $redoByPhase = @{
+        1 = ".\merit.ps1 init --path `"$TargetRoot`"; .\merit.ps1 apply --path `"$TargetRoot`""
+        2 = ".\merit.ps1 par scaffold --path `"$TargetRoot`" --variant workbench-journal"
+        3 = ".\merit.ps1 branding scaffold --path `"$TargetRoot`""
+        4 = ".\merit.ps1 subs scaffold --path `"$TargetRoot`""
+        5 = ".\merit.ps1 admin gate demo-init --path `"$TargetRoot`""
+        6 = ".\merit.ps1 verify --path `"$TargetRoot`""
+        7 = ".\merit.ps1 create --path `"$TargetRoot`" --profile fullstack-consumer   # or skip to phase 8 if portal/ exists"
+        8 = ".\merit.ps1 apps publish --path `"$TargetRoot`""
+        9 = ".\merit.ps1 create --path `"$TargetRoot`" --profile fullstack-consumer"
+    }
+    Write-Host 'Recovery tips:'
+    Write-Host "  - Re-run full create (safe/idempotent where prior phases already OK):"
+    Write-Host "      .\merit.ps1 create --path `"$TargetRoot`" --profile fullstack-consumer"
+    if ($FailedPhase -ge 1 -and $FailedPhase -le 9 -and $redoByPhase.ContainsKey($FailedPhase)) {
+        Write-Host "  - Or redo this failed phase alone, then continue through the remaining phases:"
+        Write-Host "      $($redoByPhase[$FailedPhase])"
+        Write-Host "  - Commands for phase $FailedPhase onward:"
+        Write-CreatePhaseGuide -TargetRoot $TargetRoot -FromPhase $FailedPhase
+        Write-Host "  - After phase $FailedPhase succeeds, run each later phase command above through phase 8."
+    }
+    Write-Host '  - Full command list (all verbs + phase map): .\merit.ps1 help'
+    Write-Host '  - Dinner guide: https://merit-prod.vercel.app/portal/developers/full-app/'
 }
 
 function Invoke-Create {
@@ -935,10 +1037,7 @@ function Invoke-Create {
             Write-Host "FAILED phase $($phase.n)/9 — $($phase.title)" -ForegroundColor Red
             Write-Host $_.Exception.Message
             Write-Host ""
-            Write-Host 'Recovery tips:'
-            Write-Host "  • Re-run create (idempotent where safe): .\merit.ps1 create --path `"$TargetRoot`" --profile fullstack-consumer"
-            Write-Host "  • Or redo this phase alone, then continue from the next verb"
-            Write-Host "  • Dinner guide: https://merit-prod.vercel.app/portal/developers/full-app/"
+            Write-CreateRecoveryTips -TargetRoot $TargetRoot -FailedPhase $phase.n
             throw "create stopped at phase $($phase.n)/9"
         }
     }
@@ -959,6 +1058,20 @@ switch -Regex ($Command) {
     '^portal$' { try { Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^all$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^closeout$' { try { Invoke-Closeout -TargetRoot $target; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^apps$' {
+        if (-not $Rest -or "$($Rest[0])".ToLowerInvariant() -ne 'publish') { Write-MeritHelp; exit 1 }
+        try {
+            $launch = Get-LaunchPath -TargetRoot $target -ArgList $Rest
+            $settings = Get-LaunchSettings -Path $launch
+            $cid = Require-Setting -Settings $settings -Name 'consumer_id'
+            $url = Invoke-AppsPublish -TargetRoot $target -ConsumerId $cid
+            Write-Host "apps publish OK: $url"
+            exit 0
+        } catch {
+            Write-Host $_.Exception.Message
+            exit 1
+        }
+    }
     '^create$' {
         try {
             Invoke-Create -TargetRoot $target -ArgList $Rest
