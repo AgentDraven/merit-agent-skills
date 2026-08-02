@@ -13,7 +13,7 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) — workbench, journal, AMA, subs, legal |
 | **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) — independent consumer ID using the same hosted providers |
 | **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
-| **Skills only** | Windows `.\install.ps1 -Target Cursor|Agents|Claude|Codex`; Linux/macOS `./install.sh -Target …` |
+| **Skills only** | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./install.sh -Target …` (aliases: `Claude`, `Agents`) |
 | **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** — gap analysis → FR/AGENT_REQ (no vault) |
 | **Affiliate / design partner** | [`skills/merit-affiliate`](skills/merit-affiliate/SKILL.md) — free attribution + portal recipes (no billing) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha …` |
@@ -23,7 +23,7 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 ## Quick install
 
 ```powershell
-git clone --branch skills-v0.3.14 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.17 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 ```
@@ -31,7 +31,7 @@ cd merit-agent-skills
 Linux/macOS:
 
 ```bash
-git clone --branch skills-v0.3.14 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.17 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
@@ -41,8 +41,9 @@ cd merit-agent-skills
 | Runtime | Install |
 |---------|---------|
 | **Cursor** | `.\install.ps1 -Target Cursor` → `~/.cursor/skills` |
-| **Codex / Agents** | `.\install.ps1 -Target Agents` → `~/.agents/skills` · or `-Target Codex` → `~/.codex/skills` |
-| **Claude Code** | `.\install.ps1 -Target Claude` → `~/.claude/skills` · or copy into `<repo>/.claude/skills/` |
+| **Claude Code** | `.\install.ps1 -Target ClaudeCode` → `~/.claude/skills` (alias: `Claude`) |
+| **Codex** | `.\install.ps1 -Target Codex` → `~/.codex/skills` (or `$CODEX_HOME/skills`) |
+| **VS Code / Agents** | `.\install.ps1 -Target VSCode` → `~/.agents/skills` (alias: `Agents`) |
 | **Hermes** | `hermes skills tap add AgentDraven/merit-agent-skills` · or copy into `~/.hermes/skills` / scan `~/.agents/skills` |
 | **OpenClaw** | `openclaw skills install ./skills/merit-mm-upgrade` · ClawHub publish if desired (license: Apache-2.0 here) |
 | **Project (Cursor)** | `.\install.ps1 -Target Project -Path <repo>` → `<repo>/.cursor/skills` |
@@ -153,7 +154,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` |
-| Current human-validation baseline | **`skills-v0.3.16`** |
+| Current human-validation baseline | **`skills-v0.3.17`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
 

@@ -39,7 +39,7 @@ Tools, `merit` CLI, and optional Cursor agent skills.
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.14 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.17 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 Linux/macOS:
@@ -47,7 +47,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.3.14 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.17 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 ### 1B — merit-demo
@@ -63,13 +63,14 @@ git clone https://github.com/Mr-PI-Bala/merit-demo.git
 
 **Not required.** Public `git clone` works without logging in. You only need a GitHub account later if you **fork** or **push** your own copy.
 
-### Optional — Cursor skills
+### Optional — AI IDE skills
 
-If you use [Cursor](https://cursor.com):
+Install into your host (`Cursor`, `ClaudeCode`, `Codex`, or `VSCode`; aliases `Claude` / `Agents`):
 
 ```powershell
 cd C:\MyMeritApp\merit-agent-skills
 .\install.ps1 -Target Cursor
+# also: -Target ClaudeCode | Codex | VSCode
 ```
 
 Linux/macOS:
@@ -77,9 +78,10 @@ Linux/macOS:
 ```bash
 cd ~/MyMeritApp/merit-agent-skills
 ./install.sh -Target Cursor
+# also: -Target ClaudeCode | Codex | VSCode
 ```
 
-Open the `merit-demo` folder in Cursor and ask it to help edit branding or portal text.
+Open the `merit-demo` folder in your AI IDE and ask it to help edit branding or portal text.
 
 **Step 1 complete.** Two folders on disk. No cloud accounts.
 
@@ -309,7 +311,7 @@ Read only after the three steps.
 
 ## Checklist
 
-- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.14` and merit-demo
+- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.3.17` and merit-demo
 - [ ] Step 2 — Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
 - [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed
