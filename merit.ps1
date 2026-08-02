@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.31'
+$MERIT_VERSION = '0.3.32'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -1014,6 +1014,82 @@ function Invoke-AppsPublish {
     return $appUrl
 }
 
+
+function Write-CreateSuccessCelebration {
+    param(
+        [string]$TargetRoot,
+        [string]$ConsumerId,
+        [string]$ProductName,
+        [string]$AppUrl,
+        [object]$PortalUrls,
+        [bool]$OwnHost = $false
+    )
+    if (-not $OwnHost -and -not $AppUrl) {
+        throw 'create: missing cloud app URL after phase 8 (Cloud First Security Centric). Re-run create.'
+    }
+    $portalLine = $null
+    if ($PortalUrls) {
+        $first = @($PortalUrls) | Select-Object -First 1
+        if ($first -and $first.url) { $portalLine = [string]$first.url }
+    }
+    $box = '================================================================'
+    Write-Host ''
+    Write-Host $box -ForegroundColor Green
+    Write-Host '  SUCCESS  AutoMagic create finished (all 9 phases)' -ForegroundColor Green
+    Write-Host "  Product: $ProductName    consumer_id=$ConsumerId" -ForegroundColor Green
+    Write-Host $box -ForegroundColor Green
+    Write-Host ''
+    Write-Host '  CLAIM: your MERIT shell is LIVE in production (cloud).' -ForegroundColor Green
+    Write-Host ''
+    if (-not $OwnHost) {
+        Write-Host '  === Open your app in the browser (production) ===' -ForegroundColor Cyan
+        Write-Host "  1) App UI (play):     $AppUrl"
+        if ($portalLine) {
+            Write-Host "  2) Marketing portal:  $portalLine"
+        } else {
+            Write-Host '  2) Marketing portal:  local portal/ only - run: .\merit.ps1 portal --path <repo>'
+        }
+        Write-Host "  3) Gateway host:      https://merit-prod.vercel.app  (auth/store rails for $ConsumerId)"
+        Write-Host ''
+        Write-Host '  === Validate / celebrate (2 minutes) ===' -ForegroundColor Cyan
+        Write-Host '  [ ] Paste the App UI URL into Chrome/Edge/Safari (incognito is fine).'
+        Write-Host '  [ ] Confirm the page loads (play shell / workbench chrome) - hard-refresh if blank.'
+        Write-Host '  [ ] Confirm the address bar is merit-prod.vercel.app/apps/<id>/play (cloud, not localhost).'
+        if ($portalLine) {
+            Write-Host '  [ ] Open the Marketing portal URL - jumpstart PRD / app_logic guide should appear.'
+        }
+        Write-Host '  [ ] Optional: Windows Start -> type the URL, or: start <App UI URL>'
+        Write-Host ''
+        Write-Host '  Quick open (PowerShell):' -ForegroundColor Cyan
+        Write-Host "    start `"$AppUrl`""
+        if ($portalLine) { Write-Host "    start `"$portalLine`"" }
+        Write-Host ''
+        Write-Host '  === What success means ===' -ForegroundColor Cyan
+        Write-Host '  Phases 1-9 OK. UI is published. Rails are on merit-prod.'
+        Write-Host '  Local laptop is not the host - production is the browser URL above.'
+        Write-Host ''
+        Write-Host '  === Next (dinner Steps 3-4) ===' -ForegroundColor Cyan
+        Write-Host '  /merit-prd  -> fill docs/PRODUCT.prd.md'
+        Write-Host '  /merit-portal -> shape portal/ then: .\merit.ps1 portal --path <repo>'
+        Write-Host '  /merit-applogic -> implement Must FRs under app_logic/'
+        Write-Host '  Guide: https://merit-prod.vercel.app/portal/developers/full-app/'
+        Write-Host "  Checkout later: https://merit-prod.vercel.app/store/$ConsumerId/register"
+        Write-Host '  Optional: push this folder to GitHub to archive the repo.'
+        Write-Host '  Advanced later: --deploy --vercel-scope <your-team> (own host).'
+    } else {
+        Write-Host '  CLAIM: your app is live on your Vercel host.' -ForegroundColor Green
+        Write-Host "  consumer_id=$ConsumerId"
+        Write-Host '  Next: shape portal/ then .\merit.ps1 portal --path <repo>'
+        Write-Host '  Then /merit-applogic under app_logic/.'
+        Write-Host "  Checkout later: https://merit-prod.vercel.app/store/$ConsumerId/register"
+    }
+    Write-Host ''
+    Write-Host $box -ForegroundColor Green
+    Write-Host '  Celebrate: you shipped a cloud app URL. Open it. Share it. Build on it.' -ForegroundColor Green
+    Write-Host $box -ForegroundColor Green
+    Write-Host ''
+}
+
 function Write-CreatePhaseGuide {
     param(
         [string]$TargetRoot,
@@ -1195,32 +1271,8 @@ function Invoke-Create {
             $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
             $settings = Get-LaunchSettings -Path $launch
             $cid = Get-Setting -Settings $settings -Name 'consumer_id' -Default (Split-Path -Leaf $TargetRoot)
-            Write-Host ''
-            Write-Host '------------------------------------------------------------'
-            if ($scaffoldOnly) {
-                if (-not $script:CreateAppUrl) {
-                    throw 'create: missing cloud app URL after phase 8 (Cloud First Security Centric). Re-run create.'
-                }
-                Write-Host " Your MERIT shell is live - consumer_id=$cid"
-                Write-Host " Open: $($script:CreateAppUrl)"
-                Write-Host ' Host: merit-prod.vercel.app (UI + rails).'
-                if ($script:CreatePortalUrls) {
-                    foreach ($p in $script:CreatePortalUrls) { Write-Host (" Portal: " + $p.url) }
-                } else {
-                    Write-Host ' Portal: local portal/ jumpstart (publish with merit.ps1 portal when here.now is ready)'
-                }
-                Write-Host ' Next: /merit-prd -> /merit-portal -> /merit-applogic (see portal jumpstart).'
-                Write-Host ' Recommended: push this folder to GitHub to archive the repo.'
-                Write-Host ' Advanced later: own host via --deploy --vercel-scope <your-team>'
-                Write-Host " Checkout later: https://merit-prod.vercel.app/store/$cid/register"
-            } else {
-                Write-Host ' Your app is live on your Vercel - shell ready for'
-                Write-Host ' app_logic/ and your portal. Enjoy dinner.'
-                Write-Host " consumer_id=$cid"
-                Write-Host ' Next: shape portal/ then .\merit.ps1 portal --path <repo>'
-                Write-Host " Checkout later: https://merit-prod.vercel.app/store/$cid/register"
-            }
-            Write-Host '------------------------------------------------------------'
+            $pname = Get-Setting -Settings $settings -Name 'product_name' -Default $cid
+            Write-CreateSuccessCelebration -TargetRoot $TargetRoot -ConsumerId $cid -ProductName $pname -AppUrl $script:CreateAppUrl -PortalUrls $script:CreatePortalUrls -OwnHost (-not $scaffoldOnly)
         }}
     )
 
@@ -1240,7 +1292,8 @@ function Invoke-Create {
         }
     }
     Write-Host ""
-    Write-Host "create OK: AutoMagic fullstack-consumer finished for $TargetRoot"
+    Write-Host "create OK: AutoMagic fullstack-consumer finished for $TargetRoot" -ForegroundColor Green
+    Write-Host 'Open the SUCCESS box App UI URL above in your browser to validate production.' -ForegroundColor Green
 }
 
 $target = Resolve-TargetRoot -ArgList $Rest
