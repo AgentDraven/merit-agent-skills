@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.32'
+$MERIT_VERSION = '0.3.33'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -35,6 +35,12 @@ Commands:
                            [--vercel-scope <slug>] [--product-name <name>]
                            [--scaffold-only]  (alias of default platform mode)
   apps publish --path <repo>  Upload play/+cfg/ to merit-prod /apps/<app>/play (create phase 8)
+  apps remove --path <repo> --yes
+                          Remove platform /apps/<id> files (local delete does NOT)
+                          [--tenant-all] also wipe tenant collections for that id
+                          [--with-portal] also DELETE here.now site from portals.json
+  apps remove --consumer-id <id> --yes
+                          Same without a local folder (cloud UI only)
   version                  Print version
   help                     Print help (includes create phase redo map)
 
@@ -1014,6 +1020,98 @@ function Invoke-AppsPublish {
     return $appUrl
 }
 
+function Invoke-HereNowDeleteSite {
+    param(
+        [string]$Slug,
+        [string]$BaseUrl = 'https://here.now'
+    )
+    $apiKey = Get-HereNowApiKey
+    if (-not $apiKey) {
+        throw 'here.now delete: set HERENOW_API_KEY or ~/.herenow/credentials (BYOK).'
+    }
+    if (-not $Slug -or $Slug -match '^\{\{') {
+        throw "here.now delete: invalid slug '$Slug'"
+    }
+    $headers = @{
+        Authorization = "Bearer $apiKey"
+        'x-herenow-client' = 'merit-ps1/apps-remove'
+    }
+    Write-Host "here.now: DELETE $BaseUrl/api/v1/publish/$Slug ..."
+    try {
+        Invoke-RestMethod -Uri "$BaseUrl/api/v1/publish/$Slug" -Method Delete -Headers $headers -TimeoutSec 60 | Out-Null
+    } catch {
+        throw "here.now delete failed for $Slug: $_"
+    }
+    Write-Host "here.now deleted: https://$Slug.here.now/"
+    return "https://$Slug.here.now/"
+}
+
+function Invoke-AppsRemove {
+    param(
+        [string]$TargetRoot,
+        [string]$ConsumerId,
+        [string[]]$ArgList,
+        [string]$Gateway = 'https://merit-prod.vercel.app'
+    )
+    if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) {
+        throw @"
+apps remove: refusing without --yes (destructive).
+  Platform UI:  $Gateway/apps/$ConsumerId/play
+  Then e.g.:    .\merit.ps1 apps remove --path `"$TargetRoot`" --yes
+  Full leave:   .\merit.ps1 apps remove --path `"$TargetRoot`" --yes --tenant-all --with-portal
+"@
+    }
+    $scope = if (Test-ArgFlag -ArgList $ArgList -Name '--tenant-all') { 'tenant_all' } else { 'app_files' }
+    $payload = @{
+        consumerId = $ConsumerId
+        confirm = $ConsumerId
+        scope = $scope
+    } | ConvertTo-Json -Compress
+    $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
+    Write-Host "Removing $scope for consumer_id=$ConsumerId on $Gateway ..."
+    try {
+        $wr = Invoke-WebRequest -Uri "$Gateway/api/apps/remove" -Method Post -Body $bodyBytes -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 60
+    } catch {
+        throw "apps remove failed ($Gateway/api/apps/remove). $_"
+    }
+    $parsed = $null
+    try { $parsed = $wr.Content | ConvertFrom-Json } catch { }
+    if (-not $parsed -or -not $parsed.ok) {
+        throw "apps remove rejected: $($wr.Content)"
+    }
+    Write-Host "apps remove OK: consumer_id=$ConsumerId scope=$($parsed.scope) (was $($parsed.appUrlWas))"
+    if (Test-ArgFlag -ArgList $ArgList -Name '--with-portal') {
+        if (-not $TargetRoot -or -not (Test-Path -LiteralPath $TargetRoot)) {
+            throw 'apps remove --with-portal needs --path <repo> (to read cfg/portals.json / .herenow state)'
+        }
+        $portalsPath = Join-Path $TargetRoot 'cfg/portals.json'
+        $slugs = @()
+        if (Test-Path -LiteralPath $portalsPath) {
+            $portals = Read-JsonFile $portalsPath
+            foreach ($s in @($portals.surfaces)) {
+                $slug = [string]$s.slug
+                $sub = Join-Path $TargetRoot ([string]$s.path)
+                $stateFile = Join-Path $sub '.herenow\state.json'
+                if (Test-Path -LiteralPath $stateFile) {
+                    try {
+                        $st = Read-JsonFile $stateFile
+                        $live = @($st.publishes.PSObject.Properties.Name) | Select-Object -First 1
+                        if ($live) { $slug = [string]$live }
+                    } catch { }
+                }
+                if ($slug -and $slug -notmatch '^\{\{') { $slugs += $slug }
+            }
+        }
+        if ($slugs.Count -lt 1) {
+            Write-Host 'apps remove: --with-portal set but no portal slug found (skip here.now delete)'
+        } else {
+            foreach ($slug in ($slugs | Select-Object -Unique)) {
+                Invoke-HereNowDeleteSite -Slug $slug | Out-Null
+            }
+        }
+    }
+    return $parsed
+}
 
 function Write-CreateSuccessCelebration {
     param(
@@ -1310,14 +1408,42 @@ switch -Regex ($Command) {
     '^all$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^closeout$' { try { Invoke-Closeout -TargetRoot $target; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^apps$' {
-        if (-not $Rest -or "$($Rest[0])".ToLowerInvariant() -ne 'publish') { Write-MeritHelp; exit 1 }
+        if (-not $Rest -or $Rest.Count -lt 1) { Write-MeritHelp; exit 1 }
+        $sub = "$($Rest[0])".ToLowerInvariant()
         try {
-            $launch = Get-LaunchPath -TargetRoot $target -ArgList $Rest
-            $settings = Get-LaunchSettings -Path $launch
-            $cid = Require-Setting -Settings $settings -Name 'consumer_id'
-            $url = Invoke-AppsPublish -TargetRoot $target -ConsumerId $cid
-            Write-Host "apps publish OK: $url"
-            exit 0
+            if ($sub -eq 'publish') {
+                $launch = Get-LaunchPath -TargetRoot $target -ArgList $Rest
+                $settings = Get-LaunchSettings -Path $launch
+                $cid = Require-Setting -Settings $settings -Name 'consumer_id'
+                $url = Invoke-AppsPublish -TargetRoot $target -ConsumerId $cid
+                Write-Host "apps publish OK: $url"
+                exit 0
+            }
+            if ($sub -eq 'remove') {
+                $cidArg = Get-ArgValue -ArgList $Rest -Name '--consumer-id'
+                if (-not $cidArg) { $cidArg = Get-ArgValue -ArgList $Rest -Name '--consumer_id' }
+                $cid = $cidArg
+                $rootForRemove = $null
+                $pathArg = Get-ArgValue -ArgList $Rest -Name '--path'
+                if ($pathArg) {
+                    if (-not (Test-Path -LiteralPath $pathArg)) {
+                        throw "apps remove: path not found: $pathArg — after deleting the folder use: .\merit.ps1 apps remove --consumer-id <id> --yes"
+                    }
+                    $rootForRemove = (Resolve-Path -LiteralPath $pathArg).Path
+                    if (-not $cid) {
+                        $launch = Get-LaunchPath -TargetRoot $rootForRemove -ArgList $Rest
+                        $settings = Get-LaunchSettings -Path $launch
+                        $cid = Require-Setting -Settings $settings -Name 'consumer_id'
+                    }
+                }
+                if (-not $cid) {
+                    throw 'apps remove: pass --path <repo> (reads consumer_id) or --consumer-id <id>, plus --yes'
+                }
+                Invoke-AppsRemove -TargetRoot $rootForRemove -ConsumerId $cid -ArgList $Rest | Out-Null
+                exit 0
+            }
+            Write-MeritHelp
+            exit 1
         } catch {
             Write-Host $_.Exception.Message
             exit 1
