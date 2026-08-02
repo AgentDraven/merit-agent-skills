@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.34'
+$MERIT_VERSION = '0.3.37'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -26,6 +26,7 @@ Commands:
   par scaffold             Advanced: create play shell + cfg/par_pins.json
   branding scaffold        Advanced: create cfg/branding.json
   subs scaffold            Advanced: create meritsubs/meritstore cfg
+  community scaffold       Baseline community cfg (community / collab_schedule / alerts)
   livealpha --path <repo>  Elevate consumer toward live alpha (Research + Baseline scaffold)
   baseline --path <repo>   Alias for livealpha
   admin gate demo-init     Advanced: create local demo operator-gate placeholders
@@ -317,6 +318,11 @@ function Invoke-Verify {
     foreach ($rel in @('cfg/par_pins.json', 'cfg/branding.json')) {
         if (-not (Test-Path (Join-Path $TargetRoot $rel))) { $fail += "missing $rel" }
     }
+    foreach ($rel in @('cfg/community.json', 'cfg/collab_schedule.json', 'cfg/alerts.json')) {
+        if (-not (Test-Path (Join-Path $TargetRoot $rel))) {
+            Write-Host "verify NOTE: missing $rel (run: .\merit.ps1 community scaffold --path <repo>)"
+        }
+    }
     $gitignore = Join-Path $TargetRoot '.gitignore'
     if (Test-Path $gitignore) {
         $gi = Get-Content $gitignore -Raw
@@ -334,6 +340,28 @@ function Invoke-Verify {
     return $true
 }
 
+function Resolve-ScaffoldConsumerId {
+    param([string]$TargetRoot)
+    $syncPath = Join-Path $TargetRoot 'cfg/merit-sync.json'
+    if (Test-Path -LiteralPath $syncPath) {
+        try {
+            $sync = Read-JsonFile $syncPath
+            if ($sync.consumer_id) { return ([string]$sync.consumer_id).Trim().ToLowerInvariant() }
+        } catch { }
+    }
+    $launch = Join-Path $TargetRoot '.merit_launch.md'
+    if (Test-Path -LiteralPath $launch) {
+        try {
+            $settings = Get-LaunchSettings -Path $launch
+            $cid = Get-Setting -Settings $settings -Name 'consumer_id'
+            if ($cid) { return ([string]$cid).Trim().ToLowerInvariant() }
+        } catch { }
+    }
+    $leaf = Split-Path -Leaf $TargetRoot
+    if ($leaf) { return $leaf.Trim().ToLowerInvariant() }
+    return 'app'
+}
+
 function Invoke-ParScaffold {
     param([string]$TargetRoot, [string]$Variant)
     $pinsSrc = Join-Path $Root 'cfg/par_pins.free.json'
@@ -344,6 +372,19 @@ function Invoke-ParScaffold {
     $wb = $pins.packages.merit_workbench
     $playDir = Join-Path $TargetRoot 'play'
     New-Item -ItemType Directory -Force -Path $playDir | Out-Null
+    $productName = 'MERIT Play'
+    $brandingPath = Join-Path $destCfg 'branding.json'
+    if (Test-Path -LiteralPath $brandingPath) {
+        try {
+            $branding = Read-JsonFile $brandingPath
+            if ($branding.product_name) { $productName = [string]$branding.product_name }
+        } catch { }
+    }
+    $consumerId = Resolve-ScaffoldConsumerId -TargetRoot $TargetRoot
+    $registerUrl = "https://merit-prod.vercel.app/store/$consumerId/register"
+    $productNameJs = ConvertTo-Json -InputObject $productName -Compress
+    $consumerIdJs = ConvertTo-Json -InputObject $consumerId -Compress
+    $registerUrlJs = ConvertTo-Json -InputObject $registerUrl -Compress
     $journalTags = ''
     if ($Variant -eq 'workbench-journal') {
         $jn = $pins.packages.journal
@@ -353,15 +394,18 @@ function Invoke-ParScaffold {
 "@
     }
     $tplPath = Join-Path $Root 'templates/consumer-static/play/index.html.template'
-    $html = (Get-Content -LiteralPath $tplPath -Raw -Encoding UTF8) `
-        -replace '\{\{PRODUCT_NAME\}\}', 'MERIT Play' `
-        -replace '\{\{WORKBENCH_CSS_URL\}\}', $wb.artifacts.css.url `
-        -replace '\{\{WORKBENCH_CSS_SRI\}\}', $wb.artifacts.css.sri `
-        -replace '\{\{WORKBENCH_JS_URL\}\}', $wb.artifacts.js.url `
-        -replace '\{\{WORKBENCH_JS_SRI\}\}', $wb.artifacts.js.sri `
-        -replace '\{\{JOURNAL_TAGS\}\}', $journalTags
+    $html = Get-Content -LiteralPath $tplPath -Raw -Encoding UTF8
+    $html = $html.Replace('{{PRODUCT_NAME_JS}}', $productNameJs).
+        Replace('{{PRODUCT_NAME}}', $productName).
+        Replace('{{CONSUMER_ID_JS}}', $consumerIdJs).
+        Replace('{{REGISTER_URL_JS}}', $registerUrlJs).
+        Replace('{{WORKBENCH_CSS_URL}}', [string]$wb.artifacts.css.url).
+        Replace('{{WORKBENCH_CSS_SRI}}', [string]$wb.artifacts.css.sri).
+        Replace('{{WORKBENCH_JS_URL}}', [string]$wb.artifacts.js.url).
+        Replace('{{WORKBENCH_JS_SRI}}', [string]$wb.artifacts.js.sri).
+        Replace('{{JOURNAL_TAGS}}', $journalTags)
     Set-Content -LiteralPath (Join-Path $playDir 'index.html') -Value $html -Encoding UTF8
-    Write-Host "par scaffold OK ($Variant) -> $TargetRoot"
+    Write-Host "par scaffold OK ($Variant) -> $TargetRoot (capability tour for $consumerId)"
 }
 
 function Invoke-BrandingScaffold {
@@ -392,6 +436,21 @@ function Invoke-SubsScaffold {
     $portalsTpl = Join-Path $Root 'cfg/portals.json.template'
     if (Test-Path $portalsTpl) { Copy-Item -LiteralPath $portalsTpl -Destination (Join-Path $cfg 'portals.json') -Force }
     Write-Host "subs scaffold OK -> $cfg (edit consumer_id and register URL)"
+}
+
+function Invoke-BaselineCommunityScaffold {
+    param([string]$TargetRoot)
+    $cfg = Join-Path $TargetRoot 'cfg'
+    New-Item -ItemType Directory -Force -Path $cfg | Out-Null
+    foreach ($name in @('community.json', 'collab_schedule.json', 'alerts.json')) {
+        $src = Join-Path $Root "cfg/$name"
+        $dest = Join-Path $cfg $name
+        if (-not (Test-Path -LiteralPath $src)) { throw "baseline community missing template: $src" }
+        if (-not (Test-Path -LiteralPath $dest)) {
+            Copy-Item -LiteralPath $src -Destination $dest -Force
+        }
+    }
+    Write-Host "baseline community scaffold OK -> $cfg (community / collab_schedule / alerts)"
 }
 
 function Get-ConsumerIdFromRepo {
@@ -1140,38 +1199,51 @@ function Write-CreateSuccessCelebration {
     Write-Host '  CLAIM: your MERIT shell is LIVE in production (cloud).' -ForegroundColor Green
     Write-Host ''
     if (-not $OwnHost) {
-        Write-Host '  === Open your app in the browser (production) ===' -ForegroundColor Cyan
-        Write-Host "  1) App UI (play):     $AppUrl"
+        $linkColor = 'Cyan'
+        $noteColor = 'DarkGray'
+        $gatewayHost = 'https://merit-prod.vercel.app'
+        Write-Host '  === Open these in the browser (production) ===' -ForegroundColor Cyan
+        Write-Host '  1) App UI (play)  - open this first (your live app):' -ForegroundColor White
+        Write-Host "     $AppUrl" -ForegroundColor $linkColor
+        Write-Host '     <== try your app here; a shorter fancy domain can come later' -ForegroundColor $noteColor
         if ($portalLine) {
-            Write-Host "  2) Marketing portal:  $portalLine"
+            Write-Host '  2) Marketing portal  - share this with visitors:' -ForegroundColor White
+            Write-Host "     $portalLine" -ForegroundColor $linkColor
+            Write-Host '     <== public jumpstart / marketing site for your app' -ForegroundColor $noteColor
         } else {
-            Write-Host '  2) Marketing portal:  local portal/ only - run: .\merit.ps1 portal --path <repo>'
+            Write-Host '  2) Marketing portal  - publish when ready:' -ForegroundColor White
+            Write-Host '     local portal/ only - run: .\merit.ps1 portal --path <repo>' -ForegroundColor Yellow
+            Write-Host '     <== after portal publish, this becomes your visitor-facing URL' -ForegroundColor $noteColor
         }
-        Write-Host "  3) Gateway host:      https://merit-prod.vercel.app  (auth/store rails for $ConsumerId)"
+        Write-Host '  3) Gateway host  - platform rails (reference only):' -ForegroundColor White
+        Write-Host "     $gatewayHost" -ForegroundColor DarkCyan
+        Write-Host "     <== not a page to browse; auth/store for $ConsumerId run on this host" -ForegroundColor $noteColor
         Write-Host ''
         Write-Host '  === Validate / celebrate (2 minutes) ===' -ForegroundColor Cyan
-        Write-Host '  [ ] Paste the App UI URL into Chrome/Edge/Safari (incognito is fine).'
+        Write-Host '  [ ] Paste link 1 (App UI) into Chrome/Edge/Safari (incognito is fine).'
         Write-Host '  [ ] Confirm the page loads (play shell / workbench chrome) - hard-refresh if blank.'
         Write-Host '  [ ] Confirm the address bar is merit-prod.vercel.app/apps/<id>/play (cloud, not localhost).'
         if ($portalLine) {
-            Write-Host '  [ ] Open the Marketing portal URL - jumpstart PRD / app_logic guide should appear.'
+            Write-Host '  [ ] Open link 2 (Marketing portal) - jumpstart PRD / app_logic guide should appear.'
         }
-        Write-Host '  [ ] Optional: Windows Start -> type the URL, or: start <App UI URL>'
+        Write-Host '  [ ] Optional: Windows Start -> type the App UI URL, or use Quick open below.'
         Write-Host ''
-        Write-Host '  Quick open (PowerShell):' -ForegroundColor Cyan
-        Write-Host "    start `"$AppUrl`""
-        if ($portalLine) { Write-Host "    start `"$portalLine`"" }
+        Write-Host '  Quick open (PowerShell) - link 1 first:' -ForegroundColor Cyan
+        Write-Host "    start `"$AppUrl`"" -ForegroundColor $linkColor
+        if ($portalLine) { Write-Host "    start `"$portalLine`"" -ForegroundColor $linkColor }
         Write-Host ''
         Write-Host '  === What success means ===' -ForegroundColor Cyan
         Write-Host '  Phases 1-9 OK. UI is published. Rails are on merit-prod.'
-        Write-Host '  Local laptop is not the host - production is the browser URL above.'
+        Write-Host '  Local laptop is not the host - production is link 1 above.'
         Write-Host ''
         Write-Host '  === Next (dinner Steps 3-4) ===' -ForegroundColor Cyan
         Write-Host '  /merit-prd  -> fill docs/PRODUCT.prd.md'
         Write-Host '  /merit-portal -> shape portal/ then: .\merit.ps1 portal --path <repo>'
         Write-Host '  /merit-applogic -> implement Must FRs under app_logic/'
-        Write-Host '  Guide: https://merit-prod.vercel.app/portal/developers/full-app/'
-        Write-Host "  Checkout later: https://merit-prod.vercel.app/store/$ConsumerId/register"
+        Write-Host '  Guide: ' -NoNewline
+        Write-Host 'https://merit-prod.vercel.app/portal/developers/full-app/' -ForegroundColor $linkColor
+        Write-Host '  Checkout later: ' -NoNewline
+        Write-Host "https://merit-prod.vercel.app/store/$ConsumerId/register" -ForegroundColor $linkColor
         Write-Host '  Optional: push this folder to GitHub to archive the repo.'
         Write-Host '  Advanced later: --deploy --vercel-scope <your-team> (own host).'
     } else {
@@ -1198,7 +1270,7 @@ function Write-CreatePhaseGuide {
         @{ n = 1; text = ".\merit.ps1 init --path `"$TargetRoot`"; .\merit.ps1 apply --path `"$TargetRoot`"" },
         @{ n = 2; text = ".\merit.ps1 par scaffold --path `"$TargetRoot`" --variant workbench-journal" },
         @{ n = 3; text = ".\merit.ps1 branding scaffold --path `"$TargetRoot`"" },
-        @{ n = 4; text = ".\merit.ps1 subs scaffold --path `"$TargetRoot`"" },
+        @{ n = 4; text = ".\merit.ps1 subs scaffold --path `"$TargetRoot`"; .\merit.ps1 community scaffold --path `"$TargetRoot`"" },
         @{ n = 5; text = ".\merit.ps1 admin gate demo-init --path `"$TargetRoot`"" },
         @{ n = 6; text = ".\merit.ps1 verify --path `"$TargetRoot`"" },
         @{ n = 7; text = "re-run create (portal stub is bundled) OR continue to phase 8 if portal/ already exists" },
@@ -1221,7 +1293,7 @@ function Write-CreateRecoveryTips {
         1 = ".\merit.ps1 init --path `"$TargetRoot`"; .\merit.ps1 apply --path `"$TargetRoot`""
         2 = ".\merit.ps1 par scaffold --path `"$TargetRoot`" --variant workbench-journal"
         3 = ".\merit.ps1 branding scaffold --path `"$TargetRoot`""
-        4 = ".\merit.ps1 subs scaffold --path `"$TargetRoot`""
+        4 = ".\merit.ps1 subs scaffold --path `"$TargetRoot`"; .\merit.ps1 community scaffold --path `"$TargetRoot`""
         5 = ".\merit.ps1 admin gate demo-init --path `"$TargetRoot`""
         6 = ".\merit.ps1 verify --path `"$TargetRoot`""
         7 = ".\merit.ps1 create --path `"$TargetRoot`" --profile fullstack-consumer   # or skip to phase 8 if portal/ exists"
@@ -1297,8 +1369,9 @@ function Invoke-Create {
             $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
             Update-Branding -TargetRoot $TargetRoot -Settings (Get-LaunchSettings -Path $launch)
         }},
-        @{ n = 4; title = 'Free / Plus subscriber embed (subs scaffold)'; script = {
+        @{ n = 4; title = 'Free / Plus subscriber embed + baseline community cfg'; script = {
             Invoke-SubsScaffold -TargetRoot $TargetRoot
+            Invoke-BaselineCommunityScaffold -TargetRoot $TargetRoot
             $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
             $settings = Get-LaunchSettings -Path $launch
             $cid = Require-Setting -Settings $settings -Name 'consumer_id'
@@ -1473,6 +1546,11 @@ switch -Regex ($Command) {
     '^subs$' {
         if (-not $Rest -or $Rest[0] -ne 'scaffold') { Write-MeritHelp; exit 1 }
         Invoke-SubsScaffold -TargetRoot $target
+        exit 0
+    }
+    '^community$' {
+        if (-not $Rest -or $Rest[0] -ne 'scaffold') { Write-MeritHelp; exit 1 }
+        Invoke-BaselineCommunityScaffold -TargetRoot $target
         exit 0
     }
     '^(livealpha|baseline)$' {

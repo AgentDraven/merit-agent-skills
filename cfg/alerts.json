@@ -1,0 +1,12 @@
+{
+  "schema": "merit.alerts.v1",
+  "defaults": {
+    "channels": ["vapid", "email"],
+    "offsets": ["24h", "1h", "at_time"]
+  },
+  "targets": {
+    "office_hours": true,
+    "consult": true,
+    "todo_due": true
+  }
+}

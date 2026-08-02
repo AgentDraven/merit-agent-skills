@@ -1,0 +1,16 @@
+{
+  "schema": "merit.community.v1",
+  "channels": [
+    { "id": "general", "label": "General", "description": "Community conversation" },
+    { "id": "ama", "label": "AMA", "description": "Ask Me Anything log" },
+    { "id": "announcements", "label": "Announcements", "description": "Operator updates" }
+  ],
+  "email": {
+    "onboarding": true,
+    "digests": false
+  },
+  "entitlement": {
+    "required_sku": "community_member",
+    "guests_can_post": false
+  }
+}

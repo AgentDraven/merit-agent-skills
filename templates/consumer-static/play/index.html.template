@@ -11,6 +11,180 @@
   <main id="merit-workbench-mount"></main>
   <footer id="merit-footer"><small>MERIT Powered</small></footer>
   <script src="{{WORKBENCH_JS_URL}}" integrity="{{WORKBENCH_JS_SRI}}" crossorigin="anonymous"></script>
+  <script>
+    (function () {
+      var PRODUCT = {{PRODUCT_NAME_JS}};
+      var CONSUMER_ID = {{CONSUMER_ID_JS}};
+      var REGISTER_URL = {{REGISTER_URL_JS}};
+      var GW = 'https://merit-prod.vercel.app';
+
+      function esc(s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function linkHtml(href, label) {
+        return '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a>';
+      }
+
+      function bootMeritPlay() {
+        var mw = window.merit_workbench;
+        var host = document.getElementById('merit-workbench-mount');
+        if (!mw || !host || typeof mw.mountMeritWorkbenchPanel !== 'function') return;
+        if (host.childElementCount) return;
+
+        var rows = [
+          {
+            id: 'auth',
+            hnd: 'Auth / login',
+            handle: 'meritsubs',
+            preview: 'Open guide',
+            levels: 'Rails ready',
+            detail:
+              '<p>Subscriber identity for <strong>' + esc(PRODUCT) + '</strong> runs on MERIT rails (signup, session, Free/Plus).</p>' +
+              '<p>' + linkHtml(GW + '/portal/developers/auth-subs/', 'Auth and subscriptions guide') + '</p>' +
+              '<p>Wire login UX in <code>app_logic/</code> after dinner Steps 3–4 — do not fork auth into your repo.</p>'
+          },
+          {
+            id: 'store',
+            hnd: 'Store + default SKUs',
+            handle: 'meritstore',
+            preview: 'Register path',
+            levels: 'Cfg scaffolded',
+            detail:
+              '<p>Free/Plus SKU files are in <code>cfg/</code> for your app. Checkout uses your register path:</p>' +
+              '<p>' + linkHtml(REGISTER_URL, REGISTER_URL) + '</p>' +
+              '<p>' + linkHtml(GW + '/portal/developers/sku-commerce/', 'SKU commerce guide') +
+              ' — sell SKUs and subscriptions on platform rails.</p>'
+          },
+          {
+            id: 'subs',
+            hnd: 'meritsubs entitlements',
+            handle: 'meritsubs',
+            preview: 'Providers',
+            levels: 'Gateway',
+            detail:
+              '<p>Tiers, entitlements, and usage meter through <code>/api/meritsubs/*</code> for consumer_id=<code>' +
+              esc(CONSUMER_ID) + '</code>.</p>' +
+              '<p>' + linkHtml(GW + '/portal/developers/providers/', 'Provider rails guide') + '</p>'
+          },
+          {
+            id: 'utils',
+            hnd: 'meritutils packages',
+            handle: 'PAR CDN',
+            preview: 'Registry',
+            levels: 'Pinned',
+            detail:
+              '<p>Packages available through the gateway CDN for your play / app_logic:</p>' +
+              '<ul>' +
+              '<li><strong>merit_workbench</strong> — this grid / inspector shell</li>' +
+              '<li><strong>journal</strong> — compose + history on the workbench</li>' +
+              '<li><strong>merit_ama</strong> — Q and A primitives</li>' +
+              '<li><strong>merit_leaderboard</strong> — ranking surfaces</li>' +
+              '<li><strong>merit_usage_meter</strong> — Free/Plus honesty</li>' +
+              '<li><strong>merit_ux</strong> — shared UX + Gloss themes</li>' +
+              '</ul>' +
+              '<p>' + linkHtml(GW + '/pkg/meritutils/registry.json', 'meritutils registry.json') +
+              ' · ' + linkHtml(GW + '/portal/developers/par-packages/', 'PAR packages guide') + '</p>'
+          },
+          {
+            id: 'community',
+            hnd: 'Community channels',
+            handle: 'cfg/community.json',
+            preview: 'Scaffolded',
+            levels: 'Baseline',
+            detail:
+              '<p>Default channels (<code>general</code>, <code>ama</code>, <code>announcements</code>) live in <code>cfg/community.json</code>.</p>' +
+              '<p>Eligible registered members can post; guests browse marketing only. Email hooks use platform <code>merit_notify</code>.</p>'
+          },
+          {
+            id: 'ama',
+            hnd: 'AMA + Office Hours',
+            handle: 'merit_ama',
+            preview: 'Cfg ready',
+            levels: 'Baseline',
+            detail:
+              '<p>AMA questions log on channel <code>ama</code>. Office Hours default Mondays 5–6pm Pacific (chat and/or Zoom) from <code>cfg/collab_schedule.json</code>.</p>' +
+              '<p>Free for eligible Community Member tiers. Wire UI via meritutils AMA / video packages.</p>'
+          },
+          {
+            id: 'collab',
+            hnd: 'Collaboration Corner',
+            handle: 'merit_calendar',
+            preview: 'Cfg ready',
+            levels: 'Baseline',
+            detail:
+              '<p>Consult grid Tue/Thu 4–8pm Pacific, 20-minute slots. Shared free/busy + conflict-before-book via <code>merit_calendar</code> (EventCalendar + rrule).</p>' +
+              '<p>Schedule + $0 SKUs: <code>cfg/collab_schedule.json</code>. Zoom meetings via <code>merit_video</code> / platform room-media.</p>'
+          },
+          {
+            id: 'journal-alerts',
+            hnd: 'Journal + alerts',
+            handle: 'journal / alerts',
+            preview: 'Cfg ready',
+            levels: 'Baseline',
+            detail:
+              '<p>Private journal with share modes; todos with deadlines. Alert offsets in <code>cfg/alerts.json</code> (VAPID + email).</p>' +
+              '<p>Workbench already mounts journal when pinned — extend share/todo in app_logic as packages land.</p>'
+          },
+          {
+            id: 'applogic',
+            hnd: 'Next: app_logic/',
+            handle: 'Dinner 3–4',
+            preview: 'Full-app guide',
+            levels: 'Your turn',
+            detail:
+              '<p>This tour is Step 2 taste. Product features land in <code>app_logic/</code> for <strong>' +
+              esc(PRODUCT) + '</strong>:</p>' +
+              '<ol>' +
+              '<li><code>/merit-prd</code> — fill <code>docs/PRODUCT.prd.md</code></li>' +
+              '<li><code>/merit-portal</code> — shape marketing <code>portal/</code>, then republish</li>' +
+              '<li><code>/merit-applogic</code> — implement Must FRs under <code>app_logic/</code></li>' +
+              '</ol>' +
+              '<p>' + linkHtml(GW + '/portal/developers/full-app/', 'Your app over dinner') + '</p>'
+          }
+        ];
+
+        mw.mountMeritWorkbenchPanel(host, {
+          title: PRODUCT,
+          gridTitle: 'Your MERIT rails',
+          theme: 'merit-dark',
+          idKey: 'id',
+          features: { downstream: false },
+          columns: [
+            { id: 'hnd', label: 'Capability' },
+            { id: 'handle', label: 'Rail' },
+            { id: 'preview', label: 'Open' },
+            { id: 'levels', label: 'Status' }
+          ],
+          rows: rows,
+          summary: {
+            cards: [
+              { label: 'Product', value: PRODUCT },
+              { label: 'Step', value: '2 — taste' },
+              { label: 'Next', value: 'app_logic/' },
+              { label: 'Host', value: 'merit-prod' }
+            ]
+          },
+          renderInspector: function (row) {
+            return {
+              title: row.hnd || 'Capability',
+              bodyHtml: row.detail || '<p>Select a capability row.</p>'
+            };
+          }
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootMeritPlay);
+      } else {
+        bootMeritPlay();
+      }
+    })();
+  </script>
   {{JOURNAL_TAGS}}
 </body>
 </html>

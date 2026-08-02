@@ -1,0 +1,22 @@
+{
+  "schema": "merit.collab_schedule.v1",
+  "timezone": "America/Los_Angeles",
+  "office_hours": {
+    "rrule": "FREQ=WEEKLY;BYDAY=MO",
+    "start_local": "17:00",
+    "end_local": "18:00",
+    "modality": "both"
+  },
+  "consult_hours": {
+    "by_day": ["TU", "TH"],
+    "start_local": "16:00",
+    "end_local": "20:00",
+    "slot_minutes": 20,
+    "align": ["00", "30"]
+  },
+  "skus": {
+    "community_member": { "price_usd": 0, "label": "Community Member" },
+    "oh_attend": { "price_usd": 0, "label": "Office Hours" },
+    "consult_20m": { "price_usd": 0, "label": "Consult 20m" }
+  }
+}
