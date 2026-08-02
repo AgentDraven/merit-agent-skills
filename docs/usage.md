@@ -1,4 +1,4 @@
-﻿# merit-agent-skills — usage
+# merit-agent-skills — usage
 
 Public guide for the **OSS** path: `merit.ps1`, skills, and freemium try bundles.
 Operator-only vault workflows are optional and not required for a first-time public user.
@@ -30,7 +30,7 @@ Create an empty directory, clone the pinned skills release, clone `merit-demo`, 
 ```powershell
 mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
-git clone --branch skills-v0.3.18 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.19 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
@@ -82,7 +82,7 @@ There are two separate actions:
 
 | Action | When | Command |
 |--------|------|---------|
-| Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.3.18 https://github.com/AgentDraven/merit-agent-skills.git` |
+| Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.3.19 https://github.com/AgentDraven/merit-agent-skills.git` |
 | Install skills into an AI IDE host | Optional, only when you want the host to see skill instructions as installed skills | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./install.sh -Target …` (aliases: `Claude`, `Agents`; `Project` needs `-Path`) |
 
 You can run `merit.ps1` / `merit.sh` directly from the cloned repo without installing skills. Install is for agent authoring convenience, not for runtime deployment.
@@ -186,7 +186,7 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.18 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.19 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -202,7 +202,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.18 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.19 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
