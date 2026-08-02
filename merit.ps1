@@ -30,6 +30,7 @@ Commands:
   baseline --path <repo>   Alias for livealpha
   admin gate demo-init     Advanced: create local demo operator-gate placeholders
   app scaffold             Print merit-demo clone guidance
+  create                   Not shipped yet (prints notice; use init/apply/… for now)
   version                  Print version
   help                     Print help
 
@@ -571,6 +572,17 @@ switch -Regex ($Command) {
         Write-Host "app scaffold: clone the reference consumer:"
         Write-Host "  git clone https://github.com/Mr-PI-Bala/merit-demo.git <target>"
         exit 0
+    }
+    '^create$' {
+        Write-Host @"
+merit.ps1 create — not shipped yet (AutoMagic / FR-MPD-07).
+
+Do not expect create to scaffold or deploy. Until it ships, run the dinner Step 2
+commands from the Portal full-app guide (init, apply, scaffolds, verify, deploy).
+
+See: https://merit-prod.vercel.app/portal/developers/full-app/
+"@
+        exit 1
     }
     default { Write-MeritHelp; exit 1 }
 }
