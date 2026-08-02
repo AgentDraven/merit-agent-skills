@@ -132,7 +132,7 @@ npm install
 | `merit-onboard` | OSS quickstart → merit-demo |
 | `meritcert`, `merit-closeout`, `merit-iar` | Vocabulary; vault operators run writes |
 
-`merit.ps1 create` (v0.3.29+): **Cloud First** — live `merit-prod` `/apps/<app>/play` by default. Phase 7 writes a **jumpstart portal** + enriched `PRODUCT.prd.md` (Make Art, anti-patterns, AI fill prompt). Phase 8 uploads apps one-file-at-a-time, then **publishes `portal/` to here.now** when credentials exist (`.\merit.ps1 portal`).
+`merit.ps1 create` (v0.3.30+): **Cloud First** — live `merit-prod` `/apps/<app>/play`. Phase 7 jumpstart portal + PRD include Make Art, ecosystem providers (meritutils / meritsubs / meritstore), PAR packages (`merit_workbench`…), and consumer examples (CAST, DIRT, SomaTune, M4FI). Phase 8 publishes portal/ to here.now when credentials exist.
 
 All OSS user docs use **`.\merit.ps1`** / **`./merit.sh`**. There are no public shim scripts.
 
@@ -159,7 +159,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` (L1 §E.0 / FR-SK-14) |
-| Current tip (Portal pin) | **`skills-v0.3.29`** |
+| Current tip (Portal pin) | **`skills-v0.3.30`** |
 | Current human-validation baseline | **`skills-v0.3.22`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.

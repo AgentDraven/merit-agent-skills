@@ -189,12 +189,24 @@ Prove on {{APP_URL}}.
 **In scope (your code):**
 
 - Product features and UI that express the PRD Must FRs  
+- Composition of MERIT packages (merit_workbench, journal, AMA, leaderboard, usage meter, merit_ux) via pinned PAR URLs  
 
 **Out of scope (MERIT rails — do not fork here):**
 
 - Auth / session (meritsubs)  
 - Store / checkout / entitlements (meritstore)  
 - Provider implementations (Supabase/Square projects stay provider-side until BYOK)
+
+**Ecosystem to study (patterns + sister products):**
+
+| Name | Expansion / role | Live |
+|------|------------------|------|
+| CAST | Create Audio Shows & Talks (podcast / show toolchain) | https://merit-prod.vercel.app/apps/cast/play |
+| DIRT | Digital Income Revenue Toolkit / ToolChain | https://dirt-agentdraven.vercel.app |
+| SomaTune | Branded consumer on MERIT rails | https://somatune-agentdraven.vercel.app |
+| M4FI | Polished field / Gloss-friendly consumer | https://m4fi.vercel.app |
+
+Guides: https://merit-prod.vercel.app/portal/developers/ · PAR: https://merit-prod.vercel.app/portal/developers/par-packages/ · Registry: https://merit-prod.vercel.app/pkg/meritutils/registry.json
 
 **Register path (when your store is live):** `/store/<consumer_id>/register` on the gateway — never a showcase demo slug.
 

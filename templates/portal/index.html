@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- merit-portal-stub:v2 -->
+  <!-- merit-portal-stub:v3 -->
   <title>{{PRODUCT_NAME}} — jumpstart</title>
   <meta name="description" content="{{PRODUCT_NAME}} marketing jumpstart: PRD, portal copy, and app_logic on MERIT rails.">
   <style>
@@ -165,6 +165,60 @@ Do not put secrets in the PRD or portal/.</pre>
       <pre>/merit-applogic
 # writes only under app_logic/ on merit-prod rails
 # prove on {{APP_URL}}</pre>
+    </section>
+
+    <section>
+      <h2>Build <code class="inline choice">app_logic/</code> on the MERIT ecosystem</h2>
+      <p>You write product features. MERIT supplies rails, packages, and patterns other apps already use. Start from the Developer Center guides, then copy patterns from live consumer apps.</p>
+      <p><a href="https://merit-prod.vercel.app/portal/developers/">Developer Center</a> ·
+        <a href="https://merit-prod.vercel.app/portal/developers/providers/">Providers</a> ·
+        <a href="https://merit-prod.vercel.app/portal/developers/par-packages/">PAR packages</a> ·
+        <a href="https://merit-prod.vercel.app/pkg/meritutils/registry.json">meritutils registry</a></p>
+
+      <h3 style="font-size:1.05rem;margin:1.2rem 0 0.5rem;color:var(--text);font-family:ui-sans-serif,system-ui,sans-serif;">Provider rails (via merit-prod)</h3>
+      <ul class="file-map">
+        <li><strong>merit-prod</strong><span>Gateway host for your app UI (<code class="inline">/apps/&lt;id&gt;/play</code>), health, and route map. <a href="https://merit-prod.vercel.app/api/health">/api/health</a></span></li>
+        <li><strong>meritutils</strong><span>Pinned UI packages on the PAR CDN — workbench, journal, AMA, leaderboard, usage meter, merit_ux / Gloss themes. Pin through the gateway; do not vendor provider bytes.</span></li>
+        <li><strong>meritsubs</strong><span>Subscriber identity, Free/Plus tiers, entitlements, usage. Mount: <code class="inline">/api/meritsubs/*</code>.</span></li>
+        <li><strong>meritstore</strong><span>Registration, SKUs, checkout, ledger. Paths: <code class="inline">/store/&lt;id&gt;/</code> + <code class="inline">/api/meritstore/*</code>.</span></li>
+        <li><strong>Tenant plane</strong><span>Shared item APIs isolated by <code class="inline">consumer_id</code> (<code class="inline">/api/tenant/*</code>). Server-to-server only.</span></li>
+      </ul>
+
+      <h3 style="font-size:1.05rem;margin:1.2rem 0 0.5rem;color:var(--text);font-family:ui-sans-serif,system-ui,sans-serif;">Packages to leverage in app_logic / play</h3>
+      <ul class="file-map">
+        <li><strong>merit_workbench</strong><span>Grid, inspector, action bar, themes, admin-gate UI, field schema — advanced toolchain shell. Pin via dinner <code class="inline">par scaffold</code>.</span></li>
+        <li><strong>journal</strong><span>Prompt-anchored compose + local-first history on the workbench.</span></li>
+        <li><strong>merit_journal</strong><span>Journal package variant on the same CDN family.</span></li>
+        <li><strong>merit_ama</strong><span>Q&amp;A / AMA primitives — bring your presentation layer.</span></li>
+        <li><strong>merit_leaderboard</strong><span>Ranking / scoreboard primitives.</span></li>
+        <li><strong>merit_usage_meter</strong><span>Usage display hooks for freemium / Plus honesty.</span></li>
+        <li><strong>merit_ux</strong><span>Shared UX helpers + Gloss theme CSS (aurora / graphite / daylight).</span></li>
+      </ul>
+      <pre>&lt;!-- example pin (use exact versions from the registry) --&gt;
+&lt;link rel="stylesheet" href="https://merit-prod.vercel.app/pkg/meritutils/merit_workbench/0.4.5/merit-workbench.css"&gt;
+&lt;script src="https://merit-prod.vercel.app/pkg/meritutils/merit_workbench/0.4.5/merit-workbench.js"&gt;&lt;/script&gt;</pre>
+
+      <h3 style="font-size:1.05rem;margin:1.2rem 0 0.5rem;color:var(--text);font-family:ui-sans-serif,system-ui,sans-serif;">Consumer apps to study (same rails, different product)</h3>
+      <p>These live MERIT apps show how providers + packages show up in real products. Use them as pattern libraries while you write <code class="inline choice">app_logic/</code> — and as tools you may adopt for your own venture.</p>
+      <ul class="file-map">
+        <li><strong>CAST</strong><span><em>Create Audio Shows &amp; Talks</em> — podcast / show toolchain on MERIT dinner rails (this product family). Live app: <a href="https://merit-prod.vercel.app/apps/cast/play">/apps/cast/play</a>. Study how a new consumer lands play + portal + PRD, then grows features only in app_logic.</span></li>
+        <li><strong>DIRT</strong><span><em>Digital Income Revenue Toolkit / ToolChain</em> — content intelligence + revenue ops workspace (SCOUT, workbench overlays, subscriber tiers). Live: <a href="https://dirt-agentdraven.vercel.app">dirt-agentdraven.vercel.app</a>. Pattern: deep merit_workbench + content queues for creators who need to publicize and operate a digital-income venture.</span></li>
+        <li><strong>SomaTune</strong><span>Consumer app on MERIT auth/store/subs rails with branded portal shell. Live: <a href="https://somatune-agentdraven.vercel.app">somatune-agentdraven.vercel.app</a>. Pattern: operator branding + subscriber embed.</span></li>
+        <li><strong>M4FI</strong><span>Production MERIT consumer with field-support / try-leg patterns and Gloss-friendly UX. Live: <a href="https://m4fi.vercel.app">m4fi.vercel.app</a>. Pattern: polished app_logic on shared chrome.</span></li>
+        <li><strong>Better Sex Podcast</strong><span>White-label MERIT community / podcast demonstration consumer. Pattern: community + podcast surface on the same gateway family.</span></li>
+      </ul>
+      <details>
+        <summary>How to use these examples while building</summary>
+        <div class="body">
+          <ul>
+            <li><strong>Copy structure, not secrets</strong> — observe portal vs app_logic boundaries; never paste keys.</li>
+            <li><strong>Pin packages</strong> — match versions from <a href="https://merit-prod.vercel.app/pkg/meritutils/registry.json">registry.json</a> / your <code class="inline">cfg/par_pins.json</code>.</li>
+            <li><strong>Reuse toolchains</strong> — merit_workbench + journal for operator/creator consoles; AMA/leaderboard for community loops; usage meter for Free/Plus honesty.</li>
+            <li><strong>Adopt sister products</strong> — use DIRT when you need digital-income / content ops; use CAST patterns when your venture is podcast / show oriented.</li>
+            <li><strong>Stay on rails</strong> — auth, store, payments remain meritsubs / meritstore on merit-prod; your differentiator stays in app_logic.</li>
+          </ul>
+        </div>
+      </details>
     </section>
 
     <footer>
