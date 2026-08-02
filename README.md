@@ -123,6 +123,8 @@ npm install
 |-------|---------|
 | `merit-par-workbench` | PAR play shell (`merit_workbench@0.4.x`, `journal@0.2.x`) |
 | `merit-prd` | Bake `*prd.md` (marketing + FR matrix) before portal / `app_logic/` |
+
+`merit.ps1 create` (v0.3.24+): **local taste by default** (no Vercel). Own-host: `--deploy --vercel-scope <team>`.
 | `merit-portal` | here.now marketing (`portal/` only); multi-surface |
 | `merit-subs` | meritsubs + meritstore funnel, freemium caps |
 | `merit-ama` | AMA Q&A + leaderboard (merit-demo) |

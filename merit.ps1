@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.23'
+$MERIT_VERSION = '0.3.24'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -30,14 +30,19 @@ Commands:
   baseline --path <repo>   Alias for livealpha
   admin gate demo-init     Advanced: create local demo operator-gate placeholders
   app scaffold             Print merit-demo clone guidance
-  create --path <repo>     AutoMagic fullstack-consumer pipeline (init→deploy)
-                           [--profile fullstack-consumer] [--scaffold-only]
+  create --path <repo>     AutoMagic fullstack-consumer (default = local taste, no Vercel)
+                           [--profile fullstack-consumer] [--deploy]
                            [--vercel-scope <slug>] [--product-name <name>]
+                           [--scaffold-only]  (alias of default local mode)
   version                  Print version
   help                     Print help
 
-Typical flow (AutoMagic):
-  .\merit.ps1 create --path ..\my-app --profile fullstack-consumer --vercel-scope <your-team>
+Typical flow (AutoMagic — local taste, no Vercel account):
+  .\merit.ps1 create --path ..\my-app --profile fullstack-consumer
+
+Optional later (your own host):
+  .\merit.ps1 create --path ..\my-app --profile fullstack-consumer --deploy --vercel-scope <your-team>
+  # or: .\merit.ps1 deploy --path ..\my-app
 
 Redo a single phase anytime with init / apply / par scaffold / verify / deploy.
 "@
@@ -479,7 +484,15 @@ function Get-VercelScope {
     if (-not (Test-Path $deployCfg)) { throw "deploy needs cfg/flask_deploy.json. Run merit apply first." }
     $cfg = Read-JsonFile $deployCfg
     if (-not $cfg.vercel_scope) { throw "cfg/flask_deploy.json missing vercel_scope." }
-    return $cfg.vercel_scope
+    $scope = [string]$cfg.vercel_scope
+    if ($scope -eq '' -or $scope -eq 'local' -or $scope -eq 'pending') {
+        throw @"
+deploy needs your Vercel team slug (own-host step — not required for local dinner taste).
+Pass:  --vercel-scope <your-team>
+Or set: vercel_scope= in .merit_launch.md, then: .\merit.ps1 deploy --path <repo>
+"@
+    }
+    return $scope
 }
 
 function Ensure-VercelLinked {
@@ -503,6 +516,12 @@ function Ensure-VercelLinked {
 
 function Invoke-Deploy {
     param([string]$TargetRoot, [string[]]$ArgList)
+    $scopeArg = Get-ArgValue -ArgList $ArgList -Name '--vercel-scope'
+    if ($scopeArg) {
+        $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
+        if (-not (Test-Path $launch)) { Invoke-Init -TargetRoot $TargetRoot -ArgList $ArgList }
+        Set-LaunchIniValue -Path $launch -Name 'vercel_scope' -Value $scopeArg
+    }
     Invoke-Apply -TargetRoot $TargetRoot -ArgList $ArgList
     $scope = Get-VercelScope -TargetRoot $TargetRoot
     Ensure-VercelLinked -TargetRoot $TargetRoot -Scope $scope
@@ -577,14 +596,7 @@ function Ensure-CreateLaunchDefaults {
     if (-not $scope) { $scope = Get-Setting -Settings $settings -Name 'vercel_scope' }
     if (-not $scope) { $scope = $env:VERCEL_SCOPE }
     if (-not $scope) { $scope = $env:VERCEL_ORG_ID }
-    if (-not $scope) {
-        throw @"
-create needs a Vercel team/account slug.
-Pass:  --vercel-scope <your-team>
-Or set: vercel_scope= in .merit_launch.md, or env VERCEL_SCOPE
-Find it in Vercel team settings (not a token).
-"@
-    }
+    if (-not $scope) { $scope = 'local' }
 
     $sbUrl = Get-Setting -Settings $settings -Name 'supabase_url'
     $sbAnon = Get-Setting -Settings $settings -Name 'supabase_anon_key'
@@ -603,8 +615,11 @@ Find it in Vercel team settings (not a token).
         Set-LaunchIniValue -Path $launch -Name 'here_now_slug' -Value $consumerId
     }
     Write-Host "create launch defaults: consumer_id=$consumerId product_name=$productName vercel_scope=$scope"
+    if ($scope -eq 'local') {
+        Write-Host 'create NOTE: vercel_scope=local (dinner default). Own-host deploy later with --deploy --vercel-scope <your-team>.'
+    }
     if ($sbUrl -eq 'https://platform-defaults.merit.local') {
-        Write-Host 'create NOTE: supabase_* are scaffold placeholders — replace in .merit_launch.md before relying on cloud journal/AMA data.'
+        Write-Host 'create NOTE: supabase_* are scaffold placeholders — platform rails via merit-prod; BYOK optional later.'
     }
 }
 
@@ -699,16 +714,26 @@ function Invoke-Create {
     if ($profile -ne 'fullstack-consumer') {
         throw "create: unknown --profile '$profile'. Supported: fullstack-consumer"
     }
-    $scaffoldOnly = Test-ArgFlag -ArgList $ArgList -Name '--scaffold-only'
+    # Dinner default = local taste (no Vercel). --deploy opts into own-host publish.
+    # --scaffold-only kept as alias of local mode for older docs/CI.
+    $wantDeploy = Test-ArgFlag -ArgList $ArgList -Name '--deploy'
+    $scaffoldOnly = -not $wantDeploy
+    if (Test-ArgFlag -ArgList $ArgList -Name '--scaffold-only') { $scaffoldOnly = $true; $wantDeploy = $false }
     $theme = Get-ArgValue -ArgList $ArgList -Name '--theme'
     if ($theme) { Write-Host "create NOTE: --theme $theme recorded for GlossPack when available; branding scaffold uses defaults today." }
+    if ($wantDeploy) {
+        $scopeCheck = Get-ArgValue -ArgList $ArgList -Name '--vercel-scope'
+        if (-not $scopeCheck -and -not $env:VERCEL_SCOPE) {
+            throw "create --deploy needs --vercel-scope <your-team> (own Vercel host). For dinner taste without Vercel, omit --deploy."
+        }
+    }
 
     Write-Host ""
     Write-Host "============================================================"
     Write-Host " MERIT AutoMagic create  v$MERIT_VERSION"
     Write-Host " profile=$profile"
     Write-Host " path=$TargetRoot"
-    if ($scaffoldOnly) { Write-Host ' mode=scaffold-only (deploy skipped)' } else { Write-Host ' mode=full (includes deploy)' }
+    if ($wantDeploy) { Write-Host ' mode=deploy (includes your Vercel host)' } else { Write-Host ' mode=local (default — no Vercel account; taste on your machine)' }
     Write-Host "============================================================"
 
     $phases = @(
@@ -753,11 +778,38 @@ function Invoke-Create {
             $pname = Get-Setting -Settings $settings -Name 'product_name' -Default $cid
             Invoke-PortalScaffold -TargetRoot $TargetRoot -ProductName $pname -ConsumerId $cid
         }},
-        @{ n = 8; title = 'Live deploy on your Vercel (deploy)'; script = {
-            if ($scaffoldOnly) {
-                Write-Host 'scaffold-only: skipping deploy'
-            } else {
+        @{ n = 8; title = 'Platform rails (merit-prod) + optional here.now portal'; script = {
+            if (-not $scaffoldOnly) {
+                # Advanced: builder's own Vercel host
                 Invoke-Deploy -TargetRoot $TargetRoot -ArgList $ArgList
+                return
+            }
+            # Dinner default: no builder Vercel. Attach to platform gateway rails.
+            $gateway = 'https://merit-prod.vercel.app'
+            Write-Host "Platform host for dinner: $gateway (no --vercel-scope / no your-team)"
+            try {
+                $health = Invoke-RestMethod -Uri "$gateway/api/health" -Method Get -TimeoutSec 20
+                Write-Host "merit-prod health OK (status/ok probe)"
+                if ($health.ok -eq $false) { Write-Host 'create NOTE: health payload ok=false — continue; re-check later if APIs fail.' }
+            } catch {
+                throw "merit-prod unreachable at $gateway/api/health. Check network, then re-run create. $_"
+            }
+            $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
+            $settings = Get-LaunchSettings -Path $launch
+            $cid = Require-Setting -Settings $settings -Name 'consumer_id'
+            Write-Host "Rails wired for consumer_id=$cid (store/auth via $gateway)"
+            Write-Host "Register path (after tenant): $gateway/store/$cid/register"
+            # Optional marketing publish — only if BYOK already present (never required for dinner).
+            $hasHere = $env:HERENOW_API_KEY -or (Test-Path "$env:USERPROFILE\.herenow\credentials")
+            if ($hasHere) {
+                Write-Host 'here.now credentials found — publishing portal/ (optional)'
+                try {
+                    Invoke-PortalPublish -TargetRoot $TargetRoot -ArgList $ArgList
+                } catch {
+                    Write-Host "create NOTE: portal publish skipped — $($_.Exception.Message)"
+                }
+            } else {
+                Write-Host 'here.now: skipped (no HERENOW_API_KEY / ~/.herenow/credentials). Local portal/ stub is enough for dinner; publish later with merit.ps1 portal.'
             }
         }},
         @{ n = 9; title = 'Success banner'; script = {
@@ -767,27 +819,26 @@ function Invoke-Create {
             Write-Host ''
             Write-Host '------------------------------------------------------------'
             if ($scaffoldOnly) {
-                Write-Host " Your MERIT shell is scaffolded for consumer_id=$cid"
-                Write-Host ' Next: fill real supabase_* if needed, then:'
-                Write-Host "   .\merit.ps1 deploy --path $TargetRoot"
+                Write-Host " Your MERIT shell is ready — consumer_id=$cid"
+                Write-Host ' UI: open play/ on your machine (IDE preview or npx serve).'
+                Write-Host ' Rails: merit-prod.vercel.app (platform Supabase/Square/store — no your Vercel).'
+                Write-Host "   cd `"$TargetRoot`""
+                Write-Host '   npx --yes serve . -p 5173'
+                Write-Host ' Recommended: push this folder to GitHub to archive the repo.'
+                Write-Host ' Advanced later: own Vercel host via --deploy --vercel-scope <your-team>'
+                Write-Host " Checkout later: https://merit-prod.vercel.app/store/$cid/register"
             } else {
-                Write-Host ' Your app is live on the MERIT rails — shell ready for'
+                Write-Host ' Your app is live on your Vercel — shell ready for'
                 Write-Host ' app_logic/ and your portal. Enjoy dinner.'
                 Write-Host " consumer_id=$cid"
                 Write-Host ' Next: shape portal/ then .\merit.ps1 portal --path <repo>'
-                Write-Host " Checkout later: /store/$cid/register (after tenant provision)"
+                Write-Host " Checkout later: https://merit-prod.vercel.app/store/$cid/register"
             }
             Write-Host '------------------------------------------------------------'
         }}
     )
 
     foreach ($phase in $phases) {
-        if ($scaffoldOnly -and $phase.n -eq 8) {
-            Write-Host ""
-            Write-Host "======== CREATE phase $($phase.n)/9: $($phase.title) ========"
-            Write-Host 'scaffold-only: skipped'
-            continue
-        }
         Write-Host ""
         Write-Host "======== CREATE phase $($phase.n)/9: $($phase.title) ========"
         try {
