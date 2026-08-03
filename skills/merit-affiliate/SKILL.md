@@ -12,8 +12,8 @@ Free OSS marketing package for the MERIT **Affiliate & Design Partner** program.
 ## What this skill covers
 
 1. Attribution cfg template (`cfg/consumer_attribution.json.template`)
-2. Register URL shape on **meritstore** (not vault)
-3. Portal CTA recipes
+2. Register URL shape on the **merit-prod gateway** (`/store/{consumer_id}/register` → meritstore)
+3. Portal CTA recipes (join vs attribute)
 4. Hard non-goals (no payout/admin/entitlement bypass)
 
 ## Naming guard
@@ -24,13 +24,22 @@ Free OSS marketing package for the MERIT **Affiliate & Design Partner** program.
 | `affiliate_code` | Checkout attribution string on **meritstore** |
 | `MERIT_AFFILIATE` | Operator runtime folder (HumanBala) — **unrelated** |
 
-## Register URL shape
+## Join vs attribute (do not mix)
+
+| Intent | Public path |
+|--------|-------------|
+| **Join the program** | [merit-prod partners page](https://merit-prod.vercel.app/portal/partners.html) — mailto / operator invite (not self-serve plan checkout) |
+| **Attribute a referral checkout** | Gateway register URL below |
+
+Operator-provisioned plans (`affiliate-join`, `design-partner-join`, `partner-revenue-share`) remain on meritstore/meritsubs for admin grant paths — **not** public HTML CTAs. Do not deep-link `/store/meritsubs/register?plan=affiliate-join` (gateway redirects to partners).
+
+## Attribute register URL shape
 
 ```text
-https://meritstore.vercel.app/{consumer_id}/register?affiliate=YOUR_CODE&utm_source=…&utm_medium=…&utm_campaign=…
+https://merit-prod.vercel.app/store/{consumer_id}/register?affiliate=YOUR_CODE&utm_source=…&utm_medium=…&utm_campaign=…
 ```
 
-Partner join plans (when provisioned): `affiliate-join`, `design-partner-join`, `partner-revenue-share`.
+Canonical entry is the MERIT production gateway; `/store/{consumer_id}/…` rewrites to meritstore for provisioned apps.
 
 ## Apply attribution (non-secret)
 
@@ -53,6 +62,7 @@ Paid surfaces stay on **meritstore** + **meritsubs**. See [docs/recipes/affiliat
 
 ## Related
 
-- Public partner landing: meritstore `portal/`
+- **Ecosystem overview (start here):** [merit-prod.vercel.app/portal/partners.html](https://merit-prod.vercel.app/portal/partners.html)
+- Secondary provider landing: meritstore `portal/`
 - Cohort + JWT: meritsubs `partner_kinds`
 - Money accrual: meritstore ledger `partner_share_cents`

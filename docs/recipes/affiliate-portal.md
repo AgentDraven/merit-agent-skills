@@ -1,26 +1,41 @@
 # Affiliate portal recipe (FR-AFF-OSS-04)
 
-Copyable CTA patterns for consumer `portal/` → meritstore register.
+Copyable CTA patterns for consumer `portal/`. Split **join** (program) from **attribute** (checkout referral).
 
-## Primary CTA
+## Join the program
+
+Public cohort join is operator-gated. Prefer the production Portal:
 
 ```html
-<a href="https://meritstore.vercel.app/YOUR_CONSUMER_ID/register?affiliate=YOUR_CODE&utm_source=portal&utm_medium=cta&utm_campaign=partner_join&plan=affiliate-join">
-  Join as MERIT affiliate
+<a href="https://merit-prod.vercel.app/portal/partners.html">
+  MERIT Affiliate &amp; Design Partner
 </a>
 ```
 
-## Design partner CTA
+Or mailto (same subjects as the Portal):
 
 ```html
-<a href="https://meritstore.vercel.app/YOUR_CONSUMER_ID/register?affiliate=YOUR_CODE&utm_source=portal&utm_medium=cta&utm_campaign=design_partner&plan=design-partner-join">
-  Join as design partner
+<a href="mailto:meritlabs@protonmail.com?subject=MERIT%20affiliate%20join">Join as MERIT affiliate</a>
+<a href="mailto:meritlabs@protonmail.com?subject=MERIT%20design%20partner%20join">Join as design partner</a>
+```
+
+Do **not** deep-link `/store/meritsubs/register?plan=affiliate-join` (or raw meritstore equivalent) as if self-serve — the gateway redirects that path to partners.html.
+
+## Attribute referrals (consumer portals)
+
+Share a provisioned app register URL with your code (gateway rewrite → meritstore):
+
+```html
+<a href="https://merit-prod.vercel.app/store/YOUR_CONSUMER_ID/register?affiliate=YOUR_CODE&utm_source=portal&utm_medium=cta&utm_campaign=partner_referral">
+  Sign up with my referral
 </a>
 ```
 
 ## Hosted program landing
 
-MERIT public partner explainer lives on **meritstore** `portal/` (here.now) — not vault (FR-FOCUS-003).
+**Start here (plain language):** [merit-prod.vercel.app/portal/partners.html](https://merit-prod.vercel.app/portal/partners.html).
+
+Provider-side explainer also lives on **meritstore** `portal/` (here.now) — not vault (FR-FOCUS-003).
 
 ## Non-goals
 
