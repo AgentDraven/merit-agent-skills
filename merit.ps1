@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.38'
+$MERIT_VERSION = '0.3.39'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -363,28 +363,48 @@ function Resolve-ScaffoldConsumerId {
 }
 
 function Invoke-ParScaffold {
-    param([string]$TargetRoot, [string]$Variant)
+    param([string]$TargetRoot, [string]$Variant, [string]$Theme = '')
     $pinsSrc = Join-Path $Root 'cfg/par_pins.free.json'
     $destCfg = Join-Path $TargetRoot 'cfg'
     New-Item -ItemType Directory -Force -Path $destCfg | Out-Null
     Copy-Item -LiteralPath $pinsSrc -Destination (Join-Path $destCfg 'par_pins.json') -Force
     $pins = Read-JsonFile (Join-Path $destCfg 'par_pins.json')
     $wb = $pins.packages.merit_workbench
+    $ux = $pins.packages.merit_ux
+    if (-not $ux) { throw 'par scaffold: merit_ux pin missing from cfg/par_pins.free.json (DualRail Gloss)' }
     $playDir = Join-Path $TargetRoot 'play'
     New-Item -ItemType Directory -Force -Path $playDir | Out-Null
     $productName = 'MERIT Play'
     $brandingPath = Join-Path $destCfg 'branding.json'
+    $brandTheme = ''
     if (Test-Path -LiteralPath $brandingPath) {
         try {
             $branding = Read-JsonFile $brandingPath
             if ($branding.product_name) { $productName = [string]$branding.product_name }
+            if ($branding.gloss_theme) { $brandTheme = [string]$branding.gloss_theme }
+            elseif ($branding.theme) { $brandTheme = [string]$branding.theme }
         } catch { }
+    }
+    $glossTheme = 'gloss-aurora'
+    foreach ($candidate in @($Theme, $brandTheme)) {
+        if ($candidate -and $candidate -match '^gloss-(aurora|graphite|daylight)$') {
+            $glossTheme = $candidate
+            break
+        }
+    }
+    $themeArt = $ux.artifacts.themes.$glossTheme
+    if (-not $themeArt) {
+        $glossTheme = 'gloss-aurora'
+        $themeArt = $ux.artifacts.themes.'gloss-aurora'
     }
     $consumerId = Resolve-ScaffoldConsumerId -TargetRoot $TargetRoot
     $registerUrl = "https://merit-prod.vercel.app/store/$consumerId/register"
+    $communityRailsUrl = 'https://merit-prod.vercel.app/portal/developers/community-rails/'
+    $evidenceBaseUrl = 'https://merit-prod.vercel.app/portal/developers/community-rails/evidence'
     $productNameJs = ConvertTo-Json -InputObject $productName -Compress
     $consumerIdJs = ConvertTo-Json -InputObject $consumerId -Compress
     $registerUrlJs = ConvertTo-Json -InputObject $registerUrl -Compress
+    $glossThemeJs = ConvertTo-Json -InputObject $glossTheme -Compress
     $journalTags = ''
     if ($Variant -eq 'workbench-journal') {
         $jn = $pins.packages.journal
@@ -399,13 +419,24 @@ function Invoke-ParScaffold {
         Replace('{{PRODUCT_NAME}}', $productName).
         Replace('{{CONSUMER_ID_JS}}', $consumerIdJs).
         Replace('{{REGISTER_URL_JS}}', $registerUrlJs).
+        Replace('{{REGISTER_URL}}', $registerUrl).
+        Replace('{{GLOSS_THEME_JS}}', $glossThemeJs).
+        Replace('{{GLOSS_THEME}}', $glossTheme).
+        Replace('{{GLOSS_THEME_CSS_URL}}', [string]$themeArt.url).
+        Replace('{{GLOSS_THEME_CSS_SRI}}', [string]$themeArt.sri).
+        Replace('{{MERIT_UX_CSS_URL}}', [string]$ux.artifacts.css.url).
+        Replace('{{MERIT_UX_CSS_SRI}}', [string]$ux.artifacts.css.sri).
+        Replace('{{MERIT_UX_JS_URL}}', [string]$ux.artifacts.js.url).
+        Replace('{{MERIT_UX_JS_SRI}}', [string]$ux.artifacts.js.sri).
         Replace('{{WORKBENCH_CSS_URL}}', [string]$wb.artifacts.css.url).
         Replace('{{WORKBENCH_CSS_SRI}}', [string]$wb.artifacts.css.sri).
         Replace('{{WORKBENCH_JS_URL}}', [string]$wb.artifacts.js.url).
         Replace('{{WORKBENCH_JS_SRI}}', [string]$wb.artifacts.js.sri).
+        Replace('{{COMMUNITY_RAILS_URL}}', $communityRailsUrl).
+        Replace('{{EVIDENCE_BASE_URL}}', $evidenceBaseUrl).
         Replace('{{JOURNAL_TAGS}}', $journalTags)
     Set-Content -LiteralPath (Join-Path $playDir 'index.html') -Value $html -Encoding UTF8
-    Write-Host "par scaffold OK ($Variant) -> $TargetRoot (capability tour for $consumerId)"
+    Write-Host "par scaffold OK ($Variant, $glossTheme) -> $TargetRoot (DualRail Gloss + Advanced rails for $consumerId)"
 }
 
 function Invoke-BrandingScaffold {
@@ -1339,7 +1370,10 @@ function Invoke-Create {
     }
     $script:CreateAppUrl = $null
     $theme = Get-ArgValue -ArgList $ArgList -Name '--theme'
-    if ($theme) { Write-Host "create NOTE: --theme $theme recorded for GlossPack when available; branding scaffold uses defaults today." }
+    if ($theme -and $theme -notmatch '^gloss-(aurora|graphite|daylight)$') {
+        throw "create: --theme must be gloss-aurora, gloss-graphite, or gloss-daylight (got '$theme')"
+    }
+    if ($theme) { Write-Host "create NOTE: --theme $theme → DualRail Gloss play shell (par scaffold)." }
     if ($wantDeploy) {
         $scopeCheck = Get-ArgValue -ArgList $ArgList -Name '--vercel-scope'
         if (-not $scopeCheck -and -not $env:VERCEL_SCOPE) {
@@ -1361,8 +1395,8 @@ function Invoke-Create {
             Ensure-CreateLaunchDefaults -TargetRoot $TargetRoot -ArgList $ArgList
             Invoke-Apply -TargetRoot $TargetRoot -ArgList $ArgList
         }},
-        @{ n = 2; title = 'Shared UI chrome - workbench / journal (par scaffold)'; script = {
-            Invoke-ParScaffold -TargetRoot $TargetRoot -Variant 'workbench-journal'
+        @{ n = 2; title = 'DualRail Gloss play + Advanced workbench (par scaffold)'; script = {
+            Invoke-ParScaffold -TargetRoot $TargetRoot -Variant 'workbench-journal' -Theme $theme
         }},
         @{ n = 3; title = 'Starter look (branding scaffold)'; script = {
             Invoke-BrandingScaffold -TargetRoot $TargetRoot
@@ -1535,7 +1569,8 @@ switch -Regex ($Command) {
         if (-not $Rest -or $Rest[0] -ne 'scaffold') { Write-MeritHelp; exit 1 }
         $variant = Get-ArgValue -ArgList $Rest -Name '--variant'
         if (-not $variant) { $variant = 'workbench' }
-        Invoke-ParScaffold -TargetRoot $target -Variant $variant
+        $parTheme = Get-ArgValue -ArgList $Rest -Name '--theme'
+        Invoke-ParScaffold -TargetRoot $target -Variant $variant -Theme $parTheme
         exit 0
     }
     '^branding$' {

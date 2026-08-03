@@ -121,7 +121,7 @@ npm install
 
 | Skill | Purpose |
 |-------|---------|
-| `merit-par-workbench` | PAR play shell (`merit_workbench@0.4.x`, `journal@0.2.x`) |
+| `merit-par-workbench` | DualRail Gloss play (`merit_ux` + Value Tour) + Advanced `merit_workbench` / `journal` |
 | `merit-prd` | Bake `*prd.md` (marketing + FR matrix) before portal / `app_logic/` |
 | `merit-applogic` | Implement Must FRs under `app_logic/` from PRD + portal (`/merit-applogic`) |
 | `merit-portal` | here.now marketing (`portal/` only); multi-surface |
@@ -159,7 +159,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` (L1 §E.0 / FR-SK-14) |
-| Current tip (Portal pin) | **`skills-v0.3.38`** |
+| Current tip (Portal pin) | **`skills-v0.3.39`** |
 | Current human-validation baseline | **`skills-v0.3.22`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.

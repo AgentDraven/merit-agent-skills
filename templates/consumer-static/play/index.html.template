@@ -4,18 +4,92 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{PRODUCT_NAME}} — Play</title>
+  <link rel="stylesheet" href="{{GLOSS_THEME_CSS_URL}}" integrity="{{GLOSS_THEME_CSS_SRI}}" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{MERIT_UX_CSS_URL}}" integrity="{{MERIT_UX_CSS_SRI}}" crossorigin="anonymous">
   <link rel="stylesheet" href="{{WORKBENCH_CSS_URL}}" integrity="{{WORKBENCH_CSS_SRI}}" crossorigin="anonymous">
+  <style id="play-value-tour">
+    /* Layout tokens only — colors/type from GlossPack */
+    .value-tour { display: flex; flex-direction: column; gap: 2rem; }
+    .value-tour__hero { display: flex; flex-direction: column; gap: 0.75rem; max-width: 36rem; }
+    .value-tour__hero h1 { margin: 0; font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1.15; }
+    .value-tour__hero p { margin: 0; opacity: 0.9; line-height: 1.45; }
+    .value-tour__cta {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: fit-content; margin-top: 0.35rem; padding: 0.65rem 1.15rem;
+      font-weight: 600; text-decoration: none; border-radius: 0.4rem;
+      background: var(--merit-accent, #2a6f6a); color: var(--merit-on-accent, #fff);
+    }
+    .value-tour__grid {
+      display: grid; gap: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    }
+    .value-tour__card { display: flex; flex-direction: column; gap: 0.5rem; }
+    .value-tour__card h2 { margin: 0; font-size: 1.1rem; }
+    .value-tour__card p { margin: 0; font-size: 0.95rem; line-height: 1.4; opacity: 0.88; }
+    .value-tour__thumb {
+      display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover;
+      border-radius: 0.35rem; background: color-mix(in srgb, var(--merit-fg, #222) 8%, transparent);
+    }
+    .value-tour__proof { font-size: 0.85rem; }
+    details.geek { margin-top: 2.5rem; }
+    details.geek > summary { cursor: pointer; font-weight: 600; }
+    #merit-workbench-mount { margin-top: 1rem; min-height: 12rem; }
+  </style>
 </head>
 <body>
-  <header id="merit-header"><!-- operator branding via cfg/branding.json --></header>
-  <main id="merit-workbench-mount"></main>
-  <footer id="merit-footer"><small>MERIT Powered</small></footer>
+  <main id="app-logic">
+    <section class="value-tour" aria-label="Value tour">
+      <div class="value-tour__hero">
+        <h1>Welcome to {{PRODUCT_NAME}}</h1>
+        <p>Ask the community, meet for office hours, book a consult, and keep a private journal — on MERIT rails.</p>
+        <a class="value-tour__cta" href="{{REGISTER_URL}}">Register free</a>
+      </div>
+      <div class="value-tour__grid">
+        <article class="value-tour__card" data-tour="ask">
+          <h2>Ask</h2>
+          <p>AMA questions on the community channel — free for eligible members.</p>
+          <a class="value-tour__proof" href="{{COMMUNITY_RAILS_URL}}" target="_blank" rel="noopener noreferrer">
+            <img class="value-tour__thumb" src="{{EVIDENCE_BASE_URL}}/02-member.png" alt="Ask — community member proof" width="640" height="400" loading="lazy">
+          </a>
+        </article>
+        <article class="value-tour__card" data-tour="meet">
+          <h2>Meet</h2>
+          <p>Office Hours on chat and/or video — scheduled from your collab cfg.</p>
+          <a class="value-tour__proof" href="{{COMMUNITY_RAILS_URL}}" target="_blank" rel="noopener noreferrer">
+            <img class="value-tour__thumb" src="{{EVIDENCE_BASE_URL}}/00-overview.png" alt="Meet — community overview proof" width="640" height="400" loading="lazy">
+          </a>
+        </article>
+        <article class="value-tour__card" data-tour="book">
+          <h2>Book</h2>
+          <p>Collaboration Corner consult slots with conflict-before-book calendar.</p>
+          <a class="value-tour__proof" href="{{COMMUNITY_RAILS_URL}}" target="_blank" rel="noopener noreferrer">
+            <img class="value-tour__thumb" src="{{EVIDENCE_BASE_URL}}/04-consult.png" alt="Book — consult proof" width="640" height="400" loading="lazy">
+          </a>
+        </article>
+        <article class="value-tour__card" data-tour="journal">
+          <h2>Journal</h2>
+          <p>Private notes with share modes and deadline alerts when you are ready.</p>
+          <a class="value-tour__proof" href="{{COMMUNITY_RAILS_URL}}" target="_blank" rel="noopener noreferrer">
+            <img class="value-tour__thumb" src="{{EVIDENCE_BASE_URL}}/01-guest.png" alt="Journal — guest surface proof" width="640" height="400" loading="lazy">
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <details class="geek">
+      <summary>Advanced: builder rails</summary>
+      <div id="merit-workbench-mount"></div>
+    </details>
+  </main>
+
+  <script src="{{MERIT_UX_JS_URL}}" integrity="{{MERIT_UX_JS_SRI}}" crossorigin="anonymous"></script>
   <script src="{{WORKBENCH_JS_URL}}" integrity="{{WORKBENCH_JS_SRI}}" crossorigin="anonymous"></script>
   <script>
     (function () {
       var PRODUCT = {{PRODUCT_NAME_JS}};
       var CONSUMER_ID = {{CONSUMER_ID_JS}};
       var REGISTER_URL = {{REGISTER_URL_JS}};
+      var GLOSS_THEME = {{GLOSS_THEME_JS}};
       var GW = 'https://merit-prod.vercel.app';
 
       function esc(s) {
@@ -30,7 +104,36 @@
         return '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a>';
       }
 
-      function bootMeritPlay() {
+      function bootGlossShell() {
+        var ux = window.MeritUx;
+        if (!ux || typeof ux.createAppShell !== 'function') return null;
+        var shell = ux.createAppShell({
+          host: document.body,
+          theme: GLOSS_THEME,
+          brand: {
+            name: PRODUCT,
+            tagline: 'Ask · Meet · Book · Journal',
+            eyebrow: 'Powered by MERIT'
+          },
+          freemium: {
+            tierLabel: 'Free',
+            upgradeHref: REGISTER_URL,
+            upgradeLabel: 'Register'
+          },
+          legal: {
+            brandName: PRODUCT,
+            disclaimer: 'MERIT Powered — platform rails, not a second marketing portal.'
+          },
+          slots: { main: '#app-logic' },
+          peers: { workbench: true, journal: true }
+        });
+        if (shell && shell.status && typeof ux.setStatusState === 'function') {
+          ux.setStatusState(shell.status, 'ok');
+        }
+        return shell;
+      }
+
+      function bootMeritWorkbench() {
         var mw = window.merit_workbench;
         var host = document.getElementById('merit-workbench-mount');
         if (!mw || !host || typeof mw.mountMeritWorkbenchPanel !== 'function') return;
@@ -80,12 +183,12 @@
             detail:
               '<p>Packages available through the gateway CDN for your play / app_logic:</p>' +
               '<ul>' +
-              '<li><strong>merit_workbench</strong> — this grid / inspector shell</li>' +
+              '<li><strong>merit_ux</strong> — DualRail Gloss shell (this page)</li>' +
+              '<li><strong>merit_workbench</strong> — Advanced builder grid / inspector</li>' +
               '<li><strong>journal</strong> — compose + history on the workbench</li>' +
               '<li><strong>merit_ama</strong> — Q and A primitives</li>' +
-              '<li><strong>merit_leaderboard</strong> — ranking surfaces</li>' +
-              '<li><strong>merit_usage_meter</strong> — Free/Plus honesty</li>' +
-              '<li><strong>merit_ux</strong> — shared UX + Gloss themes</li>' +
+              '<li><strong>merit_calendar</strong> — consult scheduling</li>' +
+              '<li><strong>merit_video</strong> — room-media / Zoom</li>' +
               '</ul>' +
               '<p>' + linkHtml(GW + '/pkg/meritutils/registry.json', 'meritutils registry.json') +
               ' · ' + linkHtml(GW + '/portal/developers/par-packages/', 'PAR packages guide') + '</p>'
@@ -137,7 +240,7 @@
             preview: 'Full-app guide',
             levels: 'Your turn',
             detail:
-              '<p>This tour is Step 2 taste. Product features land in <code>app_logic/</code> for <strong>' +
+              '<p>Value Tour is Step 2 taste. Product features land in <code>app_logic/</code> for <strong>' +
               esc(PRODUCT) + '</strong>:</p>' +
               '<ol>' +
               '<li><code>/merit-prd</code> — fill <code>docs/PRODUCT.prd.md</code></li>' +
@@ -164,7 +267,7 @@
           summary: {
             cards: [
               { label: 'Product', value: PRODUCT },
-              { label: 'Step', value: '2 — taste' },
+              { label: 'Step', value: '2 — DualRail Gloss' },
               { label: 'Next', value: 'app_logic/' },
               { label: 'Host', value: 'merit-prod' }
             ]
@@ -176,6 +279,11 @@
             };
           }
         });
+      }
+
+      function bootMeritPlay() {
+        bootGlossShell();
+        bootMeritWorkbench();
       }
 
       if (document.readyState === 'loading') {
