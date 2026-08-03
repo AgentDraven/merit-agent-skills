@@ -435,7 +435,7 @@ function Invoke-ParScaffold {
         Replace('{{COMMUNITY_RAILS_URL}}', $communityRailsUrl).
         Replace('{{EVIDENCE_BASE_URL}}', $evidenceBaseUrl).
         Replace('{{JOURNAL_TAGS}}', $journalTags)
-    Set-Content -LiteralPath (Join-Path $playDir 'index.html') -Value $html -Encoding UTF8
+    [System.IO.File]::WriteAllText((Join-Path $playDir 'index.html'), $html, [System.Text.UTF8Encoding]::new($false))
     Write-Host "par scaffold OK ($Variant, $glossTheme) -> $TargetRoot (DualRail Gloss + Advanced rails for $consumerId)"
 }
 
