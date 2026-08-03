@@ -37,51 +37,6 @@
   </style>
 </head>
 <body>
-  <main id="app-logic">
-    <section class="value-tour" aria-label="Value tour">
-      <div class="value-tour__hero">
-        <h1>Welcome to {{PRODUCT_NAME}}</h1>
-        <p>Ask the community, meet for office hours, book a consult, and keep a private journal — on MERIT rails.</p>
-        <a class="value-tour__cta" href="{{REGISTER_URL}}">Register free</a>
-      </div>
-      <div class="value-tour__grid">
-        <article class="value-tour__card" data-tour="ask">
-          <h2>Ask</h2>
-          <p>AMA questions on the community channel — free for eligible members.</p>
-          <a class="value-tour__proof" href="{{COMMUNITY_RAILS_URL}}" target="_blank" rel="noopener noreferrer">
-            <img class="value-tour__thumb" src="{{EVIDENCE_BASE_URL}}/02-member.png" alt="Ask — community member proof" width="640" height="400" loading="lazy">
-          </a>
-        </article>
-        <article class="value-tour__card" data-tour="meet">
-          <h2>Meet</h2>
-          <p>Office Hours on chat and/or video — scheduled from your collab cfg.</p>
-          <a class="value-tour__proof" href="{{COMMUNITY_RAILS_URL}}" target="_blank" rel="noopener noreferrer">
-            <img class="value-tour__thumb" src="{{EVIDENCE_BASE_URL}}/00-overview.png" alt="Meet — community overview proof" width="640" height="400" loading="lazy">
-          </a>
-        </article>
-        <article class="value-tour__card" data-tour="book">
-          <h2>Book</h2>
-          <p>Collaboration Corner consult slots with conflict-before-book calendar.</p>
-          <a class="value-tour__proof" href="{{COMMUNITY_RAILS_URL}}" target="_blank" rel="noopener noreferrer">
-            <img class="value-tour__thumb" src="{{EVIDENCE_BASE_URL}}/04-consult.png" alt="Book — consult proof" width="640" height="400" loading="lazy">
-          </a>
-        </article>
-        <article class="value-tour__card" data-tour="journal">
-          <h2>Journal</h2>
-          <p>Private notes with share modes and deadline alerts when you are ready.</p>
-          <a class="value-tour__proof" href="{{COMMUNITY_RAILS_URL}}" target="_blank" rel="noopener noreferrer">
-            <img class="value-tour__thumb" src="{{EVIDENCE_BASE_URL}}/01-guest.png" alt="Journal — guest surface proof" width="640" height="400" loading="lazy">
-          </a>
-        </article>
-      </div>
-    </section>
-
-    <details class="geek">
-      <summary>Advanced: builder rails</summary>
-      <div id="merit-workbench-mount"></div>
-    </details>
-  </main>
-
   <script src="{{MERIT_UX_JS_URL}}" integrity="{{MERIT_UX_JS_SRI}}" crossorigin="anonymous"></script>
   <script src="{{WORKBENCH_JS_URL}}" integrity="{{WORKBENCH_JS_SRI}}" crossorigin="anonymous"></script>
   <script>
@@ -90,6 +45,8 @@
       var CONSUMER_ID = {{CONSUMER_ID_JS}};
       var REGISTER_URL = {{REGISTER_URL_JS}};
       var GLOSS_THEME = {{GLOSS_THEME_JS}};
+      var COMMUNITY_RAILS_URL = {{COMMUNITY_RAILS_URL_JS}};
+      var EVIDENCE_BASE_URL = {{EVIDENCE_BASE_URL_JS}};
       var GW = 'https://merit-prod.vercel.app';
 
       function esc(s) {
@@ -102,6 +59,40 @@
 
       function linkHtml(href, label) {
         return '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a>';
+      }
+
+      function valueTourHtml() {
+        return (
+          '<section class="value-tour" aria-label="Value tour">' +
+            '<div class="value-tour__hero">' +
+              '<h1>Welcome to ' + esc(PRODUCT) + '</h1>' +
+              '<p>Ask the community, meet for office hours, book a consult, and keep a private journal — on MERIT rails.</p>' +
+              '<a class="value-tour__cta" href="' + esc(REGISTER_URL) + '">Register free</a>' +
+            '</div>' +
+            '<div class="value-tour__grid">' +
+              tourCard('ask', 'Ask', 'AMA questions on the community channel — free for eligible members.', '02-member.png', 'Ask — community member proof') +
+              tourCard('meet', 'Meet', 'Office Hours on chat and/or video — scheduled from your collab cfg.', '00-overview.png', 'Meet — community overview proof') +
+              tourCard('book', 'Book', 'Collaboration Corner consult slots with conflict-before-book calendar.', '04-consult.png', 'Book — consult proof') +
+              tourCard('journal', 'Journal', 'Private notes with share modes and deadline alerts when you are ready.', '01-guest.png', 'Journal — guest surface proof') +
+            '</div>' +
+          '</section>' +
+          '<details class="geek">' +
+            '<summary>Advanced: builder rails</summary>' +
+            '<div id="merit-workbench-mount"></div>' +
+          '</details>'
+        );
+      }
+
+      function tourCard(id, title, blurb, img, alt) {
+        return (
+          '<article class="value-tour__card" data-tour="' + esc(id) + '">' +
+            '<h2>' + esc(title) + '</h2>' +
+            '<p>' + esc(blurb) + '</p>' +
+            '<a class="value-tour__proof" href="' + esc(COMMUNITY_RAILS_URL) + '" target="_blank" rel="noopener noreferrer">' +
+              '<img class="value-tour__thumb" src="' + esc(EVIDENCE_BASE_URL + '/' + img) + '" alt="' + esc(alt) + '" width="640" height="400" loading="lazy">' +
+            '</a>' +
+          '</article>'
+        );
       }
 
       function bootGlossShell() {
@@ -127,6 +118,9 @@
           slots: { main: '#app-logic' },
           peers: { workbench: true, journal: true }
         });
+        if (shell && shell.main) {
+          shell.main.innerHTML = valueTourHtml();
+        }
         if (shell && shell.status && typeof ux.setStatusState === 'function') {
           ux.setStatusState(shell.status, 'ok');
         }

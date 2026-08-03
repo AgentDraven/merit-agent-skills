@@ -36,11 +36,11 @@ if ($html -notmatch 'journal') { throw "workbench-journal variant missing journa
 if ($html -notmatch 'createAppShell') { throw "play shell missing DualRail Gloss createAppShell" }
 if ($html -notmatch 'MeritUx|merit_ux') { throw "play shell missing merit_ux / MeritUx" }
 if ($html -notmatch 'gloss-aurora|gloss-graphite|gloss-daylight') { throw "play shell missing GlossPack theme" }
-if ($html -notmatch 'data-tour="ask"') { throw "play shell missing Value Tour Ask" }
-if ($html -notmatch 'data-tour="meet"' -or $html -notmatch 'data-tour="book"' -or $html -notmatch 'data-tour="journal"') {
+if ($html -notmatch "tourCard\('ask'") { throw "play shell missing Value Tour Ask" }
+if ($html -notmatch "tourCard\('meet'" -or $html -notmatch "tourCard\('book'" -or $html -notmatch "tourCard\('journal'") {
     throw "play shell missing Value Tour Meet/Book/Journal"
 }
-if ($html -notmatch 'class="geek"') { throw "play shell missing Advanced geek disclosure" }
+if ($html -notmatch 'class=.geek.') { throw "play shell missing Advanced geek disclosure" }
 if ($html -notmatch 'mountMeritWorkbenchPanel') { throw "play shell missing Advanced workbench (mountMeritWorkbenchPanel)" }
 if ($html -notmatch 'Your MERIT rails') { throw "play shell missing Advanced capability tour (Your MERIT rails)" }
 if ($html -notmatch 'app_logic') { throw "play shell missing app_logic next-step callout" }

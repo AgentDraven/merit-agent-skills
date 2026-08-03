@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.39'
+$MERIT_VERSION = '0.3.40'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -405,6 +405,8 @@ function Invoke-ParScaffold {
     $consumerIdJs = ConvertTo-Json -InputObject $consumerId -Compress
     $registerUrlJs = ConvertTo-Json -InputObject $registerUrl -Compress
     $glossThemeJs = ConvertTo-Json -InputObject $glossTheme -Compress
+    $communityRailsUrlJs = ConvertTo-Json -InputObject $communityRailsUrl -Compress
+    $evidenceBaseUrlJs = ConvertTo-Json -InputObject $evidenceBaseUrl -Compress
     $journalTags = ''
     if ($Variant -eq 'workbench-journal') {
         $jn = $pins.packages.journal
@@ -432,7 +434,9 @@ function Invoke-ParScaffold {
         Replace('{{WORKBENCH_CSS_SRI}}', [string]$wb.artifacts.css.sri).
         Replace('{{WORKBENCH_JS_URL}}', [string]$wb.artifacts.js.url).
         Replace('{{WORKBENCH_JS_SRI}}', [string]$wb.artifacts.js.sri).
+        Replace('{{COMMUNITY_RAILS_URL_JS}}', $communityRailsUrlJs).
         Replace('{{COMMUNITY_RAILS_URL}}', $communityRailsUrl).
+        Replace('{{EVIDENCE_BASE_URL_JS}}', $evidenceBaseUrlJs).
         Replace('{{EVIDENCE_BASE_URL}}', $evidenceBaseUrl).
         Replace('{{JOURNAL_TAGS}}', $journalTags)
     [System.IO.File]::WriteAllText((Join-Path $playDir 'index.html'), $html, [System.Text.UTF8Encoding]::new($false))
