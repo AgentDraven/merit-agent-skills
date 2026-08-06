@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.43'
+$MERIT_VERSION = '0.3.44'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -1134,7 +1134,13 @@ function Invoke-HereNowDeleteSite {
     try {
         Invoke-RestMethod -Uri "$BaseUrl/api/v1/publish/$Slug" -Method Delete -Headers $headers -TimeoutSec 60 | Out-Null
     } catch {
-        throw "here.now delete failed for ${Slug}: $_"
+        $err = "$_"
+        # Idempotent leave: multi-surface cfg/portals.json often lists journal/ama/subs slugs never published.
+        if ($err -match '\(404\)|404|Not Found') {
+            Write-Host "here.now: $Slug already gone (404) — OK (never published or already deleted)"
+            return $null
+        }
+        throw "here.now delete failed for ${Slug}: $err"
     }
     Write-Host "here.now deleted: https://$Slug.here.now/"
     return "https://$Slug.here.now/"
@@ -1199,8 +1205,14 @@ apps remove: refusing without --yes (destructive).
         if ($slugs.Count -lt 1) {
             Write-Host 'apps remove: --with-portal set but no portal slug found (skip here.now delete)'
         } else {
+            # Prefer live slug from portal/.herenow/state.json when present; still walk every surface in portals.json.
             foreach ($slug in ($slugs | Select-Object -Unique)) {
-                Invoke-HereNowDeleteSite -Slug $slug | Out-Null
+                try {
+                    Invoke-HereNowDeleteSite -Slug $slug | Out-Null
+                } catch {
+                    # Platform leave already succeeded above; do not block folder delete / recreate.
+                    Write-Warning "here.now delete skipped for ${slug}: $_. Platform apps remove already OK — continue start-over."
+                }
             }
         }
     }

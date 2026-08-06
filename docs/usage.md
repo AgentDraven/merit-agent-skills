@@ -303,7 +303,31 @@ See `cfg/meritstore_tenant.json` (`status: pending_platform_provision`) on merit
 .\merit.ps1 portal --path <dir>
 .\merit.ps1 all --path <dir>
 .\merit.ps1 closeout --path <dir>
+.\merit.ps1 apps remove --path <dir> --yes [--tenant-all] [--with-portal]
+.\merit.ps1 apps remove --consumer-id <id> --yes [--tenant-all]
 ```
+
+### Leave platform and start over (`apps remove`)
+
+Public Portal SSOT (subscribe-dogfood):  
+https://merit-prod.vercel.app/portal/developers/troubleshooting/#start-over
+
+```powershell
+.\merit.ps1 apps remove --path ..\<app> --yes --tenant-all --with-portal
+Remove-Item -Recurse -Force ..\<app>
+.\merit.ps1 create --path ..\<app> --profile fullstack-consumer
+```
+
+**`--with-portal` and here.now 404:** `cfg/portals.json` often lists several surfaces (`main`, `journal`, `ama`, `subs`). Create may publish only the main marketing site (sometimes a random live slug from `portal/.herenow/state.json`, e.g. `mindful-…`). Secondary slugs (`<app>-journal`, …) may never have been published. DELETE then returns **404 Not Found**. Treat that as **already gone** — if you already saw `apps remove OK` for the gateway, platform leave succeeded; continue delete folder + create. From **skills-v0.3.44+** the CLI treats 404 as OK and does not abort the rest of the leave.
+
+| Message | Meaning | Next step |
+|---------|---------|-----------|
+| `apps remove OK: consumer_id=…` | merit-prod `/apps/<id>` (and optional tenant rows) cleared | Proceed with folder delete + create |
+| `here.now deleted: https://…` | That marketing slug was removed | None |
+| `here.now: … already gone (404) — OK` | Slug never existed or was already deleted | Ignore; continue start-over |
+| `here.now delete failed …` (auth / 5xx) | Credentials or here.now outage on a **live** slug | Fix `HERENOW_API_KEY` / `~/.herenow/credentials`, re-run `--with-portal` or delete leftover sites in the here.now console; platform leave still OK if `apps remove OK` printed |
+
+---
 
 Linux/macOS equivalents use the shell wrapper:
 
