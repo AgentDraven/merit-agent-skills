@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.41'
+$MERIT_VERSION = '0.3.42'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -1277,10 +1277,12 @@ function Write-CreateSuccessCelebration {
         Write-Host '  /merit-applogic -> implement Must FRs under app_logic/'
         Write-Host '  Guide: ' -NoNewline
         Write-Host 'https://merit-prod.vercel.app/portal/developers/full-app/' -ForegroundColor $linkColor
-        Write-Host '  Checkout later: ' -NoNewline
-        Write-Host "https://merit-prod.vercel.app/store/$ConsumerId/register" -ForegroundColor $linkColor
+        Write-Host '  4) Store register  - members join your app:' -ForegroundColor White
+        Write-Host "     https://merit-prod.vercel.app/store/$ConsumerId/register" -ForegroundColor $linkColor
+        Write-Host '     <== free-community path; activate re-runs if this 404s' -ForegroundColor $noteColor
         Write-Host '  Optional: push this folder to GitHub to archive the repo.'
         Write-Host '  Advanced later: --deploy --vercel-scope <your-team> (own host).'
+        Write-Host '  Auth BYOK (optional): templates/auth/AUTH_ON_PLATFORM.md'
     } else {
         Write-Host '  CLAIM: your app is live on your Vercel host.' -ForegroundColor Green
         Write-Host "  consumer_id=$ConsumerId"
@@ -1462,6 +1464,15 @@ function Invoke-Create {
             $script:CreateAppUrl = Invoke-AppsPublish -TargetRoot $TargetRoot -ConsumerId $cid -Gateway $gateway
             if (-not $script:CreateAppUrl) {
                 throw 'create: cloud publish returned no app URL (Cloud First Security Centric). Fix merit-prod /api/apps/publish, then re-run create.'
+            }
+            # Self-serve store activate (FR-MPD-04) so /store/<app>/register is live without operator.
+            try {
+                $activateUri = "$gateway/api/meritstore/v1/tenants/$cid/activate"
+                $activateBody = (@{ template = 'free-community'; display_name = $cid } | ConvertTo-Json -Compress)
+                $null = Invoke-RestMethod -Uri $activateUri -Method Post -Body $activateBody -ContentType 'application/json' -TimeoutSec 60
+                Write-Host "Store activated (free-community): $gateway/store/$cid/register"
+            } catch {
+                Write-Host "Store activate deferred (re-try POST $gateway/api/meritstore/v1/tenants/$cid/activate): $($_.Exception.Message)"
             }
             # Baseline marketing jumpstart publish (portal/) - required when here.now BYOK is present.
             if (Get-HereNowApiKey) {
