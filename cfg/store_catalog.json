@@ -1,0 +1,54 @@
+{
+  "schema": "merit.store_catalog.v1",
+  "notes": "Default dinner capability SKUs — rendered on create play Plans table; activates into meritstore when tenant is provisioned. Keep prices/labels human-first.",
+  "categories": [
+    { "id": "free", "label": "Start free" },
+    { "id": "growth", "label": "Grow with Plus" }
+  ],
+  "items": [
+    {
+      "sku": "community-member",
+      "name": "Community Member",
+      "category_id": "free",
+      "price_usd": 0,
+      "cadence": "forever",
+      "capability": "community",
+      "member_promise": "Join your community, read channels, and post when eligible.",
+      "covers": ["community_member"],
+      "plan_query": "community-member"
+    },
+    {
+      "sku": "oh-attend",
+      "name": "Office Hours",
+      "category_id": "free",
+      "price_usd": 0,
+      "cadence": "per_attendance",
+      "capability": "meet",
+      "member_promise": "Sit in weekly office hours (chat and/or video).",
+      "covers": ["oh_attend"],
+      "plan_query": "oh-attend"
+    },
+    {
+      "sku": "consult-20m",
+      "name": "Consult 20 minutes",
+      "category_id": "free",
+      "price_usd": 0,
+      "cadence": "per_booking",
+      "capability": "book",
+      "member_promise": "Book a twenty-minute collaboration consult when slots open.",
+      "covers": ["consult_20m"],
+      "plan_query": "consult-20m"
+    },
+    {
+      "sku": "plus-monthly",
+      "name": "Plus",
+      "category_id": "growth",
+      "price_usd": 10.79,
+      "cadence": "month",
+      "capability": "plus",
+      "member_promise": "Room to grow — open journal, AMA, and member seats beyond freemium caps.",
+      "covers": ["journal", "ama", "community_member", "oh_attend", "consult_20m"],
+      "plan_query": "plus-monthly"
+    }
+  ]
+}

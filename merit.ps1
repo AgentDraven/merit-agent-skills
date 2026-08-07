@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.45'
+$MERIT_VERSION = '0.3.46'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -440,7 +440,7 @@ function Invoke-ParScaffold {
         Replace('{{EVIDENCE_BASE_URL}}', $evidenceBaseUrl).
         Replace('{{JOURNAL_TAGS}}', $journalTags)
     [System.IO.File]::WriteAllText((Join-Path $playDir 'index.html'), $html, [System.Text.UTF8Encoding]::new($false))
-    Write-Host "par scaffold OK ($Variant, $glossTheme) -> $TargetRoot (DualRail Gloss + Advanced rails for $consumerId)"
+    Write-Host "par scaffold OK ($Variant, $glossTheme) -> $TargetRoot (Make Art DualRail home for $consumerId)"
 }
 
 function Invoke-BrandingScaffold {
@@ -465,7 +465,7 @@ function Invoke-SubsScaffold {
         freemium_limits = 'cfg/freemium_limits.json'
         plus_sku = 'cfg/plus_sku.json'
     })
-    foreach ($name in @('freemium_limits.json', 'plus_sku.json')) {
+    foreach ($name in @('freemium_limits.json', 'plus_sku.json', 'store_catalog.json')) {
         Copy-Item -LiteralPath (Join-Path $Root "cfg/$name") -Destination (Join-Path $cfg $name) -Force
     }
     $portalsTpl = Join-Path $Root 'cfg/portals.json.template'
@@ -580,7 +580,7 @@ function Invoke-LiveAlpha {
         -Dest (Join-Path $iar $researchName) -Replacements $repl -Force:$forceSwitch | Out-Null
     Copy-LiveAlphaTemplateIfMissing -Source (Join-Path $tplRoot 'meritsubs_consumer.json.template') `
         -Dest (Join-Path $cfg 'meritsubs_consumer.json') -Replacements $repl -Force:$forceSwitch | Out-Null
-    foreach ($name in @('freemium_limits.json', 'plus_sku.json')) {
+    foreach ($name in @('freemium_limits.json', 'plus_sku.json', 'store_catalog.json')) {
         $dest = Join-Path $cfg $name
         if ((Test-Path $dest) -and -not $force) {
             Write-Host "  keep $dest"

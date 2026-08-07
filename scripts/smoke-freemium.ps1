@@ -36,26 +36,33 @@ if ($html -notmatch 'journal') { throw "workbench-journal variant missing journa
 if ($html -notmatch 'createAppShell') { throw "play shell missing DualRail Gloss createAppShell" }
 if ($html -notmatch 'MeritUx|merit_ux') { throw "play shell missing merit_ux / MeritUx" }
 if ($html -notmatch 'gloss-aurora|gloss-graphite|gloss-daylight') { throw "play shell missing GlossPack theme" }
-if ($html -notmatch "tourCard\('ask'") { throw "play shell missing Value Tour Ask" }
-if ($html -notmatch "tourCard\('meet'" -or $html -notmatch "tourCard\('book'" -or $html -notmatch "tourCard\('journal'") {
-    throw "play shell missing Value Tour Meet/Book/Journal"
+if ($html -notmatch "pathHtml\('Ask'" -or $html -notmatch "pathHtml\('Meet'" -or $html -notmatch "pathHtml\('Book'" -or $html -notmatch "pathHtml\('Journal'") {
+    throw "play shell missing Make Art capability paths (Ask/Meet/Book/Journal)"
 }
+if ($html -notmatch 'How it comes together') { throw "play shell missing composition section" }
+if ($html -notmatch 'ma-table') { throw "play shell missing Plans table ma-table (FR-MPD-42)" }
+if ($html -notmatch 'id=.plans.') { throw "play shell missing #plans (FR-MPD-42)" }
 if ($html -notmatch 'class=.geek.') { throw "play shell missing Advanced geek disclosure" }
-if ($html -notmatch 'mountMeritWorkbenchPanel') { throw "play shell missing Advanced workbench (mountMeritWorkbenchPanel)" }
-if ($html -notmatch 'Your MERIT rails') { throw "play shell missing Advanced capability tour (Your MERIT rails)" }
+if ($html -match 'mountMeritWorkbenchPanel') { throw "play shell must NOT default-mount workbench (BUG-MPD-PLAY-02)" }
+if ($html -match 'Your MERIT rails') { throw "play shell must NOT show operator rails grid as Advanced" }
+if ($html -match 'community-rails/evidence/') { throw "play shell must NOT use e2e evidence as product art (BUG-MPD-PLAY-01)" }
 if ($html -notmatch 'app_logic') { throw "play shell missing app_logic next-step callout" }
 if ($html -notmatch '/store/.*/register') { throw "play shell missing store register path for this app" }
-if ($html -notmatch 'community-rails') { throw "play shell missing community-rails proof links" }
+if ($html -notmatch "community-member") { throw "play shell missing community-member plan id (FR-MPD-41)" }
+if ($html -notmatch 'community-rails') { throw "play shell missing community-rails geek link" }
+
+$cat = Join-Path $ScratchRoot 'cfg\store_catalog.json'
+if (-not (Test-Path $cat)) { throw "subs scaffold missing cfg/store_catalog.json (FR-MPD-40)" }
 
 $pins = Get-Content (Join-Path $ScratchRoot 'cfg\par_pins.json') -Raw | ConvertFrom-Json
-$wbUrl = $pins.packages.merit_workbench.artifacts.js.url
-Write-Host "HEAD $wbUrl"
+$uxUrl = $pins.packages.merit_ux.artifacts.js.url
+Write-Host "HEAD $uxUrl"
 try {
-    $r = Invoke-WebRequest -Uri $wbUrl -Method Head -UseBasicParsing -TimeoutSec 30
+    $r = Invoke-WebRequest -Uri $uxUrl -Method Head -UseBasicParsing -TimeoutSec 30
     if ($r.StatusCode -ge 400) { throw "PAR CDN HEAD failed: $($r.StatusCode)" }
 } catch {
     Write-Warning "PAR CDN HEAD skipped or failed (offline?): $_"
 }
 
-Write-Host "[OK] freemium smoke passed" -ForegroundColor Green
+Write-Host "[OK] freemium smoke passed (Make Art DualRail home)" -ForegroundColor Green
 Write-Host "here.now publish: set HERENOW_API_KEY and run merit portal on a consumer with portal/"

@@ -3,42 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{PRODUCT_NAME}} — Play</title>
+  <title>{{PRODUCT_NAME}} - Play</title>
   <link rel="stylesheet" href="{{GLOSS_THEME_CSS_URL}}" integrity="{{GLOSS_THEME_CSS_SRI}}" crossorigin="anonymous">
   <link rel="stylesheet" href="{{MERIT_UX_CSS_URL}}" integrity="{{MERIT_UX_CSS_SRI}}" crossorigin="anonymous">
-  <link rel="stylesheet" href="{{WORKBENCH_CSS_URL}}" integrity="{{WORKBENCH_CSS_SRI}}" crossorigin="anonymous">
-  <style id="play-value-tour">
-    /* Layout tokens only — colors/type from GlossPack */
-    .value-tour { display: flex; flex-direction: column; gap: 2rem; }
-    .value-tour__hero { display: flex; flex-direction: column; gap: 0.75rem; max-width: 36rem; }
-    .value-tour__hero h1 { margin: 0; font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1.15; }
-    .value-tour__hero p { margin: 0; opacity: 0.9; line-height: 1.45; }
-    .value-tour__cta {
+  <style id="play-make-art">
+    /* Layout tokens - colors from GlossPack. Make Art composition (TB/Apple editorial bar). */
+    .ma-home {
+      display: flex; flex-direction: column; gap: 0;
+      max-width: 52rem; margin: 0 auto;
+    }
+    .ma-hero {
+      min-height: min(70vh, 36rem);
+      display: flex; flex-direction: column; justify-content: center;
+      gap: 1rem; padding: 2.5rem 0 3rem;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 0%, color-mix(in srgb, var(--merit-accent, #2a6f6a) 18%, transparent), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 100% 30%, color-mix(in srgb, var(--merit-accent, #2a6f6a) 10%, transparent), transparent 50%);
+    }
+    .ma-hero__brand {
+      margin: 0; font-size: clamp(2.4rem, 7vw, 3.75rem);
+      line-height: 1.05; font-weight: 500; letter-spacing: -0.03em;
+    }
+    .ma-hero__headline {
+      margin: 0; font-size: clamp(1.2rem, 2.8vw, 1.55rem);
+      font-weight: 500; opacity: 0.95; max-width: 28rem;
+    }
+    .ma-hero__lede {
+      margin: 0; max-width: 32rem; line-height: 1.5; opacity: 0.88; font-size: 1.05rem;
+    }
+    .ma-cta-row { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 0.5rem; }
+    .ma-cta {
       display: inline-flex; align-items: center; justify-content: center;
-      width: fit-content; margin-top: 0.35rem; padding: 0.65rem 1.15rem;
-      font-weight: 600; text-decoration: none; border-radius: 0.4rem;
+      padding: 0.85rem 1.35rem; font-weight: 700; text-decoration: none;
+      border-radius: 999px; border: 2px solid transparent;
       background: var(--merit-accent, #2a6f6a); color: var(--merit-on-accent, #fff);
     }
-    .value-tour__grid {
+    .ma-cta--ghost {
+      background: transparent; color: var(--merit-accent, #2a6f6a);
+      border-color: var(--merit-accent, #2a6f6a);
+    }
+    .ma-section { padding: 2.5rem 0 1rem; }
+    .ma-section h2 {
+      margin: 0 0 1rem; font-size: 1.65rem; font-weight: 500; letter-spacing: -0.02em;
+    }
+    .ma-paths {
       display: grid; gap: 1.25rem;
-      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+      grid-template-columns: 1fr;
     }
-    .value-tour__card { display: flex; flex-direction: column; gap: 0.5rem; }
-    .value-tour__card h2 { margin: 0; font-size: 1.1rem; }
-    .value-tour__card p { margin: 0; font-size: 0.95rem; line-height: 1.4; opacity: 0.88; }
-    .value-tour__thumb {
-      display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover;
-      border-radius: 0.35rem; background: color-mix(in srgb, var(--merit-fg, #222) 8%, transparent);
+    @media (min-width: 48rem) {
+      .ma-paths { grid-template-columns: 1fr 1fr; gap: 1.5rem 2rem; }
     }
-    .value-tour__proof { font-size: 0.85rem; }
-    details.geek { margin-top: 2.5rem; }
+    .ma-path { display: flex; flex-direction: column; gap: 0.35rem; }
+    .ma-path h3 { margin: 0; font-size: 1.15rem; font-weight: 600; }
+    .ma-path p { margin: 0; line-height: 1.45; opacity: 0.88; font-size: 0.98rem; }
+    .ma-path a {
+      margin-top: 0.25rem; font-weight: 600; color: var(--merit-accent, #2a6f6a);
+      text-decoration: none; width: fit-content;
+    }
+    .ma-path a:hover { text-decoration: underline; }
+    .ma-table-wrap { overflow-x: auto; margin-top: 0.5rem; }
+    .ma-table {
+      width: 100%; border-collapse: collapse; font-size: 0.95rem;
+    }
+    .ma-table th, .ma-table td {
+      text-align: left; padding: 0.7rem 0.55rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--merit-fg, #222) 14%, transparent);
+      vertical-align: top;
+    }
+    .ma-table th { font-weight: 700; opacity: 0.95; }
+    .ma-table td { opacity: 0.9; }
+    .ma-tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 700;
+      padding: 0.15rem 0.5rem; border-radius: 999px;
+      background: color-mix(in srgb, var(--merit-accent, #2a6f6a) 16%, transparent);
+      color: var(--merit-accent, #2a6f6a);
+    }
+    details.geek { margin: 2.75rem 0 1rem; }
     details.geek > summary { cursor: pointer; font-weight: 600; }
-    #merit-workbench-mount { margin-top: 1rem; min-height: 12rem; }
+    .ma-geek-list { margin: 0.75rem 0 0; padding-left: 1.15rem; line-height: 1.55; }
+    .ma-geek-list a { color: var(--merit-accent, #2a6f6a); }
   </style>
 </head>
 <body>
   <script src="{{MERIT_UX_JS_URL}}" integrity="{{MERIT_UX_JS_SRI}}" crossorigin="anonymous"></script>
-  <script src="{{WORKBENCH_JS_URL}}" integrity="{{WORKBENCH_JS_SRI}}" crossorigin="anonymous"></script>
   <script>
     (function () {
       var PRODUCT = {{PRODUCT_NAME_JS}};
@@ -46,7 +93,6 @@
       var REGISTER_URL = {{REGISTER_URL_JS}};
       var GLOSS_THEME = {{GLOSS_THEME_JS}};
       var COMMUNITY_RAILS_URL = {{COMMUNITY_RAILS_URL_JS}};
-      var EVIDENCE_BASE_URL = {{EVIDENCE_BASE_URL_JS}};
       var GW = 'https://merit-prod.vercel.app';
 
       function esc(s) {
@@ -57,53 +103,131 @@
           .replace(/"/g, '&quot;');
       }
 
-      function linkHtml(href, label) {
-        return '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a>';
+      function registerPlan(plan) {
+        var base = String(REGISTER_URL || '');
+        if (!plan) return base;
+        return base + (base.indexOf('?') >= 0 ? '&' : '?') + 'plan=' + encodeURIComponent(plan);
       }
 
-      function valueTourHtml() {
+      /* Clean default catalog — keep in sync with cfg/store_catalog.json (FR-MPD-40) */
+      var PLANS = [
+        {
+          name: 'Community Member',
+          promise: 'Join your community and post when eligible.',
+          price: 'Free',
+          plan: 'community-member',
+          tag: 'Start'
+        },
+        {
+          name: 'Office Hours',
+          promise: 'Sit with the host — chat and/or video when hours are live.',
+          price: 'Free',
+          plan: 'oh-attend',
+          tag: 'Meet'
+        },
+        {
+          name: 'Consult 20 minutes',
+          promise: 'Book a collaboration slot when the calendar opens.',
+          price: 'Free',
+          plan: 'consult-20m',
+          tag: 'Book'
+        },
+        {
+          name: 'Plus',
+          promise: 'Room to grow — open caps on journal, AMA, and member seats.',
+          price: '$10.79 / mo',
+          plan: 'plus-monthly',
+          tag: 'Grow'
+        }
+      ];
+
+      function plansTableHtml() {
+        var rows = PLANS.map(function (p) {
+          return (
+            '<tr>' +
+              '<td><strong>' + esc(p.name) + '</strong><br><span class="ma-tag">' + esc(p.tag) + '</span></td>' +
+              '<td>' + esc(p.promise) + '</td>' +
+              '<td>' + esc(p.price) + '</td>' +
+              '<td><a href="' + esc(registerPlan(p.plan)) + '">Choose</a></td>' +
+            '</tr>'
+          );
+        }).join('');
         return (
-          '<section class="value-tour" aria-label="Value tour">' +
-            '<div class="value-tour__hero">' +
-              '<h1>Welcome to ' + esc(PRODUCT) + '</h1>' +
-              '<p>Ask the community, meet for office hours, book a consult, and keep a private journal — on MERIT rails.</p>' +
-              '<a class="value-tour__cta" href="' + esc(REGISTER_URL) + '">Register free</a>' +
-            '</div>' +
-            '<div class="value-tour__grid">' +
-              tourCard('ask', 'Ask', 'AMA questions on the community channel — free for eligible members.', '02-member.png', 'Ask — community member proof') +
-              tourCard('meet', 'Meet', 'Office Hours on chat and/or video — scheduled from your collab cfg.', '00-overview.png', 'Meet — community overview proof') +
-              tourCard('book', 'Book', 'Collaboration Corner consult slots with conflict-before-book calendar.', '04-consult.png', 'Book — consult proof') +
-              tourCard('journal', 'Journal', 'Private notes with share modes and deadline alerts when you are ready.', '01-guest.png', 'Journal — guest surface proof') +
-            '</div>' +
-          '</section>' +
-          '<details class="geek">' +
-            '<summary>Advanced: builder rails</summary>' +
-            '<div id="merit-workbench-mount"></div>' +
-          '</details>'
+          '<div class="ma-table-wrap"><table class="ma-table">' +
+            '<thead><tr><th>Plan</th><th>What you get</th><th>Price</th><th></th></tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+          '</table></div>'
         );
       }
 
-      function tourCard(id, title, blurb, img, alt) {
+      function homeHtml() {
         return (
-          '<article class="value-tour__card" data-tour="' + esc(id) + '">' +
-            '<h2>' + esc(title) + '</h2>' +
+          '<div class="ma-home">' +
+            '<section class="ma-hero" aria-label="Welcome">' +
+              '<h1 class="ma-hero__brand">' + esc(PRODUCT) + '</h1>' +
+              '<p class="ma-hero__headline">Ask, meet, book, and journal - together.</p>' +
+              '<p class="ma-hero__lede">Your community is live. Register free to join channels, office hours, consults, and a private journal. Grow into Plus when you need more room.</p>' +
+              '<div class="ma-cta-row">' +
+                '<a class="ma-cta" href="' + esc(registerPlan('community-member')) + '">Register free</a>' +
+                '<a class="ma-cta ma-cta--ghost" href="#plans">See plans</a>' +
+              '</div>' +
+            '</section>' +
+
+            '<section class="ma-section" aria-label="What you can do">' +
+              '<h2>How it comes together</h2>' +
+              '<div class="ma-paths">' +
+                pathHtml('Ask', 'Bring questions to the community AMA - free for eligible members.', registerPlan('community-member'), 'Join free to ask') +
+                pathHtml('Meet', 'Weekly office hours on chat and video when the host is live.', registerPlan('oh-attend'), 'Save a seat') +
+                pathHtml('Book', 'Twenty-minute consult slots with calm booking.', registerPlan('consult-20m'), 'Book a slot') +
+                pathHtml('Journal', 'Private notes with share modes when you are ready.', registerPlan('community-member'), 'Start free') +
+              '</div>' +
+            '</section>' +
+
+            '<section class="ma-section" id="plans" aria-label="Plans">' +
+              '<h2>Plans</h2>' +
+              '<p class="ma-hero__lede" style="margin-bottom:0.75rem">Clean access for every default capability. Plus opens freemium caps.</p>' +
+              plansTableHtml() +
+            '</section>' +
+
+            '<details class="geek">' +
+              '<summary>Advanced: builder next steps</summary>' +
+              '<ul class="ma-geek-list">' +
+                '<li>Your live app: <code>/apps/' + esc(CONSUMER_ID) + '/play</code> on merit-prod</li>' +
+                '<li>Register for this app: <a href="' + esc(REGISTER_URL) + '">' + esc(REGISTER_URL) + '</a></li>' +
+                '<li><a href="' + esc(GW + '/portal/developers/full-app/') + '" target="_blank" rel="noopener noreferrer">Your app over dinner</a> — PRD, portal, then <code>app_logic/</code></li>' +
+                '<li><a href="' + esc(GW + '/portal/developers/sku-commerce/') + '" target="_blank" rel="noopener noreferrer">Sell SKUs and subscriptions</a></li>' +
+                '<li><a href="' + esc(GW + '/portal/developers/par-packages/') + '" target="_blank" rel="noopener noreferrer">UI packages on the gateway</a></li>' +
+                '<li><a href="' + esc(COMMUNITY_RAILS_URL) + '" target="_blank" rel="noopener noreferrer">Platform live-check evidence</a> (operator probes — not product screenshots)</li>' +
+                '<li>Optional platform builder join: <a href="' + esc(GW + '/store/merit/register?plan=app-builder') + '" target="_blank" rel="noopener noreferrer">/store/merit/register?plan=app-builder</a></li>' +
+                '<li><a href="' + esc(GW + '/portal/developers/troubleshooting/#start-over') + '" target="_blank" rel="noopener noreferrer">Start over — leave platform and create again</a></li>' +
+              '</ul>' +
+            '</details>' +
+          '</div>'
+        );
+      }
+
+      function pathHtml(title, blurb, href, cta) {
+        return (
+          '<article class="ma-path">' +
+            '<h3>' + esc(title) + '</h3>' +
             '<p>' + esc(blurb) + '</p>' +
-            '<a class="value-tour__proof" href="' + esc(COMMUNITY_RAILS_URL) + '" target="_blank" rel="noopener noreferrer">' +
-              '<img class="value-tour__thumb" src="' + esc(EVIDENCE_BASE_URL + '/' + img) + '" alt="' + esc(alt) + '" width="640" height="400" loading="lazy">' +
-            '</a>' +
+            '<a href="' + esc(href) + '">' + esc(cta) + '</a>' +
           '</article>'
         );
       }
 
       function bootGlossShell() {
         var ux = window.MeritUx;
-        if (!ux || typeof ux.createAppShell !== 'function') return null;
+        if (!ux || typeof ux.createAppShell !== 'function') {
+          document.body.innerHTML = homeHtml();
+          return null;
+        }
         var shell = ux.createAppShell({
           host: document.body,
           theme: GLOSS_THEME,
           brand: {
             name: PRODUCT,
-            tagline: 'Ask · Meet · Book · Journal',
+            tagline: '',
             eyebrow: 'Powered by MERIT'
           },
           freemium: {
@@ -113,13 +237,13 @@
           },
           legal: {
             brandName: PRODUCT,
-            disclaimer: 'MERIT Powered — platform rails, not a second marketing portal.'
+            disclaimer: 'MERIT Powered - your product home on platform rails.'
           },
           slots: { main: '#app-logic' },
-          peers: { workbench: true, journal: true }
+          peers: { workbench: false, journal: false }
         });
         if (shell && shell.main) {
-          shell.main.innerHTML = valueTourHtml();
+          shell.main.innerHTML = homeHtml();
         }
         if (shell && shell.status && typeof ux.setStatusState === 'function') {
           ux.setStatusState(shell.status, 'ok');
@@ -127,163 +251,10 @@
         return shell;
       }
 
-      function bootMeritWorkbench() {
-        var mw = window.merit_workbench;
-        var host = document.getElementById('merit-workbench-mount');
-        if (!mw || !host || typeof mw.mountMeritWorkbenchPanel !== 'function') return;
-        if (host.childElementCount) return;
-
-        var rows = [
-          {
-            id: 'auth',
-            hnd: 'Auth / login',
-            handle: 'meritsubs',
-            preview: 'Open guide',
-            levels: 'Rails ready',
-            detail:
-              '<p>Subscriber identity for <strong>' + esc(PRODUCT) + '</strong> runs on MERIT rails (signup, session, Free/Plus).</p>' +
-              '<p>' + linkHtml(GW + '/portal/developers/auth-subs/', 'Auth and subscriptions guide') + '</p>' +
-              '<p>Wire login UX in <code>app_logic/</code> after dinner Steps 3–4 — do not fork auth into your repo.</p>'
-          },
-          {
-            id: 'store',
-            hnd: 'Store + default SKUs',
-            handle: 'meritstore',
-            preview: 'Register path',
-            levels: 'Cfg scaffolded',
-            detail:
-              '<p>Free/Plus SKU files are in <code>cfg/</code> for your app. Checkout uses your register path:</p>' +
-              '<p>' + linkHtml(REGISTER_URL, REGISTER_URL) + '</p>' +
-              '<p>' + linkHtml(GW + '/portal/developers/sku-commerce/', 'SKU commerce guide') +
-              ' — sell SKUs and subscriptions on platform rails.</p>'
-          },
-          {
-            id: 'subs',
-            hnd: 'meritsubs entitlements',
-            handle: 'meritsubs',
-            preview: 'Providers',
-            levels: 'Gateway',
-            detail:
-              '<p>Tiers, entitlements, and usage meter through <code>/api/meritsubs/*</code> for consumer_id=<code>' +
-              esc(CONSUMER_ID) + '</code>.</p>' +
-              '<p>' + linkHtml(GW + '/portal/developers/providers/', 'Provider rails guide') + '</p>'
-          },
-          {
-            id: 'utils',
-            hnd: 'meritutils packages',
-            handle: 'PAR CDN',
-            preview: 'Registry',
-            levels: 'Pinned',
-            detail:
-              '<p>Packages available through the gateway CDN for your play / app_logic:</p>' +
-              '<ul>' +
-              '<li><strong>merit_ux</strong> — DualRail Gloss shell (this page)</li>' +
-              '<li><strong>merit_workbench</strong> — Advanced builder grid / inspector</li>' +
-              '<li><strong>journal</strong> — compose + history on the workbench</li>' +
-              '<li><strong>merit_ama</strong> — Q and A primitives</li>' +
-              '<li><strong>merit_calendar</strong> — consult scheduling</li>' +
-              '<li><strong>merit_video</strong> — room-media / Zoom</li>' +
-              '</ul>' +
-              '<p>' + linkHtml(GW + '/pkg/meritutils/registry.json', 'meritutils registry.json') +
-              ' · ' + linkHtml(GW + '/portal/developers/par-packages/', 'PAR packages guide') + '</p>'
-          },
-          {
-            id: 'community',
-            hnd: 'Community channels',
-            handle: 'cfg/community.json',
-            preview: 'Scaffolded',
-            levels: 'Baseline',
-            detail:
-              '<p>Default channels (<code>general</code>, <code>ama</code>, <code>announcements</code>) live in <code>cfg/community.json</code>.</p>' +
-              '<p>Eligible registered members can post; guests browse marketing only. Email hooks use platform <code>merit_notify</code>.</p>'
-          },
-          {
-            id: 'ama',
-            hnd: 'AMA + Office Hours',
-            handle: 'merit_ama',
-            preview: 'Cfg ready',
-            levels: 'Baseline',
-            detail:
-              '<p>AMA questions log on channel <code>ama</code>. Office Hours default Mondays 5–6pm Pacific (chat and/or Zoom) from <code>cfg/collab_schedule.json</code>.</p>' +
-              '<p>Free for eligible Community Member tiers. Wire UI via meritutils AMA / video packages.</p>'
-          },
-          {
-            id: 'collab',
-            hnd: 'Collaboration Corner',
-            handle: 'merit_calendar',
-            preview: 'Cfg ready',
-            levels: 'Baseline',
-            detail:
-              '<p>Consult grid Tue/Thu 4–8pm Pacific, 20-minute slots. Shared free/busy + conflict-before-book via <code>merit_calendar</code> (EventCalendar + rrule).</p>' +
-              '<p>Schedule + $0 SKUs: <code>cfg/collab_schedule.json</code>. Zoom meetings via <code>merit_video</code> / platform room-media.</p>'
-          },
-          {
-            id: 'journal-alerts',
-            hnd: 'Journal + alerts',
-            handle: 'journal / alerts',
-            preview: 'Cfg ready',
-            levels: 'Baseline',
-            detail:
-              '<p>Private journal with share modes; todos with deadlines. Alert offsets in <code>cfg/alerts.json</code> (VAPID + email).</p>' +
-              '<p>Workbench already mounts journal when pinned — extend share/todo in app_logic as packages land.</p>'
-          },
-          {
-            id: 'applogic',
-            hnd: 'Next: app_logic/',
-            handle: 'Dinner 3–4',
-            preview: 'Full-app guide',
-            levels: 'Your turn',
-            detail:
-              '<p>Value Tour is Step 2 taste. Product features land in <code>app_logic/</code> for <strong>' +
-              esc(PRODUCT) + '</strong>:</p>' +
-              '<ol>' +
-              '<li><code>/merit-prd</code> — fill <code>docs/PRODUCT.prd.md</code></li>' +
-              '<li><code>/merit-portal</code> — shape marketing <code>portal/</code>, then republish</li>' +
-              '<li><code>/merit-applogic</code> — implement Must FRs under <code>app_logic/</code></li>' +
-              '</ol>' +
-              '<p>' + linkHtml(GW + '/portal/developers/full-app/', 'Your app over dinner') + '</p>'
-          }
-        ];
-
-        mw.mountMeritWorkbenchPanel(host, {
-          title: PRODUCT,
-          gridTitle: 'Your MERIT rails',
-          theme: 'merit-dark',
-          idKey: 'id',
-          features: { downstream: false },
-          columns: [
-            { id: 'hnd', label: 'Capability' },
-            { id: 'handle', label: 'Rail' },
-            { id: 'preview', label: 'Open' },
-            { id: 'levels', label: 'Status' }
-          ],
-          rows: rows,
-          summary: {
-            cards: [
-              { label: 'Product', value: PRODUCT },
-              { label: 'Step', value: '2 — DualRail Gloss' },
-              { label: 'Next', value: 'app_logic/' },
-              { label: 'Host', value: 'merit-prod' }
-            ]
-          },
-          renderInspector: function (row) {
-            return {
-              title: row.hnd || 'Capability',
-              bodyHtml: row.detail || '<p>Select a capability row.</p>'
-            };
-          }
-        });
-      }
-
-      function bootMeritPlay() {
-        bootGlossShell();
-        bootMeritWorkbench();
-      }
-
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', bootMeritPlay);
+        document.addEventListener('DOMContentLoaded', bootGlossShell);
       } else {
-        bootMeritPlay();
+        bootGlossShell();
       }
     })();
   </script>
