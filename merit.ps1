@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.44'
+$MERIT_VERSION = '0.3.45'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -1130,20 +1130,20 @@ function Invoke-HereNowDeleteSite {
         Authorization = "Bearer $apiKey"
         'x-herenow-client' = 'merit-ps1/apps-remove'
     }
-    Write-Host "here.now: DELETE $BaseUrl/api/v1/publish/$Slug ..."
+    Write-Host "here.now: DELETE ${BaseUrl}/api/v1/publish/${Slug} ..."
     try {
-        Invoke-RestMethod -Uri "$BaseUrl/api/v1/publish/$Slug" -Method Delete -Headers $headers -TimeoutSec 60 | Out-Null
+        Invoke-RestMethod -Uri "${BaseUrl}/api/v1/publish/${Slug}" -Method Delete -Headers $headers -TimeoutSec 60 | Out-Null
     } catch {
         $err = "$_"
         # Idempotent leave: multi-surface cfg/portals.json often lists journal/ama/subs slugs never published.
         if ($err -match '\(404\)|404|Not Found') {
-            Write-Host "here.now: $Slug already gone (404) — OK (never published or already deleted)"
+            Write-Host ('here.now: {0} already gone (404) - OK - never published or already deleted' -f $Slug)
             return $null
         }
-        throw "here.now delete failed for ${Slug}: $err"
+        throw ('here.now delete failed for {0}: {1}' -f $Slug, $err)
     }
-    Write-Host "here.now deleted: https://$Slug.here.now/"
-    return "https://$Slug.here.now/"
+    Write-Host ('here.now deleted: https://{0}.here.now/' -f $Slug)
+    return ('https://{0}.here.now/' -f $Slug)
 }
 
 function Invoke-AppsRemove {
@@ -1154,9 +1154,10 @@ function Invoke-AppsRemove {
         [string]$Gateway = 'https://merit-prod.vercel.app'
     )
     if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) {
+        $playUi = '{0}/apps/{1}/play' -f $Gateway, $ConsumerId
         throw @"
 apps remove: refusing without --yes (destructive).
-  Platform UI:  $Gateway/apps/$ConsumerId/play
+  Platform UI:  $playUi
   Then e.g.:    .\merit.ps1 apps remove --path `"$TargetRoot`" --yes
   Full leave:   .\merit.ps1 apps remove --path `"$TargetRoot`" --yes --tenant-all --with-portal
 "@
@@ -1168,18 +1169,19 @@ apps remove: refusing without --yes (destructive).
         scope = $scope
     } | ConvertTo-Json -Compress
     $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
-    Write-Host "Removing $scope for consumer_id=$ConsumerId on $Gateway ..."
+    Write-Host ('Removing {0} for consumer_id={1} on {2} ...' -f $scope, $ConsumerId, $Gateway)
+    $removeUri = '{0}/api/apps/remove' -f $Gateway
     try {
-        $wr = Invoke-WebRequest -Uri "$Gateway/api/apps/remove" -Method Post -Body $bodyBytes -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 60
+        $wr = Invoke-WebRequest -Uri $removeUri -Method Post -Body $bodyBytes -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 60
     } catch {
-        throw "apps remove failed ($Gateway/api/apps/remove). $_"
+        throw ('apps remove failed ({0}). {1}' -f $removeUri, $_)
     }
     $parsed = $null
     try { $parsed = $wr.Content | ConvertFrom-Json } catch { }
     if (-not $parsed -or -not $parsed.ok) {
-        throw "apps remove rejected: $($wr.Content)"
+        throw ('apps remove rejected: {0}' -f $wr.Content)
     }
-    Write-Host "apps remove OK: consumer_id=$ConsumerId scope=$($parsed.scope) (was $($parsed.appUrlWas))"
+    Write-Host ('apps remove OK: consumer_id={0} scope={1} (was {2})' -f $ConsumerId, $parsed.scope, $parsed.appUrlWas)
     if (Test-ArgFlag -ArgList $ArgList -Name '--with-portal') {
         if (-not $TargetRoot -or -not (Test-Path -LiteralPath $TargetRoot)) {
             throw 'apps remove --with-portal needs --path <repo> (to read cfg/portals.json / .herenow state)'
@@ -1211,7 +1213,7 @@ apps remove: refusing without --yes (destructive).
                     Invoke-HereNowDeleteSite -Slug $slug | Out-Null
                 } catch {
                     # Platform leave already succeeded above; do not block folder delete / recreate.
-                    Write-Warning "here.now delete skipped for ${slug}: $_. Platform apps remove already OK — continue start-over."
+                    Write-Warning ('here.now delete skipped for {0}: {1}. Platform apps remove already OK - continue start-over.' -f $slug, $_)
                 }
             }
         }
