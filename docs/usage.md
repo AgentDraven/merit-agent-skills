@@ -324,8 +324,9 @@ Remove-Item -Recurse -Force ..\<app>
 |---------|---------|-----------|
 | `apps remove OK: consumer_id=…` | merit-prod `/apps/<id>` (and optional tenant rows) cleared | Proceed with folder delete + create |
 | `here.now deleted: https://…` | That marketing slug was removed | None |
-| `here.now: … already gone (404) — OK` | Slug never existed or was already deleted | Ignore; continue start-over |
+| `here.now: … already gone (404) - OK` | slug never existed or was already deleted | Ignore; continue start-over |
 | `here.now delete failed …` (auth / 5xx) | Credentials or here.now outage on a **live** slug | Fix `HERENOW_API_KEY` / `~/.herenow/credentials`, re-run `--with-portal` or delete leftover sites in the here.now console; platform leave still OK if `apps remove OK` printed |
+| `Unexpected token 'Removing'` / `'/' operator` on any verb including `create` | Double-quoted strings in `merit.ps1` with `($Gateway/api/…)` or `(… or …)` parse as subexpressions on Windows PowerShell 5.1 — whole file fails to load (fixed **skills-v0.3.45+**) | `git fetch --tags; git checkout skills-v0.3.45` then re-run. Not your app path |
 
 ---
 
