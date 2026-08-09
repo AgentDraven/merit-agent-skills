@@ -1415,7 +1415,7 @@ function Invoke-Create {
             Ensure-CreateLaunchDefaults -TargetRoot $TargetRoot -ArgList $ArgList
             Invoke-Apply -TargetRoot $TargetRoot -ArgList $ArgList
         }},
-        @{ n = 2; title = 'DualRail Gloss play + Advanced workbench (par scaffold)'; script = {
+        @{ n = 2; title = 'DualRail Gloss Make Art play (par scaffold)'; script = {
             Invoke-ParScaffold -TargetRoot $TargetRoot -Variant 'workbench-journal' -Theme $theme
         }},
         @{ n = 3; title = 'Starter look (branding scaffold)'; script = {

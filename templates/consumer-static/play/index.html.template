@@ -82,6 +82,21 @@
     details.geek > summary { cursor: pointer; font-weight: 600; }
     .ma-geek-list { margin: 0.75rem 0 0; padding-left: 1.15rem; line-height: 1.55; }
     .ma-geek-list a { color: var(--merit-accent, #2a6f6a); }
+    /* FR-MPD-43 fallback when merit_ux loginChooser is pre-0.1.1 */
+    .ma-login-fallback {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.65rem;
+      padding: 0.55rem 1.25rem; font-size: 0.88rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--merit-fg, #222) 12%, transparent);
+    }
+    .ma-login-fallback__label { font-weight: 600; opacity: 0.85; margin-right: 0.25rem; }
+    .ma-login-fallback__opt {
+      padding: 0.25rem 0.6rem; border-radius: 999px; font-weight: 600;
+      text-decoration: none; color: var(--merit-accent, #2a6f6a);
+      border: 1px solid color-mix(in srgb, var(--merit-accent, #2a6f6a) 35%, transparent);
+    }
+    .ma-login-fallback__opt.is-active {
+      background: color-mix(in srgb, var(--merit-accent, #2a6f6a) 12%, transparent);
+    }
   </style>
 </head>
 <body>
@@ -231,17 +246,35 @@
             eyebrow: 'Powered by MERIT'
           },
           freemium: {
-            tierLabel: 'Free',
-            upgradeHref: REGISTER_URL,
-            upgradeLabel: 'Register'
+            identity: 'guest',
+            hideCta: true,
+            upgradeHref: registerPlan('plus-monthly')
           },
+          loginChooser: typeof ux.createLoginChooser === 'function' ? {
+            identity: 'guest',
+            memberHref: registerPlan('community-member'),
+            plusHref: registerPlan('plus-monthly'),
+            label: 'You are'
+          } : undefined,
           legal: {
             brandName: PRODUCT,
-            disclaimer: 'MERIT Powered - your product home on platform rails.'
+            disclaimer: 'MERIT Powered — your product home.'
           },
           slots: { main: '#app-logic' },
           peers: { workbench: false, journal: false }
         });
+        /* When loginChooser API is not on older CDN pins, inject a light fallback strip. */
+        if (shell && !shell.loginChooser && shell.freemium && shell.freemium.parentNode) {
+          var strip = document.createElement('nav');
+          strip.className = 'ma-login-fallback';
+          strip.setAttribute('aria-label', 'Your plan');
+          strip.innerHTML =
+            '<span class="ma-login-fallback__label">You are</span> ' +
+            '<span class="ma-login-fallback__opt is-active">Guest</span> ' +
+            '<a class="ma-login-fallback__opt" href="' + esc(registerPlan('community-member')) + '">Free member</a> ' +
+            '<a class="ma-login-fallback__opt" href="' + esc(registerPlan('plus-monthly')) + '">Plus</a>';
+          shell.freemium.parentNode.insertBefore(strip, shell.freemium.nextSibling);
+        }
         if (shell && shell.main) {
           shell.main.innerHTML = homeHtml();
         }

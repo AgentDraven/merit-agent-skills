@@ -48,8 +48,12 @@ if ($html -match 'Your MERIT rails') { throw "play shell must NOT show operator 
 if ($html -match 'community-rails/evidence/') { throw "play shell must NOT use e2e evidence as product art (BUG-MPD-PLAY-01)" }
 if ($html -notmatch 'app_logic') { throw "play shell missing app_logic next-step callout" }
 if ($html -notmatch '/store/.*/register') { throw "play shell missing store register path for this app" }
-if ($html -notmatch "community-member") { throw "play shell missing community-member plan id (FR-MPD-41)" }
+if ($html -notmatch 'community-member') { throw "play shell missing community-member plan id (FR-MPD-41)" }
+if ($html -notmatch 'plus-monthly') { throw "play shell missing plus-monthly plan (FR-MPD-41)" }
 if ($html -notmatch 'community-rails') { throw "play shell missing community-rails geek link" }
+if ($html -notmatch 'hideCta|loginChooser|ma-login-fallback|You are') {
+    throw "play shell missing guest/free/Plus identity chrome (FR-MPD-38/43)"
+}
 
 $cat = Join-Path $ScratchRoot 'cfg\store_catalog.json'
 if (-not (Test-Path $cat)) { throw "subs scaffold missing cfg/store_catalog.json (FR-MPD-40)" }
