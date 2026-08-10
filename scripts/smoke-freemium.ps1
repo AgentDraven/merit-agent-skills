@@ -36,7 +36,7 @@ if ($html -notmatch 'journal') { throw "workbench-journal variant missing journa
 if ($html -notmatch 'createAppShell') { throw "play shell missing DualRail Gloss createAppShell" }
 if ($html -notmatch 'MeritUx|merit_ux') { throw "play shell missing merit_ux / MeritUx" }
 if ($html -notmatch 'gloss-aurora|gloss-graphite|gloss-daylight') { throw "play shell missing GlossPack theme" }
-if ($html -notmatch "pathHtml\('Ask'" -or $html -notmatch "pathHtml\('Meet'" -or $html -notmatch "pathHtml\('Book'" -or $html -notmatch "pathHtml\('Journal'") {
+if ($html -notmatch "pathHtml\('Ask'" -or $html -notmatch "pathHtml\('Meet'" -or $html -notmatch "pathHtml\('Book'" -or $html -notmatch "pathHtml\('Journal'" -or $html -notmatch "Join free to ask") {
     throw "play shell missing Make Art capability paths (Ask/Meet/Book/Journal)"
 }
 if ($html -notmatch 'How it comes together') { throw "play shell missing composition section" }
@@ -51,6 +51,15 @@ if ($html -notmatch '/store/.*/register') { throw "play shell missing store regi
 if ($html -notmatch 'community-member') { throw "play shell missing community-member plan id (FR-MPD-41)" }
 if ($html -notmatch 'plus-monthly') { throw "play shell missing plus-monthly plan (FR-MPD-41)" }
 if ($html -notmatch 'community-rails') { throw "play shell missing community-rails geek link" }
+if ($html -notmatch 'merit-ux-brand|brand__moniker|useDefaultFlanks|merit-ux-brand__wordmark') {
+    throw "play shell missing brand moniker band (Gotcha D1 / AP-MA-01)"
+}
+if ($html -notmatch 'merit-ux-legal|Powered by MERIT|MERIT Powered') {
+    throw "play shell missing legal footer Powered by MERIT (Gotcha D6)"
+}
+if ($html -match 'FR-MPD-\d+.*dogfood|Make Art dogfood') {
+    throw "play shell must not expose FR dogfood strings on member path (AP-MA-04)"
+}
 if ($html -notmatch 'hideCta|loginChooser|ma-login-fallback|You are') {
     throw "play shell missing guest/free/Plus identity chrome (FR-MPD-38/43)"
 }
