@@ -20,6 +20,17 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 
 **Production MERIT base:** `https://merit-prod.vercel.app` for metered APIs, packages, and register paths. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
 
+## Public vs private SSOT
+
+| | Public (this repo + Portal) | Private (operators only) |
+|--|----------------------------|--------------------------|
+| **What** | Skills, `merit` CLI recipes, dinner/tutorial, freemium docs | Full platform **product law**, L1, env, cert registry |
+| **Where** | **This README**, [docs/usage.md](docs/usage.md), [HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md), live [Portal](https://merit-prod.vercel.app/portal/) | Vault `docs/PRD_MERIT_AGENT_SKILLS_PLATFORM.md` (**ACCEPTED** technical SSOT — not published here) |
+| **Who** | Builders, agents on OSS path | HumanBala / AgentDraven with vault |
+| **Pin** | Clone **`skills-v*`** release tags (FR-SK-14 / L1 §E.0) | Not a substitute for product VERSION on consumers |
+
+**Do not** expect a public copy of the vault PRD. Implementers with vault access apply FR tables from the private PRD + provider IAR; builders follow **usage + Portal** only.
+
 ## Quick install
 
 ```powershell
@@ -159,7 +170,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` (L1 §E.0 / FR-SK-14) |
-| Current tip (Portal pin) | **`skills-v0.3.41`** |
+| Current tip (Portal pin) | **`skills-v0.3.49`** |
 | Current human-validation baseline | **`skills-v0.3.22`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.

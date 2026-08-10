@@ -5,6 +5,11 @@ Operator-only vault workflows are optional and not required for a first-time pub
 
 **Related:** [TRY_BUNDLES.md](TRY_BUNDLES.md) · [README](../README.md) · [LICENSING.md](../LICENSING.md) · canonical consumer [merit-demo usage](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md)
 
+### Public vs private product law
+
+- **Public (this file + README + production Portal):** how to install, create, verify, deploy, and use free vs paid *hosted* services.
+- **Private (merit-private-vault only):** full platform PRD (`PRD_MERIT_AGENT_SKILLS_PLATFORM.md`, ACCEPTED for technical implement 2026-08-09). Not shipped in this OSS tree; operators with vault access implement FR-SK / commerce / PAR against that SSOT.
+
 ## Document map
 
 | Section | Topic |
