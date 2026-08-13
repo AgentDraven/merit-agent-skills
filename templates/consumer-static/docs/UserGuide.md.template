@@ -1,0 +1,209 @@
+---
+# MERIT_SCAFFOLD:user-guide:v1
+# Safe to refresh via: .\merit.ps1 apps refresh --path <repo>
+# Do not put app_logic product secrets here.
+schema: merit.consumer_user_guide.v1
+---
+
+# User Guide — {{PRODUCT_NAME}}
+
+**Audience:** members joining your MERIT app (Free community + optional Office Hours / Consult).  
+**App:** `{{CONSUMER_ID}}` · **Play:** {{PLAY_URL}} · **Register:** {{REGISTER_URL}}
+
+> This guide ships with every dinner create. `apps refresh` updates the scaffold body when this file still carries the `MERIT_SCAFFOLD:user-guide` marker — it never edits `app_logic/`.
+
+## Table of contents
+
+1. [Who this is for](#1-who-this-is-for)
+2. [If… then pathways](#2-if-then-pathways)
+3. [Personas](#3-personas)
+4. [Join Free (email + handle)](#4-join-free-email--handle)
+5. [Office Hours & Consult add-ons](#5-office-hours--consult-add-ons)
+6. [Ask · Meet · Book · Journal](#6-ask--meet--book--journal)
+7. [Paid tiers (Freemium → Ultra)](#7-paid-tiers-freemium--ultra)
+8. [OID glossary (public-safe)](#8-oid-glossary-public-safe)
+9. [Flowcharts](#9-flowcharts)
+10. [Live visual tour](#10-live-visual-tour)
+11. [Troubleshooting](#11-troubleshooting)
+
+---
+
+## 1. Who this is for
+
+| You are… | Start here |
+|----------|------------|
+| Curious visitor | [§2 Guest path](#2-if-then-pathways) → open Play |
+| Joining Free | [§4](#4-join-free-email--handle) |
+| Wanting OH / Consult | [§5](#5-office-hours--consult-add-ons) |
+| Building features | Leave this guide; work in `app_logic/` (builders) |
+
+---
+
+## 2. If… then pathways
+
+| If… | Then… |
+|-----|--------|
+| You only want to browse | Open Play as **Guest** — no email required |
+| You want Ask / Journal / member seats | **Register Free** — email + handle, $0, no card |
+| You want weekly Office Hours reminders | Leave **Office Hours** checked on register (or add later via `?plan=oh-attend`) |
+| You want a 20-minute consult | Leave **Consult** checked → after join, open Play → **Book** and pick a slot |
+| You hit freemium caps | Upgrade on register to Freemium / Standard / Pro / Ultra (Square card) |
+| You need a pass-token login | That is issued by app identity rails **after** Free join when enabled — not on the $0 store page |
+
+---
+
+## 3. Personas
+
+| Persona | Goal | Primary URL |
+|---------|------|-------------|
+| **Guest** | Taste the home | {{PLAY_URL}} |
+| **Free member** | Community baseline | {{REGISTER_URL}}?plan=free |
+| **OH attendee** | Weekly meet | Register + OH add-on · Play → Meet |
+| **Consult booker** | 20-min slot | Register + Consult · Play → Book |
+| **Builder** | Ship `app_logic/` | [Full-app dinner](https://merit-prod.vercel.app/portal/developers/full-app/) |
+
+---
+
+## 4. Join Free (email + handle)
+
+1. Open {{REGISTER_URL}}?plan=free  
+2. Confirm **Free** (or Community Member alias) is checked.  
+3. Enter **Email** and **Handle** (3–32 chars; suggestions if taken).  
+4. Optionally keep **Office Hours** / **Consult** checked (see §5).  
+5. Click **Continue to payment** — Free is **$0** (no card, no pass-token on this page).  
+6. Confirmation shows **Handle available, registered** for `{{CONSUMER_ID}}`.
+
+You are a **subscriber of this app** (`consumer_id={{CONSUMER_ID}}`), not a generic store-only account.
+
+---
+
+## 5. Office Hours & Consult add-ons
+
+These are **Free add-ons** (not paid tiers). Uncheck at signup if you do not want them.
+
+| Add-on | What you get | After signup |
+|--------|----------------|--------------|
+| **Office Hours** | Seat for weekly OH (chat and/or video when host is live) | We send reminders when alerts are enabled · Play → **Meet** |
+| **Consult 20m** | Eligibility to book a 20-minute slot | Play → **Book** → choose time on the consult calendar |
+
+Platform rails: community / AMA / OH / consult are on **merit-prod** + provider packs. Your app’s `app_logic/` can extend behavior without forking rails.
+
+Live dogfood of community rails: [community-rails](https://merit-prod.vercel.app/portal/developers/community-rails/).
+
+---
+
+## 6. Ask · Meet · Book · Journal
+
+```mermaid
+flowchart LR
+  Play[Play home] --> Ask[Ask / AMA]
+  Play --> Meet[Meet / OH]
+  Play --> Book[Book / Consult]
+  Play --> Journal[Journal]
+  Ask --> Free[Free member]
+  Meet --> OH[OH add-on]
+  Book --> Consult[Consult add-on]
+  Journal --> Free
+```
+
+| Path | Free member | Notes |
+|------|-------------|--------|
+| Ask | Yes (caps may apply) | Community AMA / leaderboard when mounted |
+| Meet | With OH add-on | Host schedule from `cfg/collab_schedule.json` |
+| Book | With Consult add-on | Conflict-aware slots via calendar rails |
+| Journal | Yes (caps may apply) | Private notes; Plus/paid expands caps |
+
+---
+
+## 7. Paid tiers (Freemium → Ultra)
+
+| Tier | Price (default dinner catalog) | Checkout |
+|------|--------------------------------|----------|
+| Freemium | $4.99/wk via Square (product intent: 30 days $0 then weekly) | Card required |
+| Standard | $7.99/wk | Card required |
+| Pro | $14.99/wk | Card required |
+| Ultra | $24.99/wk | Card required |
+
+Feature gates for paid tiers belong in **`app_logic/`**. Store signup + entitlements notify are rails.
+
+---
+
+## 8. OID glossary (public-safe)
+
+| OID family | Meaning for members |
+|------------|---------------------|
+| OID-IDN | Identity — handle / email / subscriber |
+| OID-COM | Community — channels, AMA, OH |
+| OID-COL | Collaboration — consult slots |
+| OID-STR | Store — register / SKU / free-zero |
+| OID-ENT | Entitlements — what your tier unlocks |
+
+Full builder glossary: [OIDs (Developer Center)](https://merit-prod.vercel.app/portal/developers/oids/) (if redirected, use Troubleshooting).
+
+---
+
+## 9. Flowcharts
+
+### 9.1 Free join
+
+```mermaid
+flowchart TD
+  A[Open register?plan=free] --> B[Email + Handle]
+  B --> C{Handle available?}
+  C -->|No| D[Suggestions as taken]
+  D --> B
+  C -->|Yes| E[Optional OH / Consult checks]
+  E --> F[$0 Continue]
+  F --> G[Registered for this app]
+  G --> H[Play Ask / Meet / Book / Journal]
+```
+
+### 9.2 Consult book
+
+```mermaid
+flowchart TD
+  A[Play Book] --> B[Pick open slot]
+  B --> C{Conflict?}
+  C -->|Yes| D[Choose another time]
+  D --> B
+  C -->|No| E[Booked]
+```
+
+---
+
+## 10. Live visual tour
+
+Your live UI **is** the screenshot. Open each URL with this guide beside it (ToC + If/Then above). Do not treat operator e2e thumbs as product shots.
+
+| # | Surface | Open |
+|---|---------|------|
+| 1 | Play home (Guest taste) | {{PLAY_URL}} |
+| 2 | Register Free + OH/Consult checks | {{REGISTER_URL}}?plan=free |
+| 3 | Ask / AMA / leaderboard (after Free join) | {{PLAY_URL}} (Ask) |
+| 4 | Office Hours (if OH checked) | {{PLAY_URL}} (Meet) |
+| 5 | Consult calendar (if Consult checked) | {{PLAY_URL}} (Book) |
+| 6 | Journal | {{PLAY_URL}} (Journal) |
+| 7 | Community rails (platform dogfood) | https://merit-prod.vercel.app/portal/developers/community-rails/ |
+
+OID map while you click: OID-IDN (handle) → OID-STR (register) → OID-COM (Ask/Meet) → OID-COL (Book).
+
+---
+
+## 11. Troubleshooting
+
+| Symptom | Try |
+|---------|-----|
+| Register 404 | Builder runs `.\merit.ps1 apps refresh --path <repo>` |
+| Handle taken | Pick a suggestion — policy blocks never say “NSFW” |
+| No OH reminder | Confirm OH was checked; builder enables alerts cfg |
+| Want pass-token | Complete Free join first; use app Login when pass-token is enabled |
+
+**Builder refresh (does not touch `app_logic/`):**
+
+```powershell
+.\merit.ps1 apps refresh --path ..\{{CONSUMER_ID}}
+```
+
+---
+
+*MERIT labs · scaffold UserGuide · keep the `MERIT_SCAFFOLD:user-guide` marker to allow safe refresh.*
