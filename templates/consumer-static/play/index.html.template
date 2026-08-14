@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-webpage-shell="createAppShell">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,15 +32,18 @@
       margin: 0; max-width: 32rem; line-height: 1.5; opacity: 0.88; font-size: 1.05rem;
     }
     .ma-cta-row { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 0.5rem; }
-    .ma-cta {
+    /* Beat .merit-ux-root a { color: accent } — fill+label were the same teal. */
+    .merit-ux-root a.ma-cta {
       display: inline-flex; align-items: center; justify-content: center;
       padding: 0.85rem 1.35rem; font-weight: 700; text-decoration: none;
       border-radius: 999px; border: 2px solid transparent;
-      background: var(--merit-accent, #2a6f6a); color: var(--merit-on-accent, #fff);
+      background: var(--merit-accent, #5eead4);
+      color: var(--merit-on-accent, #041018);
     }
-    .ma-cta--ghost {
-      background: transparent; color: var(--merit-accent, #2a6f6a);
-      border-color: var(--merit-accent, #2a6f6a);
+    .merit-ux-root a.ma-cta--ghost {
+      background: transparent;
+      color: var(--merit-accent, #5eead4);
+      border-color: var(--merit-accent, #5eead4);
     }
     .ma-section { padding: 2.5rem 0 1rem; }
     .ma-section h2 {
@@ -72,6 +75,12 @@
     }
     .ma-table th { font-weight: 700; opacity: 0.95; }
     .ma-table td { opacity: 0.9; }
+    .ma-one-liner {
+      margin: 1.25rem 0 0; padding: 0.7rem 0.9rem;
+      border-radius: 10px; font-size: 0.95rem; line-height: 1.4;
+      border: 1px dashed color-mix(in srgb, var(--merit-accent, #5eead4) 40%, transparent);
+      opacity: 0.92;
+    }
     .ma-tag {
       display: inline-block; font-size: 0.72rem; font-weight: 700;
       padding: 0.15rem 0.5rem; border-radius: 999px;
@@ -97,6 +106,25 @@
     .ma-login-fallback__opt.is-active {
       background: color-mix(in srgb, var(--merit-accent, #2a6f6a) 12%, transparent);
     }
+    .merit-ux-legal__status-slot { position: relative; }
+    .ma-status-tip {
+      position: absolute; left: 0; bottom: calc(100% + 0.4rem);
+      min-width: 16.5rem; max-width: min(24rem, 92vw);
+      padding: 0.65rem 0.75rem; border-radius: 8px;
+      background: var(--merit-surface-elevated, #132a44);
+      color: var(--merit-text, #eaf6ff);
+      border: 1px solid var(--merit-border, rgba(94, 234, 212, 0.16));
+      font-size: 0.78rem; line-height: 1.4; z-index: 40;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35); display: none; text-align: left;
+    }
+    .ma-status-tip.is-open { display: block; }
+    .ma-status-tip__head { font-weight: 700; margin: 0 0 0.4rem; }
+    .ma-status-tip ul { margin: 0; padding: 0; list-style: none; }
+    .ma-status-tip li { margin: 0.28rem 0; }
+    .ma-status-tip .is-ok { color: var(--merit-ok, #4ade80); }
+    .ma-status-tip .is-warn { color: var(--merit-warn, #fbbf24); }
+    .ma-status-tip .is-down { color: var(--merit-err, #f87171); }
+    .ma-status-tip .is-pending { color: var(--merit-text-muted, #9aa8c0); }
   </style>
 </head>
 <body data-make-art="1" data-merit-dualrail="1">
@@ -122,6 +150,122 @@
         var base = String(REGISTER_URL || '');
         if (!plan) return base;
         return base + (base.indexOf('?') >= 0 ? '&' : '?') + 'plan=' + encodeURIComponent(plan);
+      }
+
+      var STATUS_MARK = { ok: 'OK — working', warn: 'Attention', down: 'Issue', pending: 'Checking' };
+      var STATUS_HEAD = {
+        ok: 'All systems go',
+        warn: 'Something needs attention',
+        down: 'Service unavailable',
+        pending: 'Checking status…'
+      };
+
+      function rollupSystems(systems) {
+        if (!systems || !systems.length) return 'pending';
+        if (systems.some(function (s) { return s.state === 'down'; })) return 'down';
+        if (systems.some(function (s) { return s.state === 'warn'; })) return 'warn';
+        if (systems.some(function (s) { return s.state === 'pending'; })) return 'pending';
+        return 'ok';
+      }
+
+      function applySystemsStatus(btn, systems) {
+        if (!btn || !systems) return;
+        var rollup = rollupSystems(systems);
+        var head = STATUS_HEAD[rollup];
+        var ux = window.meritUx;
+        if (ux && typeof ux.setStatusState === 'function') {
+          ux.setStatusState(btn, rollup, head);
+        } else {
+          btn.className = 'merit-ux-status merit-ux-status--' + rollup + ' status-float--' + rollup;
+          btn.textContent = head;
+        }
+        var lines = systems.map(function (s) {
+          var st = STATUS_MARK[s.state] || STATUS_MARK.pending;
+          return '• ' + s.label + ' — ' + st + (s.detail ? ': ' + s.detail : '');
+        });
+        var tipText = [head].concat(lines).join('\n');
+        btn.setAttribute('aria-label', tipText.replace(/\n/g, '. '));
+        var slot = btn.closest ? btn.closest('.merit-ux-legal__status-slot') : null;
+        slot = slot || btn.parentNode;
+        if (!slot) return;
+        var tip = slot.querySelector('.ma-status-tip');
+        if (!tip) {
+          tip = document.createElement('div');
+          tip.className = 'ma-status-tip';
+          tip.id = 'status-float-tip';
+          tip.setAttribute('role', 'tooltip');
+          slot.appendChild(tip);
+          btn.addEventListener('mouseenter', function () { tip.classList.add('is-open'); });
+          btn.addEventListener('mouseleave', function () { tip.classList.remove('is-open'); });
+          btn.addEventListener('focus', function () { tip.classList.add('is-open'); });
+          btn.addEventListener('blur', function () { tip.classList.remove('is-open'); });
+        }
+        btn.setAttribute('aria-describedby', tip.id);
+        btn.removeAttribute('title');
+        tip.innerHTML = '<p class="ma-status-tip__head">' + esc(head) + '</p><ul>' +
+          systems.map(function (s) {
+            var st = s.state || 'pending';
+            return '<li class="is-' + st + '"><strong>' + esc(s.label) + '</strong> · ' +
+              esc(STATUS_MARK[st] || STATUS_MARK.pending) +
+              (s.detail ? ' — ' + esc(s.detail) : '') + '</li>';
+          }).join('') + '</ul>';
+      }
+
+      function probeCheck(id, label, url, okWhen) {
+        return fetch(url, { method: 'GET', credentials: 'omit' }).then(function (res) {
+          return res.text().then(function (body) {
+            var ok = res.ok && (!okWhen || okWhen(res, body));
+            return {
+              id: id,
+              label: label,
+              state: ok ? 'ok' : 'down',
+              detail: 'HTTP ' + res.status
+            };
+          });
+        }).catch(function (err) {
+          return { id: id, label: label, state: 'down', detail: String(err && err.message || err) };
+        });
+      }
+
+      function probeRails() {
+        var local = [
+          {
+            id: 'play',
+            label: 'Play host',
+            state: document.getElementById('app-logic') ? 'ok' : 'down',
+            detail: document.getElementById('app-logic') ? 'App UI is live' : 'Main shell missing'
+          },
+          {
+            id: 'ux',
+            label: 'UX shell (merit_ux)',
+            state: (document.querySelector('.merit-ux-brand') && document.querySelector('.merit-ux-legal')) ? 'ok' : 'warn',
+            detail: (document.querySelector('.merit-ux-brand') && document.querySelector('.merit-ux-legal'))
+              ? 'Moniker and legal footer loaded' : 'Chrome incomplete'
+          },
+          {
+            id: 'catalog',
+            label: 'Plans catalog',
+            state: (document.getElementById('plans') || document.querySelector('.ma-table')) ? 'ok' : 'warn',
+            detail: (document.getElementById('plans') || document.querySelector('.ma-table'))
+              ? 'Capability SKUs on the home' : 'Plans table not found'
+          }
+        ];
+        return Promise.all([
+          probeCheck('gateway', 'Gateway health', GW + '/api/health'),
+          probeCheck('store', 'Store / register', registerPlan('community-member'), function (res, body) {
+            return res.ok && body.indexOf('__next_error__') < 0;
+          }),
+          probeCheck('cdn', 'UX CDN pin', (document.querySelector('script[src*="merit_ux"]') || {}).src || (GW + '/pkg/meritutils/merit_ux/0.1.2/merit_ux.global.js')),
+          probeCheck('subs', 'Entitlements (meritsubs)', GW + '/api/meritsubs/api/v1/health').then(function (row) {
+            if (row.state === 'down') {
+              row.state = 'warn';
+              row.detail = (row.detail || '') + ' — mount may still be live via store';
+            } else {
+              row.detail = 'Health reachable (' + row.detail + ')';
+            }
+            return row;
+          })
+        ]).then(function (remote) { return local.concat(remote); });
       }
 
       /* Clean default catalog — keep in sync with cfg/store_catalog.json (FR-MPD-40) */
@@ -208,6 +352,7 @@
               '<ul class="ma-geek-list">' +
                 '<li>Your live app: <code>/apps/' + esc(CONSUMER_ID) + '/play</code> on merit-prod</li>' +
                 '<li>Register for this app: <a href="' + esc(REGISTER_URL) + '">' + esc(REGISTER_URL) + '</a></li>' +
+                '<li>Usage &amp; quotas: <a href="' + esc(GW + '/apps/' + CONSUMER_ID + '/usage') + '">' + esc('/apps/' + CONSUMER_ID + '/usage') + '</a></li>' +
                 '<li><a href="' + esc(GW + '/portal/developers/full-app/') + '" target="_blank" rel="noopener noreferrer">Your app over dinner</a> — PRD, portal, then <code>app_logic/</code></li>' +
                 '<li><a href="' + esc(GW + '/portal/developers/sku-commerce/') + '" target="_blank" rel="noopener noreferrer">Sell SKUs and subscriptions</a></li>' +
                 '<li><a href="' + esc(GW + '/portal/developers/par-packages/') + '" target="_blank" rel="noopener noreferrer">UI packages on the gateway</a></li>' +
@@ -299,16 +444,40 @@
         if (shell && shell.main) {
           shell.main.innerHTML = homeHtml();
         }
-        if (shell && shell.status && typeof ux.setStatusState === 'function') {
-          ux.setStatusState(shell.status, 'ok');
+        if (shell && shell.status) {
+          ux.setStatusState(shell.status, 'pending', 'Checking status…');
+          probeRails().then(function (systems) {
+            applySystemsStatus(shell.status, systems);
+          });
         }
         return shell;
       }
 
+      function mountOneLiners() {
+        fetch(GW + '/apps/' + CONSUMER_ID + '/cfg/usage.json', { cache: 'no-store' })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (cfg) {
+            if (!cfg || !cfg.one_liners || cfg.one_liners.enabled !== true) return;
+            var lines = Array.isArray(cfg.one_liners.lines) ? cfg.one_liners.lines.filter(Boolean) : [];
+            if (!lines.length) return;
+            var el = document.createElement('p');
+            el.className = 'ma-one-liner';
+            el.setAttribute('data-one-liners', 'on');
+            el.textContent = String(lines[0]).slice(0, 160);
+            var home = document.querySelector('.ma-home');
+            if (home) home.appendChild(el);
+          })
+          .catch(function () {});
+      }
+
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', bootGlossShell);
+        document.addEventListener('DOMContentLoaded', function () {
+          bootGlossShell();
+          mountOneLiners();
+        });
       } else {
         bootGlossShell();
+        mountOneLiners();
       }
     })();
   </script>

@@ -34,6 +34,10 @@ $html = Get-Content $play -Raw
 if ($html -notmatch 'merit-prod\.vercel\.app/pkg/meritutils') { throw "play shell missing MERIT package gateway URL" }
 if ($html -notmatch 'journal') { throw "workbench-journal variant missing journal tags" }
 if ($html -notmatch 'createAppShell') { throw "play shell missing DualRail Gloss createAppShell" }
+if ($html -notmatch 'data-webpage-shell') { throw "play shell missing data-webpage-shell (AP-MA-13)" }
+if ($html -match '<header\b[^>]*class=["''][^"'']*merit-ux-brand' -and $html -notmatch 'createAppShell') {
+    throw "play shell DIY merit-ux-brand without createAppShell (AP-MA-13)"
+}
 if ($html -notmatch 'MeritUx|merit_ux') { throw "play shell missing merit_ux / MeritUx" }
 if ($html -notmatch 'gloss-aurora|gloss-graphite|gloss-daylight') { throw "play shell missing GlossPack theme" }
 if ($html -notmatch "pathHtml\('Ask'" -or $html -notmatch "pathHtml\('Meet'" -or $html -notmatch "pathHtml\('Book'" -or $html -notmatch "pathHtml\('Journal'" -or $html -notmatch "Join free to ask") {

@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.50'
+$MERIT_VERSION = '0.3.52'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -177,6 +177,56 @@ function ConvertTo-ConsumerSlug {
     return $s
 }
 
+function Get-UsagePassphraseEnvName {
+    param([string]$ConsumerId)
+    $slug = ($ConsumerId.ToUpperInvariant() -replace '[^A-Z0-9]+', '_')
+    return "MERIT_${slug}_PASSPHRASE"
+}
+
+function New-UsageOperatorPhrase {
+    $wlPath = Join-Path $Root 'cfg/operator_gate_wordlists.excerpt.json'
+    $wl = Read-JsonFile $wlPath
+    $adj = @($wl.adjectives)
+    $noun = @($wl.nouns)
+    $a = $adj[(Get-Random -Maximum $adj.Count)]
+    $n = $noun[(Get-Random -Maximum $noun.Count)]
+    $pin = '{0:D4}' -f (Get-Random -Maximum 10000)
+    return "$a-$n-$pin"
+}
+
+function Get-Sha256Hex {
+    param([string]$Text)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($Text)
+        return -join ($sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') })
+    } finally {
+        $sha.Dispose()
+    }
+}
+
+function Ensure-UsageOperatorPhrase {
+    param([string]$TargetRoot, [string]$ConsumerId)
+    $envPath = Join-Path $TargetRoot '.env.local'
+    $name = Get-UsagePassphraseEnvName -ConsumerId $ConsumerId
+    $existing = ''
+    if (Test-Path $envPath) {
+        foreach ($line in @(Get-Content -LiteralPath $envPath -Encoding UTF8)) {
+            if ($line -match "^$([regex]::Escape($name))=(.+)$") {
+                $existing = $Matches[1].Trim()
+                break
+            }
+        }
+    }
+    if (-not $existing) {
+        $existing = New-UsageOperatorPhrase
+        Set-EnvLocalValue -Path $envPath -Name $name -Value $existing
+        Write-Host "Operator usage phrase written to .env.local as $name (open that file; never commit)."
+    }
+    $hash = Get-Sha256Hex -Text ("usage|" + $ConsumerId.ToLowerInvariant() + "|" + $existing.ToLowerInvariant())
+    return $hash
+}
+
 function Set-EnvLocalValue {
     param([string]$Path, [string]$Name, [string]$Value)
     $lines = @()
@@ -302,6 +352,25 @@ function Invoke-Apply {
     Write-Host "apply OK: .merit_launch.md -> .env.local, cfg/flask_deploy.json, cfg/portals.json"
 }
 
+function Test-WebpageShellHtml {
+    param([string]$Path, [string]$Label)
+    $fail = @()
+    if (-not (Test-Path -LiteralPath $Path)) { return @("missing $Label") }
+    $html = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    $ux = ($html -match '\bcreateAppShell\b') -or ($html -match '\bcreateBrandShell\b')
+    $diy = $html -match '<header\b[^>]*class=["''][^"'']*merit-ux-brand'
+    if (-not $ux) {
+        $fail += "${Label}: Class B HTML must call createAppShell or createBrandShell (AP-MA-13). Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md"
+    }
+    if ($diy -and -not $ux) {
+        $fail += "${Label}: DIY merit-ux-brand header without package boot (AP-MA-13)"
+    }
+    if ($ux -and ($html -notmatch 'data-webpage-shell=')) {
+        $fail += "${Label}: missing data-webpage-shell=createAppShell or createBrandShell"
+    }
+    return $fail
+}
+
 function Invoke-Verify {
     param([string]$TargetRoot)
     $fail = @()
@@ -312,11 +381,12 @@ function Invoke-Verify {
         foreach ($rel in @('docs/usage.md', 'docs/deploy.md', 'docs/design.md', 'templates/.merit_launch.md', 'cfg/par_pins.free.json', 'scripts/smoke-freemium.ps1', 'scripts/smoke-freemium.sh', 'merit.sh')) {
             if (-not (Test-Path (Join-Path $TargetRoot $rel))) { $fail += "missing $rel" }
         }
+        $fail += Test-WebpageShellHtml -Path (Join-Path $TargetRoot 'templates/consumer-static/play/index.html.template') -Label 'play template'
         if ($fail.Count) {
             Write-Host "verify FAILED:`n$($fail -join "`n")"
             return $false
         }
-        Write-Host "verify OK: merit-agent-skills repo"
+        Write-Host "verify OK: merit-agent-skills repo (webpage-shell AP-MA-13)"
         return $true
     }
     foreach ($rel in @('cfg/par_pins.json', 'cfg/branding.json')) {
@@ -336,11 +406,15 @@ function Invoke-Verify {
     } else {
         $fail += 'missing .gitignore'
     }
+    $playHtml = Join-Path $TargetRoot 'play/index.html'
+    if (Test-Path -LiteralPath $playHtml) {
+        $fail += Test-WebpageShellHtml -Path $playHtml -Label 'play/index.html'
+    }
     if ($fail.Count) {
         Write-Host "verify FAILED:`n$($fail -join "`n")"
         return $false
     }
-    Write-Host "verify OK: $TargetRoot"
+    Write-Host "verify OK: $TargetRoot (webpage-shell AP-MA-13)"
     return $true
 }
 
@@ -481,7 +555,7 @@ function Invoke-BaselineCommunityScaffold {
     param([string]$TargetRoot)
     $cfg = Join-Path $TargetRoot 'cfg'
     New-Item -ItemType Directory -Force -Path $cfg | Out-Null
-    foreach ($name in @('community.json', 'collab_schedule.json', 'alerts.json')) {
+    foreach ($name in @('community.json', 'collab_schedule.json', 'alerts.json', 'usage.json')) {
         $src = Join-Path $Root "cfg/$name"
         $dest = Join-Path $cfg $name
         if (-not (Test-Path -LiteralPath $src)) { throw "baseline community missing template: $src" }
@@ -891,6 +965,7 @@ function Invoke-Closeout {
         } else {
             Write-Host 'closeout WARN: git not available on PATH'
         }
+        Write-Host 'closeout: webpage-shell AP-MA-13. Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md'
     } finally {
         Pop-Location
     }
@@ -1185,6 +1260,12 @@ function Invoke-AppsPublish {
     if ($files.Count -lt 1) {
         throw "apps publish: no play/ or cfg/ files under $TargetRoot"
     }
+    $usageGateHash = ''
+    try {
+        $usageGateHash = Ensure-UsageOperatorPhrase -TargetRoot $TargetRoot -ConsumerId $ConsumerId
+    } catch {
+        Write-Host "apps publish NOTE: usage operator phrase: $($_.Exception.Message)"
+    }
     $kb = [math]::Max(1, [math]::Round($totalBytes / 1KB, 1))
     Write-Host "Packed $($files.Count) file(s) (~$kb KB). Uploading one file at a time (avoids Vercel 4.5MB body limit)..."
 
@@ -1194,8 +1275,11 @@ function Invoke-AppsPublish {
     foreach ($file in $files) {
         $n++
         Write-Host "  [$n/$($files.Count)] $($file.path) ($($file.bytes) bytes)..."
-        $payload = '{"consumerId":' + (ConvertTo-JsonEscapedString $ConsumerId) +
-            ',"files":[{"path":' + (ConvertTo-JsonEscapedString $file.path) +
+        $payload = '{"consumerId":' + (ConvertTo-JsonEscapedString $ConsumerId)
+        if ($usageGateHash -and $n -eq 1) {
+            $payload += ',"usage_gate_hash":' + (ConvertTo-JsonEscapedString $usageGateHash)
+        }
+        $payload += ',"files":[{"path":' + (ConvertTo-JsonEscapedString $file.path) +
             ',"content":' + (ConvertTo-JsonEscapedString $file.content) +
             ',"contentType":' + (ConvertTo-JsonEscapedString $file.contentType) + '}]}'
         $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
