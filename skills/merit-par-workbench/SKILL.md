@@ -11,6 +11,6 @@ description: Scaffold DualRail Gloss play (merit_ux createAppShell + Value Tour)
 .\merit.ps1 par scaffold --path <consumer-repo> --variant workbench-journal --theme gloss-aurora
 ```
 
-Writes `cfg/par_pins.json` and `play/index.html` with SRI pins (`merit_ux@0.1.0` GlossPack, `merit_workbench@0.4.x`, optional `journal@0.2.x`).
+Writes `cfg/par_pins.json` and `play/index.html` with SRI pins (`merit_ux@0.1.3` GlossPack, `merit_workbench@0.4.x`, optional `journal@0.2.x`).
 
 **Play default:** DualRail Gloss — Value Tour (Ask / Meet / Book / Journal) first; FR-MPD-29 workbench under Advanced geek only. Themes: `gloss-aurora` (default), `gloss-graphite`, `gloss-daylight`.

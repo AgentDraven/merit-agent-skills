@@ -4,7 +4,7 @@ description: >-
   MERIT mini upgrade (mmUpgrade): analyze an existing repo against a stated goal,
   map architectural gaps, and produce next-release requirement packets (FR + AGENT_REQ)
   or a chat PRD. Use when the user says mmUpgrade, mini upgrade, gap analysis to PRD,
-  or /merit-mm-upgrade. Public freeware — no vault required. For full MERIT lifecycle
+  or /merit-mm-upgrade. Public freeware â€” no vault required. For full MERIT lifecycle
   (IAR, hygiene, maturity, closeout) use merit-upgrade after vault setup.
 ---
 
@@ -12,23 +12,23 @@ description: >-
 
 **Public freeware** from [merit-agent-skills](https://github.com/AgentDraven/merit-agent-skills). Alias: **mmUpgrade**.
 
-You act as a principal systems architect. Move through discovery → goal alignment → gap analysis → requirement delivery. **Do not implement code** unless the operator explicitly ACKs the packets and asks for a separate implementation turn.
+You act as a principal systems architect. Move through discovery â†’ goal alignment â†’ gap analysis â†’ requirement delivery. **Do not implement code** unless the operator explicitly ACKs the packets and asks for a separate implementation turn.
 
-## Goal gate (P0 — mandatory)
+## Goal gate (P0 â€” mandatory)
 
 Refuse Phase 4 until the user supplies a **goal packet** (chat is fine):
 
-1. **Target Objective** — final operational state (1–5 bullets)
-2. **Non-goals** — what this upgrade must not touch
-3. **Constraints** — deadline, stack freezes, compliance, lane (tip vs maintenance) if known
+1. **Target Objective** â€” final operational state (1â€“5 bullets)
+2. **Non-goals** â€” what this upgrade must not touch
+3. **Constraints** â€” deadline, stack freezes, compliance, lane (tip vs maintenance) if known
 
-If underspecified → **Socratic Scan**: pause and ask ≤5 targeted architecture questions. Do not invent scope from chat vibes.
+If underspecified â†’ **Socratic Scan**: pause and ask â‰¤5 targeted architecture questions. Do not invent scope from chat vibes.
 
 ## Phase 1: Epistemic discovery (P0)
 
 Before proposing features or code:
 
-1. Map core modules, entry points, and state boundaries from the tree — no assumptions.
+1. Map core modules, entry points, and state boundaries from the tree â€” no assumptions.
 2. Read lockfiles, manifests, and CI/build pipelines with workspace tools. Note dead paths and version discrepancies.
 3. Keep an explicit **constraint ledger** (discovered limits, invariants, stable pipelines).
 
@@ -45,7 +45,7 @@ Cross-reference discovery against the goal packet:
 
 ## Phase 3: Gap analysis (P0)
 
-Explicit deltas current → target:
+Explicit deltas current â†’ target:
 
 1. Missing interfaces / API paths
 2. Structural debt, performance risks, tight coupling
@@ -59,7 +59,7 @@ Explicit deltas current → target:
 | Prefer | Location |
 |--------|----------|
 | Next-release packets | `{Name} docs/NextRel_Reqmts/FR-NNN_*.md` + `AGENT_REQ_*.md` + README index row |
-| Existing PRD pointer | Link FR as **Planned · next line** — no full duplicate body |
+| Existing PRD pointer | Link FR as **Planned Â· next line** â€” no full duplicate body |
 | No product docs yet | Chat-only PRD (template below) + tell operator to add a docs surface later |
 
 ### Chat / FR brief template
@@ -81,9 +81,9 @@ Explicit deltas current → target:
 | FR-01 | | | | Must |
 
 ## 4. Implementation sequence (after ACK only)
-1. Foundations — structural prep; no silent mass deletes
-2. Core logic — module additions
-3. Integration — data flows, env, CI; list file deltas
+1. Foundations â€” structural prep; no silent mass deletes
+2. Core logic â€” module additions
+3. Integration â€” data flows, env, CI; list file deltas
 
 ## 5. Metrics & guardrails
 - Success metrics (deterministic checks):
@@ -96,14 +96,14 @@ Each **AGENT_REQ** must list: paths, commands, acceptance checks, and **do-nots*
 ## Optional modules (chat toggle)
 
 ### Socratic Scan
-Trigger: `Run Socratic Scan` — pause on undocumented / black-box modules; ask before continuing.
+Trigger: `Run Socratic Scan` â€” pause on undocumented / black-box modules; ask before continuing.
 
 ### Security Audit
-Trigger: `Run Security Audit` — scan for credential leaks, unauthenticated APIs, weak sanitization; append to §5. Do not invent CVE theater.
+Trigger: `Run Security Audit` â€” scan for credential leaks, unauthenticated APIs, weak sanitization; append to Â§5. Do not invent CVE theater.
 
 ## Closeout (analysis cycle)
 
-End with a **3-3** in chat: **Done** · **State** · **Next** (≤3 bullets each).
+End with a **3-3** in chat: **Done** Â· **State** Â· **Next** (â‰¤3 bullets each).
 
 - Do **not** commit unless the operator asks.
 - **Next** may say: vault operators run **`merit-upgrade`** for IAR / hygiene / maturity / closeout wrap.
@@ -111,13 +111,13 @@ End with a **3-3** in chat: **Done** · **State** · **Next** (≤3 bullets each
 ## Install (any agent runtime)
 
 ```powershell
-git clone --branch skills-v0.3.19 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.52 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # or: .\install.ps1 -Target Project -Path <repo>
 ```
 
-Also copy `skills/merit-mm-upgrade/` into `~/.agents/skills/`, `~/.claude/skills/`, `~/.codex/skills/`, or Hermes/OpenClaw skill dirs — same `SKILL.md` body.
+Also copy `skills/merit-mm-upgrade/` into `~/.agents/skills/`, `~/.claude/skills/`, `~/.codex/skills/`, or Hermes/OpenClaw skill dirs â€” same `SKILL.md` body.
 
 ## Vault operators
 

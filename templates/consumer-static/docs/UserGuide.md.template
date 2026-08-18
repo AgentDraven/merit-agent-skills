@@ -25,6 +25,7 @@ schema: merit.consumer_user_guide.v1
 9. [Flowcharts](#9-flowcharts)
 10. [Live visual tour](#10-live-visual-tour)
 11. [Troubleshooting](#11-troubleshooting)
+12. [Usage & quotas (builders)](#12-usage--quotas-builders)
 
 ---
 
@@ -203,6 +204,24 @@ OID map while you click: OID-IDN (handle) → OID-STR (register) → OID-COM (As
 ```powershell
 .\merit.ps1 apps refresh --path ..\{{CONSUMER_ID}}
 ```
+
+---
+
+---
+
+## 12. Usage & quotas (builders)
+
+First-party rails (publish, tenant, book, alerts) are **metered** on merit-prod. Members do not see this; builders do.
+
+| If… | Then… |
+|-----|--------|
+| You want usage graphs | Open `https://merit-prod.vercel.app/apps/{{CONSUMER_ID}}/usage` (Make Art dashboard — not a JSON dump) |
+| You want machine JSON | `GET https://merit-prod.vercel.app/api/usage?consumer_id={{CONSUMER_ID}}&format=json` |
+| You hit HTTP 429 | Wait the `Retry-After` window (Free: 60 mutating calls / 5 min; 40 publishes / hour) |
+| You want to charge overage later | `fee_recipe` is $0 in Alpha; paid cents attach without rewriting `app_logic/` |
+| You want a one-line suggestion on play | Set `cfg/usage.json` `one_liners.enabled` to `true` and add `lines[]`. Off by default. Not ads. |
+
+OID-MAN seed. Contract: `cfg/usage.json`.
 
 ---
 

@@ -255,7 +255,7 @@
           probeCheck('store', 'Store / register', registerPlan('community-member'), function (res, body) {
             return res.ok && body.indexOf('__next_error__') < 0;
           }),
-          probeCheck('cdn', 'UX CDN pin', (document.querySelector('script[src*="merit_ux"]') || {}).src || (GW + '/pkg/meritutils/merit_ux/0.1.2/merit_ux.global.js')),
+          probeCheck('cdn', 'UX CDN pin', (document.querySelector('script[src*="merit_ux"]') || {}).src || (GW + '/pkg/meritutils/merit_ux/0.1.3/merit_ux.global.js')),
           probeCheck('subs', 'Entitlements (meritsubs)', GW + '/api/meritsubs/api/v1/health').then(function (row) {
             if (row.state === 'down') {
               row.state = 'warn';

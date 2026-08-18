@@ -1,0 +1,31 @@
+{
+  "schema": "merit.usage_quotas.v1",
+  "admin": "https://merit-prod.vercel.app/apps/<app>/usage",
+  "admin_json": "https://merit-prod.vercel.app/api/usage?consumer_id=<app>&format=json",
+  "window_minutes": 5,
+  "mutating_per_window": 60,
+  "publish_per_hour": 40,
+  "fee_recipe": {
+    "mutating_call_cents": 0,
+    "overage_call_cents": 0,
+    "note": "Alpha $0. Platform records every mutating first-party call so fees/throttle can attach later."
+  },
+  "one_liners": {
+    "enabled": false,
+    "slot": "play-footer",
+    "lines": [],
+    "note": "Opt-in only. MERIT never fills third-party ads. Your app may set lines[] for office hours / a consult slot."
+  },
+  "capabilities": [
+    "apps.publish",
+    "tenant.*",
+    "room-media.create",
+    "room-media.book",
+    "alerts.dispatch",
+    "ama",
+    "journal",
+    "leaderboard",
+    "meritstore",
+    "meritsubs"
+  ]
+}

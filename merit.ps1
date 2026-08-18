@@ -1174,6 +1174,19 @@ function Invoke-AppsRefresh {
         Write-Host "apps refresh NOTE: community scaffold: $($_.Exception.Message)"
     }
 
+    # 2b) PAR pins + play shell from skills SSOT (never app_logic/).
+    try {
+        $playHtml = Join-Path $TargetRoot 'play/index.html'
+        if (Test-Path -LiteralPath $playHtml) {
+            $pinsProbe = Read-JsonFile (Join-Path $Root 'cfg/par_pins.free.json')
+            $variant = if ($pinsProbe.packages.journal) { 'workbench-journal' } else { 'workbench' }
+            Invoke-ParScaffold -TargetRoot $TargetRoot -Variant $variant
+            Write-Host 'apps refresh: par pins + play resynced from cfg/par_pins.free.json'
+        }
+    } catch {
+        Write-Host "apps refresh NOTE: par pin resync: $($_.Exception.Message)"
+    }
+
     # 3) UserGuide — refresh when scaffold marker present (or missing).
     Write-UserGuideScaffold -TargetRoot $TargetRoot -ProductName $display -ConsumerId $ConsumerId -Force:$false -Gateway $Gateway
 

@@ -61,29 +61,29 @@
       }
     },
     "merit_ux": {
-      "version": "0.1.0",
+      "version": "0.1.3",
       "cdn_base": "https://merit-prod.vercel.app/pkg/meritutils",
       "artifacts": {
         "js": {
-          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.0/merit_ux.global.js",
-          "sri": "sha384-emOIAjQh8PQCnUrUFm/9e5ERv0YRXDnx4ei5JRlk3y7ZkzcWTVU3s4QoRDTbUbjz"
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.3/merit_ux.global.js",
+          "sri": "sha384-YRjy1HhTmiGmhS96Pk4WqHIo5MfZ0JcNavwVh+3zOI1ONUiKa0zhuBQRuUs4jXVD"
         },
         "css": {
-          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.0/merit_ux.css",
-          "sri": "sha384-EgM2H9y6qoU3kau7U3JQH8ILFUgLq5B7dbD+kcHFKPTavDe2n0uNqwRgrqfAMO/z"
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.3/merit_ux.css",
+          "sri": "sha384-t2lrh9VYGPmekcUt8/mNthwxEkgOBstLDnLn6g/dhFgWen+h3pDYGx+FLE4u4NiS"
         },
         "themes": {
           "gloss-aurora": {
-            "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.0/themes/gloss-aurora.css",
-            "sri": "sha384-EgM2H9y6qoU3kau7U3JQH8ILFUgLq5B7dbD+kcHFKPTavDe2n0uNqwRgrqfAMO/z"
+            "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.3/themes/gloss-aurora.css",
+            "sri": "sha384-t2lrh9VYGPmekcUt8/mNthwxEkgOBstLDnLn6g/dhFgWen+h3pDYGx+FLE4u4NiS"
           },
           "gloss-graphite": {
-            "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.0/themes/gloss-graphite.css",
-            "sri": "sha384-No49SUKWJkBbvW6cXUqB5yeVugN6QP1kEbi0OO5u4CWWqEn6pv17x5oz85qN23qT"
+            "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.3/themes/gloss-graphite.css",
+            "sri": "sha384-yI1mSYYt/F2RflvfG8C0COwqb+KJfC6AA4hD3p0mA+ZYQAVCtpM/EBwJmu3vlVXD"
           },
           "gloss-daylight": {
-            "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.0/themes/gloss-daylight.css",
-            "sri": "sha384-ebgF/QeUny8Zi+m5UBcmjDut5jxX68C0aOAx0O8/7WeORDexpvuCO/02hKHMs+7J"
+            "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.3/themes/gloss-daylight.css",
+            "sri": "sha384-FtUqFZGuZRhgrLWZVHGxBInN4N4HHaMh4bRoOlNLEtyPZ9DbRTHU4d27/izsOxs1"
           }
         }
       }
