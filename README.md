@@ -14,6 +14,7 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 | **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) — independent consumer ID using the same hosted providers |
 | **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
 | **Skills only** | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./install.sh -Target …` (aliases: `Claude`, `Agents`) |
+| **Contribute (fork/branch/PR)** | [CONTRIBUTING.md](CONTRIBUTING.md) — clone vs branch vs fork, accountless path, and PR checklist |
 | **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** — gap analysis → FR/AGENT_REQ (no vault) |
 | **Affiliate / design partner** | [`skills/merit-affiliate`](skills/merit-affiliate/SKILL.md) — free attribution + portal recipes (no billing) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha …` |
@@ -174,6 +175,18 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Current human-validation baseline | **`skills-v0.3.22`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
+
+## Contributing
+
+Everyone can `git clone` a release tag and use MERIT with **no GitHub account**. To
+propose changes, use the standard **fork → branch → Pull Request** flow (a free GitHub
+account is enough — you do not need to be a collaborator). Maintainers with write access
+can branch directly on upstream. Full guidance, including the accountless patch path and
+the `must be a collaborator` explanation, is in **[CONTRIBUTING.md](CONTRIBUTING.md)**.
+
+Before opening a PR, run the same checks CI runs: `./merit.sh closeout --path .` and
+`./scripts/smoke-freemium.sh` (both need `pwsh`). The same model applies to
+[Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo).
 
 ## Licensing (product fork)
 
