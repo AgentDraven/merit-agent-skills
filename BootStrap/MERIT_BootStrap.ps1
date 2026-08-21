@@ -1,10 +1,10 @@
-# MERIT OSS BootStrap â€” public freeware BootStrap (Apache-2.0 with merit-agent-skills).
+﻿# MERIT OSS BootStrap Ã¢â‚¬â€ public freeware BootStrap (Apache-2.0 with merit-agent-skills).
 #
 # This is the PUBLIC edition. It does NOT include Private-Vault operator tooling,
 # L1 governance files, or cert/registry internals.
 #
 # Private-Vault / full operator BootStrap lives separately (operators only).
-# Teaser only below â€” subscription / entitlement = FUTURE.
+# Teaser only below Ã¢â‚¬â€ subscription / entitlement = FUTURE.
 #
 # Usage (from this folder):
 #   .\MERIT_BootStrap.cmd
@@ -151,7 +151,7 @@ function Install-WingetPkg([string]$Id, [string]$Name) {
 }
 
 # Canonical public pin for bench clones (keep in sync with README / VERSION / tag).
-$Script:SkillsPinTag = 'skills-v0.3.55'
+$Script:SkillsPinTag = 'skills-v0.3.56'
 
 function Invoke-Prereqs {
     Write-Header 'Prerequisites - check / install'
@@ -385,7 +385,7 @@ function Invoke-SeedPrivateVaultDev {
     $ownerDir = Join-Path $devRoot 'AgentDraven'
     $vaultDir = Join-Path $ownerDir 'merit-private-vault'
     $vaultUrl = 'https://github.com/AgentDraven/merit-private-vault.git'
-    $vaultPinTag = 'v1.8.69'
+    $vaultPinTag = 'v1.8.71'
     $bootCmd = Join-Path $vaultDir 'BootStrap\MERIT_BootStrap.cmd'
     $seedCmd = Join-Path $vaultDir 'BootStrap\seed-private-dev.cmd'
 
@@ -425,7 +425,7 @@ function Invoke-SeedPrivateVaultDev {
     }
     else {
         Write-Info "Cloning $vaultUrl --branch $vaultPinTag ..."
-        Write-Note 'HTTPS uses Git Credential Manager — sign in with vault access (AgentDraven).'
+        Write-Note 'HTTPS uses Git Credential Manager â€” sign in with vault access (AgentDraven).'
         & git clone --branch $vaultPinTag $vaultUrl $vaultDir
         if ($LASTEXITCODE -ne 0) {
             Write-Fail "git clone failed (exit $LASTEXITCODE)."

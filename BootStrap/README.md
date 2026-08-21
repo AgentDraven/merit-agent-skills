@@ -3,6 +3,10 @@
 Public freeware **device BootStrap** for this repo.  
 Not the same as root **`merit.ps1`** (that is the MERIT **CLI**: `init` / `apply` / `verify` / …).
 
+**Baseline pin:** parent repo tag **`skills-v0.3.56`** (or current `skills-v*` — see repo `VERSION` / tags).
+
+**Pathway flowchart (annotated):** [docs/bootstrap_pathway.md](../docs/bootstrap_pathway.md) — OSS cold start → **T** / **P** handoff. Affiliate **MAD**, Tools Python, and `~/dev` populate are Private-Vault only.
+
 ## OSS experience (easy path)
 
 Start in the OSS bench folder (recommended: `C:\MyMeritApp`). `git clone` creates `merit-agent-skills` **inside** whatever directory you are in.
@@ -10,7 +14,7 @@ Start in the OSS bench folder (recommended: `C:\MyMeritApp`). `git clone` create
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.56 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills\BootStrap
 .\MERIT_BootStrap.cmd
 ```
@@ -20,12 +24,10 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.56 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills/BootStrap
 ./MERIT_BootStrap.sh
 ```
-
-**Baseline pin:** parent repo tag **`skills-v0.3.55`**.
 
 On first run you are asked for the **OSS bench folder** (saved as User env **`MYMERITAPP`**).  
 Default: `C:\MyMeritApp`. Pick any drive/path you want.
@@ -68,6 +70,8 @@ You do **not** need the private vault for OSS freemium.
 ## Private-Vault teaser (menu P)
 
 Public facts only: AgentDraven account, private repo `merit-private-vault`, and its `BootStrap` install to `~/dev`. No vault product law in this OSS folder.
+
+Menu **P** clones the vault pin and launches Private-Vault BootStrap. After that, operators continue with edition **V**, Tools Python, affiliate **MAD** (default), then persona/repo populate — documented in the private vault `docs/vault_usage.md` §7c (not in this public repo).
 
 ## License
 

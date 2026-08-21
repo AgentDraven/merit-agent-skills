@@ -1,3 +1,12 @@
+## 0.3.56 - 2026-08-21
+
+### Added
+- `docs/bootstrap_pathway.md` — annotated OSS BootStrap flowchart (cold start → **T** / **P** handoff). Explicit: no Tools Python, no affiliate / `runtime out` on the public path. Links from BootStrap README, `bootstrap.design.md`, and README Start-here.
+- `docs/bootstrap.design.md` — L1/L2/L3 host-agnostic instruction chain; **`cfg/agent_hosts.json`** registry (Cursor, ClaudeCode, Codex, VSCode, Hermes, OpenClaw, Paperclip, GrokBot, Devin) with auto-detect design.
+
+### Changed
+- Public pin → **`skills-v0.3.56`**; menu **P** seeds vault **`v1.8.71`**.
+
 ## 0.3.55 - 2026-08-21
 
 ### Changed

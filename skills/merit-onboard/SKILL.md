@@ -1,4 +1,4 @@
----
+﻿---
 name: merit-onboard
 description: MERIT OSS quickstart and vault persona/repo onboard.
 ---
@@ -8,7 +8,7 @@ description: MERIT OSS quickstart and vault persona/repo onboard.
 ## OSS quickstart (no vault)
 
 ```powershell
-git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.56 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 .\merit.ps1 init --path ..\merit-demo

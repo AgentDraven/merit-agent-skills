@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Registry of AI IDE / agent hosts that can consume MERIT skills or instruction pointers. Policy stays in L1/L2/L3 (vault); this file only describes host install paths and detection hints for BootStrap / install.ps1.",
+  "meritInstructionChain": {
+    "summary": "L1 MERIT.instructions → L2 persona.instructions → L3 Project.instructions; hosts mount skills or AGENTS.md pointers — they do not fork product law.",
+    "l1": "MERIT.instructions (platform policy)",
+    "l2": "Persona instructions (e.g. AgentDraven.instructions)",
+    "l3": "Optional {Project}.instructions at repo root"
+  },
+  "autoDetect": {
+    "enabledByDefault": false,
+    "behavior": "When enabled, BootStrap or install.ps1 scans detectHints in priority order, offers multi-select of found hosts, then installs skills to each selected destSkills. Unknown future hosts require a new entry here before auto-install.",
+    "manualOverride": "-Target <id> always wins over auto-detect"
+  },
+  "hosts": [
+    {
+      "id": "Cursor",
+      "status": "supported",
+      "kind": "ide",
+      "aliases": [],
+      "destSkills": { "windows": "%USERPROFILE%\\.cursor\\skills", "posix": "~/.cursor/skills" },
+      "detectHints": [
+        { "type": "dir", "path": "%USERPROFILE%\\.cursor" },
+        { "type": "dir", "path": "%USERPROFILE%\\.cursor\\skills" }
+      ],
+      "notes": "Primary MERIT operator host today; also global hooks under ~/.cursor/hooks.json after runtime out."
+    },
+    {
+      "id": "ClaudeCode",
+      "status": "supported",
+      "kind": "cli_agent",
+      "aliases": ["Claude"],
+      "destSkills": { "windows": "%USERPROFILE%\\.claude\\skills", "posix": "~/.claude/skills" },
+      "detectHints": [
+        { "type": "dir", "path": "%USERPROFILE%\\.claude" },
+        { "type": "dir", "path": "%USERPROFILE%\\.claude\\skills" }
+      ],
+      "notes": "install.ps1 -Target ClaudeCode"
+    },
+    {
+      "id": "Codex",
+      "status": "supported",
+      "kind": "ide",
+      "aliases": [],
+      "destSkills": { "windows": "%CODEX_HOME%\\skills or %USERPROFILE%\\.codex\\skills", "posix": "$CODEX_HOME/skills or ~/.codex/skills" },
+      "detectHints": [
+        { "type": "env", "name": "CODEX_HOME" },
+        { "type": "dir", "path": "%USERPROFILE%\\.codex" }
+      ],
+      "notes": "OpenAI Codex desktop / CLI skills tree"
+    },
+    {
+      "id": "VSCode",
+      "status": "supported",
+      "kind": "ide",
+      "aliases": ["Agents"],
+      "destSkills": { "windows": "%USERPROFILE%\\.agents\\skills", "posix": "~/.agents/skills" },
+      "detectHints": [
+        { "type": "dir", "path": "%USERPROFILE%\\.agents\\skills" },
+        { "type": "dir", "path": "%USERPROFILE%\\.vscode" }
+      ],
+      "notes": "Open Agent Skills user path (VS Code / Copilot-style hosts)"
+    },
+    {
+      "id": "Project",
+      "status": "supported",
+      "kind": "project_overlay",
+      "aliases": [],
+      "destSkills": { "windows": "<repo>\\.cursor\\skills", "posix": "<repo>/.cursor/skills" },
+      "detectHints": [],
+      "notes": "Requires -Path <repo-root>; not auto-detected"
+    },
+    {
+      "id": "Hermes",
+      "status": "planned",
+      "kind": "cli_agent",
+      "aliases": [],
+      "destSkills": { "windows": "%USERPROFILE%\\.hermes\\skills", "posix": "~/.hermes/skills" },
+      "detectHints": [
+        { "type": "dir", "path": "%USERPROFILE%\\.hermes" },
+        { "type": "dir", "path": "%USERPROFILE%\\.agents\\skills" }
+      ],
+      "installHint": "hermes skills tap add AgentDraven/merit-agent-skills — or copy skills; may also scan ~/.agents/skills",
+      "notes": "Documented in README; wire into install.ps1 when status → supported"
+    },
+    {
+      "id": "OpenClaw",
+      "status": "planned",
+      "kind": "cli_agent",
+      "aliases": [],
+      "destSkills": { "windows": "(openclaw-managed)", "posix": "(openclaw-managed)" },
+      "detectHints": [
+        { "type": "cmd", "name": "openclaw" }
+      ],
+      "installHint": "openclaw skills install ./skills/<skill> — optional ClawHub publish",
+      "notes": "CLI-managed install; registry entry for BootStrap discovery"
+    },
+    {
+      "id": "Paperclip",
+      "status": "research",
+      "kind": "agent_runtime",
+      "aliases": [],
+      "destSkills": { "windows": "TBD", "posix": "TBD" },
+      "detectHints": [],
+      "notes": "Candidate host — add detectHints + destSkills before status:planned"
+    },
+    {
+      "id": "GrokBot",
+      "status": "research",
+      "kind": "agent_runtime",
+      "aliases": ["Grok"],
+      "destSkills": { "windows": "TBD", "posix": "TBD" },
+      "detectHints": [],
+      "notes": "Future xAI / Grok agent host — extend registry when install path is known"
+    },
+    {
+      "id": "Devin",
+      "status": "research",
+      "kind": "agent_runtime",
+      "aliases": [],
+      "destSkills": { "windows": "TBD", "posix": "TBD" },
+      "detectHints": [],
+      "notes": "Future Cognition Devin-style agent — prefer AGENTS.md + skills pointer over forking L1"
+    }
+  ]
+}
