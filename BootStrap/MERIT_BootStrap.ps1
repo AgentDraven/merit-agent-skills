@@ -151,7 +151,7 @@ function Install-WingetPkg([string]$Id, [string]$Name) {
 }
 
 # Canonical public pin for bench clones (keep in sync with README / VERSION / tag).
-$Script:SkillsPinTag = 'skills-v0.3.56'
+$Script:SkillsPinTag = 'skills-v0.3.57'
 
 function Invoke-Prereqs {
     Write-Header 'Prerequisites - check / install'
@@ -173,9 +173,37 @@ function Invoke-Prereqs {
     if (Test-Winget) { Write-Ok "winget - $((Get-Command winget).Source)" }
     else { Write-Warn 'winget - missing; cannot auto-install' }
 
-    $ghCmd = Get-Command gh -ErrorAction SilentlyContinue
-    if ($ghCmd) { Write-Ok ("gh - " + ((& gh --version 2>&1 | Select-Object -First 1 | Out-String).Trim())) }
-    else { $needGh = $true; Write-Warn 'gh - optional (PRs); can install via winget' }
+    $ghExe = $null
+    foreach ($c in @(
+            (Join-Path $env:ProgramFiles 'GitHub CLI\gh.exe'),
+            (Join-Path ${env:ProgramFiles(x86)} 'GitHub CLI\gh.exe')
+        )) {
+        if ($c -and (Test-Path -LiteralPath $c)) { $ghExe = $c; break }
+    }
+    if (-not $ghExe) {
+        $ghCmd = Get-Command gh -ErrorAction SilentlyContinue
+        if ($ghCmd -and $ghCmd.Source -and $ghCmd.Source -notmatch '(?i)^C:\\Tools\\') {
+            $ghExe = $ghCmd.Source
+        }
+    }
+    if ($ghExe) {
+        # Avoid hanging on a broken C:\Tools\gh shim (self-recursion) — prefer real exe + short timeout.
+        $p = Start-Process -FilePath $ghExe -ArgumentList '--version' -NoNewWindow -PassThru `
+            -RedirectStandardOutput "$env:TEMP\merit-oss-gh-ver.txt" -RedirectStandardError "$env:TEMP\merit-oss-gh-ver-err.txt"
+        if (-not $p.WaitForExit(10000)) {
+            try { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue } catch { }
+            Write-Warn "gh - timed out (10s) at $ghExe — skip or fix Tools shim; optional for OSS"
+        }
+        else {
+            $line = (Get-Content -LiteralPath "$env:TEMP\merit-oss-gh-ver.txt" -TotalCount 1 -ErrorAction SilentlyContinue)
+            Write-Ok ("gh - " + $(if ($line) { $line.Trim() } else { $ghExe }))
+        }
+        Remove-Item -LiteralPath "$env:TEMP\merit-oss-gh-ver.txt", "$env:TEMP\merit-oss-gh-ver-err.txt" -Force -ErrorAction SilentlyContinue
+    }
+    else {
+        $needGh = $true
+        Write-Warn 'gh - optional (PRs); can install via winget'
+    }
 
     try {
         $resp = Invoke-WebRequest -Uri 'https://github.com' -Method Head -UseBasicParsing -TimeoutSec 10
@@ -385,7 +413,7 @@ function Invoke-SeedPrivateVaultDev {
     $ownerDir = Join-Path $devRoot 'AgentDraven'
     $vaultDir = Join-Path $ownerDir 'merit-private-vault'
     $vaultUrl = 'https://github.com/AgentDraven/merit-private-vault.git'
-    $vaultPinTag = 'v1.8.71'
+    $vaultPinTag = 'v1.8.72'
     $bootCmd = Join-Path $vaultDir 'BootStrap\MERIT_BootStrap.cmd'
     $seedCmd = Join-Path $vaultDir 'BootStrap\seed-private-dev.cmd'
 

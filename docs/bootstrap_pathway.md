@@ -9,12 +9,12 @@ Annotated flowchart for a **new laptop** on the public freeware path. Private-Va
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.56 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.57 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills\BootStrap
 .\MERIT_BootStrap.cmd
 ```
 
-Use the current public pin if newer than `skills-v0.3.56` (see repo `VERSION` / tags). Clone **from** the bench folder so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
+Use the current public pin if newer than `skills-v0.3.57` (see repo `VERSION` / tags). Clone **from** the bench folder so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
 
 ## OSS pathway flowchart
 
@@ -58,13 +58,22 @@ flowchart TD
 
 ## L1 / L2 / L3 and any AI IDE (summary)
 
-MERIT keeps instructions **inside the ecosystem** (L1 platform â†’ L2 persona â†’ optional L3 project). Cursor, Codex, Claude Code, Hermes, Paperclip, OpenClaw, Grok Bot, Devin, and future hosts only **install skills** or read `AGENTS.md` â€” they do not replace L1.
+MERIT keeps instructions **inside the ecosystem** (L1 platform → L2 persona → optional L3 project). Cursor, Codex, Claude Code, Hermes, Paperclip, OpenClaw, Grok Bot, Devin, and future hosts only **install skills** or read `AGENTS.md` — they do not replace L1.
 
 Full design + **`cfg/agent_hosts.json`** (auto-detect hints, supported/planned/research hosts): [bootstrap.design.md](bootstrap.design.md#instruction-chain-l1--l2--l3--why-merit-stays-host-agnostic).
 
+## After first clone — use merit.ps1 (not raw git)
+
+Cold start may use `git clone` **once**. After that:
+
+- OSS consumer work: `.\merit.ps1` (`verify` / `closeout` / `init` / …)
+- Operator closing this skills repo or the vault: vault `scripts/merit.ps1` → **`mXin`** / **`mXout`** / **`git verify`** / **`runtime out`**
+
+Do not agent-closeout with raw `git commit`/`tag`/`push`. See vault §7c.7 and [bootstrap.design.md](bootstrap.design.md#operator--agent-law--meritps1-after-first-clone).
+
 ## Related
 
-- [BootStrap/README.md](../BootStrap/README.md) â€” how to run
-- [docs/bootstrap.design.md](bootstrap.design.md) â€” design / L1â€“L3 / agent host registry
-- [`cfg/agent_hosts.json`](../cfg/agent_hosts.json) â€” host install + detectHints
-- Root [README.md](../README.md) Start-here â€” OSS BootStrap row
+- [BootStrap/README.md](../BootStrap/README.md) — how to run
+- [docs/bootstrap.design.md](bootstrap.design.md) — design / L1–L3 / agent host registry / merit.ps1 law
+- [`cfg/agent_hosts.json`](../cfg/agent_hosts.json) — host install + detectHints
+- Root [README.md](../README.md) Start-here — OSS BootStrap row

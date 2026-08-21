@@ -1,9 +1,9 @@
-# MERIT public CLI - one entrypoint for free users.
+﻿# MERIT public CLI - one entrypoint for free users.
 
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.3.56'
+$MERIT_VERSION = '0.3.57'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -37,7 +37,7 @@ Commands:
                            [--scaffold-only]  (alias of default platform mode)
   apps publish --path <repo>  Upload play/+cfg/ to merit-prod /apps/<app>/play (create phase 8)
   apps refresh --path <repo>  Re-activate store + sync scaffold (never touches app_logic/)
-                          Store free-community activate · UserGuide · community cfg · publish
+                          Store free-community activate Â· UserGuide Â· community cfg Â· publish
   apps remove --path <repo> --yes
                           Remove platform /apps/<id> files (local delete does NOT)
                           [--tenant-all] also wipe tenant collections for that id
@@ -966,6 +966,7 @@ function Invoke-Closeout {
             Write-Host 'closeout WARN: git not available on PATH'
         }
         Write-Host 'closeout: webpage-shell AP-MA-13. Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md'
+        Write-Host 'closeout NOTE: operator shipping of merit-agent-skills itself uses vault scripts/merit.ps1 mXin (TAG_PREFIX=skills-v) â€” not raw git.'
     } finally {
         Pop-Location
     }
@@ -1118,13 +1119,13 @@ function Write-UserGuideScaffold {
         $body = Get-Content -LiteralPath $tpl -Raw -Encoding UTF8
         $body = $body.Replace('{{PRODUCT_NAME}}', $ProductName).Replace('{{CONSUMER_ID}}', $ConsumerId).Replace('{{PLAY_URL}}', $playUrl).Replace('{{REGISTER_URL}}', $registerUrl)
         Set-Content -LiteralPath $guidePath -Value $body -Encoding UTF8
-        Write-Host "UserGuide OK -> $guidePath (ToC · If/Then · OH/Consult · OIDs)"
+        Write-Host "UserGuide OK -> $guidePath (ToC Â· If/Then Â· OH/Consult Â· OIDs)"
     } else {
         Set-Content -LiteralPath $guidePath -Value @"
 ---
 # MERIT_SCAFFOLD:user-guide:v1
 ---
-# User Guide — $ProductName
+# User Guide â€” $ProductName
 
 Play: $playUrl  
 Register: $registerUrl  
@@ -1147,7 +1148,7 @@ function Invoke-AppsRefresh {
     Write-Host "apps refresh: consumer_id=$ConsumerId (never edits app_logic/)"
     $logicProbe = Join-Path $TargetRoot 'app_logic'
     if (-not (Test-Path -LiteralPath $logicProbe)) {
-        Write-Host 'apps refresh NOTE: app_logic/ missing — create first if this is a new app.'
+        Write-Host 'apps refresh NOTE: app_logic/ missing â€” create first if this is a new app.'
     }
 
     # 1) Store free-community re-activate (idempotent catalog refresh).
@@ -1187,7 +1188,7 @@ function Invoke-AppsRefresh {
         Write-Host "apps refresh NOTE: par pin resync: $($_.Exception.Message)"
     }
 
-    # 3) UserGuide — refresh when scaffold marker present (or missing).
+    # 3) UserGuide â€” refresh when scaffold marker present (or missing).
     Write-UserGuideScaffold -TargetRoot $TargetRoot -ProductName $display -ConsumerId $ConsumerId -Force:$false -Gateway $Gateway
 
     # 4) Republish play/+cfg/ to platform.
@@ -1594,7 +1595,7 @@ function Invoke-Create {
     if ($theme -and $theme -notmatch '^gloss-(aurora|graphite|daylight)$') {
         throw "create: --theme must be gloss-aurora, gloss-graphite, or gloss-daylight (got '$theme')"
     }
-    if ($theme) { Write-Host "create NOTE: --theme $theme → DualRail Gloss play shell (par scaffold)." }
+    if ($theme) { Write-Host "create NOTE: --theme $theme â†’ DualRail Gloss play shell (par scaffold)." }
     if ($wantDeploy) {
         $scopeCheck = Get-ArgValue -ArgList $ArgList -Name '--vercel-scope'
         if (-not $scopeCheck -and -not $env:VERCEL_SCOPE) {

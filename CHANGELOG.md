@@ -1,3 +1,12 @@
+## 0.3.57 - 2026-08-21
+
+### Added
+- `TAG_PREFIX` file (`skills-v`) so vault `mXin` against this repo tags `skills-v{VERSION}`.
+- Docs: after first clone, use `merit.ps1` / vault `mXin` — not raw git closeout (`bootstrap.design.md`, `bootstrap_pathway.md`).
+
+### Changed
+- Public pin → **`skills-v0.3.57`** (pairs with vault **v1.8.72** for operator closeout tooling).
+
 ## 0.3.56 - 2026-08-21
 
 ### Added

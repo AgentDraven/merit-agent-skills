@@ -35,7 +35,7 @@ Create an empty directory, clone the pinned skills release, clone `merit-demo`, 
 ```powershell
 mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
-git clone --branch skills-v0.3.56 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.57 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 ```
@@ -95,7 +95,7 @@ There are two separate actions:
 
 | Action | When | Command |
 |--------|------|---------|
-| Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.3.56 https://github.com/AgentDraven/merit-agent-skills.git` |
+| Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.3.57 https://github.com/AgentDraven/merit-agent-skills.git` |
 | Install skills into an AI IDE host | Optional, only when you want the host to see skill instructions as installed skills | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./install.sh -Target â€¦` (aliases: `Claude`, `Agents`; `Project` needs `-Path`) |
 
 You can run `merit.ps1` / `merit.sh` directly from the cloned repo without installing skills. Install is for agent authoring convenience, not for runtime deployment.
@@ -199,7 +199,7 @@ Aligned with vault `docs/vault_usage.md` Â§ merit-agent-skills validation.
 mkdir C:\MeritValidate
 cd C:\MeritValidate
 
-git clone --branch skills-v0.3.56 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.57 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir ..\my-app
@@ -215,7 +215,7 @@ Linux/macOS:
 mkdir -p ~/MeritValidate
 cd ~/MeritValidate
 
-git clone --branch skills-v0.3.56 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.57 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 
 mkdir -p ../my-app
@@ -316,7 +316,7 @@ See `cfg/meritstore_tenant.json` (`status: pending_platform_provision`) on merit
 
 ### Refresh rails without touching `app_logic/` (`apps refresh`)
 
-When the platform catalog, UserGuide, or play shell move, do **not** delete+create (that would risk `app_logic/`). From **skills-v0.3.56+**:
+When the platform catalog, UserGuide, or play shell move, do **not** delete+create (that would risk `app_logic/`). From **skills-v0.3.57+**:
 
 ```powershell
 .\merit.ps1 apps refresh --path ..\<app>
