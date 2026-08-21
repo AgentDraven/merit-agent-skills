@@ -1,0 +1,32 @@
+﻿{
+  "schemaVersion": 1,
+  "edition": "oss",
+  "purpose": "Public OSS BootStrap registry for merit-agent-skills/BootStrap. No Private-Vault secrets or L1 product law. Distinct from repo-root merit.ps1 CLI.",
+  "updatedAt": null,
+  "bootStrapRoot": null,
+  "skillsRoot": null,
+  "testBench": {
+    "path": "C:\\MyMeritApp",
+    "skillsPath": "C:\\MyMeritApp\\merit-agent-skills",
+    "demoPath": "C:\\MyMeritApp\\merit-demo",
+    "purpose": "Disposable OSS validation bench"
+  },
+  "publicSeeds": {
+    "skills": {
+      "owner": "AgentDraven",
+      "name": "merit-agent-skills",
+      "url": "https://github.com/AgentDraven/merit-agent-skills.git"
+    },
+    "showcase": {
+      "owner": "Mr-PI-Bala",
+      "name": "merit-demo",
+      "url": "https://github.com/Mr-PI-Bala/merit-demo.git"
+    }
+  },
+  "vaultTeaser": {
+    "status": "future",
+    "summary": "Private-Vault / subscription entitlement not productized yet. OSS freemium does not require it."
+  },
+  "prerequisitesLastCheck": null,
+  "ossValidationLastCheck": null
+}

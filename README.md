@@ -1,4 +1,4 @@
-# merit-agent-skills
+﻿# merit-agent-skills
 
 Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 
@@ -6,17 +6,18 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 
 | Goal | Path |
 |------|------|
-| **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** — 3 steps, no accounts night one |
+| **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** â€” 3 steps, no accounts night one |
+| **OSS BootStrap** | **[BootStrap/](BootStrap/README.md)** — clone repo, run `BootStrap\MERIT_BootStrap.cmd`; bench folder = `%MYMERITAPP%` (default `C:\MyMeritApp`). Not the root CLI. |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
-| **Launch/deploy PoV** | [docs/deploy.md](docs/deploy.md) — one local `.merit_launch.md`, one `merit` command |
+| **Launch/deploy PoV** | [docs/deploy.md](docs/deploy.md) â€” one local `.merit_launch.md`, one `merit` command |
 | **LLD map (audit)** | [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md) |
-| **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) — workbench, journal, AMA, subs, legal |
-| **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) — independent consumer ID using the same hosted providers |
-| **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
-| **Skills only** | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./install.sh -Target …` (aliases: `Claude`, `Agents`) |
-| **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** — gap analysis → FR/AGENT_REQ (no vault) |
-| **Affiliate / design partner** | [`skills/merit-affiliate`](skills/merit-affiliate/SKILL.md) — free attribution + portal recipes (no billing) |
-| **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha …` |
+| **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) â€” workbench, journal, AMA, subs, legal |
+| **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) â€” independent consumer ID using the same hosted providers |
+| **Try bundles (Angles 1â€“4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
+| **Skills only** | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./install.sh -Target â€¦` (aliases: `Claude`, `Agents`) |
+| **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** â€” gap analysis â†’ FR/AGENT_REQ (no vault) |
+| **Affiliate / design partner** | [`skills/merit-affiliate`](skills/merit-affiliate/SKILL.md) â€” free attribution + portal recipes (no billing) |
+| **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha â€¦` |
 
 **Production MERIT base:** `https://merit-prod.vercel.app` for metered APIs, packages, and register paths. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
 
@@ -25,9 +26,9 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 | | Public (this repo + Portal) | Private (operators only) |
 |--|----------------------------|--------------------------|
 | **What** | Skills, `merit` CLI recipes, dinner/tutorial, freemium docs | Full platform **product law**, L1, env, cert registry |
-| **Where** | **This README**, [docs/usage.md](docs/usage.md), [HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md), live [Portal](https://merit-prod.vercel.app/portal/) | Vault `docs/PRD_MERIT_AGENT_SKILLS_PLATFORM.md` (**ACCEPTED** technical SSOT — not published here) |
+| **Where** | **This README**, [docs/usage.md](docs/usage.md), [HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md), live [Portal](https://merit-prod.vercel.app/portal/) | Vault `docs/PRD_MERIT_AGENT_SKILLS_PLATFORM.md` (**ACCEPTED** technical SSOT â€” not published here) |
 | **Who** | Builders, agents on OSS path | HumanBala / AgentDraven with vault |
-| **Pin** | Clone **`skills-v*`** release tags (FR-SK-14 / L1 §E.0) | Not a substitute for product VERSION on consumers |
+| **Pin** | Clone **`skills-v*`** release tags (FR-SK-14 / L1 Â§E.0) | Not a substitute for product VERSION on consumers |
 
 **Do not** expect a public copy of the vault PRD. Implementers with vault access apply FR tables from the private PRD + provider IAR; builders follow **usage + Portal** only.
 
@@ -52,15 +53,15 @@ cd merit-agent-skills
 
 | Runtime | Install |
 |---------|---------|
-| **Cursor** | `.\install.ps1 -Target Cursor` → `~/.cursor/skills` |
-| **Claude Code** | `.\install.ps1 -Target ClaudeCode` → `~/.claude/skills` (alias: `Claude`) |
-| **Codex** | `.\install.ps1 -Target Codex` → `~/.codex/skills` (or `$CODEX_HOME/skills`) |
-| **VS Code / Agents** | `.\install.ps1 -Target VSCode` → `~/.agents/skills` (alias: `Agents`) |
-| **Hermes** | `hermes skills tap add AgentDraven/merit-agent-skills` · or copy into `~/.hermes/skills` / scan `~/.agents/skills` |
-| **OpenClaw** | `openclaw skills install ./skills/merit-mm-upgrade` · ClawHub publish if desired (license: Apache-2.0 here) |
-| **Project (Cursor)** | `.\install.ps1 -Target Project -Path <repo>` → `<repo>/.cursor/skills` |
+| **Cursor** | `.\install.ps1 -Target Cursor` â†’ `~/.cursor/skills` |
+| **Claude Code** | `.\install.ps1 -Target ClaudeCode` â†’ `~/.claude/skills` (alias: `Claude`) |
+| **Codex** | `.\install.ps1 -Target Codex` â†’ `~/.codex/skills` (or `$CODEX_HOME/skills`) |
+| **VS Code / Agents** | `.\install.ps1 -Target VSCode` â†’ `~/.agents/skills` (alias: `Agents`) |
+| **Hermes** | `hermes skills tap add AgentDraven/merit-agent-skills` Â· or copy into `~/.hermes/skills` / scan `~/.agents/skills` |
+| **OpenClaw** | `openclaw skills install ./skills/merit-mm-upgrade` Â· ClawHub publish if desired (license: Apache-2.0 here) |
+| **Project (Cursor)** | `.\install.ps1 -Target Project -Path <repo>` â†’ `<repo>/.cursor/skills` |
 
-**mmUpgrade** is public freeware (`merit-mm-upgrade`). Full **`merit-upgrade`** (IAR / hygiene / maturity / closeout) stays vault-only via `merit.ps1 runtime out` — not in this OSS tree.
+**mmUpgrade** is public freeware (`merit-mm-upgrade`). Full **`merit-upgrade`** (IAR / hygiene / maturity / closeout) stays vault-only via `merit.ps1 runtime out` â€” not in this OSS tree.
 
 ## 3 Steps Over Dinner cheatsheet
 
@@ -126,7 +127,7 @@ npm install
 ./merit.sh e2e
 ```
 
-`npm install` installs the demo’s declared Node dev tooling, including `@playwright/test`; the repo postinstall attempts to install the Chromium browser used for screenshots. The MERIT wrapper then runs the route/provider checks and writes screenshots under `merit-demo docs/evidence/`. If dependencies are not installed, `verify` can still pass, but screenshot capture is skipped.
+`npm install` installs the demoâ€™s declared Node dev tooling, including `@playwright/test`; the repo postinstall attempts to install the Chromium browser used for screenshots. The MERIT wrapper then runs the route/provider checks and writes screenshots under `merit-demo docs/evidence/`. If dependencies are not installed, `verify` can still pass, but screenshot capture is skipped.
 
 ## Skills
 
@@ -140,10 +141,10 @@ npm install
 | `merit-ama` | AMA Q&A + leaderboard (merit-demo) |
 | `merit-admin-gate` | MeritAdminGate phrase auth |
 | `merit-deploy-vercel` | Scoped Vercel deploy (your team scope) |
-| `merit-onboard` | OSS quickstart → merit-demo |
+| `merit-onboard` | OSS quickstart â†’ merit-demo |
 | `meritcert`, `merit-closeout`, `merit-iar` | Vocabulary; vault operators run writes |
 
-`merit.ps1 create` (v0.3.31+): **Cloud First** — live `merit-prod` `/apps/<app>/play`. Phase 7 jumpstart portal + PRD include Make Art, ecosystem providers, PAR packages, and consumer examples (CAST = Cloud-Assisted Autonomous Synth-Podcast Theatre, DIRT, SomaTune, M4FI, Tranquil Balance). Phase 8 publishes portal/ to here.now when credentials exist.
+`merit.ps1 create` (v0.3.31+): **Cloud First** â€” live `merit-prod` `/apps/<app>/play`. Phase 7 jumpstart portal + PRD include Make Art, ecosystem providers, PAR packages, and consumer examples (CAST = Cloud-Assisted Autonomous Synth-Podcast Theatre, DIRT, SomaTune, M4FI, Tranquil Balance). Phase 8 publishes portal/ to here.now when credentials exist.
 
 All OSS user docs use **`.\merit.ps1`** / **`./merit.sh`**. There are no public shim scripts.
 
@@ -155,21 +156,21 @@ All OSS user docs use **`.\merit.ps1`** / **`./merit.sh`**. There are no public 
 | Journal | 2 entries/day | Uncapped |
 | AMA | 2 ask/vote/response/day; top 25 | Uncapped |
 | CLI | merit.ps1 / merit.sh | + vault merit.ps1 for operators |
-| Commerce | — | meritstore + meritsubs on **your** `consumer_id` |
+| Commerce | â€” | meritstore + meritsubs on **your** `consumer_id` |
 
 Plus: **$10.79/mo** ($2.49/wk round up); 20% off 6-month; 50% off annual.
 
-### Guest → paid funnel
+### Guest â†’ paid funnel
 
-Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** SKU → meritsubs entitlements. See [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md).
+Guest OSS PAR â†’ free register (meritstore) â†’ hit freemium cap â†’ **Plus** SKU â†’ meritsubs entitlements. See [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md).
 
 ## Releases
 
 | Policy | Detail |
 |--------|--------|
-| Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
+| Pre-GA tags | `skills-v0.x.y` â€” minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
-| Pin | Release tags, not floating `main` (L1 §E.0 / FR-SK-14) |
+| Pin | Release tags, not floating `main` (L1 Â§E.0 / FR-SK-14) |
 | Current tip (Portal pin) | **`skills-v0.3.52`** |
 | Current human-validation baseline | **`skills-v0.3.22`** |
 
@@ -177,7 +178,7 @@ Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA unti
 
 ## Licensing (product fork)
 
-Apache-2.0 adoption on skills; monetization via meritstore — not license royalties. See **`LICENSING.md`**, **`THIRD_PARTY_NOTICES.md`**.
+Apache-2.0 adoption on skills; monetization via meritstore â€” not license royalties. See **`LICENSING.md`**, **`THIRD_PARTY_NOTICES.md`**.
 
 ## Sync from vault
 

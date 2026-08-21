@@ -1,3 +1,15 @@
+## Unreleased
+
+### Added
+
+- **OSS device BootStrap** under `BootStrap/` (`MERIT_BootStrap.ps1` / `.cmd` / `.sh`): prereqs, `%MYMERITAPP%` bench (default `C:\MyMeritApp`), demo seed, validate, Private-Vault teaser + menu **P** seed into `~/dev`.
+- Docs: `docs/bootstrap.design.md`; BootStrap section in `docs/design.md`; Start-here row in `README.md`.
+
+### Notes
+
+- Root `merit.ps1` remains the MERIT CLI. BootStrap does not replace it.
+- One-time land from detached tag checkout → branch `bootstrap/oss-bootstrap` (see `docs/bootstrap.design.md`).
+
 ## 0.3.53 - 2026-08-17
 
 ### Changed

@@ -38,3 +38,16 @@ Legacy `merit-live` and `merit-*` shim scripts are intentionally not part of the
 The public skills call hosted MERIT providers through `https://merit-prod.vercel.app`. Public clones must not ship local usage-metering or Square billing bypass logic.
 
 The default promo path is `MERITAGENT`; the hosted provider owns credit budget, entitlement, Square configuration, and tenant separation.
+
+## Device BootStrap (distinct from the CLI)
+
+Root `merit.ps1` / `merit.sh` remain the **CLI** (`init` / `apply` / `verify` / …).
+
+`BootStrap/MERIT_BootStrap.*` is the **device BootStrap** menu:
+
+- Lives in GitHub under `merit-agent-skills/BootStrap/`
+- First run asks for OSS bench path, saves User env **`MYMERITAPP`** (default `C:\MyMeritApp`)
+- Installs a live copy to `%MYMERITAPP%\BootStrap\` plus `%MYMERITAPP%\MERIT_BootStrap.cmd`
+- Menu **P** can seed Private-Vault BootStrap into `~/dev` when the operator has GitHub access to `AgentDraven/merit-private-vault` (public teaser facts only; no vault product law in this repo)
+
+See [bootstrap.design.md](bootstrap.design.md) for how this was introduced and pushed.
