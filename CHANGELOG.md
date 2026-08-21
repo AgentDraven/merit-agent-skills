@@ -1,3 +1,14 @@
+## 0.3.55 - 2026-08-21
+
+### Changed
+
+- Cold-start docs: clone from bench folder (`mkdir C:\MyMeritApp` / `~/MyMeritApp`) in `BootStrap/README.md`, root README, HowTo Over Dinner, deploy, usage.
+- Public pin / Portal tip → **`skills-v0.3.55`**; menu **P** seeds vault **`v1.8.69`**.
+
+### Notes
+
+- `git clone` creates `merit-agent-skills` as a child of the current directory — start in the OSS bench folder.
+
 ## 0.3.54 - 2026-08-20
 
 ### Added

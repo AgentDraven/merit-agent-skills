@@ -34,17 +34,24 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 
 ## Quick install
 
+Recommended starting point (OSS bench = `%MYMERITAPP%`, default `C:\MyMeritApp`):
+
 ```powershell
-git clone --branch skills-v0.3.54 https://github.com/AgentDraven/merit-agent-skills.git
+mkdir C:\MyMeritApp
+cd C:\MyMeritApp
+git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # omit -Target to print usage (no default host)
+# Device BootStrap (optional): cd BootStrap; .\MERIT_BootStrap.cmd
 ```
 
 Linux/macOS:
 
 ```bash
-git clone --branch skills-v0.3.54 https://github.com/AgentDraven/merit-agent-skills.git
+mkdir -p ~/MyMeritApp
+cd ~/MyMeritApp
+git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
@@ -171,7 +178,7 @@ Guest OSS PAR â†’ free register (meritstore) â†’ hit freemium cap â�
 | Pre-GA tags | `skills-v0.x.y` â€” minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` (L1 Â§E.0 / FR-SK-14) |
-| Current tip (Portal pin) | **`skills-v0.3.54`** |
+| Current tip (Portal pin) | **`skills-v0.3.55`** |
 | Current human-validation baseline | **`skills-v0.3.22`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.

@@ -3,15 +3,29 @@
 Public freeware **device BootStrap** for this repo.  
 Not the same as root **`merit.ps1`** (that is the MERIT **CLI**: `init` / `apply` / `verify` / …).
 
-**Baseline pin:** parent repo tag **`skills-v0.3.54`**.
-
 ## OSS experience (easy path)
 
+Start in the OSS bench folder (recommended: `C:\MyMeritApp`). `git clone` creates `merit-agent-skills` **inside** whatever directory you are in.
+
 ```powershell
-git clone --branch skills-v0.3.54 https://github.com/AgentDraven/merit-agent-skills.git
+mkdir C:\MyMeritApp
+cd C:\MyMeritApp
+git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills\BootStrap
 .\MERIT_BootStrap.cmd
 ```
+
+Linux/macOS:
+
+```bash
+mkdir -p ~/MyMeritApp
+cd ~/MyMeritApp
+git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
+cd merit-agent-skills/BootStrap
+./MERIT_BootStrap.sh
+```
+
+**Baseline pin:** parent repo tag **`skills-v0.3.55`**.
 
 On first run you are asked for the **OSS bench folder** (saved as User env **`MYMERITAPP`**).  
 Default: `C:\MyMeritApp`. Pick any drive/path you want.

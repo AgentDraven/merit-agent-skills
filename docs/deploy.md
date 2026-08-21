@@ -11,9 +11,9 @@ This is the public creator path for launching a MERIT consumer with one local la
 Create a clean working directory and clone the two public repos:
 
 ```powershell
-mkdir C:\MeritOverDinner
-cd C:\MeritOverDinner
-git clone --branch skills-v0.3.54 https://github.com/AgentDraven/merit-agent-skills.git
+mkdir C:\MyMeritApp
+cd C:\MyMeritApp
+git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
@@ -22,9 +22,9 @@ cd merit-agent-skills
 Linux/macOS:
 
 ```bash
-mkdir -p ~/MeritOverDinner
-cd ~/MeritOverDinner
-git clone --branch skills-v0.3.54 https://github.com/AgentDraven/merit-agent-skills.git
+mkdir -p ~/MyMeritApp
+cd ~/MyMeritApp
+git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 ./install.sh -Target Cursor

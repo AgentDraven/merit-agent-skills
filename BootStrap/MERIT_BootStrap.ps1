@@ -1,4 +1,4 @@
-﻿# MERIT OSS BootStrap â€” public freeware BootStrap (Apache-2.0 with merit-agent-skills).
+# MERIT OSS BootStrap â€” public freeware BootStrap (Apache-2.0 with merit-agent-skills).
 #
 # This is the PUBLIC edition. It does NOT include Private-Vault operator tooling,
 # L1 governance files, or cert/registry internals.
@@ -151,7 +151,7 @@ function Install-WingetPkg([string]$Id, [string]$Name) {
 }
 
 # Canonical public pin for bench clones (keep in sync with README / VERSION / tag).
-$Script:SkillsPinTag = 'skills-v0.3.54'
+$Script:SkillsPinTag = 'skills-v0.3.55'
 
 function Invoke-Prereqs {
     Write-Header 'Prerequisites - check / install'
@@ -385,7 +385,7 @@ function Invoke-SeedPrivateVaultDev {
     $ownerDir = Join-Path $devRoot 'AgentDraven'
     $vaultDir = Join-Path $ownerDir 'merit-private-vault'
     $vaultUrl = 'https://github.com/AgentDraven/merit-private-vault.git'
-    $vaultPinTag = 'v1.8.68'
+    $vaultPinTag = 'v1.8.69'
     $bootCmd = Join-Path $vaultDir 'BootStrap\MERIT_BootStrap.cmd'
     $seedCmd = Join-Path $vaultDir 'BootStrap\seed-private-dev.cmd'
 

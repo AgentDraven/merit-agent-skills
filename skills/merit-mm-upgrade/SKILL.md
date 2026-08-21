@@ -111,7 +111,7 @@ End with a **3-3** in chat: **Done** Â· **State** Â· **Next** (â‰¤3 bull
 ## Install (any agent runtime)
 
 ```powershell
-git clone --branch skills-v0.3.54 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.55 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # or: .\install.ps1 -Target Project -Path <repo>
