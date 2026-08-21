@@ -150,6 +150,204 @@ function Install-WingetPkg([string]$Id, [string]$Name) {
     return $false
 }
 
+# Canonical public pin for bench clones (keep in sync with README / VERSION / tag).
+$Script:SkillsPinTag = 'skills-v0.3.54'
+
+function Invoke-Prereqs {
+    Write-Header 'Prerequisites - check / install'
+    Write-Note 'Safe to re-run. Offers winget install for missing tools.'
+    Write-Host ''
+    $needGit = $false
+    $needPwsh = $false
+    $needGh = $false
+
+    $gitCmd = Get-Command git -ErrorAction SilentlyContinue
+    if ($gitCmd) { Write-Ok ("Git - " + ((& git --version 2>&1 | Out-String).Trim())) }
+    else { $needGit = $true; Write-Fail 'Git - not on PATH' }
+
+    Write-Ok ("Host PSVersion - $($PSVersionTable.PSEdition) $($PSVersionTable.PSVersion)")
+    $pwshCmd = Get-Command pwsh -ErrorAction SilentlyContinue
+    if ($pwshCmd) { Write-Ok "pwsh - $($pwshCmd.Source)" }
+    else { $needPwsh = $true; Write-Warn 'pwsh - missing (Windows PowerShell 5.1 still works for this BootStrap)' }
+
+    if (Test-Winget) { Write-Ok "winget - $((Get-Command winget).Source)" }
+    else { Write-Warn 'winget - missing; cannot auto-install' }
+
+    $ghCmd = Get-Command gh -ErrorAction SilentlyContinue
+    if ($ghCmd) { Write-Ok ("gh - " + ((& gh --version 2>&1 | Select-Object -First 1 | Out-String).Trim())) }
+    else { $needGh = $true; Write-Warn 'gh - optional (PRs); can install via winget' }
+
+    try {
+        $resp = Invoke-WebRequest -Uri 'https://github.com' -Method Head -UseBasicParsing -TimeoutSec 10
+        Write-Ok "GitHub reachability - HTTP $($resp.StatusCode)"
+    }
+    catch {
+        Write-Warn "GitHub reachability - $($_.Exception.Message)"
+    }
+
+    $bench = Get-Bench (Get-State)
+    if (Test-Path -LiteralPath $bench.Path) { Write-Ok "MYMERITAPP bench - $($bench.Path)" }
+    else { Write-Warn "MYMERITAPP bench missing - $($bench.Path) (created on first run / menu M)" }
+    if (Test-Path -LiteralPath $bench.SkillsPath) { Write-Ok "Bench skills - $($bench.SkillsPath)" }
+    else { Write-Warn "Bench skills missing - use menu 2 (pin $($Script:SkillsPinTag))" }
+    if (Test-Path -LiteralPath $bench.DemoPath) { Write-Ok "Bench demo - $($bench.DemoPath)" }
+    else { Write-Warn 'Bench demo missing - use menu 3' }
+
+    if (-not ($needGit -or $needPwsh -or $needGh)) {
+        Write-Ok 'No required installs pending.'
+        $state = Get-State
+        $state.prerequisitesLastCheck = (Get-Date).ToString('o')
+        Save-State $state
+        return
+    }
+
+    Write-Host ''
+    $ans = Read-Host 'Install missing tools via winget now? [y/N]'
+    if ($ans -notmatch '^[Yy]') {
+        Write-Warn 'Skipped installs.'
+        return
+    }
+    if ($needGit) { [void](Install-WingetPkg -Id 'Git.Git' -Name 'Git') }
+    if ($needPwsh) { [void](Install-WingetPkg -Id 'Microsoft.PowerShell' -Name 'PowerShell 7+') }
+    if ($needGh) { [void](Install-WingetPkg -Id 'GitHub.cli' -Name 'GitHub CLI') }
+    $state = Get-State
+    $state.prerequisitesLastCheck = (Get-Date).ToString('o')
+    Save-State $state
+}
+
+function Invoke-EnsureBenchSkills {
+    Write-Header "Ensure bench merit-agent-skills @ $($Script:SkillsPinTag)"
+    $state = Get-State
+    $bench = Get-Bench $state
+    $url = [string]$state.publicSeeds.skills.url
+    if ([string]::IsNullOrWhiteSpace($url)) {
+        $url = 'https://github.com/AgentDraven/merit-agent-skills.git'
+    }
+    New-Item -ItemType Directory -Force -Path $bench.Path | Out-Null
+    $dest = $bench.SkillsPath
+    $gitDir = Join-Path $dest '.git'
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Fail 'git not on PATH. Use menu 1 first.'
+        return
+    }
+
+    if (Test-Path -LiteralPath $gitDir) {
+        Write-Ok "Already cloned: $dest"
+        Write-Info "Fetching / checking out pin $($Script:SkillsPinTag) ..."
+        & git -C $dest fetch --tags origin 2>&1 | Out-Host
+        & git -C $dest checkout --detach "refs/tags/$($Script:SkillsPinTag)" 2>&1 | Out-Host
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warn "Tag checkout failed; staying on current tip. Tag $($Script:SkillsPinTag) may not exist yet."
+        }
+        else {
+            Write-Ok "Detached at $($Script:SkillsPinTag)"
+        }
+    }
+    elseif (Test-Path -LiteralPath $dest) {
+        Write-Fail "$dest exists but is not a git clone. Move it aside and re-run."
+        return
+    }
+    else {
+        Write-Info "Cloning $url --branch $($Script:SkillsPinTag) ..."
+        & git clone --branch $Script:SkillsPinTag $url $dest
+        if ($LASTEXITCODE -ne 0) {
+            Write-Fail "git clone failed (exit $LASTEXITCODE)."
+            return
+        }
+        Write-Ok "Cloned $dest @ $($Script:SkillsPinTag)"
+    }
+
+    if (-not $state.testBench) {
+        $state | Add-Member -NotePropertyName testBench -NotePropertyValue ([pscustomobject]@{}) -Force
+    }
+    $state.testBench.path = $bench.Path
+    $state.testBench.skillsPath = $dest
+    Save-State $state
+}
+
+function Invoke-EnsureDemo {
+    Write-Header 'Seed clone merit-demo under MYMERITAPP'
+    $state = Get-State
+    $bench = Get-Bench $state
+    $url = [string]$state.publicSeeds.showcase.url
+    if ([string]::IsNullOrWhiteSpace($url)) {
+        $url = 'https://github.com/Mr-PI-Bala/merit-demo.git'
+    }
+    New-Item -ItemType Directory -Force -Path $bench.Path | Out-Null
+    $dest = $bench.DemoPath
+    $gitDir = Join-Path $dest '.git'
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Fail 'git not on PATH. Use menu 1 first.'
+        return
+    }
+    if (Test-Path -LiteralPath $gitDir) {
+        Write-Ok "Already cloned: $dest"
+        Write-Info 'Pulling latest...'
+        & git -C $dest pull --ff-only 2>&1 | Out-Host
+    }
+    elseif (Test-Path -LiteralPath $dest) {
+        Write-Fail "$dest exists but is not a git clone. Move it aside and re-run."
+        return
+    }
+    else {
+        Write-Info "Cloning $url ..."
+        & git clone $url $dest
+        if ($LASTEXITCODE -ne 0) {
+            Write-Fail "git clone failed (exit $LASTEXITCODE)."
+            return
+        }
+        Write-Ok "Cloned $dest"
+    }
+    if (-not $state.testBench) {
+        $state | Add-Member -NotePropertyName testBench -NotePropertyValue ([pscustomobject]@{}) -Force
+    }
+    $state.testBench.path = $bench.Path
+    $state.testBench.demoPath = $dest
+    Save-State $state
+}
+
+function Invoke-OssValidate {
+    Write-Header 'OSS validate (closeout + smoke)'
+    $state = Get-State
+    $bench = Get-Bench $state
+    if (-not (Test-Path -LiteralPath $bench.CliPath)) {
+        Write-Fail "merit.ps1 missing at $($bench.CliPath)"
+        Write-Note 'Run menu 2 first (skills pin clone under MYMERITAPP).'
+        return
+    }
+    $runner = Get-Runner
+    Write-Info "Runner: $($runner.Label) -> $($runner.Exe)"
+    Write-Info "CLI:    $($bench.CliPath)"
+    Write-Host ''
+    Write-Info 'Running closeout ...'
+    & $runner.Exe -NoProfile -File $bench.CliPath 'closeout' '--path' $bench.SkillsPath
+    $code1 = $LASTEXITCODE
+    if ($code1 -eq 0) { Write-Ok 'closeout exit 0' } else { Write-Fail "closeout exit $code1" }
+
+    $smoke = Join-Path $bench.SkillsPath 'scripts\smoke-freemium.ps1'
+    $code2 = -1
+    if (Test-Path -LiteralPath $smoke) {
+        Write-Info 'Running smoke-freemium.ps1 ...'
+        & $runner.Exe -NoProfile -File $smoke
+        $code2 = $LASTEXITCODE
+        if ($code2 -eq 0) { Write-Ok 'smoke-freemium exit 0' } else { Write-Fail "smoke-freemium exit $code2" }
+    }
+    else {
+        Write-Warn "smoke script missing: $smoke"
+    }
+
+    $state.ossValidationLastCheck = [pscustomobject]@{
+        at      = (Get-Date).ToString('o')
+        bench   = $bench.Path
+        pin     = $Script:SkillsPinTag
+        results = @(
+            [pscustomobject]@{ Step = 'closeout'; Exit = $code1 }
+            [pscustomobject]@{ Step = 'smoke-freemium'; Exit = $code2 }
+        )
+    }
+    Save-State $state
+}
+
 function Show-VaultTeaser {
     Write-Header 'Private-Vault teaser'
     Write-Note 'OSS stays free: skills, CLI, demo, local validate.'
@@ -187,6 +385,7 @@ function Invoke-SeedPrivateVaultDev {
     $ownerDir = Join-Path $devRoot 'AgentDraven'
     $vaultDir = Join-Path $ownerDir 'merit-private-vault'
     $vaultUrl = 'https://github.com/AgentDraven/merit-private-vault.git'
+    $vaultPinTag = 'v1.8.68'
     $bootCmd = Join-Path $vaultDir 'BootStrap\MERIT_BootStrap.cmd'
     $seedCmd = Join-Path $vaultDir 'BootStrap\seed-private-dev.cmd'
 
@@ -195,8 +394,17 @@ function Invoke-SeedPrivateVaultDev {
     $gitDir = Join-Path $vaultDir '.git'
     if (Test-Path -LiteralPath $gitDir) {
         Write-Ok "Vault already cloned: $vaultDir"
-        Write-Info 'Pulling latest...'
-        & git -C $vaultDir pull --ff-only 2>&1 | Out-Host
+        Write-Info "Fetching / checking out pin $vaultPinTag ..."
+        & git -C $vaultDir fetch --tags origin 2>&1 | Out-Host
+        & git -C $vaultDir checkout --detach "refs/tags/$vaultPinTag" 2>&1 | Out-Host
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warn "Tag checkout failed; pulling main tip instead."
+            & git -C $vaultDir checkout main 2>&1 | Out-Host
+            & git -C $vaultDir pull --ff-only 2>&1 | Out-Host
+        }
+        else {
+            Write-Ok "Detached at $vaultPinTag"
+        }
     }
     elseif (Test-Path -LiteralPath $vaultDir) {
         Write-Warn "$vaultDir exists but is not a git clone."
@@ -208,17 +416,17 @@ function Invoke-SeedPrivateVaultDev {
         $bak = Join-Path $ownerDir ("merit-private-vault.bak-" + (Get-Date -Format 'yyyyMMdd-HHmmss'))
         Move-Item -LiteralPath $vaultDir -Destination $bak
         Write-Ok "Moved aside -> $bak"
-        Write-Info "Cloning $vaultUrl ..."
-        & git clone $vaultUrl $vaultDir
+        Write-Info "Cloning $vaultUrl --branch $vaultPinTag ..."
+        & git clone --branch $vaultPinTag $vaultUrl $vaultDir
         if ($LASTEXITCODE -ne 0) {
             Write-Fail "git clone failed (exit $LASTEXITCODE). Use an account that can read the private vault."
             return
         }
     }
     else {
-        Write-Info "Cloning $vaultUrl ..."
-        Write-Note 'HTTPS uses Git Credential Manager — sign in with vault access.'
-        & git clone $vaultUrl $vaultDir
+        Write-Info "Cloning $vaultUrl --branch $vaultPinTag ..."
+        Write-Note 'HTTPS uses Git Credential Manager — sign in with vault access (AgentDraven).'
+        & git clone --branch $vaultPinTag $vaultUrl $vaultDir
         if ($LASTEXITCODE -ne 0) {
             Write-Fail "git clone failed (exit $LASTEXITCODE)."
             return

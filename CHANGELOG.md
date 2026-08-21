@@ -1,14 +1,20 @@
-## Unreleased
+## 0.3.54 - 2026-08-20
 
 ### Added
 
-- **OSS device BootStrap** under `BootStrap/` (`MERIT_BootStrap.ps1` / `.cmd` / `.sh`): prereqs, `%MYMERITAPP%` bench (default `C:\MyMeritApp`), demo seed, validate, Private-Vault teaser + menu **P** seed into `~/dev`.
+- **OSS device BootStrap** under `BootStrap/` (`MERIT_BootStrap.ps1` / `.cmd` / `.sh`): prereqs, `%MYMERITAPP%` bench (default `C:\MyMeritApp`), demo seed, validate, Private-Vault teaser + menu **P** seed into `~/dev` (pins vault `v1.8.68`).
 - Docs: `docs/bootstrap.design.md`; BootStrap section in `docs/design.md`; Start-here row in `README.md`.
+- Menu implementations for prereqs / bench skills pin / demo / OSS validate.
+
+### Changed
+
+- Public pin / Portal tip → **`skills-v0.3.54`** (`VERSION`, `merit.ps1`, README, HowTo, deploy, onboard/mm-upgrade skills).
+- Bench clone uses tag `skills-v0.3.54` (not floating `main`).
 
 ### Notes
 
 - Root `merit.ps1` remains the MERIT CLI. BootStrap does not replace it.
-- One-time land from detached tag checkout → branch `bootstrap/oss-bootstrap` (see `docs/bootstrap.design.md`).
+- Cold start: clone this tag → `BootStrap\MERIT_BootStrap.cmd` → menu **T**/**P** with vault GitHub credentials.
 
 ## 0.3.53 - 2026-08-17
 

@@ -3,10 +3,12 @@
 Public freeware **device BootStrap** for this repo.  
 Not the same as root **`merit.ps1`** (that is the MERIT **CLI**: `init` / `apply` / `verify` / …).
 
+**Baseline pin:** parent repo tag **`skills-v0.3.54`**.
+
 ## OSS experience (easy path)
 
 ```powershell
-git clone https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.54 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills\BootStrap
 .\MERIT_BootStrap.cmd
 ```

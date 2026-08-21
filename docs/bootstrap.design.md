@@ -37,5 +37,13 @@ On 2026-08-20 the work was preserved from a detached `skills-v0.3.53` checkout u
 4. Restore/ensure `BootStrap/` and README Start-here row  
 5. Add `docs/design.md` BootStrap section + this file + CHANGELOG entry  
 6. Commit and `git push -u origin bootstrap/oss-bootstrap`  
+7. Merge to `main`, then baseline release **`skills-v0.3.54`** (menus 1–4 restored; pin docs + tag)
 
-Operators merge via PR into `main` (or fast-forward if policy allows).
+## Cold start (baseline)
+
+```powershell
+git clone --branch skills-v0.3.54 https://github.com/AgentDraven/merit-agent-skills.git
+cd merit-agent-skills\BootStrap
+.\MERIT_BootStrap.cmd
+# Menu T = vault teaser; Menu P = clone AgentDraven/merit-private-vault @ v1.8.68 (GCM credentials)
+```
