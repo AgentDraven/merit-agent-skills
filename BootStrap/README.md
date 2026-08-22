@@ -3,7 +3,7 @@
 Public freeware **device BootStrap** for this repo.  
 Not the same as root **`merit.ps1`** (that is the MERIT **CLI**: `init` / `apply` / `verify` / …).
 
-**Baseline pin:** parent repo tag **`skills-v0.3.58`** (or current `skills-v*` — see repo `VERSION` / tags).
+**Baseline pin:** parent repo tag **`skills-v0.5.0`** (or current `skills-v*` — see repo `VERSION` / tags).
 
 **Pathway flowchart (annotated):** [docs/bootstrap_pathway.md](../docs/bootstrap_pathway.md) — OSS cold start → **T** / **P** handoff. Menu **1** installs laptop-shared **`C:\Tools\merit-venv`** (same path as Private-Vault). Affiliate **MAD** / `runtime out` remain vault-only.
 
@@ -14,7 +14,7 @@ Start in the OSS bench folder (recommended: `C:\MyMeritApp`). `git clone` create
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.58 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills\BootStrap
 .\MERIT_BootStrap.cmd
 ```
@@ -24,7 +24,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.3.58 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills/BootStrap
 ./MERIT_BootStrap.sh
 ```

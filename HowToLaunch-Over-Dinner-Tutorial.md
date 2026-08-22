@@ -39,7 +39,7 @@ Tools, `merit` CLI, and optional Cursor agent skills.
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.58 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 Linux/macOS:
@@ -47,7 +47,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.3.58 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
 Optional device BootStrap (prereqs, demo seed, Private-Vault teaser **T** / seed **P**):
@@ -320,7 +320,7 @@ Read only after the three steps.
 
 ## Checklist
 
-- [ ] Step 1 Ã¢â‚¬â€ Cloned merit-agent-skills @ `skills-v0.3.58` under C:\MyMeritApp (or ~/MyMeritApp) and merit-demo
+- [ ] Step 1 Ã¢â‚¬â€ Cloned merit-agent-skills @ `skills-v0.5.0` under C:\MyMeritApp (or ~/MyMeritApp) and merit-demo
 - [ ] Step 2 Ã¢â‚¬â€ Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
 - [ ] Step 3 Ã¢â‚¬â€ Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed

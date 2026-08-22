@@ -223,7 +223,7 @@ function Install-ToolsMeritPython {
 }
 
 # Canonical public pin for bench clones (keep in sync with README / VERSION / tag).
-$Script:SkillsPinTag = 'skills-v0.3.58'
+$Script:SkillsPinTag = 'skills-v0.5.0'
 
 function Invoke-Prereqs {
     Write-Header 'Prerequisites - check / install'
@@ -502,7 +502,7 @@ function Invoke-SeedPrivateVaultDev {
     $ownerDir = Join-Path $devRoot 'AgentDraven'
     $vaultDir = Join-Path $ownerDir 'merit-private-vault'
     $vaultUrl = 'https://github.com/AgentDraven/merit-private-vault.git'
-    $vaultPinTag = 'v1.8.73'
+    $vaultPinTag = 'vault-v0.5.0'
     $bootCmd = Join-Path $vaultDir 'BootStrap\MERIT_BootStrap.cmd'
     $seedCmd = Join-Path $vaultDir 'BootStrap\seed-private-dev.cmd'
 

@@ -39,7 +39,7 @@ Recommended starting point (OSS bench = `%MYMERITAPP%`, default `C:\MyMeritApp`)
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.58 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # omit -Target to print usage (no default host)
@@ -51,7 +51,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.3.58 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
@@ -178,7 +178,7 @@ Guest OSS PAR â†’ free register (meritstore) â†’ hit freemium cap â�
 | Pre-GA tags | `skills-v0.x.y` â€” minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` (L1 Â§E.0 / FR-SK-14) |
-| Current tip (Portal pin) | **`skills-v0.3.58`** |
+| Current tip (Portal pin) | **`skills-v0.5.0`** |
 | Current human-validation baseline | **`skills-v0.3.22`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.

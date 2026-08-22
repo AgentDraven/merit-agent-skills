@@ -9,12 +9,12 @@ Annotated flowchart for a **new laptop** on the public freeware path. Private-Va
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.58 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills\BootStrap
 .\MERIT_BootStrap.cmd
 ```
 
-Use the current public pin if newer than `skills-v0.3.58` (see repo `VERSION` / tags). Clone **from** the bench folder so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
+Use the current public pin if newer than `skills-v0.5.0` (see repo `VERSION` / tags). Clone **from** the bench folder so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
 
 ## OSS pathway flowchart
 
