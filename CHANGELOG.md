@@ -1,3 +1,13 @@
+## 0.5.3 - 2026-08-22
+
+### Added
+- **Merit-Hub menu I / `-InstallSkills`:** built-in skills install (same as `install.ps1`) for Cursor, Codex, Hermes, OpenClaw, Grok, Devin, etc.
+- **pwsh guide + portable install:** menu **1** prints download links; optional portable pwsh to `%MYMERITTOOLS%\pwsh\` + `pwsh.cmd` shim.
+
+### Changed
+- Merit-Hub **J** prompts for skills install; README documents pwsh requirement and host install paths.
+- Hub pin: **`skills-v0.5.3`** / **`vault-v0.5.3`**.
+
 ## 0.5.2 - 2026-08-22
 
 ### Added

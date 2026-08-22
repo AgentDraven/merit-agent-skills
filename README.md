@@ -15,7 +15,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) â€” workbench, journal, AMA, subs, legal |
 | **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) â€” independent consumer ID using the same hosted providers |
 | **Try bundles (Angles 1â€“4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
-| **Skills only** | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode|Hermes|OpenClaw|GrokBot|Devin`; Linux/macOS `./install.sh -Target …` (aliases: `Claude`, `Agents`, `Grok`) |
+| **Skills only** | Merit-Hub menu **I** or `pwsh -File Merit-Hub.ps1 -InstallSkills Cursor` (after **J**). Or from cloned repo: `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode|Hermes|OpenClaw|GrokBot|Devin` |
 | **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** â€” gap analysis â†’ FR/AGENT_REQ (no vault) |
 | **Affiliate / design partner** | [`skills/merit-affiliate`](skills/merit-affiliate/SKILL.md) â€” free attribution + portal recipes (no billing) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha â€¦` |

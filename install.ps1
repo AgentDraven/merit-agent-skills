@@ -13,6 +13,8 @@ function Write-InstallUsage {
     Write-Host @"
 install.ps1 - install MERIT agent skills into an AI IDE host
 
+Also available from Merit-Hub (no separate script): menu I or -InstallSkills <host>
+
 Usage:
   .\install.ps1 -Target <host>
   .\install.ps1 -Target Project -Path <repo-root>
