@@ -16,7 +16,7 @@
       "owner": "AgentDraven",
       "name": "merit-agent-skills",
       "url": "https://github.com/AgentDraven/merit-agent-skills.git",
-      "pinTag": "skills-v0.3.57"
+      "pinTag": "skills-v0.3.58"
     },
     "showcase": {
       "owner": "Mr-PI-Bala",
@@ -27,7 +27,7 @@
   "vaultTeaser": {
     "status": "future",
     "summary": "Private-Vault / subscription entitlement not productized yet. OSS freemium does not require it.",
-    "vaultPinTag": "v1.8.72",
+    "vaultPinTag": "v1.8.73",
     "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git"
   },
   "prerequisitesLastCheck": null,

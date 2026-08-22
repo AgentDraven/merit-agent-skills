@@ -150,8 +150,80 @@ function Install-WingetPkg([string]$Id, [string]$Name) {
     return $false
 }
 
+function Refresh-ProcessPath {
+    $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' +
+        [Environment]::GetEnvironmentVariable('Path', 'User')
+}
+
+function Resolve-BasePythonExe {
+    Refresh-ProcessPath
+    foreach ($name in @('python', 'python3', 'py')) {
+        $cmd = Get-Command $name -ErrorAction SilentlyContinue
+        if (-not $cmd) { continue }
+        if ($name -eq 'py') {
+            try {
+                $viaPy = & py -3 -c "import sys; print(sys.executable)" 2>$null
+                if ($viaPy -and (Test-Path -LiteralPath $viaPy.Trim())) { return $viaPy.Trim() }
+            }
+            catch { }
+            continue
+        }
+        if ($cmd.Source -and (Test-Path -LiteralPath $cmd.Source) -and ($cmd.Source -notmatch 'WindowsApps')) {
+            return $cmd.Source
+        }
+    }
+    foreach ($c in @(
+            (Join-Path $env:LOCALAPPDATA 'Programs\Python\Python312\python.exe'),
+            (Join-Path $env:ProgramFiles 'Python312\python.exe')
+        )) {
+        if ($c -and (Test-Path -LiteralPath $c)) { return $c }
+    }
+    return $null
+}
+
+function Install-ToolsMeritPython {
+    <#
+      Laptop-shared C:\Tools\merit-venv (same path as Private-Vault). Menu 1 installs like git/gh.
+      Public merit.ps1 is PowerShell-first; Python still helps merit-demo / Flask / local tooling.
+    #>
+    Write-Header 'MERIT Python under C:\Tools (laptop shared)'
+    Write-Note 'Not git-tracked. Same C:\Tools\merit-venv Private-Vault uses for scripts/merit.ps1.'
+    $tools = 'C:\Tools'
+    $venvDir = Join-Path $tools 'merit-venv'
+    $venvPy = Join-Path $venvDir 'Scripts\python.exe'
+    New-Item -ItemType Directory -Force -Path $tools | Out-Null
+    if (Test-Path -LiteralPath $venvPy) {
+        Write-Ok "Already present: $venvPy"
+        Set-Content -LiteralPath (Join-Path $tools 'merit-python.cmd') -Value "@echo off`r`n`"$venvPy`" %*`r`n" -Encoding ASCII
+        return $true
+    }
+    $base = Resolve-BasePythonExe
+    if (-not $base) {
+        Write-Info 'Base Python missing — winget Python.Python.3.12 ...'
+        if (-not (Install-WingetPkg -Id 'Python.Python.3.12' -Name 'Python 3.12')) { return $false }
+        Refresh-ProcessPath
+        $base = Resolve-BasePythonExe
+        if (-not $base) {
+            Write-Fail 'Python installed but not on PATH — open a NEW terminal, re-run menu 1.'
+            return $false
+        }
+    }
+    else {
+        Write-Ok "Base Python: $base"
+    }
+    Write-Info "Creating $venvDir ..."
+    & $base -m venv $venvDir
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $venvPy)) {
+        Write-Fail "venv create failed at $venvDir"
+        return $false
+    }
+    Set-Content -LiteralPath (Join-Path $tools 'merit-python.cmd') -Value "@echo off`r`n`"$venvPy`" %*`r`n" -Encoding ASCII
+    Write-Ok "MERIT laptop Python: $venvPy"
+    return $true
+}
+
 # Canonical public pin for bench clones (keep in sync with README / VERSION / tag).
-$Script:SkillsPinTag = 'skills-v0.3.57'
+$Script:SkillsPinTag = 'skills-v0.3.58'
 
 function Invoke-Prereqs {
     Write-Header 'Prerequisites - check / install'
@@ -160,6 +232,7 @@ function Invoke-Prereqs {
     $needGit = $false
     $needPwsh = $false
     $needGh = $false
+    $needToolsPy = $false
 
     $gitCmd = Get-Command git -ErrorAction SilentlyContinue
     if ($gitCmd) { Write-Ok ("Git - " + ((& git --version 2>&1 | Out-String).Trim())) }
@@ -221,7 +294,22 @@ function Invoke-Prereqs {
     if (Test-Path -LiteralPath $bench.DemoPath) { Write-Ok "Bench demo - $($bench.DemoPath)" }
     else { Write-Warn 'Bench demo missing - use menu 3' }
 
-    if (-not ($needGit -or $needPwsh -or $needGh)) {
+    $toolsPy = 'C:\Tools\merit-venv\Scripts\python.exe'
+    if (Test-Path -LiteralPath $toolsPy) {
+        try {
+            $ver = & $toolsPy -c "import sys; print(sys.version.split()[0])" 2>&1
+            Write-Ok "MERIT Python (C:\Tools) - $ver"
+        }
+        catch {
+            Write-Ok "MERIT Python (C:\Tools) - $toolsPy"
+        }
+    }
+    else {
+        $needToolsPy = $true
+        Write-Warn 'MERIT Python (C:\Tools) missing - menu 1 can create C:\Tools\merit-venv (shared with Private-Vault)'
+    }
+
+    if (-not ($needGit -or $needPwsh -or $needGh -or $needToolsPy)) {
         Write-Ok 'No required installs pending.'
         $state = Get-State
         $state.prerequisitesLastCheck = (Get-Date).ToString('o')
@@ -230,7 +318,7 @@ function Invoke-Prereqs {
     }
 
     Write-Host ''
-    $ans = Read-Host 'Install missing tools via winget now? [y/N]'
+    $ans = Read-Host 'Install missing tools now? [y/N]'
     if ($ans -notmatch '^[Yy]') {
         Write-Warn 'Skipped installs.'
         return
@@ -238,6 +326,7 @@ function Invoke-Prereqs {
     if ($needGit) { [void](Install-WingetPkg -Id 'Git.Git' -Name 'Git') }
     if ($needPwsh) { [void](Install-WingetPkg -Id 'Microsoft.PowerShell' -Name 'PowerShell 7+') }
     if ($needGh) { [void](Install-WingetPkg -Id 'GitHub.cli' -Name 'GitHub CLI') }
+    if ($needToolsPy) { [void](Install-ToolsMeritPython) }
     $state = Get-State
     $state.prerequisitesLastCheck = (Get-Date).ToString('o')
     Save-State $state
@@ -413,7 +502,7 @@ function Invoke-SeedPrivateVaultDev {
     $ownerDir = Join-Path $devRoot 'AgentDraven'
     $vaultDir = Join-Path $ownerDir 'merit-private-vault'
     $vaultUrl = 'https://github.com/AgentDraven/merit-private-vault.git'
-    $vaultPinTag = 'v1.8.72'
+    $vaultPinTag = 'v1.8.73'
     $bootCmd = Join-Path $vaultDir 'BootStrap\MERIT_BootStrap.cmd'
     $seedCmd = Join-Path $vaultDir 'BootStrap\seed-private-dev.cmd'
 

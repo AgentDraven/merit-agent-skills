@@ -1,3 +1,12 @@
+## 0.3.58 - 2026-08-21
+
+### Changed
+- OSS BootStrap menu **1** installs laptop-shared **`C:\Tools\merit-venv`** (same path as Private-Vault) — not assumed pre-installed; helps merit-demo / Flask while public `merit.ps1` stays PowerShell-first.
+- Docs: `bootstrap_pathway.md` / BootStrap README / design note.
+
+### Notes
+- Pairs with vault **v1.8.73** Tools Python policy.
+
 ## 0.3.57 - 2026-08-21
 
 ### Added

@@ -46,10 +46,10 @@ On 2026-08-20 the work was preserved from a detached `skills-v0.3.53` checkout u
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.3.57 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.3.58 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills\BootStrap
 .\MERIT_BootStrap.cmd
-# Menu T = vault teaser; Menu P = clone AgentDraven/merit-private-vault @ v1.8.72 (GCM credentials)
+# Menu T = vault teaser; Menu P = clone AgentDraven/merit-private-vault @ v1.8.73 (GCM credentials)
 ```
 
 `git clone` must run **from** the bench folder so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
