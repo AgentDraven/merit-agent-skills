@@ -23,20 +23,29 @@ Targets:
   ClaudeCode   -> ~/.claude/skills     (alias: Claude)
   Codex        -> ~/.codex/skills      (or `$CODEX_HOME/skills)
   VSCode       -> ~/.agents/skills     (alias: Agents)
+  Hermes       -> ~/.hermes/skills
+  OpenClaw     -> ~/.openclaw/skills
+  GrokBot      -> ~/.grok/skills       (alias: Grok)
+  Devin        -> ~/.devin/skills
   Project      -> <repo>/.cursor/skills  (requires -Path)
 
 Examples:
   .\install.ps1 -Target Cursor
   .\install.ps1 -Target ClaudeCode
-  .\install.ps1 -Target Codex
-  .\install.ps1 -Target VSCode
+  .\install.ps1 -Target Hermes
+  .\install.ps1 -Target OpenClaw
+  .\install.ps1 -Target GrokBot
+  .\install.ps1 -Target Devin
   .\install.ps1 -Target Project -Path ..\my-app
 
 Re-run after git pull to refresh installed skills. Existing skill folders are replaced (not nested).
 "@
 }
 
-$known = @('Cursor', 'ClaudeCode', 'Claude', 'Codex', 'VSCode', 'Agents', 'Project')
+$known = @(
+    'Cursor', 'ClaudeCode', 'Claude', 'Codex', 'VSCode', 'Agents',
+    'Hermes', 'OpenClaw', 'GrokBot', 'Grok', 'Devin', 'Project'
+)
 
 if ($Help -or [string]::IsNullOrWhiteSpace($Target)) {
     Write-InstallUsage
@@ -63,6 +72,7 @@ if (-not $homeRoot) {
 $resolved = switch ($Target) {
     'Claude' { 'ClaudeCode' }
     'Agents' { 'VSCode' }
+    'Grok' { 'GrokBot' }
     default { $Target }
 }
 
@@ -78,8 +88,19 @@ switch ($resolved) {
         $destRoot = Join-Path $codexHome 'skills'
     }
     'VSCode' {
-        # Open Agent Skills user path (VS Code / Copilot-style hosts + Agents alias)
         $destRoot = Join-Path $homeRoot '.agents\skills'
+    }
+    'Hermes' {
+        $destRoot = Join-Path $homeRoot '.hermes\skills'
+    }
+    'OpenClaw' {
+        $destRoot = Join-Path $homeRoot '.openclaw\skills'
+    }
+    'GrokBot' {
+        $destRoot = Join-Path $homeRoot '.grok\skills'
+    }
+    'Devin' {
+        $destRoot = Join-Path $homeRoot '.devin\skills'
     }
     'Project' {
         if (-not $Path) {
@@ -104,3 +125,9 @@ Get-ChildItem -LiteralPath $skillsSrc -Directory | ForEach-Object {
     $count++
 }
 Write-Host "Installed $count skills to $destRoot (Target=$Target)"
+if ($resolved -eq 'OpenClaw') {
+    Write-Host 'Tip: openclaw skills install ./skills/<skill-name> for CLI-managed single-skill installs.'
+}
+if ($resolved -eq 'Hermes') {
+    Write-Host 'Tip: hermes skills tap add AgentDraven/merit-agent-skills for tap-based refresh.'
+}

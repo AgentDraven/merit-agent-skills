@@ -6,17 +6,14 @@ Annotated flowchart for a **new laptop** on the public freeware path. Private-Va
 
 ## Cold start
 
-**Easiest path — Merit-Hub** (copy [`Merit-Hub/`](../Merit-Hub/) to `%MYMERITTOOLS%\Merit-Hub`, default `C:\Tools\Merit-Hub`):
+**Easiest path — one file:** [download `Merit-Hub.ps1`](../Merit-Hub/Merit-Hub.ps1) to `C:\Tools\Merit-Hub.ps1` (or anywhere), then:
 
 ```powershell
-cd C:\Tools\Merit-Hub
-.\Merit-Hub.cmd
-# J = Jumpstart OSS (clone skills pin + launch BootStrap)
-# V = Jumpstart Vault
-# P = Pristine v2 laptop reset
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+# J = Jumpstart OSS  |  V = Jumpstart Vault  |  P = Pristine v2
 ```
 
-See [Merit-Hub/README.md](../Merit-Hub/README.md). Pins live in `Merit-Hub.json`.
+See [Merit-Hub/README.md](../Merit-Hub/README.md). Release pins are embedded in the script.
 
 **Classic path — clone skills first:**
 

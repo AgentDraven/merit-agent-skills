@@ -1,3 +1,14 @@
+## 0.5.2 - 2026-08-22
+
+### Added
+- **`install.ps1` targets:** Hermes, OpenClaw, GrokBot (alias Grok), Devin — promoted to **supported** in `cfg/agent_hosts.json`.
+- **Collaboration** section in README — email [meritlabs@protonmail.com](mailto:meritlabs@protonmail.com?subject=MERIT%20host%20suggestion) to suggest AI IDEs / agent harnesses.
+
+### Changed
+- **Merit-Hub:** single standalone **`Merit-Hub.ps1`** only (embedded pins; no `.cmd`/`.sh`/`.json`/`install.ps1`).
+- README tagline and multi-runtime table list all supported + research hosts; GitHub repo description updated.
+- Hub pins: **`skills-v0.5.2`** / **`vault-v0.5.3`**.
+
 ## 0.5.1 - 2026-08-21
 
 ### Added

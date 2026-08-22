@@ -1,69 +1,49 @@
-# Merit-Hub — laptop hub
+# Merit-Hub — one file
 
-Single entry under **`%MYMERITTOOLS%\Merit-Hub`** (default **`C:\Tools\Merit-Hub`**).
+**Download one script:** [`Merit-Hub.ps1`](Merit-Hub.ps1) — standalone, no git, no folder, no `.json`.
 
-Script name **`Merit-Hub`** — distinct from repo **`merit.ps1`** (public CLI) and **`MERIT.ps1`** (vault operator copy under `~/dev`).
-
-| Launcher | Role |
-|----------|------|
-| **`Merit-Hub.cmd`** / **`Merit-Hub.ps1`** / **`Merit-Hub.sh`** | Hub menu + switches |
-
-Config: [`Merit-Hub.json`](Merit-Hub.json) (pins `skills-v0.5.1` / `vault-v0.5.2`).
-
-## Quick start
+Save it anywhere (default: **`C:\Tools\Merit-Hub.ps1`**) and run:
 
 ```powershell
-cd C:\Tools\Merit-Hub
-.\Merit-Hub.cmd
-# P = Pristine v2  |  J = Jumpstart OSS  |  V = Jumpstart Vault
+# Windows — PowerShell 7+ (recommended)
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+
+# Windows — built-in Windows PowerShell 5.1 also works
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
-Non-interactive:
-
-```powershell
-.\Merit-Hub.cmd -Pristine -Force
-.\Merit-Hub.cmd -Jumpstart Oss
-.\Merit-Hub.cmd -Jumpstart Vault
-.\Merit-Hub.cmd -Prereqs -Force
+```bash
+# Linux / macOS (PowerShell 7+ required)
+pwsh Merit-Hub.ps1
 ```
 
-Linux/macOS: `./Merit-Hub.sh` (needs `pwsh`).
+That opens the menu. **J** jumpstarts OSS, **V** jumpstart vault, **P** pristine laptop reset. Release pins are **inside the script** — no config file.
 
-## Install from git
+## Download (no git)
 
-Copy this folder from **`merit-agent-skills/Merit-Hub`** to your laptop tools root:
+1. Open **[Merit-Hub.ps1](Merit-Hub.ps1)** on GitHub.
+2. **Raw** → Save As → `Merit-Hub.ps1` (e.g. under `C:\Tools\`).
+3. Run the command above.
 
-```powershell
-# default target
-Copy-Item -Recurse -Force .\Merit-Hub C:\Tools\Merit-Hub
-cd C:\Tools\Merit-Hub
-.\Merit-Hub.cmd
-```
+Direct raw link (replace `main` with a `skills-v*` tag for a frozen pin):
 
-Or run [`install.ps1`](install.ps1) from the repo copy.
+`https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
 
-## Environment variables
+## What the script creates locally
 
-| Variable | Default (Windows) | Purpose |
-|----------|-------------------|---------|
-| **`MYMERITTOOLS`** | `C:\Tools` | Tools root — `merit-venv`, shims |
-| **`MYMERITAPP`** | `C:\MyMeritApp` | OSS bench |
+| Path | When |
+|------|------|
+| `backups\<timestamp>\` | Next to the script, on Pristine / Soft / Backup |
+| `C:\Tools\merit-venv\` | Menu **1** or jumpstart (MYMERITTOOLS root) |
+| `%MYMERITAPP%\merit-agent-skills\` | Menu **J** (default bench `C:\MyMeritApp`) |
+| `~/dev\...\merit-private-vault\` | Menu **V** |
 
-Menu **T** / **M** set and display paths (User env).
+**P** keeps **`Merit-Hub.ps1`** itself; it removes bench clones, `~/dev`, and merit-venv/shims under Tools.
 
-## Naming (avoid confusion)
+## Naming
 
-| Name | Where | Role |
-|------|-------|------|
-| **Merit-Hub** | `C:\Tools\Merit-Hub\Merit-Hub.*` | Laptop cold-start / cleanup |
-| **merit.ps1** | `merit-agent-skills` repo root | Public freemium CLI |
-| **MERIT.ps1** | `~/dev` after vault BootStrap | Operator CLI mirror |
-| **MERIT.json** | `~/dev` or `BootStrap/` | BootStrap registry (not Merit-Hub.json) |
-
-## Pristine v2
-
-**P** wipes OSS bench, **~/dev** tree + folder, **merit-venv** under MYMERITTOOLS, clears **MYMERITAPP** / **MYMERITTOOLS**, strips **~/dev** from User Path. Keeps **`C:\Tools\Merit-Hub`** hub files.
-
-Open a **new terminal** after Pristine, then **J** to jumpstart.
-
-Backups: `backups\<timestamp>\`
+| Name | Role |
+|------|------|
+| **Merit-Hub.ps1** | This laptop hub (this file) |
+| **merit.ps1** | Public CLI inside `merit-agent-skills` (cloned by **J**) |
+| **MERIT.ps1** | Vault operator CLI under `~/dev` (after **V**) |

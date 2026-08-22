@@ -1,12 +1,12 @@
 ﻿# merit-agent-skills
 
-Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
+Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for **Cursor**, **Claude Code**, **Codex**, **VS Code / Open Agents**, **Hermes**, **OpenClaw**, **Grok Bot**, **Devin**, and more agent harnesses (see [Collaboration](#collaboration--suggest-a-host)).
 
 ## Start here
 
 | Goal | Path |
 |------|------|
-| **Laptop hub (easiest cold start)** | **[Merit-Hub/](Merit-Hub/README.md)** — copy `Merit-Hub/` to `%MYMERITTOOLS%\Merit-Hub` (default `C:\Tools\Merit-Hub`), run `Merit-Hub.cmd`; **J** jumpstarts OSS, **V** vault, **P** pristine reset. No full clone required first. |
+| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** — one file, save as `C:\Tools\Merit-Hub.ps1`, run `pwsh -File C:\Tools\Merit-Hub.ps1`. Details: [Merit-Hub/README.md](Merit-Hub/README.md). **J** OSS · **V** vault · **P** reset. No git. |
 | **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** â€” 3 steps, no accounts night one |
 | **OSS BootStrap** | **[BootStrap/](BootStrap/README.md)** — clone repo, run `BootStrap\MERIT_BootStrap.cmd`; bench folder = `%MYMERITAPP%` (default `C:\MyMeritApp`). Not the root CLI. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
@@ -15,7 +15,7 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) â€” workbench, journal, AMA, subs, legal |
 | **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) â€” independent consumer ID using the same hosted providers |
 | **Try bundles (Angles 1â€“4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
-| **Skills only** | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./install.sh -Target â€¦` (aliases: `Claude`, `Agents`) |
+| **Skills only** | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode|Hermes|OpenClaw|GrokBot|Devin`; Linux/macOS `./install.sh -Target …` (aliases: `Claude`, `Agents`, `Grok`) |
 | **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** â€” gap analysis â†’ FR/AGENT_REQ (no vault) |
 | **Affiliate / design partner** | [`skills/merit-affiliate`](skills/merit-affiliate/SKILL.md) â€” free attribution + portal recipes (no billing) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha â€¦` |
@@ -35,31 +35,25 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 
 ## Quick install
 
-**Recommended cold start:** download or sparse-clone only [`Merit-Hub/`](Merit-Hub/) to your laptop, then run the hub — it clones pinned OSS/vault releases for you.
+**Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) to `C:\Tools\`, then:
 
 ```powershell
-# Option A — Merit-Hub only (no full repo clone yet)
-git clone --depth 1 --filter=blob:none --sparse https://github.com/AgentDraven/merit-agent-skills.git C:\MyMeritApp\merit-agent-skills
-cd C:\MyMeritApp\merit-agent-skills
-git sparse-checkout set Merit-Hub
-cd Merit-Hub
-.\install.ps1
-cd C:\Tools\Merit-Hub
-.\Merit-Hub.cmd
-# J = Jumpstart OSS  |  V = Jumpstart Vault
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
+
+Menu **J** / **V** clones pinned OSS/vault for you — no full repo clone required first.
 
 **Full repo install** (OSS bench = `%MYMERITAPP%`, default `C:\MyMeritApp`):
 
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.2 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # omit -Target to print usage (no default host)
 # Device BootStrap (optional): cd BootStrap; .\MERIT_BootStrap.cmd
-# Or copy Merit-Hub: cd Merit-Hub; .\install.ps1
+# Or copy Merit-Hub.ps1 to C:\Tools\ and: pwsh -File C:\Tools\Merit-Hub.ps1
 ```
 
 Linux/macOS:
@@ -67,22 +61,39 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.2 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
 
 ## Multi-runtime install (same `skills/` tree)
 
-| Runtime | Install |
-|---------|---------|
-| **Cursor** | `.\install.ps1 -Target Cursor` â†’ `~/.cursor/skills` |
-| **Claude Code** | `.\install.ps1 -Target ClaudeCode` â†’ `~/.claude/skills` (alias: `Claude`) |
-| **Codex** | `.\install.ps1 -Target Codex` â†’ `~/.codex/skills` (or `$CODEX_HOME/skills`) |
-| **VS Code / Agents** | `.\install.ps1 -Target VSCode` â†’ `~/.agents/skills` (alias: `Agents`) |
-| **Hermes** | `hermes skills tap add AgentDraven/merit-agent-skills` Â· or copy into `~/.hermes/skills` / scan `~/.agents/skills` |
-| **OpenClaw** | `openclaw skills install ./skills/merit-mm-upgrade` Â· ClawHub publish if desired (license: Apache-2.0 here) |
-| **Project (Cursor)** | `.\install.ps1 -Target Project -Path <repo>` â†’ `<repo>/.cursor/skills` |
+| Runtime | Status | Install |
+|---------|--------|---------|
+| **Cursor** | supported | `.\install.ps1 -Target Cursor` → `~/.cursor/skills` |
+| **Claude Code** | supported | `.\install.ps1 -Target ClaudeCode` → `~/.claude/skills` (alias: `Claude`) |
+| **Codex** | supported | `.\install.ps1 -Target Codex` → `~/.codex/skills` (or `$CODEX_HOME/skills`) |
+| **VS Code / Open Agents** | supported | `.\install.ps1 -Target VSCode` → `~/.agents/skills` (alias: `Agents`) |
+| **Hermes** | supported | `.\install.ps1 -Target Hermes` → `~/.hermes/skills` · or `hermes skills tap add AgentDraven/merit-agent-skills` |
+| **OpenClaw** | supported | `.\install.ps1 -Target OpenClaw` → `~/.openclaw/skills` · or `openclaw skills install ./skills/<skill>` |
+| **Grok Bot** | supported | `.\install.ps1 -Target GrokBot` → `~/.grok/skills` (alias: `Grok`) |
+| **Devin** | supported | `.\install.ps1 -Target Devin` → `~/.devin/skills` + repo `AGENTS.md` in cloud sessions |
+| **Project (Cursor)** | supported | `.\install.ps1 -Target Project -Path <repo>` → `<repo>/.cursor/skills` |
+| **Paperclip** | research | — (suggest via email below) |
+
+Registry source of truth: [`cfg/agent_hosts.json`](cfg/agent_hosts.json).
+
+## Collaboration — suggest a host
+
+MERIT aims to be the **one-stop** public path for builders on **any** AI IDE, agentic harness, or autonomous agent — not just the hosts above.
+
+**Missing your stack?** Email **[meritlabs@protonmail.com](mailto:meritlabs@protonmail.com?subject=MERIT%20host%20suggestion)** with:
+
+- Host / product name (e.g. your IDE, CLI agent, or cloud agent)
+- Where skills or instructions are loaded from (path, env var, or doc link)
+- Whether you want file-copy install (`install.ps1 -Target …`) or CLI-only integration
+
+We add vetted hosts to [`cfg/agent_hosts.json`](cfg/agent_hosts.json) and promote `research` → `supported` when install wiring lands. Same instruction chain (L1 → L2 → L3) for every host — hosts mount skills; they do not fork product law.
 
 **mmUpgrade** is public freeware (`merit-mm-upgrade`). Full **`merit-upgrade`** (IAR / hygiene / maturity / closeout) stays vault-only via `merit.ps1 runtime out` â€” not in this OSS tree.
 
@@ -194,7 +205,7 @@ Guest OSS PAR â†’ free register (meritstore) â†’ hit freemium cap â�
 | Pre-GA tags | `skills-v0.x.y` â€” minor bumps in this program |
 | GA | `skills-v1.0.0` when **HumanBala** approves |
 | Pin | Release tags, not floating `main` (L1 Â§E.0 / FR-SK-14) |
-| Current tip (Portal pin) | **`skills-v0.5.0`** |
+| Current tip (Portal pin) | **`skills-v0.5.2`** |
 | Current human-validation baseline | **`skills-v0.3.22`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.

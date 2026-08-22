@@ -4,7 +4,7 @@
   Merit-Hub â€” laptop cleanup (Pristine v2), jumpstart OSS/vault, shared tools (MYMERITTOOLS).
 
 .DESCRIPTION
-  Single entry point under %MYMERITTOOLS%\Merit-Hub (default C:\Tools\Merit-Hub). Script name Merit-Hub.ps1 â€” not repo MERIT.ps1 / merit.ps1.
+  Single standalone script — save as e.g. C:\Tools\Merit-Hub.ps1 (default %MYMERITTOOLS%). Pins are embedded; no .json or install helper required.
   Run with no args for interactive menu.
 
   Cleanup:
@@ -21,11 +21,11 @@
     MYMERITTOOLS  laptop tools root (default C:\Tools) â€” merit-venv, shims
 
 .EXAMPLE
-  .\Merit-Hub.cmd
-  .\Merit-Hub.cmd -Pristine -Force
-  .\Merit-Hub.cmd -Jumpstart Oss
-  .\Merit-Hub.cmd -Jumpstart Vault
-  .\Merit-Hub.cmd -Prereqs
+  pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1
+  pwsh -File .\Merit-Hub.ps1 -Pristine -Force
+  pwsh -File .\Merit-Hub.ps1 -Jumpstart Oss
+  pwsh -File .\Merit-Hub.ps1 -Jumpstart Vault
+  pwsh -File .\Merit-Hub.ps1 -Prereqs
 #>
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
@@ -43,11 +43,34 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$Script:HubRoot = $PSScriptRoot
-if (-not $Script:HubRoot) { $Script:HubRoot = Split-Path -Parent $MyInvocation.MyCommand.Path }
-$Script:ConfigPath = Join-Path $Script:HubRoot 'Merit-Hub.json'
+$Script:HubScriptPath = $PSCommandPath
+if (-not $Script:HubScriptPath) { $Script:HubScriptPath = $MyInvocation.MyCommand.Path }
+$Script:HubRoot = Split-Path -Parent $Script:HubScriptPath
 $Script:BackupRoot = Join-Path $Script:HubRoot 'backups'
 $Script:IsWindows = ($PSVersionTable.PSPlatform -eq 'Win32NT') -or ($env:OS -match 'Windows')
+
+# Embedded release pins (no separate Merit-Hub.json required).
+$Script:EmbeddedHubConfigJson = @'
+{
+  "schemaVersion": 1,
+  "skillsPin": "skills-v0.5.2",
+  "vaultPin": "vault-v0.5.3",
+  "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
+  "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
+  "vaultOwner": "AgentDraven",
+  "vaultRepo": "merit-private-vault",
+  "showcaseUrl": "https://github.com/Mr-PI-Bala/merit-demo.git",
+  "defaultMyMeritAppWindows": "C:\\MyMeritApp",
+  "defaultMyMeritAppUnix": "~/MyMeritApp",
+  "defaultMyMeritToolsWindows": "C:\\Tools",
+  "defaultMyMeritToolsUnix": "~/Tools",
+  "devSubdir": "dev"
+}
+'@
+
+function Get-HubRunHint {
+    return "pwsh -NoProfile -ExecutionPolicy Bypass -File `"$($Script:HubScriptPath)`""
+}
 
 function Write-Ok([string]$t) { Write-Host "  [OK]   $t" -ForegroundColor Green }
 function Write-Fail([string]$t) { Write-Host "  [FAIL] $t" -ForegroundColor Red }
@@ -62,10 +85,7 @@ function Write-Header([string]$t) {
 }
 
 function Get-HubConfig {
-    if (-not (Test-Path -LiteralPath $Script:ConfigPath)) {
-        throw "Merit-Hub.json missing at $($Script:ConfigPath)"
-    }
-    return (Get-Content -LiteralPath $Script:ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json)
+    return ($Script:EmbeddedHubConfigJson | ConvertFrom-Json)
 }
 
 function Expand-HomePath([string]$Path) {
@@ -268,7 +288,7 @@ function New-MeritBackup {
     foreach ($pair in @(
             @{ Src = (Join-Path $dev 'MERIT.json'); Sub = 'dev'; Name = 'MERIT.json' }
             @{ Src = (Join-Path $oss 'BootStrap\MERIT.json'); Sub = 'oss-bootstrap'; Name = 'MERIT.json' }
-            @{ Src = (Join-Path $Script:HubRoot 'Merit-Hub.json'); Sub = 'hub'; Name = 'Merit-Hub.json' }
+            @{ Src = $Script:HubScriptPath; Sub = 'hub'; Name = (Split-Path -Leaf $Script:HubScriptPath) }
         )) {
         if (Copy-IfExists -Source $pair.Src -DestDir (Join-Path $dir $pair.Sub) -DestName $pair.Name) {
             Write-Ok "$($pair.Sub)/$($pair.Name)"
@@ -281,8 +301,7 @@ function New-MeritBackup {
 After **Pristine**, cold-start from the hub (no prior clone required):
 
 ``````powershell
-cd $($Script:HubRoot)
-.\Merit-Hub.cmd
+$(Get-HubRunHint)
 # J = Jumpstart OSS  |  V = Jumpstart Vault  |  1 = Prereqs only
 ``````
 
@@ -390,17 +409,22 @@ function Invoke-MeritCleanup {
     if ($DoWipeOss -and -not [string]::IsNullOrWhiteSpace($oss)) {
         $fullOss = Expand-HomePath $oss
         $fullDev = Expand-HomePath $dev
-        $hubNorm = Expand-HomePath $Script:HubRoot
+        $hubNorm = Expand-HomePath $Script:HubScriptPath
+        $hubDir = Expand-HomePath $Script:HubRoot
         if ($fullOss -in @([IO.Path]::GetFullPath('C:\'), Expand-HomePath $HOME)) {
             Write-Fail "Refusing to wipe unsafe OSS path: $fullOss"
         }
         elseif ($fullOss -eq $fullDev) {
             Write-Fail 'Refusing to wipe OSS bench that equals ~/dev'
         }
-        elseif ($fullOss -eq (Split-Path -Parent $hubNorm)) {
-            Write-Warn "OSS bench is parent of Merit-Hub â€” skipping full delete of $fullOss"
+        elseif ($fullOss -eq $hubDir) {
+            Write-Warn "OSS bench is Merit-Hub directory — skipping full delete of $fullOss"
             Get-ChildItem -LiteralPath $fullOss -Force -ErrorAction SilentlyContinue |
-                Where-Object { $_.FullName -ne $hubNorm -and $_.Name -notin @('Merit-Hub') } |
+                Where-Object {
+                    $_.FullName -ne $hubNorm -and
+                    $_.Name -notin @('Merit-Hub', 'backups') -and
+                    $_.Name -notlike 'Merit-Hub.ps1'
+                } |
                 ForEach-Object { Remove-PathSafe -Path $_.FullName -Label "OSS child $($_.Name)" }
         }
         else {
@@ -411,7 +435,7 @@ function Invoke-MeritCleanup {
     Write-Host ''
     Write-Ok "Cleanup finished ($ModeName)."
     Write-Info "Backup: $BackupDir"
-    Write-Info "Cold start: cd $($Script:HubRoot) && .\Merit-Hub.cmd  â†’  J Jumpstart OSS"
+    Write-Info "Cold start: $(Get-HubRunHint)  →  J Jumpstart OSS"
 }
 
 function Invoke-Mode {
@@ -420,7 +444,7 @@ function Invoke-Mode {
         'Pristine' {
             Write-Header 'Mode: PRISTINE v2 (brand-new laptop)'
             Write-Info 'Wipes OSS bench, ~/dev tree, MYMERIT* env, merit-venv/shims under MYMERITTOOLS.'
-            Write-Info "Keeps hub folder: $Script:HubRoot"
+            Write-Info "Keeps hub script: $Script:HubScriptPath"
             $backup = New-MeritBackup
             Invoke-MeritCleanup -BackupDir $backup -ModeName $Mode -ConfirmWord 'PRISTINE' `
                 -DoWipeOss $true -DoWipeDevTree $true -DoWipeToolsArtifacts $true
@@ -694,7 +718,7 @@ function Invoke-JumpstartVault {
 function Show-MeritHubHelp {
     $cfg = Get-HubConfig
     Write-Header 'Merit-Hub laptop hub'
-    Write-Info "Location: $($Script:HubRoot)"
+    Write-Info "Location: $Script:HubScriptPath"
     Write-Info "MYMERITTOOLS: $(Get-MyMeritToolsRoot)  |  MYMERITAPP: $(Get-MyMeritAppRoot)"
     Write-Info "Pins: skills=$($cfg.skillsPin)  vault=$($cfg.vaultPin)"
     Write-Host ''
@@ -747,7 +771,7 @@ function Show-InteractiveMenu {
 }
 
 # --- main ---
-New-Item -ItemType Directory -Force -Path $Script:HubRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
 
 if ($Help) {
     Show-MeritHubHelp
