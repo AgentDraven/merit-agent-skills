@@ -1,3 +1,14 @@
+## 0.5.4 - 2026-08-22
+
+### Fixed
+- **Merit-Hub parse:** mojibake em-dashes in double-quoted strings, here-string backticks, and `$Script:IsWindows` colliding with PowerShell's read-only `$IsWindows` — first-run no longer `ParserError` / exit.
+- **StrictMode:** Windows detection uses `PSVersionTable.ContainsKey('PSPlatform')` (`$Script:HubOnWindows`).
+
+### Changed
+- First interactive run **prompts** for `MYMERITTOOLS` / `MYMERITAPP` when unset; **Enter** accepts defaults (`C:\Tools`, `C:\MyMeritApp`).
+- README: download via **Raw** only; ParserError symptom = saved HTML.
+- Hub pin: **`skills-v0.5.4`** / **`vault-v0.5.4`**.
+
 ## 0.5.3 - 2026-08-22
 
 ### Added

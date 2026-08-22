@@ -1,10 +1,10 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 <#
 .SYNOPSIS
-  Merit-Hub â€” laptop cleanup (Pristine v2), jumpstart OSS/vault, shared tools (MYMERITTOOLS).
+  Merit-Hub - laptop cleanup (Pristine v2), jumpstart OSS/vault, shared tools (MYMERITTOOLS).
 
 .DESCRIPTION
-  Single standalone script — save as e.g. C:\Tools\Merit-Hub.ps1 (default %MYMERITTOOLS%). Pins are embedded; no .json or install helper required.
+  Single standalone script  -  save as e.g. C:\Tools\Merit-Hub.ps1 (default %MYMERITTOOLS%). Pins are embedded; no .json or install helper required.
   Run with no args for interactive menu.
 
   Cleanup:
@@ -21,7 +21,7 @@
 
   Env (mirrors BootStrap):
     MYMERITAPP    OSS bench (default C:\MyMeritApp)
-    MYMERITTOOLS  laptop tools root (default C:\Tools) â€” merit-venv, shims
+    MYMERITTOOLS  laptop tools root (default C:\Tools) - merit-venv, shims
 
 .EXAMPLE
   pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1
@@ -53,14 +53,17 @@ $Script:HubScriptPath = $PSCommandPath
 if (-not $Script:HubScriptPath) { $Script:HubScriptPath = $MyInvocation.MyCommand.Path }
 $Script:HubRoot = Split-Path -Parent $Script:HubScriptPath
 $Script:BackupRoot = Join-Path $Script:HubRoot 'backups'
-$Script:IsWindows = ($PSVersionTable.PSPlatform -eq 'Win32NT') -or ($env:OS -match 'Windows')
+$Script:HubOnWindows = (
+    ($PSVersionTable.ContainsKey('PSPlatform') -and $PSVersionTable.PSPlatform -eq 'Win32NT') -or
+    ($env:OS -match 'Windows')
+)
 
 # Embedded release pins (no separate Merit-Hub.json required).
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.3",
-  "vaultPin": "vault-v0.5.3",
+  "skillsPin": "skills-v0.5.4",
+  "vaultPin": "vault-v0.5.4",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",
@@ -106,7 +109,7 @@ function Expand-HomePath([string]$Path) {
 
 function Get-DefaultMyMeritTools {
     $cfg = Get-HubConfig
-    if ($Script:IsWindows) {
+    if ($Script:HubOnWindows) {
         return Expand-HomePath ([string]$cfg.defaultMyMeritToolsWindows)
     }
     return Expand-HomePath ([string]$cfg.defaultMyMeritToolsUnix)
@@ -114,7 +117,7 @@ function Get-DefaultMyMeritTools {
 
 function Get-DefaultMyMeritApp {
     $cfg = Get-HubConfig
-    if ($Script:IsWindows) {
+    if ($Script:HubOnWindows) {
         return Expand-HomePath ([string]$cfg.defaultMyMeritAppWindows)
     }
     return Expand-HomePath ([string]$cfg.defaultMyMeritAppUnix)
@@ -165,7 +168,7 @@ function Clear-EnvVarAllScopes {
             if ([string]::IsNullOrWhiteSpace($existing)) { continue }
             if ($scope -eq 'Machine') {
                 $isAdmin = $false
-                if ($Script:IsWindows) {
+                if ($Script:HubOnWindows) {
                     try {
                         $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
                     }
@@ -180,7 +183,7 @@ function Clear-EnvVarAllScopes {
             Write-Ok "cleared $scope`:$Name (was $existing)"
         }
         catch {
-            Write-Warn "Could not clear $scope`:$Name â€” $($_.Exception.Message)"
+            Write-Warn "Could not clear $scope`:$Name - $($_.Exception.Message)"
         }
     }
 }
@@ -211,7 +214,7 @@ function Remove-PathFromUserEnvPath {
 }
 
 function Refresh-ProcessPath {
-    if ($Script:IsWindows) {
+    if ($Script:HubOnWindows) {
         $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' +
             [Environment]::GetEnvironmentVariable('Path', 'User')
     }
@@ -302,18 +305,19 @@ function New-MeritBackup {
         }
     }
 
-    $readme = @"
-# Merit-Hub backup $stamp
+    $runHint = Get-HubRunHint
+    $readme = @'
+# Merit-Hub backup {0}
 
 After **Pristine**, cold-start from the hub (no prior clone required):
 
-``````powershell
-$(Get-HubRunHint)
+```powershell
+{1}
 # J = Jumpstart OSS  |  V = Jumpstart Vault  |  1 = Prereqs only
-``````
+```
 
-Pins: skills=$($cfg.skillsPin) vault=$($cfg.vaultPin)
-"@
+Pins: skills={2} vault={3}
+'@ -f $stamp, $runHint, [string]$cfg.skillsPin, [string]$cfg.vaultPin
     Set-Content -LiteralPath (Join-Path $dir 'README.md') -Value $readme -Encoding UTF8
     Write-Ok 'README.md'
     return $dir
@@ -337,7 +341,7 @@ function Invoke-WipeMeritToolsArtifacts {
                     Remove-PathSafe -Path $p -Label "Tools shim $f"
                 }
                 else {
-                    Write-Info "skip large Tools\$f ($size bytes) â€” not assumed MERIT shim"
+                    Write-Info ('skip large Tools\' + $f + ' (' + $size + ' bytes) - not assumed MERIT shim')
                 }
             }
         }
@@ -371,7 +375,7 @@ function Invoke-MeritCleanup {
         Write-Warn "Type $ConfirmWord to proceed (or -Force)."
         $ans = Read-Host 'Confirm'
         if ($ans -ne $ConfirmWord) {
-            Write-Warn 'Aborted â€” backup kept.'
+            Write-Warn 'Aborted - backup kept.'
             return
         }
     }
@@ -400,7 +404,7 @@ function Invoke-MeritCleanup {
                 Remove-PathSafe -Path $dev -Label '~/dev folder'
             }
             else {
-                Write-Warn "~/dev not empty after clone wipe â€” remaining: $($remaining.Name -join ', ')"
+                Write-Warn "~/dev not empty after clone wipe - remaining: $($remaining.Name -join ', ')"
                 Write-Info 'Remove manually or close handles, then re-run Pristine.'
             }
         }
@@ -419,14 +423,15 @@ function Invoke-MeritCleanup {
         $fullDev = Expand-HomePath $dev
         $hubNorm = Expand-HomePath $Script:HubScriptPath
         $hubDir = Expand-HomePath $Script:HubRoot
-        if ($fullOss -in @([IO.Path]::GetFullPath('C:\'), Expand-HomePath $HOME)) {
+        $homeRoot = Expand-HomePath $HOME
+        if ($fullOss -in @([IO.Path]::GetFullPath('C:\'), $homeRoot)) {
             Write-Fail "Refusing to wipe unsafe OSS path: $fullOss"
         }
         elseif ($fullOss -eq $fullDev) {
             Write-Fail 'Refusing to wipe OSS bench that equals ~/dev'
         }
         elseif ($fullOss -eq $hubDir) {
-            Write-Warn "OSS bench is Merit-Hub directory — skipping full delete of $fullOss"
+            Write-Warn "OSS bench is Merit-Hub directory  -  skipping full delete of $fullOss"
             Get-ChildItem -LiteralPath $fullOss -Force -ErrorAction SilentlyContinue |
                 Where-Object {
                     $_.FullName -ne $hubNorm -and
@@ -472,7 +477,7 @@ function Invoke-Mode {
 }
 
 function Show-PwshInstallGuide {
-    Write-Header 'PowerShell 7+ (pwsh) — recommended runner'
+    Write-Header 'PowerShell 7+ (pwsh)  -  recommended runner'
     Write-Info 'Merit-Hub and merit.ps1 work best with pwsh. Hub runs on Windows PowerShell 5.1 only for bootstrapping.'
     Write-Host ''
     Write-Host '  Download / install by platform:' -ForegroundColor White
@@ -482,7 +487,7 @@ function Show-PwshInstallGuide {
     Write-Host '  macOS:                brew install powershell/tap/powershell'
     Write-Host '  Linux:                https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux'
     Write-Host ''
-    Write-Note 'winget / MSI install to Program Files (system-wide) — normal and supported.'
+    Write-Note 'winget / MSI install to Program Files (system-wide)  -  normal and supported.'
     Write-Note 'Optional laptop-local copy: menu 1 can extract portable pwsh to %MYMERITTOOLS%\pwsh + pwsh.cmd shim (stays under Tools).'
 }
 
@@ -496,7 +501,7 @@ function Resolve-MeritPwshExe {
     }
     $cmd = Get-Command pwsh -ErrorAction SilentlyContinue
     if ($cmd -and $cmd.Source -and (Test-Path -LiteralPath $cmd.Source)) { return $cmd.Source }
-    if ($Script:IsWindows) {
+    if ($Script:HubOnWindows) {
         foreach ($c in @(
                 (Join-Path $env:ProgramFiles 'PowerShell\7\pwsh.exe'),
                 (Join-Path ${env:ProgramFiles(x86)} 'PowerShell\7\pwsh.exe')
@@ -508,7 +513,7 @@ function Resolve-MeritPwshExe {
 }
 
 function Install-MeritToolsPwshPortable {
-    if (-not $Script:IsWindows) {
+    if (-not $Script:HubOnWindows) {
         Show-PwshInstallGuide
         return $false
     }
@@ -559,7 +564,7 @@ function Ensure-SkillsRepo {
         Write-Ok "skills repo present: $dest"
         return $dest
     }
-    Write-Note 'merit-agent-skills not on bench — cloning pinned release ...'
+    Write-Note 'merit-agent-skills not on bench  -  cloning pinned release ...'
     if (-not (Invoke-GitClonePin -Url ([string]$cfg.skillsUrl) -Pin ([string]$cfg.skillsPin) -Dest $dest -Label 'merit-agent-skills')) {
         return $null
     }
@@ -606,7 +611,7 @@ function Invoke-InstallMeritSkills {
         'Devin' { Join-Path $homeRoot '.devin\skills' }
         'Project' {
             if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
-                Write-Fail 'Project install requires -InstallSkillsPath <repo-root>'
+                Write-Fail 'Project install requires -InstallSkillsPath (repo-root)'
                 return $false
             }
             Join-Path (Resolve-Path $ProjectPath).Path '.cursor\skills'
@@ -636,7 +641,7 @@ function Invoke-InstallMeritSkills {
 
 function Invoke-InstallSkillsMenu {
     Write-Header 'Install skills to AI host'
-    Write-Info 'Same as repo install.ps1 — built into Merit-Hub (no separate script needed).'
+    Write-Info 'Same as repo install.ps1  -  built into Merit-Hub (no separate script needed).'
     Write-Host ''
     Write-Host '  1 Cursor   2 Claude Code   3 Codex   4 VS Code/Agents'
     Write-Host '  5 Hermes   6 OpenClaw      7 Grok    8 Devin'
@@ -666,7 +671,7 @@ function Invoke-InstallSkillsMenu {
     [void](Invoke-InstallMeritSkills -Target $target -ProjectPath $projPath)
 }
 
-function Test-Winget { return $Script:IsWindows -and [bool](Get-Command winget -ErrorAction SilentlyContinue) }
+function Test-Winget { return $Script:HubOnWindows -and [bool](Get-Command winget -ErrorAction SilentlyContinue) }
 
 function Install-WingetPkg {
     param([string]$Id, [string]$Name)
@@ -701,7 +706,7 @@ function Resolve-BasePythonExe {
             return $cmd.Source
         }
     }
-    if ($Script:IsWindows) {
+    if ($Script:HubOnWindows) {
         foreach ($c in @(
                 (Join-Path $env:LOCALAPPDATA 'Programs\Python\Python312\python.exe'),
                 (Join-Path $env:ProgramFiles 'Python312\python.exe')
@@ -717,18 +722,18 @@ function Install-MeritToolsPython {
     Set-UserEnvVar -Name 'MYMERITTOOLS' -Value $tools
     Write-Header "MERIT Python under MYMERITTOOLS ($tools)"
     $venvDir = Join-Path $tools 'merit-venv'
-    $venvPy = if ($Script:IsWindows) { Join-Path $venvDir 'Scripts\python.exe' } else { Join-Path $venvDir 'bin/python3' }
+    $venvPy = if ($Script:HubOnWindows) { Join-Path $venvDir 'Scripts\python.exe' } else { Join-Path $venvDir 'bin/python3' }
     New-Item -ItemType Directory -Force -Path $tools | Out-Null
     if (Test-Path -LiteralPath $venvPy) {
         Write-Ok "Already present: $venvPy"
-        if ($Script:IsWindows) {
+        if ($Script:HubOnWindows) {
             Set-Content -LiteralPath (Join-Path $tools 'merit-python.cmd') -Value "@echo off`r`n`"$venvPy`" %*`r`n" -Encoding ASCII
         }
         return $true
     }
     $base = Resolve-BasePythonExe
     if (-not $base) {
-        if ($Script:IsWindows) {
+        if ($Script:HubOnWindows) {
             if (-not (Install-WingetPkg -Id 'Python.Python.3.12' -Name 'Python 3.12')) { return $false }
         }
         else {
@@ -738,7 +743,7 @@ function Install-MeritToolsPython {
         Refresh-ProcessPath
         $base = Resolve-BasePythonExe
         if (-not $base) {
-            Write-Fail 'Python not on PATH â€” open a new terminal and re-run.'
+            Write-Fail 'Python not on PATH - open a new terminal and re-run.'
             return $false
         }
     }
@@ -748,7 +753,7 @@ function Install-MeritToolsPython {
         Write-Fail "venv create failed at $venvDir"
         return $false
     }
-    if ($Script:IsWindows) {
+    if ($Script:HubOnWindows) {
         Set-Content -LiteralPath (Join-Path $tools 'merit-python.cmd') -Value "@echo off`r`n`"$venvPy`" %*`r`n" -Encoding ASCII
     }
     Write-Ok "MERIT laptop Python: $venvPy"
@@ -756,7 +761,7 @@ function Install-MeritToolsPython {
 }
 
 function Invoke-MeritPrereqs {
-    Write-Header 'Prerequisites â€” check / install'
+    Write-Header 'Prerequisites - check / install'
     $tools = Get-MyMeritToolsRoot
     Write-Ok "MYMERITTOOLS = $tools"
     Write-Ok "MYMERITAPP    = $(Get-MyMeritAppRoot)"
@@ -767,7 +772,7 @@ function Invoke-MeritPrereqs {
     $needPwsh = -not $pwshExe
     $needGh = $true
     $ghExe = $null
-    if ($Script:IsWindows) {
+    if ($Script:HubOnWindows) {
         foreach ($c in @(
                 (Join-Path $env:ProgramFiles 'GitHub CLI\gh.exe'),
                 (Join-Path ${env:ProgramFiles(x86)} 'GitHub CLI\gh.exe')
@@ -781,18 +786,18 @@ function Invoke-MeritPrereqs {
             $ghExe = $ghCmd.Source
         }
     }
-    if ($ghExe) { Write-Ok "gh â€” $ghExe"; $needGh = $false }
-    else { Write-Warn 'gh â€” optional; install for PRs / identity' }
+    if ($ghExe) { Write-Ok "gh - $ghExe"; $needGh = $false }
+    else { Write-Warn 'gh - optional; install for PRs / identity' }
 
-    if (-not $needGit) { Write-Ok ("Git â€” " + ((& git --version 2>&1 | Out-String).Trim())) }
-    else { Write-Fail 'Git â€” missing' }
-    if (-not $needPwsh) { Write-Ok "pwsh — $pwshExe" }
+    if (-not $needGit) { Write-Ok ("Git - " + ((& git --version 2>&1 | Out-String).Trim())) }
+    else { Write-Fail 'Git - missing' }
+    if (-not $needPwsh) { Write-Ok "pwsh  -  $pwshExe" }
     else {
-        Write-Warn 'pwsh — missing (hub runs on Windows PowerShell 5.1 for now; install pwsh for best experience)'
+        Write-Warn 'pwsh  -  missing (hub runs on Windows PowerShell 5.1 for now; install pwsh for best experience)'
         Show-PwshInstallGuide
     }
 
-    $venvPy = if ($Script:IsWindows) { Join-Path $tools 'merit-venv\Scripts\python.exe' } else { Join-Path $tools 'merit-venv\bin\python3' }
+    $venvPy = if ($Script:HubOnWindows) { Join-Path $tools 'merit-venv\Scripts\python.exe' } else { Join-Path $tools 'merit-venv\bin\python3' }
     $needPy = -not (Test-Path -LiteralPath $venvPy)
 
     if (-not ($needGit -or $needPwsh -or $needGh -or $needPy)) {
@@ -802,10 +807,10 @@ function Invoke-MeritPrereqs {
     if ($Force) {
         if ($needGit) { [void](Install-WingetPkg -Id 'Git.Git' -Name 'Git') }
         if ($needPwsh) {
-            if ($Script:IsWindows -and (Test-Winget)) {
+            if ($Script:HubOnWindows -and (Test-Winget)) {
                 [void](Install-WingetPkg -Id 'Microsoft.PowerShell' -Name 'PowerShell 7+')
             }
-            elseif ($Script:IsWindows) {
+            elseif ($Script:HubOnWindows) {
                 [void](Install-MeritToolsPwshPortable)
             }
         }
@@ -817,7 +822,7 @@ function Invoke-MeritPrereqs {
     if ($ans -notmatch '^[Yy]') { Write-Warn 'Skipped.'; return }
     if ($needGit) { [void](Install-WingetPkg -Id 'Git.Git' -Name 'Git') }
     if ($needPwsh) {
-        if ($Script:IsWindows) {
+        if ($Script:HubOnWindows) {
             $how = Read-Host 'pwsh: [W]inget (Program Files) or [P]ortable to MYMERITTOOLS\pwsh [W/P/skip]'
             switch -Regex ($how) {
                 '^[Pp]' { [void](Install-MeritToolsPwshPortable) }
@@ -831,6 +836,28 @@ function Invoke-MeritPrereqs {
     }
     if ($needGh) { [void](Install-WingetPkg -Id 'GitHub.cli' -Name 'GitHub CLI') }
     if ($needPy) { [void](Install-MeritToolsPython) }
+}
+
+function Ensure-MeritHubEnvAtStart {
+    if ($Force) { return }
+    $toolsUser = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'User')
+    if ([string]::IsNullOrWhiteSpace($toolsUser)) {
+        $def = Get-DefaultMyMeritTools
+        Write-Note "MYMERITTOOLS is not set. Tools root (merit-venv, shims, optional portable pwsh)."
+        Write-Info "Default: $def"
+        $ans = Read-Host "MYMERITTOOLS path [$def]"
+        $path = if ([string]::IsNullOrWhiteSpace($ans)) { $def } else { $ans }
+        Set-UserEnvVar -Name 'MYMERITTOOLS' -Value (Expand-HomePath $path)
+    }
+    $appUser = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'User')
+    if ([string]::IsNullOrWhiteSpace($appUser)) {
+        $def = Get-DefaultMyMeritApp
+        Write-Note "MYMERITAPP is not set. OSS bench (merit-agent-skills clone target)."
+        Write-Info "Default: $def"
+        $ans = Read-Host "MYMERITAPP path [$def]"
+        $path = if ([string]::IsNullOrWhiteSpace($ans)) { $def } else { $ans }
+        Set-UserEnvVar -Name 'MYMERITAPP' -Value (Expand-HomePath $path)
+    }
 }
 
 function Ensure-MyMeritAppPrompt {
@@ -856,7 +883,7 @@ function Invoke-GitClonePin {
         [string]$Label
     )
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-        Write-Fail 'git not on PATH â€” run Prereqs (menu 1) first.'
+        Write-Fail 'git not on PATH - run Prereqs (menu 1) first.'
         return $false
     }
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Dest) | Out-Null
@@ -869,7 +896,7 @@ function Invoke-GitClonePin {
         return ($LASTEXITCODE -eq 0)
     }
     if (Test-Path -LiteralPath $Dest) {
-        Write-Fail "$Dest exists but is not a git clone â€” move aside and retry."
+        Write-Fail "$Dest exists but is not a git clone - move aside and retry."
         return $false
     }
     Write-Info "Cloning $Url @ $Pin -> $Dest"
@@ -904,7 +931,7 @@ function Invoke-JumpstartOss {
         Write-Fail "BootStrap missing: $bootPs1"
         return
     }
-    Write-Ok 'Launching repo OSS BootStrap (menus 1â€“4, P vault teaser) ...'
+    Write-Ok 'Launching repo OSS BootStrap (menus 1-4, P vault teaser) ...'
     Write-Note "Hub pins: skills=$($cfg.skillsPin) vault=$($cfg.vaultPin)"
     if (Test-Path -LiteralPath $bootCmd) {
         & $bootCmd
@@ -971,7 +998,7 @@ function Show-MeritHubHelp {
     Write-Host '  H) Help'
     Write-Host '  0) Exit'
     Write-Host ''
-    Write-Note 'After Pristine: J is the only file you need â€” no manual git clone first.'
+    Write-Note 'After Pristine: J is the only file you need - no manual git clone first.'
 }
 
 function Set-MyMeritToolsPrompt {
@@ -983,6 +1010,7 @@ function Set-MyMeritToolsPrompt {
 }
 
 function Show-InteractiveMenu {
+    Ensure-MeritHubEnvAtStart
     while ($true) {
         Show-MeritHubHelp
         Write-Host '  Recommended cold start:  J' -ForegroundColor Yellow
@@ -1000,7 +1028,7 @@ function Show-InteractiveMenu {
             { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; Read-Host 'Press Enter' | Out-Null }
             '^(H|h|\?|Help)$' { continue }
             '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default { Write-Warn 'Unknown — choose P, S, B, J, V, I, 1, M, T, H, or 0.' }
+            default { Write-Warn 'Unknown  -  choose P, S, B, J, V, I, 1, M, T, H, or 0.' }
         }
     }
 }

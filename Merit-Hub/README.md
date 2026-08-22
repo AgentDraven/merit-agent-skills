@@ -35,9 +35,12 @@ Interactive: menu **I**.
 
 ## Download (no git)
 
-1. Open **[Merit-Hub.ps1](Merit-Hub.ps1)** on GitHub → **Raw** → Save As `C:\Tools\Merit-Hub.ps1`
-2. Install pwsh (table above)
-3. `pwsh -File C:\Tools\Merit-Hub.ps1`
+1. Open **[Merit-Hub.ps1](Merit-Hub.ps1)** on GitHub → click **Raw** → Save As **`Merit-Hub.ps1`** (not the HTML page).
+2. Save to **`C:\Tools\Merit-Hub.ps1`** (one file at Tools root — not a folder saved from the GitHub web UI).
+3. Install pwsh (table above) if needed.
+4. `pwsh -File C:\Tools\Merit-Hub.ps1` — first run prompts for **MYMERITTOOLS** / **MYMERITAPP** if unset (**Enter** = defaults `C:\Tools` / `C:\MyMeritApp`).
+
+**ParserError at MYMERITTOOLS?** You saved GitHub HTML instead of the script. Use **Raw** download again.
 
 Raw link: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
 
