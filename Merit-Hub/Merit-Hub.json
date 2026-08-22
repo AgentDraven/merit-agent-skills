@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Merit-Hub — cleanup, jumpstart, shared tools. Folder %MYMERITTOOLS%\\Merit-Hub; script Merit-Hub.ps1 (not repo MERIT.ps1 / merit.ps1).",
+  "skillsPin": "skills-v0.5.1",
+  "vaultPin": "vault-v0.5.2",
+  "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
+  "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
+  "vaultOwner": "AgentDraven",
+  "vaultRepo": "merit-private-vault",
+  "showcaseUrl": "https://github.com/Mr-PI-Bala/merit-demo.git",
+  "defaultMyMeritAppWindows": "C:\\MyMeritApp",
+  "defaultMyMeritAppUnix": "~/MyMeritApp",
+  "defaultMyMeritToolsWindows": "C:\\Tools",
+  "defaultMyMeritToolsUnix": "~/Tools",
+  "devSubdir": "dev",
+  "updatedAt": null
+}

@@ -1,3 +1,13 @@
+## 0.5.1 - 2026-08-21
+
+### Added
+- **`Merit-Hub/`** — laptop hub (`Merit-Hub.ps1` / `.cmd` / `.sh` / `.json`) for Pristine v2 cleanup, OSS/vault jumpstart, and MYMERITTOOLS prereqs. Copy to `%MYMERITTOOLS%\Merit-Hub` (default `C:\Tools\Merit-Hub`); run `Merit-Hub.cmd`.
+- **`Merit-Hub/install.ps1`** — one-shot copy from repo to local tools root.
+
+### Changed
+- README + `docs/bootstrap_pathway.md`: Merit-Hub documented as the easiest cold-start path before/alongside full skills clone.
+- Hub pins: **`skills-v0.5.1`** / **`vault-v0.5.2`**.
+
 ## 0.5.0 - 2026-08-21
 
 ### Changed

@@ -6,6 +6,7 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 
 | Goal | Path |
 |------|------|
+| **Laptop hub (easiest cold start)** | **[Merit-Hub/](Merit-Hub/README.md)** — copy `Merit-Hub/` to `%MYMERITTOOLS%\Merit-Hub` (default `C:\Tools\Merit-Hub`), run `Merit-Hub.cmd`; **J** jumpstarts OSS, **V** vault, **P** pristine reset. No full clone required first. |
 | **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** â€” 3 steps, no accounts night one |
 | **OSS BootStrap** | **[BootStrap/](BootStrap/README.md)** — clone repo, run `BootStrap\MERIT_BootStrap.cmd`; bench folder = `%MYMERITAPP%` (default `C:\MyMeritApp`). Not the root CLI. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
@@ -34,7 +35,21 @@ Free **Cursor Agent Skills** and **`merit`** CLI for MERIT-shaped product repos.
 
 ## Quick install
 
-Recommended starting point (OSS bench = `%MYMERITAPP%`, default `C:\MyMeritApp`):
+**Recommended cold start:** download or sparse-clone only [`Merit-Hub/`](Merit-Hub/) to your laptop, then run the hub — it clones pinned OSS/vault releases for you.
+
+```powershell
+# Option A — Merit-Hub only (no full repo clone yet)
+git clone --depth 1 --filter=blob:none --sparse https://github.com/AgentDraven/merit-agent-skills.git C:\MyMeritApp\merit-agent-skills
+cd C:\MyMeritApp\merit-agent-skills
+git sparse-checkout set Merit-Hub
+cd Merit-Hub
+.\install.ps1
+cd C:\Tools\Merit-Hub
+.\Merit-Hub.cmd
+# J = Jumpstart OSS  |  V = Jumpstart Vault
+```
+
+**Full repo install** (OSS bench = `%MYMERITAPP%`, default `C:\MyMeritApp`):
 
 ```powershell
 mkdir C:\MyMeritApp
@@ -44,6 +59,7 @@ cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # omit -Target to print usage (no default host)
 # Device BootStrap (optional): cd BootStrap; .\MERIT_BootStrap.cmd
+# Or copy Merit-Hub: cd Merit-Hub; .\install.ps1
 ```
 
 Linux/macOS:
