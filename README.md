@@ -6,7 +6,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 
 | Goal | Path |
 |------|------|
-| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`, then `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Details: [Merit-Hub/README.md](Merit-Hub/README.md). **J** OSS · **V** vault · **P** reset. |
+| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`. **Required** (do not double-click / `.\`): `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Internet downloads are blocked otherwise. Details: [Merit-Hub/README.md](Merit-Hub/README.md). **J** OSS · **V** vault · **P** reset. |
 | **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** â€” 3 steps, no accounts night one |
 | **OSS BootStrap** | **[BootStrap/](BootStrap/README.md)** — clone repo, run `BootStrap\MERIT_BootStrap.cmd`; bench folder = `%MYMERITAPP%` (default `C:\MyMeritApp`). Not the root CLI. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
@@ -15,7 +15,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) â€” workbench, journal, AMA, subs, legal |
 | **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) â€” independent consumer ID using the same hosted providers |
 | **Try bundles (Angles 1â€“4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
-| **Skills only** | Merit-Hub menu **I** or `pwsh -File Merit-Hub.ps1 -InstallSkills Cursor` (after **J**). Or from cloned repo: `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode|Hermes|OpenClaw|GrokBot|Devin` |
+| **Skills only** | Merit-Hub menu **I** or `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1 -InstallSkills Cursor` (after **J**). Or from cloned repo: `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode|Hermes|OpenClaw|GrokBot|Devin` |
 | **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** â€” gap analysis â†’ FR/AGENT_REQ (no vault) |
 | **Affiliate / design partner** | [`skills/merit-affiliate`](skills/merit-affiliate/SKILL.md) â€” free attribution + portal recipes (no billing) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha â€¦` |
@@ -45,13 +45,13 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 
 ## Quick install
 
-**Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) to `C:\Tools\`, then **one command** (do not use `.\Merit-Hub.ps1` after a browser download):
+**Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (**Raw**) to `C:\Tools\`. **Required — use the full command.** Do not double-click the file or run `.\Merit-Hub.ps1`. Windows (and other OS quarantine) treats an internet-downloaded script as a security risk and will block a plain run.
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
-`Bypass` is for this process only. Browser “harmful file” warnings on a `.ps1` download are expected — **Keep**.
+`-ExecutionPolicy Bypass` is for **this process only**. Browser “harmful file” warnings are expected — **Keep**.
 
 Menu **J** / **V** clones pinned OSS/vault for you — no full repo clone required first.
 
@@ -65,7 +65,8 @@ cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # omit -Target to print usage (no default host)
 # Device BootStrap (optional): cd BootStrap; .\MERIT_BootStrap.cmd
-# Or copy Merit-Hub.ps1 to C:\Tools\ and: pwsh -File C:\Tools\Merit-Hub.ps1
+# Or copy Merit-Hub.ps1 to C:\Tools\ and run the REQUIRED full command:
+# pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
 Linux/macOS:

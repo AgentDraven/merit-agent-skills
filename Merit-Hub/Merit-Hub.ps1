@@ -5,9 +5,8 @@
 
 .DESCRIPTION
   Standalone script - save as e.g. C:\Tools\Merit-Hub.ps1 (default %MYMERITTOOLS%).
-  After a browser download, start it with one command (Bypass applies to this process only):
+  REQUIRED after download (do not double-click or .\\Merit-Hub.ps1; OS blocks internet scripts):
     pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
-  Do not use .\Merit-Hub.ps1 in an already-open session (RemoteSigned + unsigned MOTW).
   Pins are embedded; no .json or extra launcher required. Run with no args for interactive menu.
 
   Cleanup:
@@ -67,8 +66,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.6",
-  "vaultPin": "vault-v0.5.6",
+  "skillsPin": "skills-v0.5.7",
+  "vaultPin": "vault-v0.5.7",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",
@@ -328,10 +327,69 @@ Pins: skills={2} vault={3}
     return $dir
 }
 
+function Test-HubSafeWipeTarget {
+    param([string]$Path)
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $false }
+    $full = Expand-HomePath $Path
+    $homeRoot = Expand-HomePath $HOME
+    $dev = Get-DevRoot
+    $roots = @($homeRoot)
+    if ($Script:HubOnWindows) {
+        $roots += [IO.Path]::GetFullPath('C:\')
+    }
+    if ($full -in $roots) { return $false }
+    if ($full -eq (Expand-HomePath $dev)) { return $false }
+    return $true
+}
+
+function Invoke-WipeLegacyMeritHubFolder {
+    $tools = Get-MyMeritToolsRoot
+    $legacy = Join-Path $tools 'Merit-Hub'
+    if (-not (Test-Path -LiteralPath $legacy -PathType Container)) { return }
+    $hubNorm = Expand-HomePath $Script:HubScriptPath
+    $legacyNorm = Expand-HomePath $legacy
+    $inside = $hubNorm.StartsWith(($legacyNorm.TrimEnd('\', '/') + '\'), [StringComparison]::OrdinalIgnoreCase)
+    if ($inside) {
+        Write-Warn "Hub is still inside leftover $legacy - removing other files; save hub as $(Join-Path $tools 'Merit-Hub.ps1')"
+        Get-ChildItem -LiteralPath $legacy -Force -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -ne $hubNorm } |
+            ForEach-Object { Remove-PathSafe -Path $_.FullName -Label "legacy hub $($_.Name)" }
+        return
+    }
+    Remove-PathSafe -Path $legacy -Label 'leftover Tools\Merit-Hub folder (retired layout)'
+}
+
+function Invoke-WipeOssBenches {
+    param([string]$ConfiguredOss)
+    $seen = @{}
+    $targets = @()
+    foreach ($p in @($ConfiguredOss, (Get-DefaultMyMeritApp))) {
+        if ([string]::IsNullOrWhiteSpace($p)) { continue }
+        $full = Expand-HomePath $p
+        if ($seen.ContainsKey($full)) { continue }
+        $seen[$full] = $true
+        $targets += $full
+    }
+    $hubDir = Expand-HomePath $Script:HubRoot
+    foreach ($fullOss in $targets) {
+        if (-not (Test-HubSafeWipeTarget $fullOss)) {
+            Write-Fail "Refusing to wipe unsafe OSS path: $fullOss"
+            continue
+        }
+        if ($fullOss -eq $hubDir) {
+            Write-Warn "OSS bench equals hub directory $fullOss - not deleting Tools root"
+            Invoke-WipeLegacyMeritHubFolder
+            continue
+        }
+        Remove-PathSafe -Path $fullOss -Label 'OSS bench (MYMERITAPP)'
+    }
+}
+
 function Invoke-WipeMeritToolsArtifacts {
     param([bool]$IncludeGhShims = $true)
     $tools = Get-MyMeritToolsRoot
     Write-Info "MYMERITTOOLS = $tools"
+    Invoke-WipeLegacyMeritHubFolder
     Remove-PathSafe -Path (Join-Path $tools 'merit-venv') -Label 'merit-venv'
     foreach ($f in @('merit-python.cmd', 'merit-python', 'merit-python.ps1', 'pwsh.cmd')) {
         Remove-PathSafe -Path (Join-Path $tools $f) -Label $f
@@ -423,30 +481,8 @@ function Invoke-MeritCleanup {
 
     Remove-PathFromUserEnvPath -PathsToRemove @($dev)
 
-    if ($DoWipeOss -and -not [string]::IsNullOrWhiteSpace($oss)) {
-        $fullOss = Expand-HomePath $oss
-        $fullDev = Expand-HomePath $dev
-        $hubNorm = Expand-HomePath $Script:HubScriptPath
-        $hubDir = Expand-HomePath $Script:HubRoot
-        $homeRoot = Expand-HomePath $HOME
-        if ($fullOss -in @([IO.Path]::GetFullPath('C:\'), $homeRoot)) {
-            Write-Fail "Refusing to wipe unsafe OSS path: $fullOss"
-        }
-        elseif ($fullOss -eq $fullDev) {
-            Write-Fail 'Refusing to wipe OSS bench that equals ~/dev'
-        }
-        elseif ($fullOss -eq $hubDir) {
-            Write-Warn "OSS bench is Merit-Hub directory  -  skipping full delete of $fullOss"
-            Get-ChildItem -LiteralPath $fullOss -Force -ErrorAction SilentlyContinue |
-                Where-Object {
-                    $_.FullName -ne $hubNorm -and
-                    $_.Name -notin @('Merit-Hub', 'backups', 'Merit-Hub.ps1')
-                } |
-                ForEach-Object { Remove-PathSafe -Path $_.FullName -Label "OSS child $($_.Name)" }
-        }
-        else {
-            Remove-PathSafe -Path $fullOss -Label 'OSS bench (MYMERITAPP)'
-        }
+    if ($DoWipeOss) {
+        Invoke-WipeOssBenches -ConfiguredOss $oss
     }
 
     Write-Host ''
@@ -460,8 +496,8 @@ function Invoke-Mode {
     switch ($Mode) {
         'Pristine' {
             Write-Header 'Mode: PRISTINE v2 (brand-new laptop)'
-            Write-Info 'Wipes OSS bench, ~/dev tree, MYMERIT* env, merit-venv/shims under MYMERITTOOLS.'
-            Write-Info "Keeps hub script: $Script:HubScriptPath"
+            Write-Info 'Wipes OSS bench (MYMERITAPP and default C:\MyMeritApp), leftover Tools\Merit-Hub folder, ~/dev tree, MYMERIT* env, merit-venv/shims.'
+            Write-Info "Keeps this hub script only: $Script:HubScriptPath"
             $backup = New-MeritBackup
             Invoke-MeritCleanup -BackupDir $backup -ModeName $Mode -ConfirmWord 'PRISTINE' `
                 -DoWipeOss $true -DoWipeDevTree $true -DoWipeToolsArtifacts $true

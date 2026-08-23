@@ -2,17 +2,17 @@
 
 **Download one script:** [`Merit-Hub.ps1`](Merit-Hub.ps1) — standalone, no git, no folder, no `.json`, no extra launcher.
 
-## Windows: one command (not `.\Merit-Hub.ps1`)
+## Required: run the full command
 
-A browser-downloaded `.ps1` is unsigned and has **Mark of the Web**. An already-open PowerShell session (`.\Merit-Hub.ps1`) uses **RemoteSigned** and refuses it. `pwsh` cannot unlock a file it was never allowed to start.
-
-**One process flag is enough** (`Bypass` applies to this run only — not User/Machine policy):
+After you save the file, **you must start it with this entire line**. Do **not** double-click `Merit-Hub.ps1`, and do **not** type `.\Merit-Hub.ps1` in an already-open PowerShell window.
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
-The script then **Unblock-File**s itself so later local copies are not treated as remote. Browser / SmartScreen **“this file can harm your computer”** is expected — **Keep**. Do not disable Defender or set ExecutionPolicy to Unrestricted.
+Windows treats an internet download as a security risk (unsigned script + **Mark of the Web**). A plain run is blocked (`not digitally signed` / `PSSecurityException`). macOS may quarantine a downloaded script the same way. `-ExecutionPolicy Bypass` applies to **this process only** — it does not change User/Machine policy. The script then **Unblock-File**s itself.
+
+Browser / SmartScreen **“this file can harm your computer”** is expected — **Keep**. Do not disable Defender or set ExecutionPolicy to Unrestricted.
 
 ## PowerShell 7 (pwsh) — required for daily use
 
@@ -44,9 +44,15 @@ Interactive: menu **I**.
 1. Open **[Merit-Hub.ps1](Merit-Hub.ps1)** on GitHub → click **Raw** → Save As **`Merit-Hub.ps1`** (not the HTML page).
 2. Save to **`C:\Tools\Merit-Hub.ps1`** (one file at Tools root — not a folder saved from the GitHub web UI).
 3. Browser **Keep** if warned. Install pwsh (table above) if needed.
-4. Run the **one command** above — first run prompts for **MYMERITTOOLS** / **MYMERITAPP** if unset (**Enter** = defaults `C:\Tools` / `C:\MyMeritApp`).
+4. **Required** — paste the full command (do not double-click the file):
 
-**`not digitally signed` / `PSSecurityException`?** You used `.\Merit-Hub.ps1`. Use the Bypass `-File` line.
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+```
+
+First run prompts for **MYMERITTOOLS** / **MYMERITAPP** if unset (**Enter** = defaults `C:\Tools` / `C:\MyMeritApp`).
+
+**`not digitally signed` / `PSSecurityException`?** You did not use the full command. Double-click and `.\Merit-Hub.ps1` are blocked for internet downloads.
 
 **ParserError at MYMERITTOOLS?** You saved GitHub HTML instead of the script. Use **Raw** download again.
 
@@ -60,7 +66,7 @@ Raw: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Meri
 | **V** | Clone vault + BootStrap |
 | **I** | Install skills to Cursor / Codex / Hermes / … |
 | **1** | Prereqs (git, gh, pwsh, merit-venv) |
-| **P** | Pristine laptop reset |
+| **P** | Pristine: wipe OSS bench (`C:\MyMeritApp`), leftover `Tools\Merit-Hub\` folder, ~/dev, MYMERIT* env, merit-venv. **Keeps** `C:\Tools\Merit-Hub.ps1` only. |
 
 ## What the script creates locally
 

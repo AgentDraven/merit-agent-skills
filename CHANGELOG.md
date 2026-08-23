@@ -1,3 +1,12 @@
+## 0.5.7 - 2026-08-23
+
+### Fixed
+- **Pristine:** remove leftover `%MYMERITTOOLS%\Merit-Hub\` folder (retired cmd/json/HTML-save layout). Always wipe the default OSS bench (`C:\MyMeritApp`) even if `MYMERITAPP` was pointed at Tools (old code kept a child named `Merit-Hub` and never touched MyMeritApp).
+
+### Changed
+- Download / README copy: the full `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1` line is **required**. Double-click and `.\Merit-Hub.ps1` are called out as blocked for internet downloads.
+- Hub pin: **`skills-v0.5.7`** / **`vault-v0.5.7`**.
+
 ## 0.5.6 - 2026-08-23
 
 ### Changed

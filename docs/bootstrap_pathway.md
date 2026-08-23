@@ -6,14 +6,14 @@ Annotated flowchart for a **new laptop** on the public freeware path. Private-Va
 
 ## Cold start
 
-**Easiest path — one file:** [download `Merit-Hub.ps1`](../Merit-Hub/Merit-Hub.ps1) to `C:\Tools\Merit-Hub.ps1`, then **one command**:
+**Easiest path — one file:** [download `Merit-Hub.ps1`](../Merit-Hub/Merit-Hub.ps1) to `C:\Tools\Merit-Hub.ps1`. **Required — full command** (do not double-click or `.\Merit-Hub.ps1`; Windows blocks internet-downloaded scripts):
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 # J = Jumpstart OSS  |  V = Jumpstart Vault  |  P = Pristine v2
 ```
 
-Do not run `.\Merit-Hub.ps1` after a browser download (unsigned + Mark of the Web). `Bypass` is this process only.
+`-ExecutionPolicy Bypass` is this process only.
 
 See [Merit-Hub/README.md](../Merit-Hub/README.md). Release pins are embedded in the script.
 
