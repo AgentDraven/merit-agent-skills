@@ -53,6 +53,8 @@ $Script:HubScriptPath = $PSCommandPath
 if (-not $Script:HubScriptPath) { $Script:HubScriptPath = $MyInvocation.MyCommand.Path }
 $Script:HubRoot = Split-Path -Parent $Script:HubScriptPath
 $Script:BackupRoot = Join-Path $Script:HubRoot 'backups'
+$Script:HistoryLog = Join-Path $Script:BackupRoot 'Merit-Hub-history.log'
+$Script:TranscriptStarted = $false
 $Script:HubOnWindows = (
     ($PSVersionTable.ContainsKey('PSPlatform') -and $PSVersionTable.PSPlatform -eq 'Win32NT') -or
     ($env:OS -match 'Windows')
@@ -66,7 +68,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.8",
+  "skillsPin": "skills-v0.5.9",
   "vaultPin": "vault-v0.5.6",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
@@ -197,6 +199,48 @@ function Get-HubRelaunchArgumentList {
     return @($list)
 }
 
+function Start-HubTranscript {
+    New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
+    $Script:HistoryLog = Join-Path $Script:BackupRoot 'Merit-Hub-history.log'
+    try {
+        Start-Transcript -Path $Script:HistoryLog -Append -ErrorAction Stop | Out-Null
+        $Script:TranscriptStarted = $true
+    }
+    catch {
+        Write-Warn "Could not start transcript: $($_.Exception.Message)"
+        $Script:TranscriptStarted = $false
+    }
+    Write-Host ''
+    Write-Host ('=' * 72) -ForegroundColor DarkGray
+    Write-Host ("  Merit-Hub run  {0}" -f (Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))
+    Write-Host ("  user={0}  machine={1}  elevated={2}" -f $env:USERNAME, $env:COMPUTERNAME, (Test-HubAdmin))
+    Write-Host ("  script={0}" -f $Script:HubScriptPath)
+    Write-Host ("  log (append)={0}" -f $Script:HistoryLog)
+    Write-Host ('=' * 72) -ForegroundColor DarkGray
+}
+
+function Stop-HubTranscript {
+    if (-not $Script:TranscriptStarted) { return }
+    try { Stop-Transcript | Out-Null } catch { }
+    $Script:TranscriptStarted = $false
+    Write-Note "Run log appended: $Script:HistoryLog"
+}
+
+function Wait-HubWindow {
+    param([string]$Reason = 'Merit-Hub finished')
+    if (-not [Environment]::UserInteractive) { return }
+    Write-Host ''
+    Write-Note $Reason
+    if ($Script:HistoryLog) { Write-Info "History: $Script:HistoryLog" }
+    try { [void](Read-Host 'Press Enter to close') } catch { }
+}
+
+function Complete-HubSession {
+    param([string]$Reason = 'Merit-Hub finished')
+    Stop-HubTranscript
+    Wait-HubWindow -Reason $Reason
+}
+
 function Ensure-HubElevated {
     if (-not $Script:HubOnWindows) { return }
     if ($Help) { return }
@@ -207,16 +251,21 @@ function Ensure-HubElevated {
     }
     $exe = (Get-Process -Id $PID).Path
     $argList = Get-HubRelaunchArgumentList
-    Write-Note 'Not elevated. Relaunching Merit-Hub in an Administrator window (UAC). This window will exit.'
+    Write-Note 'Not elevated. Opening an Administrator window (UAC).'
     Write-Info ("{0} {1}" -f $exe, ($argList -join ' '))
+    New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
+    $Script:HistoryLog = Join-Path $Script:BackupRoot 'Merit-Hub-history.log'
+    $line = '{0} relaunch-elevated user={1} script={2}' -f (Get-Date).ToString('o'), $env:USERNAME, $Script:HubScriptPath
+    try { Add-Content -LiteralPath $Script:HistoryLog -Value $line -Encoding UTF8 } catch { }
     try {
         Start-Process -FilePath $exe -Verb RunAs -ArgumentList $argList
     }
     catch {
         Write-Fail "UAC relaunch failed: $($_.Exception.Message)"
-        Write-Info 'Continue without admin — deletes may fail on locked / protected folders.'
+        Write-Info 'Continue without admin - deletes may fail on locked / protected folders.'
         return
     }
+    Wait-HubWindow -Reason 'Elevated Merit-Hub is running in the other window. Press Enter to close this one.'
     exit 0
 }
 
@@ -1278,6 +1327,7 @@ function Show-MeritHubHelp {
     Write-HubEnvScopes
     Write-Info "Resolved MYMERITTOOLS=$(Get-MyMeritToolsRoot)  MYMERITAPP=$(Get-MyMeritAppRoot)"
     Write-Info "Pins: skills=$($cfg.skillsPin)  vault=$($cfg.vaultPin)"
+    Write-Info "History log (append): $Script:HistoryLog"
     Write-Host ''
     Write-Host '  CLEANUP' -ForegroundColor White
     Write-Host '  P) Pristine v2   full cold-start wipe (+ merit-venv, ~/dev folder, env)' -ForegroundColor Green
@@ -1337,21 +1387,26 @@ if ($Help) {
 }
 Ensure-HubElevated
 New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
+Start-HubTranscript
+try {
+    if ($Pristine) { Invoke-Mode -Mode Pristine; return }
+    if ($Soft) { Invoke-Mode -Mode Soft; return }
+    if ($BackupOnly) { Invoke-Mode -Mode BackupOnly; return }
+    if ($Prereqs) { Invoke-MeritPrereqs; return }
+    if ($InstallSkills) {
+        [void](Invoke-InstallMeritSkills -Target $InstallSkills -ProjectPath $InstallSkillsPath)
+        return
+    }
+    if ($Jumpstart -eq 'Oss') { Invoke-JumpstartOss; return }
+    if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
 
-if ($Pristine) { Invoke-Mode -Mode Pristine; return }
-if ($Soft) { Invoke-Mode -Mode Soft; return }
-if ($BackupOnly) { Invoke-Mode -Mode BackupOnly; return }
-if ($Prereqs) { Invoke-MeritPrereqs; return }
-if ($InstallSkills) {
-    [void](Invoke-InstallMeritSkills -Target $InstallSkills -ProjectPath $InstallSkillsPath)
-    return
+    $bound = $PSBoundParameters.Keys
+    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help') | Where-Object { $bound -contains $_ }
+    if (-not $hasAction) {
+        Show-InteractiveMenu
+    }
 }
-if ($Jumpstart -eq 'Oss') { Invoke-JumpstartOss; return }
-if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
-
-$bound = $PSBoundParameters.Keys
-$hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help') | Where-Object { $bound -contains $_ }
-if (-not $hasAction) {
-    Show-InteractiveMenu
+finally {
+    Complete-HubSession
 }
 

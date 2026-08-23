@@ -1,3 +1,9 @@
+## 0.5.9 - 2026-08-23
+
+### Added
+- **Run history:** `Start-Transcript -Append` to `%MYMERITTOOLS%\backups\Merit-Hub-history.log` (same backups folder as snapshots).
+- **Press Enter to close** so the elevated window does not vanish when work finishes.
+
 ## 0.5.8 - 2026-08-23
 
 ### Fixed
