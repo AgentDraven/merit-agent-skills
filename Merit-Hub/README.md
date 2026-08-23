@@ -66,7 +66,7 @@ Raw: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Meri
 | **V** | Clone vault + BootStrap |
 | **I** | Install skills to Cursor / Codex / Hermes / … |
 | **1** | Prereqs (git, gh, pwsh, merit-venv) |
-| **P** | Pristine: wipe OSS bench (`C:\MyMeritApp`), leftover `Tools\Merit-Hub\` folder, ~/dev, MYMERIT* env, merit-venv. **Keeps** `C:\Tools\Merit-Hub.ps1` only. |
+| **P** | Pristine: wipe OSS bench, leftover `Tools\Merit-Hub\`, ~/dev, **MYMERIT* env** (next run prompts again), merit-venv. Keeps `C:\Tools\Merit-Hub.ps1`. UAC-elevates. Then asks about leftover folders (`HumanBala`, `DravenCode.OLD`, `Code`, `*Merit*`) — type **DELETE** to remove. |
 
 ## What the script creates locally
 

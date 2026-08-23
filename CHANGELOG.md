@@ -1,3 +1,14 @@
+## 0.5.8 - 2026-08-23
+
+### Fixed
+- **Pristine env:** MYMERIT* User/Process/Machine are **cleared on purpose**. Menu now prints Process/User/Machine scopes and explains that the next run will prompt again (Enter = defaults).
+- **Stuck deletes:** attrib -R -A -S -H, takeown/icacls when elevated, locking-process insight, then retry — not a silent give-up.
+
+### Changed
+- Auto-relaunch via UAC (`Start-Process -Verb RunAs`) when not Administrator (same pattern as other MERIT launchers). Does not bail.
+- After Pristine, scan leftover folders (`HumanBala`, `DravenCode.OLD`, `Code`, `*Merit*` under `C:\` and each `C:\Users\<name>`) and **double-confirm** (`DELETE`) before removing.
+- Hub pin: **`skills-v0.5.8`** / **`vault-v0.5.6`**.
+
 ## 0.5.7 - 2026-08-23
 
 ### Fixed

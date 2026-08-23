@@ -66,8 +66,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.7",
-  "vaultPin": "vault-v0.5.7",
+  "skillsPin": "skills-v0.5.8",
+  "vaultPin": "vault-v0.5.6",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",
@@ -78,7 +78,10 @@ $Script:EmbeddedHubConfigJson = @'
   "defaultMyMeritToolsWindows": "C:\\Tools",
   "defaultMyMeritToolsUnix": "~/Tools",
   "devSubdir": "dev",
-  "pwshPortableVersion": "7.5.2"
+  "pwshPortableVersion": "7.5.2",
+  "rogueProfileNames": ["HumanBala", "DravenCode.OLD", "Code", "AgentDraven", "Mr-PI-Bala"],
+  "rogueProfileGlobs": ["*Merit*", "DravenCode*"],
+  "rogueDriveRootNames": ["HumanBala", "MyMeritApp", "AgentDraven", "DravenCode.OLD"]
 }
 '@
 
@@ -153,11 +156,76 @@ function Get-DevRoot {
     return Expand-HomePath (Join-Path $HOME $sub)
 }
 
+function Test-HubAdmin {
+    if (-not $Script:HubOnWindows) { return $true }
+    try {
+        return ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+            [Security.Principal.WindowsBuiltInRole]::Administrator)
+    }
+    catch { return $false }
+}
+
+function Write-HubEnvScopes {
+    foreach ($name in @('MYMERITTOOLS', 'MYMERITAPP')) {
+        $p = [Environment]::GetEnvironmentVariable($name, 'Process')
+        $u = [Environment]::GetEnvironmentVariable($name, 'User')
+        $m = [Environment]::GetEnvironmentVariable($name, 'Machine')
+        Write-Info ("{0}  Process={1}  User={2}  Machine={3}" -f $name,
+            $(if ($p) { $p } else { '(empty)' }),
+            $(if ($u) { $u } else { '(empty)' }),
+            $(if ($m) { $m } else { '(empty)' }))
+    }
+}
+
+function Get-HubRelaunchArgumentList {
+    $list = [System.Collections.Generic.List[string]]::new()
+    $list.Add('-NoProfile')
+    $list.Add('-ExecutionPolicy')
+    $list.Add('Bypass')
+    $list.Add('-File')
+    $list.Add($Script:HubScriptPath)
+    foreach ($key in @($PSBoundParameters.Keys)) {
+        $val = $PSBoundParameters[$key]
+        if ($val -is [switch]) {
+            if ($val.IsPresent) { $list.Add("-$key") }
+            continue
+        }
+        if ($val -eq $true) { $list.Add("-$key"); continue }
+        $list.Add("-$key")
+        $list.Add([string]$val)
+    }
+    return @($list)
+}
+
+function Ensure-HubElevated {
+    if (-not $Script:HubOnWindows) { return }
+    if ($Help) { return }
+    if ($env:MERIT_HUB_NO_ELEVATE -eq '1') { return }
+    if (Test-HubAdmin) {
+        Write-Ok 'Running elevated (Administrator)'
+        return
+    }
+    $exe = (Get-Process -Id $PID).Path
+    $argList = Get-HubRelaunchArgumentList
+    Write-Note 'Not elevated. Relaunching Merit-Hub in an Administrator window (UAC). This window will exit.'
+    Write-Info ("{0} {1}" -f $exe, ($argList -join ' '))
+    try {
+        Start-Process -FilePath $exe -Verb RunAs -ArgumentList $argList
+    }
+    catch {
+        Write-Fail "UAC relaunch failed: $($_.Exception.Message)"
+        Write-Info 'Continue without admin — deletes may fail on locked / protected folders.'
+        return
+    }
+    exit 0
+}
+
 function Set-UserEnvVar {
     param([string]$Name, [string]$Value)
     [Environment]::SetEnvironmentVariable($Name, $Value, 'User')
     Set-Item -Path "Env:$Name" -Value $Value
-    Write-Ok "$Name (User) = $Value"
+    Write-Ok "$Name (User+Process) = $Value"
+    Write-Note 'Open a NEW terminal to see User env in other windows. This process already has it.'
 }
 
 function Clear-EnvVarAllScopes {
@@ -171,14 +239,7 @@ function Clear-EnvVarAllScopes {
             $existing = [Environment]::GetEnvironmentVariable($Name, $scope)
             if ([string]::IsNullOrWhiteSpace($existing)) { continue }
             if ($scope -eq 'Machine') {
-                $isAdmin = $false
-                if ($Script:HubOnWindows) {
-                    try {
-                        $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-                    }
-                    catch { $isAdmin = $false }
-                }
-                if (-not $isAdmin) {
+                if (-not (Test-HubAdmin)) {
                     Write-Warn "Cannot clear Machine:$Name without admin (was $existing)"
                     continue
                 }
@@ -224,6 +285,74 @@ function Refresh-ProcessPath {
     }
 }
 
+function Invoke-HubNativeQuiet {
+    param([string]$FilePath, [string[]]$NativeArgs)
+    if (-not (Test-Path -LiteralPath $FilePath)) { return }
+    try {
+        $p = Start-Process -FilePath $FilePath -ArgumentList $NativeArgs -Wait -PassThru -WindowStyle Hidden -ErrorAction SilentlyContinue
+        return $p.ExitCode
+    }
+    catch { return $null }
+}
+
+function Clear-HubPathAttributes {
+    param([string]$Path)
+    if (-not $Script:HubOnWindows) { return }
+    $attrib = Join-Path $env:SystemRoot 'System32\attrib.exe'
+    Write-Info "clearing R/A/S/H attributes under $Path"
+    [void](Invoke-HubNativeQuiet -FilePath $attrib -NativeArgs @('-R', '-A', '-S', '-H', $Path, '/S', '/D'))
+}
+
+function Repair-HubPathAcl {
+    param([string]$Path)
+    if (-not $Script:HubOnWindows) { return }
+    if (-not (Test-HubAdmin)) {
+        Write-Info 'skip takeown/icacls (not elevated)'
+        return
+    }
+    $takeown = Join-Path $env:SystemRoot 'System32\takeown.exe'
+    $icacls = Join-Path $env:SystemRoot 'System32\icacls.exe'
+    Write-Info "takeown / icacls grant for $Path"
+    [void](Invoke-HubNativeQuiet -FilePath $takeown -NativeArgs @('/F', $Path, '/R', '/D', 'Y'))
+    [void](Invoke-HubNativeQuiet -FilePath $icacls -NativeArgs @($Path, '/grant', "${env:USERNAME}:(OI)(CI)F", '/T', '/C', '/Q'))
+}
+
+function Get-HubLockingProcesses {
+    param([string]$Path)
+    $norm = $Path.TrimEnd('\', '/')
+    $hits = @()
+    try {
+        $hits += @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+                ($_.ExecutablePath -and $_.ExecutablePath.StartsWith($norm, [StringComparison]::OrdinalIgnoreCase)) -or
+                ($_.CommandLine -and $_.CommandLine.IndexOf($norm, [StringComparison]::OrdinalIgnoreCase) -ge 0)
+            } | Select-Object ProcessId, Name, ExecutablePath)
+    }
+    catch { }
+    return @($hits)
+}
+
+function Write-HubDeleteInsight {
+    param([string]$Path, [string]$Label)
+    Write-Info "delete insight: $Label"
+    Write-Info "  path   = $Path"
+    Write-Info "  admin  = $(Test-HubAdmin)"
+    $lock = @(Get-HubLockingProcesses -Path $Path)
+    if ($lock.Count -eq 0) {
+        Write-Info '  no Win32_Process image/command line matched this path (Cursor/Explorer can still lock files)'
+    }
+    else {
+        Write-Warn '  processes that look related (close these, then retry):'
+        foreach ($p in $lock | Select-Object -First 12) {
+            Write-Info ("    pid={0} name={1} exe={2}" -f $p.ProcessId, $p.Name, $p.ExecutablePath)
+        }
+    }
+    if (Test-Path -LiteralPath $Path -PathType Container) {
+        $kids = @(Get-ChildItem -LiteralPath $Path -Force -Recurse -ErrorAction SilentlyContinue | Select-Object -First 15)
+        Write-Info ("  remaining entries (first {0}):" -f $kids.Count)
+        foreach ($k in $kids) { Write-Info ("    {0}" -f $k.FullName) }
+    }
+}
+
 function Remove-PathSafe {
     param([string]$Path, [string]$Label)
     if ([string]::IsNullOrWhiteSpace($Path)) { return }
@@ -238,7 +367,18 @@ function Remove-PathSafe {
         return
     }
     catch {
-        Write-Warn "could not delete $Label (in use?): $($_.Exception.Message)"
+        Write-Warn "first delete failed $Label : $($_.Exception.Message)"
+    }
+    Write-HubDeleteInsight -Path $Path -Label $Label
+    Clear-HubPathAttributes -Path $Path
+    Repair-HubPathAcl -Path $Path
+    try {
+        Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction Stop
+        Write-Ok "removed $Label after attrib/acl -> $Path"
+        return
+    }
+    catch {
+        Write-Warn "retry delete failed $Label : $($_.Exception.Message)"
     }
     if (-not (Test-Path -LiteralPath $Path -PathType Container)) { return }
     $parent = Split-Path -Parent $Path
@@ -251,6 +391,7 @@ function Remove-PathSafe {
     }
     catch {
         Write-Fail "could not remove or move $Label -> $Path"
+        Write-Info 'Close locking apps (Cursor, Explorer preview, git, terminals with that cwd) and re-run Pristine elevated.'
     }
 }
 
@@ -385,6 +526,106 @@ function Invoke-WipeOssBenches {
     }
 }
 
+function Test-HubProtectedScanPath {
+    param([string]$Path)
+    $full = Expand-HomePath $Path
+    $hubDir = Expand-HomePath $Script:HubRoot
+    $tools = Get-MyMeritToolsRoot
+    $blocked = @(
+        $hubDir,
+        $tools,
+        (Join-Path $env:SystemRoot ''),
+        $env:ProgramFiles,
+        ${env:ProgramFiles(x86)},
+        (Join-Path $env:SystemDrive 'Windows')
+    )
+    foreach ($b in $blocked) {
+        if ([string]::IsNullOrWhiteSpace($b)) { continue }
+        $bn = Expand-HomePath $b
+        if ($full -eq $bn) { return $true }
+    }
+    if ($Script:HubOnWindows -and $full -eq [IO.Path]::GetFullPath('C:\')) { return $true }
+    return $false
+}
+
+function Get-HubRogueFolderCandidates {
+    $cfg = Get-HubConfig
+    $names = @($cfg.rogueProfileNames)
+    $globs = @($cfg.rogueProfileGlobs)
+    $driveNames = @($cfg.rogueDriveRootNames)
+    $found = New-Object System.Collections.Generic.List[string]
+    $skipUser = @('Public', 'Default', 'Default User', 'All Users', 'DefaultAppPool')
+
+    $roots = New-Object System.Collections.Generic.List[string]
+    if ($Script:HubOnWindows -and $env:SystemDrive) {
+        $driveRoot = $env:SystemDrive + '\'
+        $roots.Add($driveRoot)
+        $usersRoot = Join-Path $env:SystemDrive 'Users'
+        if (Test-Path -LiteralPath $usersRoot) {
+            Get-ChildItem -LiteralPath $usersRoot -Directory -Force -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name -notin $skipUser } |
+                ForEach-Object { $roots.Add($_.FullName) }
+        }
+    }
+    $home = Expand-HomePath $HOME
+    if ($home -and -not $roots.Contains($home)) { $roots.Add($home) }
+    $dev = Get-DevRoot
+    if (Test-Path -LiteralPath $dev) { $roots.Add($dev) }
+
+    foreach ($root in $roots) {
+        if (-not (Test-Path -LiteralPath $root)) { continue }
+        $isDrive = ($Script:HubOnWindows -and ($root.TrimEnd('\') + '\').ToLower() -eq (($env:SystemDrive + '\').ToLower()))
+        $checkNames = if ($isDrive) { $driveNames } else { $names }
+        foreach ($n in $checkNames) {
+            $p = Join-Path $root $n
+            if ((Test-Path -LiteralPath $p) -and -not (Test-HubProtectedScanPath $p) -and -not $found.Contains((Expand-HomePath $p))) {
+                $found.Add((Expand-HomePath $p))
+            }
+        }
+        if (-not $isDrive) {
+            foreach ($g in $globs) {
+                Get-ChildItem -LiteralPath $root -Directory -Force -ErrorAction SilentlyContinue |
+                    Where-Object { $_.Name -like $g } |
+                    ForEach-Object {
+                        $fp = Expand-HomePath $_.FullName
+                        if (-not (Test-HubProtectedScanPath $fp) -and -not $found.Contains($fp)) { $found.Add($fp) }
+                    }
+            }
+        }
+    }
+    return @($found | Sort-Object -Unique)
+}
+
+function Invoke-RogueFolderReview {
+    $cands = @(Get-HubRogueFolderCandidates)
+    Write-Header 'Leftover folder scan'
+    if ($cands.Count -eq 0) {
+        Write-Ok 'No catalog leftovers (HumanBala, DravenCode.OLD, Code, *Merit*, …)'
+        return
+    }
+    Write-Note 'These are NOT deleted automatically. Known leftover names under C:\, each C:\Users\<name>, and ~/dev.'
+    $i = 1
+    foreach ($p in $cands) {
+        Write-Info ("  {0}) {1}" -f $i, $p)
+        $i++
+    }
+    if ($Force) {
+        Write-Warn '-Force skips leftover deletes (too dangerous). Re-run without -Force to review.'
+        return
+    }
+    $go = Read-Host 'Review leftovers for possible delete? [y/N]'
+    if ($go -notmatch '^[Yy]') { Write-Info 'Skipped leftover review.'; return }
+    foreach ($p in $cands) {
+        Write-Host ''
+        Write-Warn "Candidate: $p"
+        $d = Read-Host 'Delete this folder? [y/N]'
+        if ($d -notmatch '^[Yy]') { Write-Info "kept $p"; continue }
+        $ok = Read-Host "Type DELETE to confirm removal of $p"
+        if ($ok -ne 'DELETE') { Write-Warn "not confirmed - kept $p"; continue }
+        Remove-PathSafe -Path $p -Label "leftover $p"
+    }
+}
+
 function Invoke-WipeMeritToolsArtifacts {
     param([bool]$IncludeGhShims = $true)
     $tools = Get-MyMeritToolsRoot
@@ -431,7 +672,9 @@ function Invoke-MeritCleanup {
     Write-Info "MYMERITTOOLS: $tools (wipe MERIT artifacts=$DoWipeToolsArtifacts)"
     Write-Info "~/dev:      $dev (wipe tree=$DoWipeDevTree)"
     Write-Info 'Will clear MYMERITAPP + MYMERITTOOLS (User/Machine/Process where allowed)'
+    Write-Info 'That is why a later hub run has empty MYMERIT* until you answer the prompts again (Enter = defaults).'
     Write-Info 'Will remove ~/dev from User Path if present'
+    Write-HubEnvScopes
 
     if (-not $Force -and -not $WhatIfPreference) {
         Write-Host ''
@@ -478,11 +721,17 @@ function Invoke-MeritCleanup {
         Clear-EnvVarAllScopes -Name 'MYMERITTOOLS'
         Invoke-WipeMeritToolsArtifacts
     }
+    Write-Note 'MYMERITAPP / MYMERITTOOLS cleared. Next interactive run will prompt (Enter = defaults).'
+    Write-HubEnvScopes
 
     Remove-PathFromUserEnvPath -PathsToRemove @($dev)
 
     if ($DoWipeOss) {
         Invoke-WipeOssBenches -ConfiguredOss $oss
+    }
+
+    if ($ModeName -eq 'Pristine') {
+        Invoke-RogueFolderReview
     }
 
     Write-Host ''
@@ -880,19 +1129,25 @@ function Invoke-MeritPrereqs {
 
 function Ensure-MeritHubEnvAtStart {
     if ($Force) { return }
+    Write-Header 'MYMERIT* environment'
+    Write-HubEnvScopes
     $toolsUser = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'User')
+    $toolsProc = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'Process')
     if ([string]::IsNullOrWhiteSpace($toolsUser)) {
         $def = Get-DefaultMyMeritTools
-        Write-Note "MYMERITTOOLS is not set. Tools root (merit-venv, shims, optional portable pwsh)."
+        Write-Note 'MYMERITTOOLS User is empty (new laptop, or Pristine cleared it).'
+        if ($toolsProc) { Write-Info "This process still has MYMERITTOOLS=$toolsProc (not persisted to User)." }
         Write-Info "Default: $def"
         $ans = Read-Host "MYMERITTOOLS path [$def]"
         $path = if ([string]::IsNullOrWhiteSpace($ans)) { $def } else { $ans }
         Set-UserEnvVar -Name 'MYMERITTOOLS' -Value (Expand-HomePath $path)
     }
     $appUser = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'User')
+    $appProc = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'Process')
     if ([string]::IsNullOrWhiteSpace($appUser)) {
         $def = Get-DefaultMyMeritApp
-        Write-Note "MYMERITAPP is not set. OSS bench (merit-agent-skills clone target)."
+        Write-Note 'MYMERITAPP User is empty (new laptop, or Pristine cleared it).'
+        if ($appProc) { Write-Info "This process still has MYMERITAPP=$appProc (not persisted to User)." }
         Write-Info "Default: $def"
         $ans = Read-Host "MYMERITAPP path [$def]"
         $path = if ([string]::IsNullOrWhiteSpace($ans)) { $def } else { $ans }
@@ -1019,7 +1274,9 @@ function Show-MeritHubHelp {
     $cfg = Get-HubConfig
     Write-Header 'Merit-Hub laptop hub'
     Write-Info "Location: $Script:HubScriptPath"
-    Write-Info "MYMERITTOOLS: $(Get-MyMeritToolsRoot)  |  MYMERITAPP: $(Get-MyMeritAppRoot)"
+    Write-Info "Elevated: $(Test-HubAdmin)"
+    Write-HubEnvScopes
+    Write-Info "Resolved MYMERITTOOLS=$(Get-MyMeritToolsRoot)  MYMERITAPP=$(Get-MyMeritAppRoot)"
     Write-Info "Pins: skills=$($cfg.skillsPin)  vault=$($cfg.vaultPin)"
     Write-Host ''
     Write-Host '  CLEANUP' -ForegroundColor White
@@ -1074,12 +1331,12 @@ function Show-InteractiveMenu {
 }
 
 # --- main ---
-New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
-
 if ($Help) {
     Show-MeritHubHelp
     return
 }
+Ensure-HubElevated
+New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
 
 if ($Pristine) { Invoke-Mode -Mode Pristine; return }
 if ($Soft) { Invoke-Mode -Mode Soft; return }
