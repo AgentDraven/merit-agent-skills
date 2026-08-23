@@ -68,7 +68,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.9",
+  "skillsPin": "skills-v0.5.10",
   "vaultPin": "vault-v0.5.6",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
@@ -616,8 +616,6 @@ function Get-HubRogueFolderCandidates {
                 ForEach-Object { $roots.Add($_.FullName) }
         }
     }
-    $home = Expand-HomePath $HOME
-    if ($home -and -not $roots.Contains($home)) { $roots.Add($home) }
     $dev = Get-DevRoot
     if (Test-Path -LiteralPath $dev) { $roots.Add($dev) }
 

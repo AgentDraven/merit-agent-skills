@@ -1,3 +1,8 @@
+## 0.5.10 - 2026-08-23
+
+### Fixed
+- **`$HOME` collision:** leftover scan used `$home = …` which PowerShell treats as the read-only automatic `$HOME`. Scan roots are `C:\`, `C:\Users\<name>`, and `~/dev` only — the profile folder itself is never assigned or deleted.
+
 ## 0.5.9 - 2026-08-23
 
 ### Added
