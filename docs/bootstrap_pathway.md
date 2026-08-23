@@ -6,14 +6,14 @@ Annotated flowchart for a **new laptop** on the public freeware path. Private-Va
 
 ## Cold start
 
-**Easiest path:** save [`Merit-Hub.ps1`](../Merit-Hub/Merit-Hub.ps1) and [`Merit-Hub.cmd`](../Merit-Hub/Merit-Hub.cmd) to `C:\Tools\` (or anywhere together), then:
+**Easiest path — one file:** [download `Merit-Hub.ps1`](../Merit-Hub/Merit-Hub.ps1) to `C:\Tools\Merit-Hub.ps1`, then **one command**:
 
-```bat
-C:\Tools\Merit-Hub.cmd
-REM J = Jumpstart OSS  |  V = Jumpstart Vault  |  P = Pristine v2
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+# J = Jumpstart OSS  |  V = Jumpstart Vault  |  P = Pristine v2
 ```
 
-Or: `Unblock-File` + `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Do not run `.\Merit-Hub.ps1` after a browser download (unsigned + Mark of the Web).
+Do not run `.\Merit-Hub.ps1` after a browser download (unsigned + Mark of the Web). `Bypass` is this process only.
 
 See [Merit-Hub/README.md](../Merit-Hub/README.md). Release pins are embedded in the script.
 

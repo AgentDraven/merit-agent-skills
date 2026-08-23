@@ -5,9 +5,10 @@
 
 .DESCRIPTION
   Standalone script - save as e.g. C:\Tools\Merit-Hub.ps1 (default %MYMERITTOOLS%).
-  On Windows, run Merit-Hub.cmd (same folder) - do not use .\Merit-Hub.ps1 after a browser download
-  (unsigned + Mark of the Web is blocked by RemoteSigned). Pins are embedded; no .json required.
-  Run with no args for interactive menu.
+  After a browser download, start it with one command (Bypass applies to this process only):
+    pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+  Do not use .\Merit-Hub.ps1 in an already-open session (RemoteSigned + unsigned MOTW).
+  Pins are embedded; no .json or extra launcher required. Run with no args for interactive menu.
 
   Cleanup:
     -Pristine   backup + full cold-start wipe (~/dev folder, OSS bench, MERIT tools artifacts, env)
@@ -26,7 +27,6 @@
     MYMERITTOOLS  laptop tools root (default C:\Tools) - merit-venv, shims
 
 .EXAMPLE
-  C:\Tools\Merit-Hub.cmd
   pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
   pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1 -Pristine -Force
   pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1 -Jumpstart Oss
@@ -58,13 +58,17 @@ $Script:HubOnWindows = (
     ($PSVersionTable.ContainsKey('PSPlatform') -and $PSVersionTable.PSPlatform -eq 'Win32NT') -or
     ($env:OS -match 'Windows')
 )
+# After a Bypass -File start, drop Mark of the Web so later local edits are not treated as remote.
+if ($Script:HubOnWindows -and $Script:HubScriptPath) {
+    try { Unblock-File -LiteralPath $Script:HubScriptPath -ErrorAction SilentlyContinue } catch { }
+}
 
 # Embedded release pins (no separate Merit-Hub.json required).
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.5",
-  "vaultPin": "vault-v0.5.5",
+  "skillsPin": "skills-v0.5.6",
+  "vaultPin": "vault-v0.5.6",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",
@@ -80,10 +84,6 @@ $Script:EmbeddedHubConfigJson = @'
 '@
 
 function Get-HubRunHint {
-    $cmd = [IO.Path]::ChangeExtension($Script:HubScriptPath, '.cmd')
-    if ($Script:HubOnWindows -and (Test-Path -LiteralPath $cmd)) {
-        return $cmd
-    }
     return "pwsh -NoProfile -ExecutionPolicy Bypass -File `"$($Script:HubScriptPath)`""
 }
 
@@ -440,7 +440,7 @@ function Invoke-MeritCleanup {
             Get-ChildItem -LiteralPath $fullOss -Force -ErrorAction SilentlyContinue |
                 Where-Object {
                     $_.FullName -ne $hubNorm -and
-                    $_.Name -notin @('Merit-Hub', 'backups', 'Merit-Hub.ps1', 'Merit-Hub.cmd')
+                    $_.Name -notin @('Merit-Hub', 'backups', 'Merit-Hub.ps1')
                 } |
                 ForEach-Object { Remove-PathSafe -Path $_.FullName -Label "OSS child $($_.Name)" }
         }

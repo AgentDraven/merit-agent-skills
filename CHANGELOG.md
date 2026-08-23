@@ -1,3 +1,10 @@
+## 0.5.6 - 2026-08-23
+
+### Changed
+- **Merit-Hub is one file again.** Removed `Merit-Hub.cmd`. Windows entry is a single command: `pwsh -NoProfile -ExecutionPolicy Bypass -File …` (`Bypass` is this process only; script self-`Unblock-File`s after start).
+- README name map: public `merit.ps1` vs vault `scripts/merit.ps1` vs `BootStrap/MERIT.json` vs `~/dev/MERIT.json`.
+- Hub pin: **`skills-v0.5.6`** / **`vault-v0.5.6`**.
+
 ## 0.5.5 - 2026-08-23
 
 ### Added
