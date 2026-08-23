@@ -4,7 +4,9 @@
   Merit-Hub - laptop cleanup (Pristine v2), jumpstart OSS/vault, shared tools (MYMERITTOOLS).
 
 .DESCRIPTION
-  Single standalone script  -  save as e.g. C:\Tools\Merit-Hub.ps1 (default %MYMERITTOOLS%). Pins are embedded; no .json or install helper required.
+  Standalone script - save as e.g. C:\Tools\Merit-Hub.ps1 (default %MYMERITTOOLS%).
+  On Windows, run Merit-Hub.cmd (same folder) - do not use .\Merit-Hub.ps1 after a browser download
+  (unsigned + Mark of the Web is blocked by RemoteSigned). Pins are embedded; no .json required.
   Run with no args for interactive menu.
 
   Cleanup:
@@ -24,11 +26,10 @@
     MYMERITTOOLS  laptop tools root (default C:\Tools) - merit-venv, shims
 
 .EXAMPLE
-  pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1
-  pwsh -File .\Merit-Hub.ps1 -Pristine -Force
-  pwsh -File .\Merit-Hub.ps1 -Jumpstart Oss
-  pwsh -File .\Merit-Hub.ps1 -Jumpstart Vault
-  pwsh -File .\Merit-Hub.ps1 -Prereqs
+  C:\Tools\Merit-Hub.cmd
+  pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1 -Pristine -Force
+  pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1 -Jumpstart Oss
 #>
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
@@ -62,8 +63,8 @@ $Script:HubOnWindows = (
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.4",
-  "vaultPin": "vault-v0.5.4",
+  "skillsPin": "skills-v0.5.5",
+  "vaultPin": "vault-v0.5.5",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",
@@ -79,6 +80,10 @@ $Script:EmbeddedHubConfigJson = @'
 '@
 
 function Get-HubRunHint {
+    $cmd = [IO.Path]::ChangeExtension($Script:HubScriptPath, '.cmd')
+    if ($Script:HubOnWindows -and (Test-Path -LiteralPath $cmd)) {
+        return $cmd
+    }
     return "pwsh -NoProfile -ExecutionPolicy Bypass -File `"$($Script:HubScriptPath)`""
 }
 
@@ -435,8 +440,7 @@ function Invoke-MeritCleanup {
             Get-ChildItem -LiteralPath $fullOss -Force -ErrorAction SilentlyContinue |
                 Where-Object {
                     $_.FullName -ne $hubNorm -and
-                    $_.Name -notin @('Merit-Hub', 'backups') -and
-                    $_.Name -notlike 'Merit-Hub.ps1'
+                    $_.Name -notin @('Merit-Hub', 'backups', 'Merit-Hub.ps1', 'Merit-Hub.cmd')
                 } |
                 ForEach-Object { Remove-PathSafe -Path $_.FullName -Label "OSS child $($_.Name)" }
         }

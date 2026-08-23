@@ -6,7 +6,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 
 | Goal | Path |
 |------|------|
-| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** — one file, save as `C:\Tools\Merit-Hub.ps1`, run `pwsh -File C:\Tools\Merit-Hub.ps1`. Details: [Merit-Hub/README.md](Merit-Hub/README.md). **J** OSS · **V** vault · **P** reset. No git. |
+| **Laptop hub (easiest cold start)** | Save [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) + [`Merit-Hub.cmd`](Merit-Hub/Merit-Hub.cmd) to `C:\Tools\`, run **`C:\Tools\Merit-Hub.cmd`**. Do not use `.\Merit-Hub.ps1` after a browser download. Details: [Merit-Hub/README.md](Merit-Hub/README.md). **J** OSS · **V** vault · **P** reset. |
 | **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** â€” 3 steps, no accounts night one |
 | **OSS BootStrap** | **[BootStrap/](BootStrap/README.md)** — clone repo, run `BootStrap\MERIT_BootStrap.cmd`; bench folder = `%MYMERITAPP%` (default `C:\MyMeritApp`). Not the root CLI. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
@@ -35,11 +35,13 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 
 ## Quick install
 
-**Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) to `C:\Tools\`, then:
+**Recommended cold start:** save [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) and [`Merit-Hub.cmd`](Merit-Hub/Merit-Hub.cmd) to `C:\Tools\`, then:
 
-```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+```bat
+C:\Tools\Merit-Hub.cmd
 ```
+
+Or: `Unblock-File C:\Tools\Merit-Hub.ps1` then `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Browser “harmful file” warnings on a `.ps1` download are expected — Keep, then use the `.cmd`.
 
 Menu **J** / **V** clones pinned OSS/vault for you — no full repo clone required first.
 

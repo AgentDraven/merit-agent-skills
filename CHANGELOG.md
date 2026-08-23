@@ -1,3 +1,12 @@
+## 0.5.5 - 2026-08-23
+
+### Added
+- **`Merit-Hub.cmd`:** Windows launcher next to the `.ps1` — `Unblock-File` (Mark of the Web) + `-ExecutionPolicy Bypass` for this process only. Fixes `not digitally signed` / `PSSecurityException` from `.\Merit-Hub.ps1` after a browser download.
+
+### Changed
+- Docs: browser “harmful file” warnings are expected; run the `.cmd`. Do not set machine ExecutionPolicy to Unrestricted.
+- Hub pin: **`skills-v0.5.5`** / **`vault-v0.5.5`**.
+
 ## 0.5.4 - 2026-08-22
 
 ### Fixed
