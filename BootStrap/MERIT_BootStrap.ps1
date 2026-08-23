@@ -75,6 +75,45 @@ function Ensure-MyMeritAppRoot {
 
 $Script:BenchRoot = Get-MyMeritAppRoot
 
+function Test-BootOnWindows {
+    return [bool]($env:OS -match 'Windows')
+}
+
+function Get-DefaultMyMeritTools {
+    if (Test-BootOnWindows) { return 'C:\Tools' }
+    return [IO.Path]::GetFullPath((Join-Path $HOME 'Tools'))
+}
+
+function Get-MyMeritToolsRoot {
+    foreach ($scope in @('Process', 'User', 'Machine')) {
+        $v = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', $scope)
+        if (-not [string]::IsNullOrWhiteSpace($v)) {
+            return [IO.Path]::GetFullPath($v.Trim().TrimEnd('\', '/'))
+        }
+    }
+    return Get-DefaultMyMeritTools
+}
+
+function Get-MeritVenvPython {
+    $tools = Get-MyMeritToolsRoot
+    if (Test-BootOnWindows) { return Join-Path $tools 'merit-venv\Scripts\python.exe' }
+    return Join-Path $tools 'merit-venv/bin/python3'
+}
+
+function Resolve-SkillsPinTag {
+    $candidates = @(
+        (Join-Path $Script:SkillsRoot 'VERSION'),
+        (Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\VERSION')
+    )
+    foreach ($p in $candidates) {
+        if (Test-Path -LiteralPath $p) {
+            $v = ((Get-Content -LiteralPath $p -Raw) -split '\r?\n')[0].Trim()
+            if ($v -match '^\d+\.\d+') { return "skills-v$v" }
+        }
+    }
+    return 'skills-v0.5.10'
+}
+
 function Write-Header([string]$Title) {
     Write-Host ''
     Write-Host ('=' * 72) -ForegroundColor Cyan
@@ -183,14 +222,14 @@ function Resolve-BasePythonExe {
 
 function Install-ToolsMeritPython {
     <#
-      Laptop-shared C:\Tools\merit-venv (same path as Private-Vault). Menu 1 installs like git/gh.
+      Laptop-shared MYMERITTOOLS\merit-venv (default C:\Tools). Menu 1 installs like git/gh.
       Public merit.ps1 is PowerShell-first; Python still helps merit-demo / Flask / local tooling.
     #>
-    Write-Header 'MERIT Python under C:\Tools (laptop shared)'
-    Write-Note 'Not git-tracked. Same C:\Tools\merit-venv Private-Vault uses for scripts/merit.ps1.'
-    $tools = 'C:\Tools'
+    $tools = Get-MyMeritToolsRoot
+    Write-Header "Creating MERIT Python venv under MYMERITTOOLS ($tools)"
+    Write-Note 'Not git-tracked. Same path Private-Vault uses when MYMERITTOOLS is set.'
     $venvDir = Join-Path $tools 'merit-venv'
-    $venvPy = Join-Path $venvDir 'Scripts\python.exe'
+    $venvPy = Get-MeritVenvPython
     New-Item -ItemType Directory -Force -Path $tools | Out-Null
     if (Test-Path -LiteralPath $venvPy) {
         Write-Ok "Already present: $venvPy"
@@ -222,17 +261,26 @@ function Install-ToolsMeritPython {
     return $true
 }
 
-# Canonical public pin for bench clones (keep in sync with README / VERSION / tag).
-$Script:SkillsPinTag = 'skills-v0.5.0'
+$Script:SkillsPinTag = Resolve-SkillsPinTag
 
 function Invoke-Prereqs {
-    Write-Header 'Prerequisites - check / install'
-    Write-Note 'Safe to re-run. Offers winget install for missing tools.'
+    Write-Header 'Prerequisites - check tools, Python venv, and MYMERIT* env'
+    Write-Note 'Safe to re-run. Lists what is missing before asking. y only installs those items.'
     Write-Host ''
     $needGit = $false
     $needPwsh = $false
     $needGh = $false
     $needToolsPy = $false
+    $tools = Get-MyMeritToolsRoot
+    $toolsUser = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'User')
+    $needPersistTools = [string]::IsNullOrWhiteSpace($toolsUser)
+
+    Write-Info '--- Environment ---'
+    Write-Ok "MYMERITTOOLS resolved = $tools"
+    if ($needPersistTools) { Write-Warn "MYMERITTOOLS User env - not persisted (will SET to $tools)" }
+    else { Write-Ok "MYMERITTOOLS User env already set = $toolsUser" }
+    Write-Host ''
+    Write-Info '--- Tools ---'
 
     $gitCmd = Get-Command git -ErrorAction SilentlyContinue
     if ($gitCmd) { Write-Ok ("Git - " + ((& git --version 2>&1 | Out-String).Trim())) }
@@ -255,7 +303,8 @@ function Invoke-Prereqs {
     }
     if (-not $ghExe) {
         $ghCmd = Get-Command gh -ErrorAction SilentlyContinue
-        if ($ghCmd -and $ghCmd.Source -and $ghCmd.Source -notmatch '(?i)^C:\\Tools\\') {
+        $toolsPrefix = [regex]::Escape($tools.TrimEnd('\') + '\')
+        if ($ghCmd -and $ghCmd.Source -and $ghCmd.Source -notmatch "(?i)^$toolsPrefix" -and $ghCmd.Source -notmatch '(?i)^C:\\Tools\\') {
             $ghExe = $ghCmd.Source
         }
     }
@@ -294,23 +343,37 @@ function Invoke-Prereqs {
     if (Test-Path -LiteralPath $bench.DemoPath) { Write-Ok "Bench demo - $($bench.DemoPath)" }
     else { Write-Warn 'Bench demo missing - use menu 3' }
 
-    $toolsPy = 'C:\Tools\merit-venv\Scripts\python.exe'
+    $toolsPy = Get-MeritVenvPython
+    $basePy = Resolve-BasePythonExe
     if (Test-Path -LiteralPath $toolsPy) {
         try {
             $ver = & $toolsPy -c "import sys; print(sys.version.split()[0])" 2>&1
-            Write-Ok "MERIT Python (C:\Tools) - $ver"
+            Write-Ok "MERIT Python venv - $ver ($toolsPy)"
         }
         catch {
-            Write-Ok "MERIT Python (C:\Tools) - $toolsPy"
+            Write-Ok "MERIT Python venv - $toolsPy"
         }
     }
     else {
         $needToolsPy = $true
-        Write-Warn 'MERIT Python (C:\Tools) missing - menu 1 can create C:\Tools\merit-venv (shared with Private-Vault)'
+        Write-Warn "MERIT Python venv - MISSING at $toolsPy"
+        if ($basePy) {
+            Write-Note "Base Python is present ($basePy). y will create the venv under MYMERITTOOLS (not a reinstall of Git/gh/pwsh)."
+        }
+        else {
+            Write-Note 'Base Python is also missing. y will install Python 3.12 then create the venv under MYMERITTOOLS.'
+        }
     }
 
-    if (-not ($needGit -or $needPwsh -or $needGh -or $needToolsPy)) {
-        Write-Ok 'No required installs pending.'
+    $missingTools = [System.Collections.Generic.List[string]]::new()
+    if ($needGit) { $missingTools.Add('Git') }
+    if ($needPwsh) { $missingTools.Add('pwsh (PowerShell 7+)') }
+    if ($needGh) { $missingTools.Add('GitHub CLI (gh) — optional') }
+    if ($needToolsPy) { $missingTools.Add("MERIT Python venv ($toolsPy)") }
+    $needAnyTool = $needGit -or $needPwsh -or $needGh -or $needToolsPy
+
+    if (-not $needAnyTool -and -not $needPersistTools) {
+        Write-Ok 'Nothing missing. Tools and User env are already set.'
         $state = Get-State
         $state.prerequisitesLastCheck = (Get-Date).ToString('o')
         Save-State $state
@@ -318,10 +381,38 @@ function Invoke-Prereqs {
     }
 
     Write-Host ''
-    $ans = Read-Host 'Install missing tools now? [y/N]'
+    Write-Info '--- What y will do ---'
+    if ($needAnyTool) {
+        Write-Note 'Install / create:'
+        foreach ($item in $missingTools) { Write-Info "    - $item" }
+    }
+    else {
+        Write-Ok 'No packages to install (Git, gh, pwsh, and MERIT Python venv are present).'
+    }
+    if ($needPersistTools) {
+        Write-Note 'Set User environment variables:'
+        Write-Info "    - MYMERITTOOLS = $tools"
+    }
+
+    $prompt = if ($needAnyTool -and $needPersistTools) {
+        'Install missing items and set User env listed above? [y/N]'
+    }
+    elseif ($needAnyTool) {
+        'Install / create the missing items listed above? [y/N]'
+    }
+    else {
+        'Set the User environment variables listed above? [y/N]'
+    }
+    $ans = Read-Host $prompt
     if ($ans -notmatch '^[Yy]') {
         Write-Warn 'Skipped installs.'
         return
+    }
+    if ($needPersistTools) {
+        [Environment]::SetEnvironmentVariable('MYMERITTOOLS', $tools, 'User')
+        $env:MYMERITTOOLS = $tools
+        Write-Ok "SET User env MYMERITTOOLS = $tools"
+        Write-Note 'Open a NEW terminal to see User env in other windows. This process already has it.'
     }
     if ($needGit) { [void](Install-WingetPkg -Id 'Git.Git' -Name 'Git') }
     if ($needPwsh) { [void](Install-WingetPkg -Id 'Microsoft.PowerShell' -Name 'PowerShell 7+') }
@@ -588,7 +679,7 @@ function Show-Menu {
     Write-Note 'Public freeware path. Start with: MERIT_BootStrap.cmd'
     Write-Note "Skills: $($Script:SkillsRoot)"
     Write-Host ''
-    Write-Host '  1) Prerequisites - check / install missing tools'
+    Write-Host '  1) Prerequisites - check tools, Python venv, and MYMERIT* env'
     Write-Host '  2) Ensure %MYMERITAPP%\merit-agent-skills (clone if needed)'
     Write-Host '  3) Seed clone merit-demo under %MYMERITAPP%'
     Write-Host '  4) OSS validate (closeout + smoke)'
@@ -644,6 +735,7 @@ function Main {
     Write-Header 'MERIT OSS BootStrap'
     Write-Note 'Repo source: merit-agent-skills/BootStrap  ->  installs live copy under MYMERITAPP'
     [void](Ensure-MyMeritAppRoot)
+    $Script:SkillsPinTag = Resolve-SkillsPinTag
     $leaf = Split-Path -Leaf $Script:BootStrapRoot
     # Install when running from a BootStrap folder
     if ($leaf -eq 'BootStrap') {

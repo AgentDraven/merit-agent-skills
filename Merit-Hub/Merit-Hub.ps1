@@ -68,7 +68,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.10",
+  "skillsPin": "skills-v0.5.11",
   "vaultPin": "vault-v0.5.6",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
@@ -271,9 +271,14 @@ function Ensure-HubElevated {
 
 function Set-UserEnvVar {
     param([string]$Name, [string]$Value)
+    $existing = [Environment]::GetEnvironmentVariable($Name, 'User')
     [Environment]::SetEnvironmentVariable($Name, $Value, 'User')
     Set-Item -Path "Env:$Name" -Value $Value
-    Write-Ok "$Name (User+Process) = $Value"
+    if ($existing -eq $Value) {
+        Write-Ok "$Name User env already set = $Value"
+        return
+    }
+    Write-Ok "SET User env $Name = $Value (was $(if ($existing) { $existing } else { 'empty' }))"
     Write-Note 'Open a NEW terminal to see User env in other windows. This process already has it.'
 }
 
@@ -1053,10 +1058,15 @@ function Resolve-BasePythonExe {
     return $null
 }
 
+function Get-MeritVenvPython {
+    $tools = Get-MyMeritToolsRoot
+    if ($Script:HubOnWindows) { return Join-Path $tools 'merit-venv\Scripts\python.exe' }
+    return Join-Path $tools 'merit-venv/bin/python3'
+}
+
 function Install-MeritToolsPython {
     $tools = Get-MyMeritToolsRoot
-    Set-UserEnvVar -Name 'MYMERITTOOLS' -Value $tools
-    Write-Header "MERIT Python under MYMERITTOOLS ($tools)"
+    Write-Header "Creating MERIT Python venv under MYMERITTOOLS ($tools)"
     $venvDir = Join-Path $tools 'merit-venv'
     $venvPy = if ($Script:HubOnWindows) { Join-Path $venvDir 'Scripts\python.exe' } else { Join-Path $venvDir 'bin/python3' }
     New-Item -ItemType Directory -Force -Path $tools | Out-Null
@@ -1097,12 +1107,24 @@ function Install-MeritToolsPython {
 }
 
 function Invoke-MeritPrereqs {
-    Write-Header 'Prerequisites - check / install'
+    Write-Header 'Prerequisites - check tools, Python venv, and MYMERIT* env'
     $tools = Get-MyMeritToolsRoot
-    Write-Ok "MYMERITTOOLS = $tools"
-    Write-Ok "MYMERITAPP    = $(Get-MyMeritAppRoot)"
-    Set-UserEnvVar -Name 'MYMERITTOOLS' -Value $tools
+    $app = Get-MyMeritAppRoot
+    $toolsUser = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'User')
+    $appUser = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'User')
+    $needPersistTools = [string]::IsNullOrWhiteSpace($toolsUser)
+    $needPersistApp = [string]::IsNullOrWhiteSpace($appUser)
 
+    Write-Info '--- Environment (not the same as git/gh/pwsh) ---'
+    Write-Ok "MYMERITTOOLS resolved = $tools"
+    Write-Ok "MYMERITAPP    resolved = $app"
+    if ($needPersistTools) { Write-Warn "MYMERITTOOLS User env - not persisted (will SET to $tools)" }
+    else { Write-Ok "MYMERITTOOLS User env already set = $toolsUser" }
+    if ($needPersistApp) { Write-Warn "MYMERITAPP User env - not persisted (will SET to $app)" }
+    else { Write-Ok "MYMERITAPP User env already set = $appUser" }
+
+    Write-Host ''
+    Write-Info '--- Tools ---'
     $needGit = -not (Get-Command git -ErrorAction SilentlyContinue)
     $pwshExe = Resolve-MeritPwshExe
     $needPwsh = -not $pwshExe
@@ -1118,29 +1140,74 @@ function Invoke-MeritPrereqs {
     }
     if (-not $ghExe) {
         $ghCmd = Get-Command gh -ErrorAction SilentlyContinue
-        if ($ghCmd -and $ghCmd.Source -and ($ghCmd.Source -notmatch '(?i)[\\/]Tools[\\/]gh')) {
+        $toolsGh = Join-Path (Get-MyMeritToolsRoot) 'gh'
+        $isToolsShim = $ghCmd -and $ghCmd.Source -and (
+            $ghCmd.Source.StartsWith($toolsGh, [StringComparison]::OrdinalIgnoreCase) -or
+            $ghCmd.Source -match '(?i)[\\/]Tools[\\/]gh'
+        )
+        if ($ghCmd -and $ghCmd.Source -and -not $isToolsShim) {
             $ghExe = $ghCmd.Source
         }
     }
     if ($ghExe) { Write-Ok "gh - $ghExe"; $needGh = $false }
-    else { Write-Warn 'gh - optional; install for PRs / identity' }
+    else { Write-Warn 'gh - missing (optional; install for PRs / identity)' }
 
     if (-not $needGit) { Write-Ok ("Git - " + ((& git --version 2>&1 | Out-String).Trim())) }
     else { Write-Fail 'Git - missing' }
-    if (-not $needPwsh) { Write-Ok "pwsh  -  $pwshExe" }
+    if (-not $needPwsh) { Write-Ok "pwsh - $pwshExe" }
     else {
-        Write-Warn 'pwsh  -  missing (hub runs on Windows PowerShell 5.1 for now; install pwsh for best experience)'
+        Write-Warn 'pwsh - missing (hub runs on Windows PowerShell 5.1 for now; install pwsh for best experience)'
         Show-PwshInstallGuide
     }
 
-    $venvPy = if ($Script:HubOnWindows) { Join-Path $tools 'merit-venv\Scripts\python.exe' } else { Join-Path $tools 'merit-venv\bin\python3' }
+    $venvPy = Get-MeritVenvPython
     $needPy = -not (Test-Path -LiteralPath $venvPy)
+    $basePy = Resolve-BasePythonExe
+    if (-not $needPy) {
+        Write-Ok "MERIT Python venv - $venvPy"
+    }
+    else {
+        Write-Warn "MERIT Python venv - MISSING at $venvPy"
+        if ($basePy) {
+            Write-Note "Base Python is present ($basePy). y will create the venv under MYMERITTOOLS (not a reinstall of Git/gh/pwsh)."
+        }
+        else {
+            Write-Note 'Base Python is also missing. y will install Python 3.12 then create the venv under MYMERITTOOLS.'
+        }
+    }
 
-    if (-not ($needGit -or $needPwsh -or $needGh -or $needPy)) {
-        Write-Ok 'All hub prereqs present.'
+    $missingTools = [System.Collections.Generic.List[string]]::new()
+    if ($needGit) { $missingTools.Add('Git') }
+    if ($needPwsh) { $missingTools.Add('pwsh (PowerShell 7+)') }
+    if ($needGh) { $missingTools.Add('GitHub CLI (gh) — optional') }
+    if ($needPy) { $missingTools.Add("MERIT Python venv ($venvPy)") }
+    $needAnyTool = $needGit -or $needPwsh -or $needGh -or $needPy
+    $needAnyEnv = $needPersistTools -or $needPersistApp
+
+    if (-not $needAnyTool -and -not $needAnyEnv) {
+        Write-Host ''
+        Write-Ok 'Nothing missing. Tools and User env are already set.'
         return
     }
+
+    Write-Host ''
+    Write-Info '--- What y will do ---'
+    if ($needAnyTool) {
+        Write-Note 'Install / create:'
+        foreach ($item in $missingTools) { Write-Info "    - $item" }
+    }
+    else {
+        Write-Ok 'No packages to install (Git, gh, pwsh, and MERIT Python venv are present).'
+    }
+    if ($needAnyEnv) {
+        Write-Note 'Set User environment variables:'
+        if ($needPersistTools) { Write-Info "    - MYMERITTOOLS = $tools" }
+        if ($needPersistApp) { Write-Info "    - MYMERITAPP = $app" }
+    }
+
     if ($Force) {
+        if ($needPersistTools) { Set-UserEnvVar -Name 'MYMERITTOOLS' -Value $tools }
+        if ($needPersistApp) { Set-UserEnvVar -Name 'MYMERITAPP' -Value $app }
         if ($needGit) { [void](Install-WingetPkg -Id 'Git.Git' -Name 'Git') }
         if ($needPwsh) {
             if ($Script:HubOnWindows -and (Test-Winget)) {
@@ -1154,8 +1221,20 @@ function Invoke-MeritPrereqs {
         if ($needPy) { [void](Install-MeritToolsPython) }
         return
     }
-    $ans = Read-Host 'Install missing tools now? [y/N]'
+
+    $prompt = if ($needAnyTool -and $needAnyEnv) {
+        'Install missing items and set User env listed above? [y/N]'
+    }
+    elseif ($needAnyTool) {
+        'Install / create the missing items listed above? [y/N]'
+    }
+    else {
+        'Set the User environment variables listed above? [y/N]'
+    }
+    $ans = Read-Host $prompt
     if ($ans -notmatch '^[Yy]') { Write-Warn 'Skipped.'; return }
+    if ($needPersistTools) { Set-UserEnvVar -Name 'MYMERITTOOLS' -Value $tools }
+    if ($needPersistApp) { Set-UserEnvVar -Name 'MYMERITAPP' -Value $app }
     if ($needGit) { [void](Install-WingetPkg -Id 'Git.Git' -Name 'Git') }
     if ($needPwsh) {
         if ($Script:HubOnWindows) {
@@ -1335,7 +1414,7 @@ function Show-MeritHubHelp {
     Write-Host '  JUMPSTART' -ForegroundColor White
     Write-Host '  J) Jumpstart OSS    clone skills pin + launch repo BootStrap'
     Write-Host '  V) Jumpstart Vault  clone vault pin + launch vault BootStrap'
-    Write-Host '  1) Prereqs only     git / gh / pwsh / MYMERITTOOLS Python'
+    Write-Host '  1) Prereqs only     git / gh / pwsh / MYMERITTOOLS Python venv + persist MYMERIT* if empty'
     Write-Host '  I) Install skills   Cursor, Codex, Hermes, … (same as install.ps1)'
     Write-Host ''
     Write-Host '  M) Set MYMERITAPP bench path'

@@ -2,22 +2,9 @@
 
 Annotated flowchart for a **new laptop** on the public freeware path. Private-Vault continuation (affiliate **MAD**, persona/repo picker) lives in the vault doc [`vault_usage.md` §7c](https://github.com/AgentDraven/merit-private-vault/blob/main/docs/vault_usage.md#7c-device-bootstrap--affiliate-pathway) (operators only).
 
-**Laptop shared:** `C:\Tools\merit-venv` is installed by **OSS BootStrap menu 1** (same path Private-Vault uses). Affiliate / `runtime out` remain Private-Vault only.
+**Laptop shared:** `%MYMERITTOOLS%\merit-venv` (default `C:\Tools`) is installed by **OSS BootStrap menu 1** and Merit-Hub prereqs (same path Private-Vault uses). Affiliate / `runtime out` remain Private-Vault only.
 
 ## Cold start
-
-**Easiest path — one file:** [download `Merit-Hub.ps1`](../Merit-Hub/Merit-Hub.ps1) to `C:\Tools\Merit-Hub.ps1`. **Required — full command** (do not double-click or `.\Merit-Hub.ps1`; Windows blocks internet-downloaded scripts):
-
-```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
-# J = Jumpstart OSS  |  V = Jumpstart Vault  |  P = Pristine v2
-```
-
-`-ExecutionPolicy Bypass` is this process only.
-
-See [Merit-Hub/README.md](../Merit-Hub/README.md). Release pins are embedded in the script.
-
-**Classic path — clone skills first:**
 
 ```powershell
 mkdir C:\MyMeritApp

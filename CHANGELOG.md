@@ -1,3 +1,9 @@
+## 0.5.11 - 2026-08-23
+
+### Fixed
+- **Prereq prompt:** Hub and OSS BootStrap now print **MERIT Python venv MISSING/OK** and separate **Environment** vs **Tools** before asking. `y` lists exactly what will be installed or SET (User `MYMERIT*`).
+- **OSS BootStrap Python path:** venv is `%MYMERITTOOLS%\merit-venv` (default `C:\Tools`), not hardcoded `C:\Tools`. Hub already followed the env; BootStrap does now too.
+
 ## 0.5.10 - 2026-08-23
 
 ### Fixed

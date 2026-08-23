@@ -5,7 +5,7 @@ Not the same as root **`merit.ps1`** (that is the MERIT **CLI**: `init` / `apply
 
 **Baseline pin:** parent repo tag **`skills-v0.5.0`** (or current `skills-v*` — see repo `VERSION` / tags).
 
-**Pathway flowchart (annotated):** [docs/bootstrap_pathway.md](../docs/bootstrap_pathway.md) — OSS cold start → **T** / **P** handoff. Menu **1** installs laptop-shared **`C:\Tools\merit-venv`** (same path as Private-Vault). Affiliate **MAD** / `runtime out` remain vault-only.
+**Pathway flowchart (annotated):** [docs/bootstrap_pathway.md](../docs/bootstrap_pathway.md) — OSS cold start → **T** / **P** handoff. Menu **1** installs laptop-shared **`%MYMERITTOOLS%\merit-venv`** (default `C:\Tools`; same path as Private-Vault). Affiliate **MAD** / `runtime out` remain vault-only.
 
 ## OSS experience (easy path)
 
@@ -57,7 +57,7 @@ You do **not** need the private vault for OSS freemium.
 
 ## Menu
 
-1. Prerequisites (git / gh / **`C:\Tools\merit-venv`**)  
+1. Prerequisites (git / gh / **`%MYMERITTOOLS%\merit-venv`**; lists missing items + env before asking)  
 2. Ensure `%MYMERITAPP%\merit-agent-skills`  
 3. Seed `merit-demo` under `%MYMERITAPP%`  
 4. Validate (`closeout` + `smoke`)  
