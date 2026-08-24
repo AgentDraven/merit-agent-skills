@@ -8,7 +8,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 |------|------|
 | **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`. **Required** (do not double-click / `.\`): `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Internet downloads are blocked otherwise. Details: [Merit-Hub/README.md](Merit-Hub/README.md). **J** OSS · **V** vault · **P** reset. |
 | **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** â€” 3 steps, no accounts night one |
-| **OSS BootStrap** | **[BootStrap/](BootStrap/README.md)** — clone repo, run `BootStrap\MERIT_BootStrap.cmd`; bench folder = `%MYMERITAPP%` (default `C:\MyMeritApp`). Not the root CLI. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
+| **OSS BootStrap** | Internal **PHASE 2** inside Merit-Hub (not a second product). Hub **J** dotsources `BootStrap/_oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
 | **Launch/deploy PoV** | [docs/deploy.md](docs/deploy.md) â€” one local `.merit_launch.md`, one `merit` command |
 | **LLD map (audit)** | [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md) |
@@ -39,7 +39,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 |------|------------|----------------|
 | This repo **`merit.ps1` / `merit.sh`** | Public OSS CLI (`create` / `apply` / `verify` / `portal` / consumer `closeout`) | Vault operator CLI |
 | Vault **`scripts/merit.ps1`** | Operator CLI (`mXin`, `runtime`, `env`, hygiene) | Public create/deploy CLI |
-| This repo **`BootStrap/MERIT.json`** | OSS BootStrap registry (edition `oss`, bench seeds) | Live laptop state |
+| This repo **`BootStrap/MERIT.json`** | Repo template / pointer (edition `oss`) | Live laptop state (that is `%MYMERITAPP%\oss-bench.json`) |
 | Vault **`BootStrap/MERIT.json`** | Vault BootStrap template (edition `vault`) | Public OSS registry |
 | **`~/dev/MERIT.json`** | Live machine BootStrap state after first run | A committed repo file |
 
@@ -64,8 +64,7 @@ git clone --branch skills-v0.5.2 https://github.com/AgentDraven/merit-agent-skil
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # omit -Target to print usage (no default host)
-# Device BootStrap (optional): cd BootStrap; .\MERIT_BootStrap.cmd
-# Or copy Merit-Hub.ps1 to C:\Tools\ and run the REQUIRED full command:
+# Do not run BootStrap as a second product. Use Merit-Hub (required full command):
 # pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 

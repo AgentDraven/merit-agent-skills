@@ -43,11 +43,12 @@ The default promo path is `MERITAGENT`; the hosted provider owns credit budget, 
 
 Root `merit.ps1` / `merit.sh` remain the **CLI** (`init` / `apply` / `verify` / …).
 
-`BootStrap/MERIT_BootStrap.*` is the **device BootStrap** menu:
+`BootStrap/` is **PHASE 2 internals** for Merit-Hub, not a second user product:
 
-- Lives in GitHub under `merit-agent-skills/BootStrap/`
-- First run asks for OSS bench path, saves User env **`MYMERITAPP`** (default `C:\MyMeritApp`)
-- Installs a live copy to `%MYMERITAPP%\BootStrap\` plus `%MYMERITAPP%\MERIT_BootStrap.cmd`
-- Menu **P** can seed Private-Vault BootStrap into `~/dev` when the operator has GitHub access to `AgentDraven/merit-private-vault` (public teaser facts only; no vault product law in this repo)
+- Lives in GitHub under `merit-agent-skills/BootStrap/` (`_oss.ps1` + legacy name forwarders)
+- Hub **J** clones this repo under `%MYMERITAPP%\merit-agent-skills` and dotsources `_oss.ps1` in the same window
+- **Do not** install a live copy to `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd` — that leftover drifted from git and is retired
+- Laptop status is `%MYMERITAPP%\oss-bench.json`
+- PHASE 3 (key **3**) can seed Private-Vault into `~/dev` when the operator has GitHub access (public teaser facts only; no vault product law in this repo)
 
 See [bootstrap.design.md](bootstrap.design.md) for how this was introduced and pushed.

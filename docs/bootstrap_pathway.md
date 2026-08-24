@@ -7,14 +7,12 @@ Annotated flowchart for a **new laptop** on the public freeware path. Private-Va
 ## Cold start
 
 ```powershell
-mkdir C:\MyMeritApp
-cd C:\MyMeritApp
-git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
-cd merit-agent-skills\BootStrap
-.\MERIT_BootStrap.cmd
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
-Use the current public pin if newer than `skills-v0.5.0` (see repo `VERSION` / tags). Clone **from** the bench folder so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
+Save Hub via **Raw** first. Menu **J** clones the current `skills-v*` pin into `%MYMERITAPP%\merit-agent-skills` and continues as PHASE 2. Do **not** copy `BootStrap/` to `%MYMERITAPP%\BootStrap\`.
+
+Use the current public pin (see repo `VERSION` / tags). Clone **from** the bench folder only if you are installing skills by hand so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
 
 ## OSS pathway flowchart
 
@@ -23,13 +21,12 @@ flowchart TD
   start([New_laptop]) --> ossOrPriv{OSS_only_or_Private}
 
   ossOrPriv -->|OSS_freeware| ossA[mkdir_MYMERITAPP]
-  ossA --> ossB[clone_skills_pin]
-  ossB --> ossC[run_OSS_BootStrap]
-  ossC --> ossD[optional_menus_1_4]
-  ossD --> ossT[T_teaser]
-  ossT --> wantPriv{Want_Private_Vault}
-  wantPriv -->|No| ossDone([OSS_done])
-  wantPriv -->|Yes_menu_P| handoff[P_clone_vault_and_launch]
+  ossA --> ossB[Hub_J_clone_skills]
+  ossB --> ossC[PHASE2_D_then_G]
+  ossC --> ossDone([OSS_done])
+  ossDone --> wantPriv{Want_Private_Vault}
+  wantPriv -->|No| stayOss([stay_freeware])
+  wantPriv -->|Yes_key_3| handoff[PHASE3_clone_vault]
 
   ossOrPriv -->|Have_vault_access| handoff
 ```
@@ -37,13 +34,13 @@ flowchart TD
 ### What happens at each step
 
 - **New_laptop / OSS_only_or_Private:** Choose public freeware (skills + demo) vs an operator path that needs GitHub access to the private vault. OSS never creates an affiliate runtime.
-- **mkdir_MYMERITAPP:** Create the OSS bench root (default `C:\MyMeritApp`). First BootStrap run (or menu **M**) can also set User env `MYMERITAPP`.
-- **clone_skills_pin:** Clone this public repo at a release tag (`skills-v*`). Prefer cloning into the bench so paths match BootStrap expectations.
-- **run_OSS_BootStrap:** Run `BootStrap\MERIT_BootStrap.cmd`. That installs/refreshes live BootStrap under `%MYMERITAPP%\BootStrap\` and a launcher `%MYMERITAPP%\MERIT_BootStrap.cmd`.
-- **optional_menus_1_4:** Prerequisites (**git / gh / `C:\Tools\merit-venv`**), ensure skills under the bench, seed `merit-demo`, closeout/smoke.
-- **T_teaser:** Public facts only — AgentDraven hosts the private ecosystem account; repo `merit-private-vault` exists; that repo’s BootStrap installs into `~/dev`. No L1 product law in this public folder.
-- **Want_Private_Vault:** Stay on OSS forever, or continue with menu **P**.
-- **P_clone_vault_and_launch:** Clones the private vault at the pinned release tag (needs credentials / GCM), then launches **Private-Vault** BootStrap. Continue there with edition **V**.
+- **mkdir_MYMERITAPP:** Create the OSS bench root (default `C:\MyMeritApp`). Hub first run (or menu **M**) can also set User env `MYMERITAPP`.
+- **Hub_J_clone_skills:** Merit-Hub **J** clones this public repo at a release tag (`skills-v*`) into the bench. PHASE 2 is `_oss.ps1` inside that clone — not a second script.
+- **PHASE2_D_then_G:** Seed `merit-demo`, then validate (`closeout` + `smoke`). Freeware OSS is done here.
+- **Want_Private_Vault:** Stay on OSS forever, or continue with PHASE 3 key **3**.
+- **PHASE3_clone_vault:** Clones the private vault at the pinned release tag (needs credentials / GCM), then launches **Private-Vault** BootStrap. Continue there with edition **V**.
+
+Do **not** create `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd`. Those were a retired live copy of the old BootStrap product.
 
 ## What OSS BootStrap does *not* do
 
@@ -57,7 +54,7 @@ flowchart TD
 
 ## MERIT Python on the laptop
 
-`C:\Tools\merit-venv` is **not** assumed pre-installed. BootStrap **menu 1** creates it (OSS and vault), like git/gh. Public root `merit.ps1` remains PowerShell-first; Tools Python helps **merit-demo / Flask** and later vault `scripts/merit.ps1`.
+`C:\Tools\merit-venv` is **not** assumed pre-installed. Hub **1** / PHASE 1 prereqs create it (same path Private-Vault uses). Public root `merit.ps1` remains PowerShell-first; Tools Python helps **merit-demo / Flask** and later vault `scripts/merit.ps1`.
 
 ## After first clone — use merit.ps1 (not raw git)
 

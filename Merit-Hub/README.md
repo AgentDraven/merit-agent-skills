@@ -77,4 +77,7 @@ Raw: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Meri
 | `%MYMERITTOOLS%\pwsh\` | Menu **1 → Portable** (optional) |
 | `%MYMERITTOOLS%\merit-venv\` | Menu **1** |
 | `%MYMERITAPP%\merit-agent-skills\` | Menu **J** or **I** |
+| `%MYMERITAPP%\oss-bench.json` | PHASE 2 status (human field names) |
 | `~/.cursor/skills\` (etc.) | Menu **I** / `-InstallSkills` |
+
+Hub does **not** create `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd`. Those leftover live copies are retired; Hub removes them on menu start / **J** / **2** / Pristine.

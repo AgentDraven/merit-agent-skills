@@ -8,12 +8,16 @@ Separate **device BootStrap** from the public **MERIT CLI** (`merit.ps1`) so bui
 
 | Location | Role |
 |----------|------|
-| `BootStrap/MERIT_BootStrap.ps1` (+ `.cmd` / `.sh`) | OSS BootStrap menu |
-| `BootStrap/MERIT.json` | Local status template (no secrets) |
-| `BootStrap/README.md` | Operator-facing how to run |
+| `Merit-Hub/Merit-Hub.ps1` | Only user script (PHASE 1 laptop + dotsources PHASE 2) |
+| `BootStrap/_oss.ps1` | PHASE 2 internals (not user-run) |
+| `BootStrap/MERIT_BootStrap.ps1` (+ `.cmd` / `.sh`) | Legacy names — forward to Hub `-OssPhase` |
+| `BootStrap/oss-bench.json` | Template; live copy is `%MYMERITAPP%\oss-bench.json` |
+| `BootStrap/MERIT.json` | Pointer note (not laptop status) |
+| `BootStrap/README.md` | PHASE 2 keys |
 | `docs/bootstrap_pathway.md` | Annotated OSS â†’ Private handoff flowchart |
 | `cfg/agent_hosts.json` | AI IDE / agent host registry (install paths + auto-detect hints) |
-| `%MYMERITAPP%` (default `C:\MyMeritApp`) | Live OSS bench after first run |
+| `%MYMERITAPP%` (default `C:\MyMeritApp`) | Live OSS bench after Hub **J** (clone + demo + `oss-bench.json`) |
+| `%MYMERITAPP%\BootStrap\` | **Retired.** Do not create. Old live copy of BootStrap as a second product. |
 
 ## MYMERITAPP
 
@@ -44,15 +48,10 @@ On 2026-08-20 the work was preserved from a detached `skills-v0.3.53` checkout u
 ## Cold start (baseline)
 
 ```powershell
-mkdir C:\MyMeritApp
-cd C:\MyMeritApp
-git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
-cd merit-agent-skills\BootStrap
-.\MERIT_BootStrap.cmd
-# Menu T = vault teaser; Menu P = clone AgentDraven/merit-private-vault @ vault-v0.5.0 (GCM credentials)
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
-`git clone` must run **from** the bench folder so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
+Hub **J** clones the current `skills-v*` pin. Do not copy this folder to `%MYMERITAPP%\BootStrap\`.
 
 Annotated pathway: [bootstrap_pathway.md](bootstrap_pathway.md).
 
@@ -115,7 +114,7 @@ OSS BootStrap does **not** deploy vault L1. It may later offer â€œinstall sk
 | Step | Command surface |
 |------|-----------------|
 | First skills clone into bench | Raw `git clone --branch skills-v*` (chicken-egg) |
-| Device menus | `BootStrap\MERIT_BootStrap.cmd` |
+| Device menus | `C:\Tools\Merit-Hub.ps1` (PHASE 1/2). Legacy `BootStrap\MERIT_BootStrap.cmd` forwards to Hub. |
 | Consumer app verify / OSS closeout print | `.\merit.ps1 verify` / `.\merit.ps1 closeout --path <repo>` |
 | Operator closeout of **this** skills repo | Vault `scripts/merit.ps1 mXin` from skills cwd (`TAG_PREFIX` â†’ `skills-v{VERSION}`) + `git verify` |
 | Day-to-day vault / private repos | Always vault `merit.ps1` â€” never raw git closeout |

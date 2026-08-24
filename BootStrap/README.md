@@ -6,6 +6,8 @@ This folder is **not** a second product. Hub **J** dotsources [`_oss.ps1`](_oss.
 
 `MERIT_BootStrap.cmd` / `.ps1` are **legacy names** — they forward to `Merit-Hub.ps1 -OssPhase`.
 
+**Do not** copy this folder to `%MYMERITAPP%\BootStrap\` or add `%MYMERITAPP%\MERIT_BootStrap.cmd`. That live copy was a second product (stale pin, old keys 1–4). Hub deletes it if it reappears. Git source stays here, inside the clone.
+
 ## PHASE 2 keys (do not reuse laptop 1 / P / S)
 
 | Key | Action |

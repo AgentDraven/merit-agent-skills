@@ -70,8 +70,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.12",
-  "vaultPin": "vault-v0.5.6",
+  "skillsPin": "skills-v0.5.13",
+  "vaultPin": "vault-v0.5.7",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
@@ -584,6 +584,40 @@ function Invoke-WipeOssBenches {
     }
 }
 
+function Remove-RetiredOssLiveBootStrap {
+    # Old OSS BootStrap copied a second product to %MYMERITAPP%\BootStrap plus a
+    # bench-root MERIT_BootStrap.cmd. Hub never creates those. Git source stays at
+    # %MYMERITAPP%\merit-agent-skills\BootStrap\_oss.ps1.
+    $benches = New-Object System.Collections.Generic.List[string]
+    foreach ($p in @((Get-MyMeritAppRoot), (Get-DefaultMyMeritApp))) {
+        if ([string]::IsNullOrWhiteSpace($p)) { continue }
+        $full = Expand-HomePath $p
+        if (-not $benches.Contains($full)) { [void]$benches.Add($full) }
+    }
+    foreach ($bench in $benches) {
+        if (-not (Test-Path -LiteralPath $bench)) { continue }
+        $gitBoot = Join-Path $bench 'merit-agent-skills\BootStrap'
+        $liveBoot = Join-Path $bench 'BootStrap'
+        $gitFull = $null
+        if (Test-Path -LiteralPath $gitBoot) {
+            $gitFull = [IO.Path]::GetFullPath($gitBoot)
+        }
+        if (Test-Path -LiteralPath $liveBoot) {
+            $liveFull = [IO.Path]::GetFullPath($liveBoot)
+            if ($gitFull -and ($liveFull -eq $gitFull)) {
+                Write-Info 'skip retired live BootStrap wipe - path is the git clone BootStrap'
+            }
+            else {
+                Remove-PathSafe -Path $liveFull -Label 'retired live OSS BootStrap copy (not the git clone)'
+            }
+        }
+        $legacyCmd = Join-Path $bench 'MERIT_BootStrap.cmd'
+        if (Test-Path -LiteralPath $legacyCmd) {
+            Remove-PathSafe -Path $legacyCmd -Label 'retired bench-root MERIT_BootStrap.cmd'
+        }
+    }
+}
+
 function Test-HubProtectedScanPath {
     param([string]$Path)
     $full = Expand-HomePath $Path
@@ -743,6 +777,7 @@ function Invoke-MeritCleanup {
     }
 
     Write-Header "Cleanup ($ModeName)"
+    Remove-RetiredOssLiveBootStrap
 
     $liveFiles = @(
         'MERIT.json', 'MERIT_BootStrap.ps1', 'MERIT_BootStrap.cmd', 'MERIT_BootStrap.sh',
@@ -1362,6 +1397,7 @@ function Get-HubOssInternalScript {
 
 function Enter-HubOssPhase {
     param([switch]$Chain)
+    Remove-RetiredOssLiveBootStrap
     $oss = Get-HubOssInternalScript
     if (-not (Test-Path -LiteralPath $oss)) {
         Write-Fail "PHASE 2 internal script missing: $oss"
@@ -1451,6 +1487,7 @@ function Set-MyMeritToolsPrompt {
 
 function Show-InteractiveMenu {
     Ensure-MeritHubEnvAtStart
+    Remove-RetiredOssLiveBootStrap
     while ($true) {
         Show-MeritHubHelp
         Write-Host '  Recommended cold start:  J' -ForegroundColor Yellow

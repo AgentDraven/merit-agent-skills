@@ -50,14 +50,13 @@ cd ~/MyMeritApp
 git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 ```
 
-Optional device BootStrap (prereqs, demo seed, Private-Vault teaser **T** / seed **P**):
+Optional laptop hub (prereqs, demo seed, PHASE 2 validate, PHASE 3 vault):
 
 ```powershell
-cd C:\MyMeritApp\merit-agent-skills\BootStrap
-.\MERIT_BootStrap.cmd
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
-See [BootStrap/README.md](BootStrap/README.md). `git clone` must run **from** the bench folder so the repo lands at `C:\MyMeritApp\merit-agent-skills`.
+See [Merit-Hub/README.md](Merit-Hub/README.md) and [BootStrap/README.md](BootStrap/README.md). Do not copy BootStrap to `%MYMERITAPP%\BootStrap\`. `git clone` must run **from** the bench folder so the repo lands at `C:\MyMeritApp\merit-agent-skills`.
 
 ### 1B Ã¢â‚¬â€ merit-demo
 

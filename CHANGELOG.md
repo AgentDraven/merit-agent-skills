@@ -1,3 +1,11 @@
+## 0.5.13 - 2026-08-23
+
+### Removed
+- **Leftover live OSS BootStrap copy.** Hub never creates `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd`. Those were a second on-disk product from the old BootStrap installer (36 KB menu, keys 1–4, schema-1 `MERIT.json` pinned to an old tag). They drifted from git and looked like starting over. PHASE 2 lives only in the clone: `%MYMERITAPP%\merit-agent-skills\BootStrap\_oss.ps1`. Hub **J** / **2** / Pristine delete the retired live copy if it reappears. Laptop status is `%MYMERITAPP%\oss-bench.json` only.
+
+### Changed
+- Docs and Hub pin: **`skills-v0.5.13`** / **`vault-v0.5.7`**. Cold start is Merit-Hub only. `BootStrap/MERIT_BootStrap.md` (old live-copy table) deleted.
+
 ## 0.5.12 - 2026-08-23
 
 ### Changed
