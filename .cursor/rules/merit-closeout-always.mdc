@@ -1,0 +1,12 @@
+---
+description: Binding MERIT closeout — mXin + 3-3 on every completed scope
+alwaysApply: true
+---
+
+# Closeout is not optional
+
+When a scoped task is complete, **execute merit-closeout** before ending: `merit.ps1` `mXin` + `git verify` + chat **3-3** (Done · State with VERSION/tag · Next).
+
+Do not finish with explanation-only. Exception only if the user said WIP / no commit / local-only.
+
+Never raw `git commit` / `tag` / `push` for closeout.

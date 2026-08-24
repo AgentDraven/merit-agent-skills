@@ -2,6 +2,16 @@
 
 L3: **merit-agent-skills** — public MERIT skills and CLI distribution.
 
+## Closeout (binding — never skip)
+
+Work is **not done** until closeout + **3-3**. Do not end a completed scope with only a chat summary.
+
+1. Operator ship of this repo: vault `scripts/merit.ps1` `mXin` then `git verify` (never raw git commit/tag/push).
+2. Consumer apps: `.\merit.ps1 closeout --path .`
+3. Chat **3-3**: **Done** · **State** (include `VERSION` / tag) · **Next** (≤3 bullets each).
+
+Exception only if the user said **WIP** / **no commit** / **local-only**.
+
 ## Maniacal focus
 
 - Own public skills under `skills/`.

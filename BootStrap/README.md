@@ -1,78 +1,30 @@
-﻿# MERIT OSS BootStrap
+﻿# OSS bench (PHASE 2) — internal
 
-Public freeware **device BootStrap** for this repo.  
-Not the same as root **`merit.ps1`** (that is the MERIT **CLI**: `init` / `apply` / `verify` / …).
+**Users run one file:** [`../Merit-Hub/Merit-Hub.ps1`](../Merit-Hub/Merit-Hub.ps1) saved as `C:\Tools\Merit-Hub.ps1`.
 
-**Baseline pin:** parent repo tag **`skills-v0.5.0`** (or current `skills-v*` — see repo `VERSION` / tags).
+This folder is **not** a second product. Hub **J** dotsources [`_oss.ps1`](_oss.ps1) and continues in the same window as **PHASE 2 of 3** (green). Laptop is PHASE 1 (cyan). Private-Vault is PHASE 3 (magenta, key **3**).
 
-**Pathway flowchart (annotated):** [docs/bootstrap_pathway.md](../docs/bootstrap_pathway.md) — OSS cold start → **T** / **P** handoff. Menu **1** installs laptop-shared **`%MYMERITTOOLS%\merit-venv`** (default `C:\Tools`; same path as Private-Vault). Affiliate **MAD** / `runtime out` remain vault-only.
+`MERIT_BootStrap.cmd` / `.ps1` are **legacy names** — they forward to `Merit-Hub.ps1 -OssPhase`.
 
-## OSS experience (easy path)
+## PHASE 2 keys (do not reuse laptop 1 / P / S)
 
-Start in the OSS bench folder (recommended: `C:\MyMeritApp`). `git clone` creates `merit-agent-skills` **inside** whatever directory you are in.
+| Key | Action |
+|-----|--------|
+| **D** | Seed / update `merit-demo` |
+| **G** | Validate OSS (`closeout` + `smoke`) — freeware done |
+| **U** | Status in plain English |
+| **F** | Help (flow + vault teaser) |
+| **3** | PHASE 3 Private-Vault (optional; OSS checklist first) |
+| **0** | Back to PHASE 1 laptop menu |
 
-```powershell
-mkdir C:\MyMeritApp
-cd C:\MyMeritApp
-git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
-cd merit-agent-skills\BootStrap
-.\MERIT_BootStrap.cmd
-```
+After a step, type the next key at the pause (example: **D** then **G**).
 
-Linux/macOS:
+## Status file
 
-```bash
-mkdir -p ~/MyMeritApp
-cd ~/MyMeritApp
-git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
-cd merit-agent-skills/BootStrap
-./MERIT_BootStrap.sh
-```
+Laptop status is **`%MYMERITAPP%\oss-bench.json`** with human field names (`benchFolder`, `skillsFolder`, `demoFolder`, `skillsPin`, `lastValidateOk`, …).
 
-On first run you are asked for the **OSS bench folder** (saved as User env **`MYMERITAPP`**).  
-Default: `C:\MyMeritApp`. Pick any drive/path you want.
+Old `BootStrap/MERIT.json` (`testBench`, `publicSeeds`, `pinTag`, `ossValidationLastCheck`) is **migrated automatically** on first PHASE 2 save.
 
-That:
+## Pathway
 
-1. Saves `MYMERITAPP` for later sessions  
-2. Copies live BootStrap to `%MYMERITAPP%\BootStrap\`  
-3. Adds `%MYMERITAPP%\MERIT_BootStrap.cmd`  
-
-Later:
-
-```powershell
-# if MYMERITAPP is set, or from the bench root:
-%MYMERITAPP%\MERIT_BootStrap.cmd
-```
-
-Change the folder anytime: menu **M**.
-
-You do **not** need the private vault for OSS freemium.
-
-| Piece | Role |
-|-------|------|
-| Root `merit.ps1` | CLI for apps |
-| `BootStrap/MERIT_BootStrap.*` | Device setup menu |
-| `%MYMERITAPP%` | Your OSS bench (default `C:\MyMeritApp`) |
-
-## Menu
-
-1. Prerequisites (git / gh / **`%MYMERITTOOLS%\merit-venv`**; lists missing items + env before asking)  
-2. Ensure `%MYMERITAPP%\merit-agent-skills`  
-3. Seed `merit-demo` under `%MYMERITAPP%`  
-4. Validate (`closeout` + `smoke`)  
-5. Guidelines  
-6. Show `MERIT.json`  
-**M** — Set / change `MYMERITAPP`  
-**T** — Private-Vault teaser  
-**P** — Seed Private-Vault BootStrap into `~/dev` (needs vault GitHub access)
-
-## Private-Vault teaser (menu P)
-
-Public facts only: AgentDraven account, private repo `merit-private-vault`, and its `BootStrap` install to `~/dev`. No vault product law in this OSS folder.
-
-Menu **P** clones the vault pin and launches Private-Vault BootStrap. After that, operators continue with edition **V**, Tools Python, affiliate **MAD** (default), then persona/repo populate — documented in the private vault `docs/vault_usage.md` §7c (not in this public repo).
-
-## License
-
-Same as parent repo (`LICENSE` / `LICENSING.md`).
+Hub **J** → PHASE 2 D → G → stop (or **3** if you have vault GitHub access). Flowchart: [docs/bootstrap_pathway.md](../docs/bootstrap_pathway.md).

@@ -1,26 +1,15 @@
 @echo off
-REM MERIT_BootStrap launcher (OSS). Does NOT replace repo-root merit.ps1 CLI.
-REM From this folder:  MERIT_BootStrap.cmd
+REM Legacy launcher name. Real entry is Merit-Hub.ps1 PHASE 2.
 setlocal
-set "BOOTSTRAP_ROOT=%~dp0"
-set "BOOTSTRAP_PS1=%BOOTSTRAP_ROOT%MERIT_BootStrap.ps1"
-
-if not exist "%BOOTSTRAP_PS1%" (
-  echo MERIT_BootStrap: MERIT_BootStrap.ps1 not found at "%BOOTSTRAP_PS1%"
-  exit /b 1
-)
-
-where pwsh >nul 2>&1
-if %ERRORLEVEL%==0 (
-  pwsh -NoProfile -File "%BOOTSTRAP_PS1%" %*
+if defined MYMERITTOOLS (set "HUB=%MYMERITTOOLS%\Merit-Hub.ps1") else (set "HUB=C:\Tools\Merit-Hub.ps1")
+if not exist "%HUB%" set "HUB=C:\Tools\Merit-Hub.ps1"
+if exist "%HUB%" (
+  where pwsh >nul 2>&1 && (pwsh -NoProfile -ExecutionPolicy Bypass -File "%HUB%" -OssPhase %* & exit /b %ERRORLEVEL%)
+  powershell -NoProfile -ExecutionPolicy Bypass -File "%HUB%" -OssPhase %*
   exit /b %ERRORLEVEL%
 )
-
-where powershell >nul 2>&1
-if %ERRORLEVEL%==0 (
-  powershell -NoProfile -ExecutionPolicy Bypass -File "%BOOTSTRAP_PS1%" %*
-  exit /b %ERRORLEVEL%
-)
-
-echo MERIT_BootStrap: need pwsh or powershell on PATH
-exit /b 1
+set "OSS=%~dp0_oss.ps1"
+if not exist "%OSS%" (echo Merit-Hub.ps1 not found. Save Hub to C:\Tools\Merit-Hub.ps1 & exit /b 1)
+where pwsh >nul 2>&1 && (pwsh -NoProfile -File "%~dp0MERIT_BootStrap.ps1" %* & exit /b %ERRORLEVEL%)
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0MERIT_BootStrap.ps1" %*
+exit /b %ERRORLEVEL%

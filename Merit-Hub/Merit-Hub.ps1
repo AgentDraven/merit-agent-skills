@@ -14,8 +14,9 @@
     -Soft       backup + wipe bench/status; keep ~/dev clones
     -BackupOnly snapshot only
 
-  Jumpstart:
-    -Jumpstart Oss|Vault   clone pinned release + launch repo BootStrap
+    Jumpstart:
+    -Jumpstart Oss|Vault   clone pinned release; OSS stays in this script as PHASE 2
+    -OssPhase              open PHASE 2 OSS bench menu (after a skills clone exists)
     -InstallSkills <host>  copy skills/ to Cursor, Codex, Hermes, … (needs OSS clone; menu I)
     -Prereqs                 install/check git, gh, pwsh, MYMERITTOOLS Python venv
 
@@ -41,6 +42,7 @@ param(
     [string]$InstallSkills,
     [string]$InstallSkillsPath = '',
     [switch]$Prereqs,
+    [switch]$OssPhase,
     [switch]$Force,
     [Alias('?')]
     [switch]$Help
@@ -68,8 +70,10 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.11",
+  "skillsPin": "skills-v0.5.12",
   "vaultPin": "vault-v0.5.6",
+  "agentCloseoutRequired": true,
+  "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",
@@ -99,7 +103,7 @@ function Write-Info([string]$t) { Write-Host "  $t" }
 function Write-Header([string]$t) {
     Write-Host ''
     Write-Host ('=' * 72) -ForegroundColor Cyan
-    Write-Host "  Merit-Hub  |  $t" -ForegroundColor Cyan
+    Write-Host "  Merit-Hub  |  PHASE 1 of 3  -  laptop  |  $t" -ForegroundColor Cyan
     Write-Host ('=' * 72) -ForegroundColor Cyan
 }
 
@@ -1346,19 +1350,30 @@ function Invoke-JumpstartOss {
         }
     }
 
-    $bootPs1 = Join-Path $skillsDest 'BootStrap\MERIT_BootStrap.ps1'
-    $bootCmd = Join-Path $skillsDest 'BootStrap\MERIT_BootStrap.cmd'
-    if (-not (Test-Path -LiteralPath $bootPs1)) {
-        Write-Fail "BootStrap missing: $bootPs1"
+    Write-Ok 'PHASE 1 jumpstart finished. Same window -> PHASE 2 OSS bench (not a second script).'
+    Write-Note "Hub pins: skills=$($cfg.skillsPin) vault=$($cfg.vaultPin)"
+    Enter-HubOssPhase -Chain
+}
+
+function Get-HubOssInternalScript {
+    $bench = Get-MyMeritAppRoot
+    return Join-Path $bench 'merit-agent-skills\BootStrap\_oss.ps1'
+}
+
+function Enter-HubOssPhase {
+    param([switch]$Chain)
+    $oss = Get-HubOssInternalScript
+    if (-not (Test-Path -LiteralPath $oss)) {
+        Write-Fail "PHASE 2 internal script missing: $oss"
+        Write-Note 'Run Hub J first so merit-agent-skills is cloned under MYMERITAPP.'
         return
     }
-    Write-Ok 'Launching repo OSS BootStrap (menus 1-4, P vault teaser) ...'
-    Write-Note "Hub pins: skills=$($cfg.skillsPin) vault=$($cfg.vaultPin)"
-    if (Test-Path -LiteralPath $bootCmd) {
-        & $bootCmd
+    . $oss
+    if ($Chain) {
+        Invoke-OssChainThenMenu
     }
     else {
-        & $bootPs1
+        Invoke-OssPhaseMenu
     }
 }
 
@@ -1398,7 +1413,7 @@ function Invoke-JumpstartVault {
 
 function Show-MeritHubHelp {
     $cfg = Get-HubConfig
-    Write-Header 'Merit-Hub laptop hub'
+    Write-Header 'Merit-Hub laptop (PHASE 1 of 3)'
     Write-Info "Location: $Script:HubScriptPath"
     Write-Info "Elevated: $(Test-HubAdmin)"
     Write-HubEnvScopes
@@ -1412,8 +1427,9 @@ function Show-MeritHubHelp {
     Write-Host '  B) Backup only'
     Write-Host ''
     Write-Host '  JUMPSTART' -ForegroundColor White
-    Write-Host '  J) Jumpstart OSS    clone skills pin + launch repo BootStrap'
-    Write-Host '  V) Jumpstart Vault  clone vault pin + launch vault BootStrap'
+    Write-Host '  J) Jumpstart OSS    PHASE 1 prereqs+clone, then PHASE 2 (green) demo+validate'
+    Write-Host '  2) OSS bench        PHASE 2 menu only (needs skills clone from J)'
+    Write-Host '  V) Jumpstart Vault  clone vault pin + vault BootStrap'
     Write-Host '  1) Prereqs only     git / gh / pwsh / MYMERITTOOLS Python venv + persist MYMERIT* if empty'
     Write-Host '  I) Install skills   Cursor, Codex, Hermes, … (same as install.ps1)'
     Write-Host ''
@@ -1444,7 +1460,8 @@ function Show-InteractiveMenu {
             '^(P|p|Pristine)$' { Invoke-Mode -Mode Pristine; return }
             '^(S|s|Soft)$' { Invoke-Mode -Mode Soft; return }
             '^(B|b|BackupOnly)$' { Invoke-Mode -Mode BackupOnly; return }
-            '^(J|j|Jumpstart|Oss)$' { Invoke-JumpstartOss; return }
+            '^(J|j|Jumpstart|Oss)$' { Invoke-JumpstartOss }
+            '^2$' { Enter-HubOssPhase }
             '^(V|v|Vault)$' { Invoke-JumpstartVault; return }
             '^1$' { Invoke-MeritPrereqs; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('I', 'i', 'Install', 'InstallSkills') } { Invoke-InstallSkillsMenu; Read-Host 'Press Enter' | Out-Null }
@@ -1452,7 +1469,7 @@ function Show-InteractiveMenu {
             { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; Read-Host 'Press Enter' | Out-Null }
             '^(H|h|\?|Help)$' { continue }
             '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default { Write-Warn 'Unknown  -  choose P, S, B, J, V, I, 1, M, T, H, or 0.' }
+            default { Write-Warn 'Unknown  -  choose P, S, B, J, 2, V, I, 1, M, T, H, or 0.' }
         }
     }
 }
@@ -1474,11 +1491,12 @@ try {
         [void](Invoke-InstallMeritSkills -Target $InstallSkills -ProjectPath $InstallSkillsPath)
         return
     }
+    if ($OssPhase) { Enter-HubOssPhase; return }
     if ($Jumpstart -eq 'Oss') { Invoke-JumpstartOss; return }
     if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
 
     $bound = $PSBoundParameters.Keys
-    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help') | Where-Object { $bound -contains $_ }
+    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase') | Where-Object { $bound -contains $_ }
     if (-not $hasAction) {
         Show-InteractiveMenu
     }

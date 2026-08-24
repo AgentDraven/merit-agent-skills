@@ -62,7 +62,8 @@ Raw: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Meri
 
 | Key | Action |
 |-----|--------|
-| **J** | Clone OSS + optional skills install + BootStrap |
+| **J** | PHASE 1 prereqs + skills clone, then **PHASE 2** (green) demo + validate in the **same** script |
+| **2** | PHASE 2 OSS bench menu only (after a clone exists) |
 | **V** | Clone vault + BootStrap |
 | **I** | Install skills to Cursor / Codex / Hermes / … |
 | **1** | Prereqs: lists Git/gh/pwsh **and** MERIT Python venv MISSING/OK; `y` only installs those items and SETs empty `MYMERIT*` User env |

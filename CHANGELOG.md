@@ -1,3 +1,10 @@
+## 0.5.12 - 2026-08-23
+
+### Changed
+- **One script, three phases:** Merit-Hub stays the only user entry. OSS BootStrap is internal `_oss.ps1` (PHASE 2, green keys D/G/F/U; PHASE 3 vault is key 3). Laptop menu is PHASE 1 (cyan).
+- **OSS status file:** `%MYMERITAPP%\oss-bench.json` uses human names (`benchFolder`, `skillsFolder`, `skillsPin`, `lastValidateOk`, …). Old `MERIT.json` fields are migrated.
+- **Agents:** closeout + 3-3 is binding (`AGENTS.md`, alwaysApply rule). Hub config `agentCloseoutRequired`.
+
 ## 0.5.11 - 2026-08-23
 
 ### Fixed
