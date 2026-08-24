@@ -10,7 +10,7 @@ Annotated flowchart for a **new laptop** on the public freeware path. Private-Va
 pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
-Save Hub via **Raw** first. Menu **J** clones the current `skills-v*` pin into `%MYMERITAPP%\merit-agent-skills` and continues as PHASE 2. Do **not** copy `BootStrap/` to `%MYMERITAPP%\BootStrap\`.
+Save Hub via **Raw** first. Menu **2** (alias **J**) clones the current `skills-v*` pin into `%MYMERITAPP%\merit-agent-skills` and continues Install OSS in the same window. Do **not** copy `BootStrap/` to `%MYMERITAPP%\BootStrap\`.
 
 Use the current public pin (see repo `VERSION` / tags). Clone **from** the bench folder only if you are installing skills by hand so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
 
@@ -21,12 +21,15 @@ flowchart TD
   start([New_laptop]) --> ossOrPriv{OSS_only_or_Private}
 
   ossOrPriv -->|OSS_freeware| ossA[mkdir_MYMERITAPP]
-  ossA --> ossB[Hub_J_clone_skills]
-  ossB --> ossC[PHASE2_D_then_G]
-  ossC --> ossDone([OSS_done])
+  ossA --> ossB[Hub_2_clone_skills]
+  ossB --> ossC[Install_OSS_demo_quiet_smoke]
+  ossC --> ossDone([OSS_local_done])
+  ossDone --> tryIt[3_Try_it_local]
+  tryIt --> oc[OC_OSS_in_the_Cloud]
   ossDone --> wantPriv{Want_Private_Vault}
-  wantPriv -->|No| stayOss([stay_freeware])
-  wantPriv -->|Yes_key_3| handoff[PHASE3_clone_vault]
+  wantPriv -->|No| stayOss([stay_freeware_or_OC])
+  wantPriv -->|Yes_key_4| handoff[4_clone_vault_local]
+  handoff --> vc[VC_Venture_Capable]
 
   ossOrPriv -->|Have_vault_access| handoff
 ```
@@ -35,10 +38,13 @@ flowchart TD
 
 - **New_laptop / OSS_only_or_Private:** Choose public freeware (skills + demo) vs an operator path that needs GitHub access to the private vault. OSS never creates an affiliate runtime.
 - **mkdir_MYMERITAPP:** Create the OSS bench root (default `C:\MyMeritApp`). Hub first run (or menu **M**) can also set User env `MYMERITAPP`.
-- **Hub_J_clone_skills:** Merit-Hub **J** clones this public repo at a release tag (`skills-v*`) into the bench. PHASE 2 is `_oss.ps1` inside that clone — not a second script.
-- **PHASE2_D_then_G:** Seed `merit-demo`, then validate (`closeout` + `smoke`). Freeware OSS is done here.
-- **Want_Private_Vault:** Stay on OSS forever, or continue with PHASE 3 key **3**.
-- **PHASE3_clone_vault:** Clones the private vault at the pinned release tag (needs credentials / GCM), then launches **Private-Vault** BootStrap. Continue there with edition **V**.
+- **Hub_2_clone_skills:** Merit-Hub **2** (alias **J**) clones this public repo at a release tag (`skills-v*`) into the bench. Internals: `_oss.ps1` inside that clone — not a second script.
+- **Install_OSS_demo_quiet_smoke:** Seed `merit-demo`, then validate (`closeout` + quiet `smoke`). Local freeware OSS is done here. Old D+G live inside this step.
+- **3_Try_it_local:** Open `merit-demo\play\index.html`. Not hosted yet.
+- **OC_OSS_in_the_Cloud:** Publish play+cfg to merit-prod; store activate **must** succeed. Optional platform here.now (laptop never sees the key).
+- **Want_Private_Vault:** Stay on OSS/OC, or continue with key **4**.
+- **4_clone_vault_local:** Clones the private vault at the pinned release tag (needs credentials / GCM). Still local.
+- **VC_Venture_Capable:** Operator/tenant grade vs freeware OC. Vault BootStrap on this laptop.
 
 Do **not** create `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd`. Those were a retired live copy of the old BootStrap product.
 

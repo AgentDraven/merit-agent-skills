@@ -8,15 +8,13 @@ Separate **device BootStrap** from the public **MERIT CLI** (`merit.ps1`) so bui
 
 | Location | Role |
 |----------|------|
-| `Merit-Hub/Merit-Hub.ps1` | Only user script (PHASE 1 laptop + dotsources PHASE 2) |
-| `BootStrap/_oss.ps1` | PHASE 2 internals (not user-run) |
-| `BootStrap/MERIT_BootStrap.ps1` (+ `.cmd` / `.sh`) | Legacy names — forward to Hub `-OssPhase` |
+| `Merit-Hub/Merit-Hub.ps1` | Only user script (map 1 2 3 OC 4 VC 5) |
+| `BootStrap/_oss.ps1` | Install OSS internals (not user-run) |
 | `BootStrap/oss-bench.json` | Template; live copy is `%MYMERITAPP%\oss-bench.json` |
-| `BootStrap/MERIT.json` | Pointer note (not laptop status) |
-| `BootStrap/README.md` | PHASE 2 keys |
-| `docs/bootstrap_pathway.md` | Annotated OSS â†’ Private handoff flowchart |
+| `BootStrap/README.md` | Hub map internals |
+| `docs/bootstrap_pathway.md` | Annotated OSS → Private handoff flowchart |
 | `cfg/agent_hosts.json` | AI IDE / agent host registry (install paths + auto-detect hints) |
-| `%MYMERITAPP%` (default `C:\MyMeritApp`) | Live OSS bench after Hub **J** (clone + demo + `oss-bench.json`) |
+| `%MYMERITAPP%` (default `C:\MyMeritApp`) | Live OSS bench after Hub **2** (clone + demo + `oss-bench.json`) |
 | `%MYMERITAPP%\BootStrap\` | **Retired.** Do not create. Old live copy of BootStrap as a second product. |
 
 ## MYMERITAPP

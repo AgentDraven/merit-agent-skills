@@ -1,32 +1,26 @@
-﻿# OSS bench (PHASE 2) — internal
+﻿# OSS bench internals
 
 **Users run one file:** [`../Merit-Hub/Merit-Hub.ps1`](../Merit-Hub/Merit-Hub.ps1) saved as `C:\Tools\Merit-Hub.ps1`.
 
-This folder is **not** a second product. Hub **J** dotsources [`_oss.ps1`](_oss.ps1) and continues in the same window as **PHASE 2 of 3** (green). Laptop is PHASE 1 (cyan). Private-Vault is PHASE 3 (magenta, key **3**).
+This folder is **not** a second product. Hub **2** (alias **J**) dotsources [`_oss.ps1`](_oss.ps1) in the same window.
 
-`MERIT_BootStrap.cmd` / `.ps1` are **legacy names** — they forward to `Merit-Hub.ps1 -OssPhase`.
+**Do not** copy this folder to `%MYMERITAPP%\BootStrap\` or add `%MYMERITAPP%\MERIT_BootStrap.cmd`. Hub deletes that leftover if it reappears.
 
-**Do not** copy this folder to `%MYMERITAPP%\BootStrap\` or add `%MYMERITAPP%\MERIT_BootStrap.cmd`. That live copy was a second product (stale pin, old keys 1–4). Hub deletes it if it reappears. Git source stays here, inside the clone.
+## Hub map (the only menu)
 
-## PHASE 2 keys (do not reuse laptop 1 / P / S)
+```
+1 Setup laptop --> 2 Install OSS --+--> 3 Try it --> OC (OSS in the Cloud)
+                                   +--> 4 Vault (still local) --> VC (Venture Capable)
+                                   +--> 5 Join MERIT
+                                   +--> Stop
+```
 
-| Key | Action |
-|-----|--------|
-| **D** | Seed / update `merit-demo` |
-| **G** | Validate OSS (`closeout` + `smoke`) — freeware done |
-| **U** | Status in plain English |
-| **F** | Help (flow + vault teaser) |
-| **3** | PHASE 3 Private-Vault (optional; OSS checklist first) |
-| **0** | Back to PHASE 1 laptop menu |
-
-After a step, type the next key at the pause (example: **D** then **G**).
+Keys: **1 2 3 OC 4 VC 5 0**. Aliases **J**=2, **V**=4. Old D/G live inside **2**.
 
 ## Status file
 
-Laptop status is **`%MYMERITAPP%\oss-bench.json`** with human field names (`benchFolder`, `skillsFolder`, `demoFolder`, `skillsPin`, `lastValidateOk`, …).
-
-Old `BootStrap/MERIT.json` (`testBench`, `publicSeeds`, `pinTag`, `ossValidationLastCheck`) is **migrated automatically** on first PHASE 2 save.
+Laptop status is **`%MYMERITAPP%\oss-bench.json`** (`benchFolder`, `skillsFolder`, `demoFolder`, `skillsPin`, `lastValidateOk`, `ocConsumerId`, …).
 
 ## Pathway
 
-Hub **J** → PHASE 2 D → G → stop (or **3** if you have vault GitHub access). Flowchart: [docs/bootstrap_pathway.md](../docs/bootstrap_pathway.md).
+Hub **1** then **2** → **3** Try it locally → **OC** for a live merit-prod app (no here.now account on the laptop). **4** clones the vault locally. **VC** is operator/tenant grade vs freeware OC.

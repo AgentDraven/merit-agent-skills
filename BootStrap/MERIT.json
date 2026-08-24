@@ -1,6 +1,0 @@
-{
-  "schemaVersion": 2,
-  "whatThisFileIs": "Repo template only. Laptop status lives at %MYMERITAPP%\\oss-bench.json with the same field names.",
-  "edition": "oss",
-  "note": "Old schemaVersion 1 used bootStrapRoot, testBench, publicSeeds, pinTag, ossValidationLastCheck. PHASE 2 migrates those automatically."
-}

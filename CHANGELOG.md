@@ -1,3 +1,16 @@
+## 0.5.15 - 2026-08-23
+
+### Added
+- **Hub map:** one menu **1 Setup laptop · 2 Install OSS · 3 Try it · OC · 4 Vault · VC · 5 Join MERIT · 0 Stop**. Aliases **J**=2, **V**=4. Drill-in + receipt after each step. Old D/G live inside **2**.
+- **OC (OSS in the Cloud):** `merit.ps1 oc` publishes play+cfg and **requires** store `free-community` activate. Prints play + register. Optional `POST merit-prod/api/portal/publish` (platform here.now; laptop never needs a key).
+- **VC:** after local vault clone — operator/tenant grade vs freeware OC.
+
+### Removed
+- OSS `BootStrap/MERIT_BootStrap.ps1` / `.cmd` / `.sh` and template `MERIT.json`. Internals stay `_oss.ps1` + `oss-bench.json`.
+
+### Changed
+- Smoke/closeout: `MERIT_VERIFY_QUIET=1` hides optional community `verify NOTE` lines. Hub pin **`skills-v0.5.15`** / **`vault-v0.5.8`**.
+
 ## 0.5.14 - 2026-08-23
 
 ### Fixed

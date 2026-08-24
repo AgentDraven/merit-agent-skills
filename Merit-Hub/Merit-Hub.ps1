@@ -15,9 +15,13 @@
     -BackupOnly snapshot only
 
     Jumpstart:
-    -Jumpstart Oss|Vault   clone pinned release; OSS stays in this script as PHASE 2
-    -OssPhase              open PHASE 2 OSS bench menu (after a skills clone exists)
-    -InstallSkills <host>  copy skills/ to Cursor, Codex, Hermes, … (needs OSS clone; menu I)
+    -Jumpstart Oss|Vault   clone pinned release; OSS continues as Install OSS (step 2)
+    -OssPhase / -InstallOss  clone demo + quiet validate (after a skills clone exists)
+    -TryIt                 open local merit-demo play
+    -Oc                    OSS in the Cloud (publish + required activate)
+    -Vc                    Venture Capable receipt after local vault
+    -JoinMerit             portal / partners / register links
+    -InstallSkills <host>  copy skills/ to Cursor, Codex, Hermes, ... (needs OSS clone; menu I)
     -Prereqs                 install/check git, gh, pwsh, MYMERITTOOLS Python venv
 
   Recommended runner: PowerShell 7+ (pwsh). Windows PowerShell 5.1 can bootstrap the hub once.
@@ -43,6 +47,11 @@ param(
     [string]$InstallSkillsPath = '',
     [switch]$Prereqs,
     [switch]$OssPhase,
+    [switch]$InstallOss,
+    [switch]$TryIt,
+    [switch]$Oc,
+    [switch]$Vc,
+    [switch]$JoinMerit,
     [switch]$Force,
     [Alias('?')]
     [switch]$Help
@@ -70,8 +79,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.14",
-  "vaultPin": "vault-v0.5.7",
+  "skillsPin": "skills-v0.5.15",
+  "vaultPin": "vault-v0.5.8",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
@@ -103,7 +112,7 @@ function Write-Info([string]$t) { Write-Host "  $t" }
 function Write-Header([string]$t) {
     Write-Host ''
     Write-Host ('=' * 72) -ForegroundColor Cyan
-    Write-Host "  Merit-Hub  |  PHASE 1 of 3  -  laptop  |  $t" -ForegroundColor Cyan
+    Write-Host "  Merit-Hub  |  $t" -ForegroundColor Cyan
     Write-Host ('=' * 72) -ForegroundColor Cyan
 }
 
@@ -1218,7 +1227,7 @@ function Invoke-MeritPrereqs {
     $missingTools = [System.Collections.Generic.List[string]]::new()
     if ($needGit) { $missingTools.Add('Git') }
     if ($needPwsh) { $missingTools.Add('pwsh (PowerShell 7+)') }
-    if ($needGh) { $missingTools.Add('GitHub CLI (gh) — optional') }
+    if ($needGh) { $missingTools.Add('GitHub CLI (gh) - optional') }
     if ($needPy) { $missingTools.Add("MERIT Python venv ($venvPy)") }
     $needAnyTool = $needGit -or $needPwsh -or $needGh -or $needPy
     $needAnyEnv = $needPersistTools -or $needPersistApp
@@ -1369,10 +1378,136 @@ function Invoke-GitClonePin {
     return $true
 }
 
-function Invoke-JumpstartOss {
+function Write-HubMap {
+    Write-Host ''
+    Write-Host '  MAP (always)' -ForegroundColor White
+    Write-Host '  1 Setup laptop'
+    Write-Host '       |'
+    Write-Host '       v'
+    Write-Host '  2 Install OSS  (J)'
+    Write-Host '       |'
+    Write-Host '       +--> 3 Try it --> OC  OSS in the Cloud'
+    Write-Host '       +--> 4 Vault (V, still local) --> VC  Venture Capable'
+    Write-Host '       +--> 5 Join MERIT'
+    Write-Host '       +--> 0 Stop'
+}
+
+function Write-HubDrillIn {
+    param([string]$Step)
+    switch ($Step) {
+        '1' { Write-Note 'Drill-in: git / gh / pwsh + MERIT Python venv under MYMERITTOOLS. Persist MYMERIT*. Not hosted.' }
+        '2' { Write-Note 'Drill-in: clone skills pin + merit-demo; quiet smoke. Old D+G live here. Not cloud.' }
+        '3' { Write-Note 'Drill-in: open local merit-demo\play\index.html. Still not hosted.' }
+        'OC' { Write-Note 'Drill-in: publish play+cfg to merit-prod; store activate MUST succeed. Optional platform here.now (no laptop key).' }
+        '4' { Write-Note 'Drill-in: clone private vault into ~/dev. Still local. Not VC yet.' }
+        'VC' { Write-Note 'Drill-in: operator/tenant grade vs freeware OC. Vault BootStrap on this laptop.' }
+        '5' { Write-Note 'Drill-in: links only - portal, partners, register. Affiliate is ?affiliate= on register, not a here.now slug.' }
+        default { }
+    }
+}
+
+function Get-HubVaultDest {
     $cfg = Get-HubConfig
-    Write-Header "Jumpstart OSS @ $($cfg.skillsPin)"
+    $dev = Get-DevRoot
+    $owner = [string]$cfg.vaultOwner
+    if ([string]::IsNullOrWhiteSpace($owner)) { $owner = 'AgentDraven' }
+    $repo = [string]$cfg.vaultRepo
+    if ([string]::IsNullOrWhiteSpace($repo)) { $repo = 'merit-private-vault' }
+    return Join-Path (Join-Path $dev $owner) $repo
+}
+
+function Write-HubReceipt {
+    param([string]$Step)
+    $tools = Get-MyMeritToolsRoot
+    $bench = Get-MyMeritAppRoot
+    $venv = Join-Path $tools 'merit-venv'
+    $skills = Join-Path $bench 'merit-agent-skills'
+    $demo = Join-Path $bench 'merit-demo'
+    $status = Join-Path $bench 'oss-bench.json'
+    $vault = Get-HubVaultDest
+    Write-Host ''
+    Write-Host "  RECEIPT - step $Step" -ForegroundColor Cyan
+    switch ($Step) {
+        '1' {
+            Write-Info "Hub script : $Script:HubScriptPath"
+            if (Test-Path -LiteralPath $venv) { Write-Ok "Tools venv : $venv" } else { Write-Warn "Tools venv missing: $venv" }
+            Write-Info "Bench      : $bench"
+            Write-Note 'Not hosted. Cloud starts at OC after Install OSS + Try it.'
+        }
+        '2' {
+            if (Test-Path -LiteralPath (Join-Path $skills 'merit.ps1')) { Write-Ok "Skills : $skills" } else { Write-Warn "Skills missing: $skills" }
+            if (Test-Path -LiteralPath (Join-Path $demo '.git')) { Write-Ok "Demo   : $demo" } else { Write-Warn "Demo missing: $demo" }
+            Write-Info "Status : $status"
+            Write-Note 'Not cloud. Folders on this laptop only.'
+        }
+        '3' {
+            $play = Join-Path $demo 'play\index.html'
+            if (Test-Path -LiteralPath $play) { Write-Ok "Local play: $play" } else { Write-Warn "Local play missing: $play (run 2 first)" }
+            Write-Note 'Not hosted yet. OC puts this on merit-prod.'
+        }
+        'OC' {
+            $state = $null
+            if (Get-Command Get-OssState -ErrorAction SilentlyContinue) { $state = Get-OssState }
+            $cid = ''
+            try { $cid = [string]$state.ocConsumerId } catch { }
+            $playUrl = ''
+            try { $playUrl = [string]$state.ocPlayUrl } catch { }
+            $regUrl = ''
+            try { $regUrl = [string]$state.ocRegisterUrl } catch { }
+            $hn = ''
+            try { $hn = [string]$state.ocHereNowUrl } catch { }
+            if ($cid) { Write-Ok "consumer_id: $cid" } else { Write-Warn 'No OC consumer_id yet' }
+            if ($playUrl) { Write-Ok "play:     $playUrl" } else { Write-Warn 'play URL missing' }
+            if ($regUrl) { Write-Ok "register: $regUrl" } else { Write-Warn 'register URL missing (activate required)' }
+            if ($hn) { Write-Ok "here.now: $hn" } else { Write-Note 'here.now optional (platform key). Play + register are enough.' }
+        }
+        '4' {
+            if (Test-Path -LiteralPath (Join-Path $vault '.git')) { Write-Ok "Vault (local): $vault" } else { Write-Warn "Vault not cloned: $vault" }
+            Write-Note 'Still local. VC is the operator/cloud grade after this clone.'
+        }
+        'VC' {
+            if (Test-Path -LiteralPath (Join-Path $vault '.git')) { Write-Ok "Vault local: $vault" } else { Write-Warn 'Run 4 first (clone vault).' }
+            Write-Note 'OC = freeware Community Member on merit-prod. VC = operator/tenant grade (vault BootStrap, operator gate).'
+        }
+        '5' {
+            Write-Info 'https://merit-prod.vercel.app/portal/'
+            Write-Info 'https://merit-prod.vercel.app/portal/partners.html'
+            Write-Info 'After OC: https://merit-prod.vercel.app/store/{your-oc-id}/register'
+            Write-Note 'Affiliate attribution: ?affiliate= on the register URL. Not a here.now slug.'
+        }
+    }
+}
+
+function Ensure-HubOssHelpers {
+    $oss = Get-HubOssInternalScript
+    if (-not (Test-Path -LiteralPath $oss)) {
+        Write-Fail "Install OSS internals missing: $oss"
+        Write-Note 'Run Hub 2 first so merit-agent-skills is cloned under MYMERITAPP.'
+        return $false
+    }
+    . $oss
+    return $true
+}
+
+function New-HubOcConsumerId {
+    return ('oc-' + [guid]::NewGuid().ToString('n').Substring(0, 10))
+}
+
+function Invoke-HubSetupLaptop {
+    Write-Header '1 Setup laptop'
+    Write-HubMap
+    Write-HubDrillIn '1'
     [void](Invoke-MeritPrereqs)
+    Write-HubReceipt '1'
+}
+
+function Invoke-HubInstallOss {
+    param([switch]$SkipPrereqs)
+    $cfg = Get-HubConfig
+    Write-Header "2 Install OSS @ $($cfg.skillsPin)"
+    Write-HubMap
+    Write-HubDrillIn '2'
+    if (-not $SkipPrereqs) { [void](Invoke-MeritPrereqs) }
     $bench = Ensure-MyMeritAppPrompt
     $skillsDest = Join-Path $bench 'merit-agent-skills'
     $ok = Invoke-GitClonePin -Url ([string]$cfg.skillsUrl) -Pin ([string]$cfg.skillsPin) -Dest $skillsDest -Label 'merit-agent-skills'
@@ -1385,9 +1520,97 @@ function Invoke-JumpstartOss {
         }
     }
 
-    Write-Ok 'PHASE 1 jumpstart finished. Same window -> PHASE 2 OSS bench (not a second script).'
-    Write-Note "Hub pins: skills=$($cfg.skillsPin) vault=$($cfg.vaultPin)"
-    Enter-HubOssPhase -Chain
+    if (-not (Ensure-HubOssHelpers)) { return }
+    $env:MERIT_VERIFY_QUIET = '1'
+    Invoke-OssEnsureDemo
+    Invoke-OssValidate
+    Write-HubReceipt '2'
+}
+
+function Invoke-HubTryIt {
+    Write-Header '3 Try it'
+    Write-HubMap
+    Write-HubDrillIn '3'
+    if (-not (Ensure-HubOssHelpers)) { return }
+    $state = Get-OssState
+    $play = Join-Path ([string]$state.demoFolder) 'play\index.html'
+    if (-not (Test-Path -LiteralPath $play)) {
+        Write-Fail "Local play missing: $play"
+        Write-Note 'Run 2 Install OSS first.'
+        Write-HubReceipt '3'
+        return
+    }
+    Write-Ok "Opening $play"
+    try { Start-Process $play } catch { Write-Warn "Could not open browser: $($_.Exception.Message)" }
+    Write-HubReceipt '3'
+}
+
+function Invoke-HubOc {
+    Write-Header 'OC  OSS in the Cloud'
+    Write-HubMap
+    Write-HubDrillIn 'OC'
+    if (-not (Ensure-HubOssHelpers)) { return }
+    $state = Get-OssState
+    $cli = Join-Path ([string]$state.skillsFolder) 'merit.ps1'
+    $demo = [string]$state.demoFolder
+    if (-not (Test-Path -LiteralPath $cli)) {
+        Write-Fail "merit.ps1 missing: $cli - run 2 first."
+        return
+    }
+    if (-not (Test-Path -LiteralPath (Join-Path $demo 'play\index.html'))) {
+        Write-Fail "Demo play missing under $demo - run 2 then 3."
+        return
+    }
+    $cid = ''
+    try { $cid = [string]$state.ocConsumerId } catch { }
+    if ([string]::IsNullOrWhiteSpace($cid) -or $cid -notmatch '^oc-') {
+        $cid = New-HubOcConsumerId
+    }
+    Write-Info "consumer_id: $cid"
+    $runner = Get-OssRunner
+    $env:MERIT_VERIFY_QUIET = '1'
+    & $runner.Exe -NoProfile -File $cli 'oc' '--path' $demo '--consumer-id' $cid
+    if ($LASTEXITCODE -ne 0) {
+        Write-Fail "OC failed (exit $LASTEXITCODE). Activate is required; play-only is not OC."
+        return
+    }
+    $gw = 'https://merit-prod.vercel.app'
+    $state.ocConsumerId = $cid
+    $state.ocPlayUrl = "$gw/apps/$cid/play"
+    $state.ocRegisterUrl = "$gw/store/$cid/register"
+    Save-OssState $state
+    Write-HubReceipt 'OC'
+}
+
+function Invoke-HubJoinMerit {
+    Write-Header '5 Join MERIT'
+    Write-HubMap
+    Write-HubDrillIn '5'
+    Write-HubReceipt '5'
+    $portal = 'https://merit-prod.vercel.app/portal/'
+    try { Start-Process $portal } catch { Write-Warn "Could not open $portal" }
+}
+
+function Invoke-HubVc {
+    Write-Header 'VC  Venture Capable'
+    Write-HubMap
+    Write-HubDrillIn 'VC'
+    $vault = Get-HubVaultDest
+    if (-not (Test-Path -LiteralPath (Join-Path $vault '.git'))) {
+        Write-Fail 'Vault not cloned yet. Run 4 first (still local).'
+        Write-HubReceipt 'VC'
+        return
+    }
+    Write-HubReceipt 'VC'
+    Write-Note 'OC is freeware on merit-prod (Community Member). VC is the operator path.'
+    $launch = Read-Host 'Launch vault operator BootStrap now? [y/N]'
+    if ($launch -match '^[Yy]') {
+        Invoke-JumpstartVault
+    }
+}
+
+function Invoke-JumpstartOss {
+    Invoke-HubInstallOss
 }
 
 function Get-HubOssInternalScript {
@@ -1398,37 +1621,28 @@ function Get-HubOssInternalScript {
 function Enter-HubOssPhase {
     param([switch]$Chain)
     Remove-RetiredOssLiveBootStrap
-    $oss = Get-HubOssInternalScript
-    if (-not (Test-Path -LiteralPath $oss)) {
-        Write-Fail "PHASE 2 internal script missing: $oss"
-        Write-Note 'Run Hub J first so merit-agent-skills is cloned under MYMERITAPP.'
-        return
-    }
-    . $oss
-    if ($Chain) {
-        Invoke-OssChainThenMenu
-    }
-    else {
-        Invoke-OssPhaseMenu
-    }
+    Invoke-HubInstallOss -SkipPrereqs:$false
 }
 
 function Invoke-JumpstartVault {
     $cfg = Get-HubConfig
-    Write-Header "Jumpstart Vault @ $($cfg.vaultPin)"
+    Write-Header "4 Vault (local) @ $($cfg.vaultPin)"
+    Write-HubMap
+    Write-HubDrillIn '4'
     [void](Invoke-MeritPrereqs)
-    $dev = Get-DevRoot
-    $owner = [string]$cfg.vaultOwner
-    if ([string]::IsNullOrWhiteSpace($owner)) { $owner = 'AgentDraven' }
-    $repo = [string]$cfg.vaultRepo
-    if ([string]::IsNullOrWhiteSpace($repo)) { $repo = 'merit-private-vault' }
-    $vaultDest = Join-Path (Join-Path $dev $owner) $repo
+    $vaultDest = Get-HubVaultDest
     $ok = Invoke-GitClonePin -Url ([string]$cfg.vaultUrl) -Pin ([string]$cfg.vaultPin) -Dest $vaultDest -Label 'merit-private-vault'
     if (-not $ok) { return }
 
+    Write-HubReceipt '4'
     $seedCmd = Join-Path $vaultDest 'BootStrap\seed-private-dev.cmd'
     $bootCmd = Join-Path $vaultDest 'BootStrap\MERIT_BootStrap.cmd'
     $bootPs1 = Join-Path $vaultDest 'BootStrap\MERIT_BootStrap.ps1'
+    $go = Read-Host 'Launch vault BootStrap now? [y/N] (needed before VC operator menus)'
+    if ($go -notmatch '^[Yy]') {
+        Write-Note 'Vault is local. Run VC when you want the operator/cloud grade receipt.'
+        return
+    }
     if (Test-Path -LiteralPath $seedCmd) {
         Write-Ok 'Launching seed-private-dev.cmd ...'
         & $seedCmd
@@ -1449,32 +1663,35 @@ function Invoke-JumpstartVault {
 
 function Show-MeritHubHelp {
     $cfg = Get-HubConfig
-    Write-Header 'Merit-Hub laptop (PHASE 1 of 3)'
+    Write-Header 'Merit-Hub'
     Write-Info "Location: $Script:HubScriptPath"
     Write-Info "Elevated: $(Test-HubAdmin)"
     Write-HubEnvScopes
     Write-Info "Resolved MYMERITTOOLS=$(Get-MyMeritToolsRoot)  MYMERITAPP=$(Get-MyMeritAppRoot)"
     Write-Info "Pins: skills=$($cfg.skillsPin)  vault=$($cfg.vaultPin)"
     Write-Info "History log (append): $Script:HistoryLog"
+    Write-HubMap
     Write-Host ''
-    Write-Host '  CLEANUP' -ForegroundColor White
-    Write-Host '  P) Pristine v2   full cold-start wipe (+ merit-venv, ~/dev folder, env)' -ForegroundColor Green
+    Write-Host '  KEYS' -ForegroundColor White
+    Write-Host '  1) Setup laptop     prereqs + MYMERIT* + merit-venv'
+    Write-Host '  2) Install OSS      skills pin + merit-demo + quiet smoke   (alias J)'
+    Write-Host '  3) Try it           open local play/index.html'
+    Write-Host '  OC) OSS in the Cloud  merit-prod play + required register'
+    Write-Host '  4) Vault            clone private vault (still local)       (alias V)'
+    Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC'
+    Write-Host '  5) Join MERIT       portal / partners / register links'
+    Write-Host '  0) Stop'
+    Write-Host ''
+    Write-Host '  ALSO' -ForegroundColor White
+    Write-Host '  P) Pristine v2   full cold-start wipe'
     Write-Host '  S) Soft          bench + status; keep ~/dev clones'
     Write-Host '  B) Backup only'
-    Write-Host ''
-    Write-Host '  JUMPSTART' -ForegroundColor White
-    Write-Host '  J) Jumpstart OSS    PHASE 1 prereqs+clone, then PHASE 2 (green) demo+validate'
-    Write-Host '  2) OSS bench        PHASE 2 menu only (needs skills clone from J)'
-    Write-Host '  V) Jumpstart Vault  clone vault pin + vault BootStrap'
-    Write-Host '  1) Prereqs only     git / gh / pwsh / MYMERITTOOLS Python venv + persist MYMERIT* if empty'
-    Write-Host '  I) Install skills   Cursor, Codex, Hermes, … (same as install.ps1)'
-    Write-Host ''
+    Write-Host '  I) Install skills   Cursor, Codex, Hermes, ...'
     Write-Host '  M) Set MYMERITAPP bench path'
-    Write-Host '  T) Set MYMERITTOOLS root (shows current; persists User env)'
+    Write-Host '  T) Set MYMERITTOOLS root'
     Write-Host '  H) Help'
-    Write-Host '  0) Exit'
     Write-Host ''
-    Write-Note 'After Pristine: J is the only file you need - no manual git clone first.'
+    Write-Note 'Cold start: 1 then 2. Do not double-click this file. ASCII hyphens only in this script.'
 }
 
 function Set-MyMeritToolsPrompt {
@@ -1490,23 +1707,26 @@ function Show-InteractiveMenu {
     Remove-RetiredOssLiveBootStrap
     while ($true) {
         Show-MeritHubHelp
-        Write-Host '  Recommended cold start:  J' -ForegroundColor Yellow
+        Write-Host '  Recommended cold start:  1 then 2' -ForegroundColor Yellow
         Write-Host ''
         $c = (Read-Host 'Select').Trim()
         switch -Regex ($c) {
             '^(P|p|Pristine)$' { Invoke-Mode -Mode Pristine; return }
             '^(S|s|Soft)$' { Invoke-Mode -Mode Soft; return }
             '^(B|b|BackupOnly)$' { Invoke-Mode -Mode BackupOnly; return }
-            '^(J|j|Jumpstart|Oss)$' { Invoke-JumpstartOss }
-            '^2$' { Enter-HubOssPhase }
-            '^(V|v|Vault)$' { Invoke-JumpstartVault; return }
-            '^1$' { Invoke-MeritPrereqs; Read-Host 'Press Enter' | Out-Null }
+            '^1$' { Invoke-HubSetupLaptop; Read-Host 'Press Enter' | Out-Null }
+            '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss }
+            '^3$' { Invoke-HubTryIt; Read-Host 'Press Enter' | Out-Null }
+            '^(OC|oc|Oc)$' { Invoke-HubOc; Read-Host 'Press Enter' | Out-Null }
+            '^(4|V|v|Vault)$' { Invoke-JumpstartVault }
+            '^(VC|vc|Vc)$' { Invoke-HubVc; Read-Host 'Press Enter' | Out-Null }
+            '^5$' { Invoke-HubJoinMerit; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('I', 'i', 'Install', 'InstallSkills') } { Invoke-InstallSkillsMenu; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; Read-Host 'Press Enter' | Out-Null }
             '^(H|h|\?|Help)$' { continue }
             '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default { Write-Warn 'Unknown  -  choose P, S, B, J, 2, V, I, 1, M, T, H, or 0.' }
+            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, 0 (or P S B I M T H).' }
         }
     }
 }
@@ -1523,17 +1743,21 @@ try {
     if ($Pristine) { Invoke-Mode -Mode Pristine; return }
     if ($Soft) { Invoke-Mode -Mode Soft; return }
     if ($BackupOnly) { Invoke-Mode -Mode BackupOnly; return }
-    if ($Prereqs) { Invoke-MeritPrereqs; return }
+    if ($Prereqs) { Invoke-HubSetupLaptop; return }
     if ($InstallSkills) {
         [void](Invoke-InstallMeritSkills -Target $InstallSkills -ProjectPath $InstallSkillsPath)
         return
     }
-    if ($OssPhase) { Enter-HubOssPhase; return }
-    if ($Jumpstart -eq 'Oss') { Invoke-JumpstartOss; return }
+    if ($OssPhase -or $InstallOss) { Invoke-HubInstallOss; return }
+    if ($TryIt) { Invoke-HubTryIt; return }
+    if ($Oc) { Invoke-HubOc; return }
+    if ($Vc) { Invoke-HubVc; return }
+    if ($JoinMerit) { Invoke-HubJoinMerit; return }
+    if ($Jumpstart -eq 'Oss') { Invoke-HubInstallOss; return }
     if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
 
     $bound = $PSBoundParameters.Keys
-    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase') | Where-Object { $bound -contains $_ }
+    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'Vc', 'JoinMerit') | Where-Object { $bound -contains $_ }
     if (-not $hasAction) {
         Show-InteractiveMenu
     }

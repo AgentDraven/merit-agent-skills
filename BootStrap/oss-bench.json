@@ -6,14 +6,18 @@
   "benchFolder": "",
   "skillsFolder": "",
   "demoFolder": "",
-  "skillsPin": "skills-v0.5.14",
+  "skillsPin": "skills-v0.5.15",
   "skillsGitUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "demoGitUrl": "https://github.com/Mr-PI-Bala/merit-demo.git",
-  "vaultPin": "vault-v0.5.7",
+  "vaultPin": "vault-v0.5.8",
   "vaultGitUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "lastPrereqCheckAt": "",
   "lastValidateAt": "",
   "lastValidatePin": "",
   "lastValidateOk": false,
-  "lastValidateDetail": ""
+  "lastValidateDetail": "",
+  "ocConsumerId": "",
+  "ocPlayUrl": "",
+  "ocRegisterUrl": "",
+  "ocHereNowUrl": ""
 }

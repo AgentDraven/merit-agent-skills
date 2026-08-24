@@ -62,12 +62,15 @@ Raw: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Meri
 
 | Key | Action |
 |-----|--------|
-| **J** | PHASE 1 prereqs + skills clone, then **PHASE 2** (green) demo + validate in the **same** script |
-| **2** | PHASE 2 OSS bench menu only (after a clone exists) |
-| **V** | Clone vault + BootStrap |
-| **I** | Install skills to Cursor / Codex / Hermes / … |
-| **1** | Prereqs: lists Git/gh/pwsh **and** MERIT Python venv MISSING/OK; `y` only installs those items and SETs empty `MYMERIT*` User env |
-| **P** | Pristine: wipe OSS bench, leftover `Tools\Merit-Hub\`, ~/dev, **MYMERIT* env** (next run prompts again), merit-venv. Keeps `C:\Tools\Merit-Hub.ps1`. UAC-elevates. Then asks about leftover folders (`HumanBala`, `DravenCode.OLD`, `Code`, `*Merit*`) — type **DELETE** to remove. Window stays open until **Enter**. Log: `backups\Merit-Hub-history.log` (append). |
+| **1** | Setup laptop (prereqs + MYMERIT* + merit-venv) |
+| **2** | Install OSS (skills pin + merit-demo + quiet smoke). Alias **J** |
+| **3** | Try it — open local `play/index.html` |
+| **OC** | OSS in the Cloud — merit-prod play + **required** store activate |
+| **4** | Vault clone (still local). Alias **V** |
+| **VC** | Venture Capable — operator/tenant grade vs freeware OC |
+| **5** | Join MERIT — portal / partners / register links |
+| **0** | Stop |
+| **P** | Pristine: wipe OSS bench, leftover `Tools\Merit-Hub\`, ~/dev, **MYMERIT* env** (next run prompts again), merit-venv. Keeps `C:\Tools\Merit-Hub.ps1`. |
 
 ## What the script creates locally
 
@@ -77,7 +80,7 @@ Raw: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Meri
 | `%MYMERITTOOLS%\pwsh\` | Menu **1 → Portable** (optional) |
 | `%MYMERITTOOLS%\merit-venv\` | Menu **1** |
 | `%MYMERITAPP%\merit-agent-skills\` | Menu **J** or **I** |
-| `%MYMERITAPP%\oss-bench.json` | PHASE 2 status (human field names) |
+| `%MYMERITAPP%\oss-bench.json` | Laptop status (human field names, including OC URLs) |
 | `~/.cursor/skills\` (etc.) | Menu **I** / `-InstallSkills` |
 
 Hub does **not** create `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd`. Those leftover live copies are retired; Hub removes them on menu start / **J** / **2** / Pristine.

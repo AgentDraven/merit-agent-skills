@@ -13,7 +13,7 @@ if (-not (Get-Command Write-Ok -ErrorAction SilentlyContinue)) {
 function Write-OssPhaseHeader([string]$Title) {
     Write-Host ''
     Write-Host ('=' * 72) -ForegroundColor Green
-    Write-Host '  Merit-Hub  |  PHASE 2 of 3  -  OSS bench' -ForegroundColor Green
+    Write-Host '  Merit-Hub  |  Install OSS' -ForegroundColor Green
     Write-Host "  $Title" -ForegroundColor Green
     Write-Host ('=' * 72) -ForegroundColor Green
 }
@@ -21,7 +21,7 @@ function Write-OssPhaseHeader([string]$Title) {
 function Write-VaultPhaseHeader([string]$Title) {
     Write-Host ''
     Write-Host ('=' * 72) -ForegroundColor Magenta
-    Write-Host '  Merit-Hub  |  PHASE 3 of 3  -  Private-Vault (optional)' -ForegroundColor Magenta
+    Write-Host '  Merit-Hub  |  Vault (local)' -ForegroundColor Magenta
     Write-Host "  $Title" -ForegroundColor Magenta
     Write-Host ('=' * 72) -ForegroundColor Magenta
 }
@@ -52,7 +52,7 @@ function Get-OssSkillsPin {
         $v = ((Get-Content -LiteralPath $verFile -Raw) -split '\r?\n')[0].Trim()
         if ($v -match '^\d+\.\d+') { return "skills-v$v" }
     }
-    return 'skills-v0.5.12'
+    return 'skills-v0.5.15'
 }
 
 function Get-OssVaultPin {
@@ -60,7 +60,7 @@ function Get-OssVaultPin {
         $p = [string](Get-HubConfig).vaultPin
         if ($p) { return $p }
     }
-    return 'vault-v0.5.6'
+    return 'vault-v0.5.8'
 }
 
 function New-OssBenchState {
@@ -83,6 +83,10 @@ function New-OssBenchState {
         lastValidatePin     = ''
         lastValidateOk      = $false
         lastValidateDetail  = ''
+        ocConsumerId        = ''
+        ocPlayUrl           = ''
+        ocRegisterUrl       = ''
+        ocHereNowUrl        = ''
     }
 }
 
@@ -174,7 +178,7 @@ function Get-OssRunner {
 }
 
 function Invoke-OssEnsureDemo {
-    Write-OssPhaseHeader 'D  Seed merit-demo'
+    Write-OssPhaseHeader 'Seed merit-demo'
     $state = Get-OssState
     $url = [string]$state.demoGitUrl
     if ([string]::IsNullOrWhiteSpace($url)) { $url = 'https://github.com/Mr-PI-Bala/merit-demo.git' }
@@ -191,7 +195,7 @@ function Invoke-OssEnsureDemo {
         & git -C $dest pull --ff-only 2>&1 | Out-Host
     }
     elseif (Test-Path -LiteralPath $dest) {
-        Write-Fail ($dest + ' exists but is not a git clone. Move it aside and retry D.')
+        Write-Fail ($dest + ' exists but is not a git clone. Move it aside and retry Install OSS.')
         return
     }
     else {
@@ -207,7 +211,8 @@ function Invoke-OssEnsureDemo {
 }
 
 function Invoke-OssValidate {
-    Write-OssPhaseHeader 'G  Validate OSS (closeout + smoke)'
+    Write-OssPhaseHeader 'Validate OSS (quiet smoke)'
+    $env:MERIT_VERIFY_QUIET = '1'
     $state = Get-OssState
     $cli = Join-Path $state.skillsFolder 'merit.ps1'
     if (-not (Test-Path -LiteralPath $cli)) {
@@ -244,19 +249,10 @@ function Invoke-OssValidate {
 
 function Show-OssFlow {
     Write-Host ''
-    Write-Info 'One script: Merit-Hub.ps1. PHASE 2 keys do not reuse laptop 1/P/S.'
-    Write-Host @'
-      PHASE 1  laptop   (cyan)     P/S/B cleanup · J jumpstart · 1 prereqs
-           |
-           |  J
-           v
-      PHASE 2  OSS bench (green)   D demo · G validate   <- freeware done
-           |
-           +-- stop here (CLI: merit.ps1)
-           |
-           v
-      PHASE 3  Private-Vault (magenta)   key 3   optional, needs GitHub vault access
-'@
+    Write-Info 'One script: Merit-Hub.ps1. Map keys: 1 2 3 OC 4 VC 5 0.'
+    if (Get-Command Write-HubMap -ErrorAction SilentlyContinue) {
+        Write-HubMap
+    }
 }
 
 function Get-OssChecklist {
@@ -277,29 +273,28 @@ function Write-OssChecklist {
     $c = Get-OssChecklist
     $s = $c.State
     if ($c.SkillsOk) { Write-Ok ('Skills folder - ' + [string]$s.skillsFolder) } else { Write-Warn ('Skills folder missing - Hub J first (' + [string]$s.skillsFolder + ')') }
-    if ($c.DemoOk) { Write-Ok ('Demo folder   - ' + [string]$s.demoFolder) } else { Write-Warn 'Demo folder missing - PHASE 2 key D' }
+    if ($c.DemoOk) { Write-Ok ('Demo folder   - ' + [string]$s.demoFolder) } else { Write-Warn 'Demo folder missing - run Hub 2 Install OSS' }
     if ($c.ValOk) {
         Write-Ok ('Last validate PASS - ' + [string]$s.lastValidateDetail + ' at ' + [string]$s.lastValidateAt)
     }
     else {
-        Write-Warn 'Last validate not PASS yet - PHASE 2 key G before Private-Vault'
+        Write-Warn 'Last validate not PASS yet - run Hub 2 Install OSS'
     }
     return $c
 }
 
 function Show-OssHelp {
-    Write-OssPhaseHeader 'F  Help (flow + vault teaser)'
-    Write-Note 'You are still in Merit-Hub. This is PHASE 2, not a second product.'
-    Write-Info 'CLI for apps stays repo-root merit.ps1 (init / apply / verify / create).'
+    Write-OssPhaseHeader 'Help'
+    Write-Note 'You are still in Merit-Hub. Not a second product.'
+    Write-Info 'CLI for apps stays repo-root merit.ps1 (init / apply / verify / create / oc).'
     Write-Info 'Showcase: Mr-PI-Bala/merit-demo. Proof: Mr-PI-Bala/merit-test.'
     Show-OssFlow
     Write-Host ''
-    Write-Note 'PHASE 3 is optional. OSS stays free (skills, CLI, demo, local validate).'
+    Write-Note 'Vault (key 4) is optional and still local. OC is freeware cloud. VC is operator grade.'
     Write-Info 'Public facts only (no product law / no secrets):'
     Write-Info '  (a) AgentDraven hosts the private MERIT ecosystem account'
     Write-Info '  (b) Repo: merit-private-vault (private on GitHub)'
-    Write-Info '  (c) Key 3 clones that repo into ~/dev and launches its BootStrap'
-    Write-Info 'Subscription / design-partner access for everyone else = FUTURE.'
+    Write-Info '  (c) Key 4 clones that repo into ~/dev'
 }
 
 function Show-OssStatus {
@@ -310,7 +305,7 @@ function Show-OssStatus {
     Write-Info ('Status file       : ' + (Get-OssJsonPath))
     Write-Info ('Bench folder      : ' + [string]$s.benchFolder)
     Write-Info ('Skills pin        : ' + [string]$s.skillsPin)
-    Write-Info ('Vault pin         : ' + [string]$s.vaultPin + ' (only if you run PHASE 3)')
+    Write-Info ('Vault pin         : ' + [string]$s.vaultPin + ' (only if you run Hub 4)')
     Write-Host ''
     [void](Write-OssChecklist)
     Write-Host ''
@@ -320,8 +315,8 @@ function Show-OssStatus {
 }
 
 function Invoke-OssVaultSeed {
-    Write-VaultPhaseHeader '3  Seed Private-Vault into ~/dev'
-    Write-Note 'Do this after PHASE 2 D + G are green. PHASE 3 is optional.'
+    Write-VaultPhaseHeader '4  Seed Private-Vault into ~/dev'
+    Write-Note 'Do this after Hub 2 is green. Vault is still local. VC is later.'
     Write-Note 'Needs GitHub access to AgentDraven/merit-private-vault.'
     Write-Host ''
     Show-OssFlow
@@ -330,10 +325,10 @@ function Invoke-OssVaultSeed {
     $c = Write-OssChecklist
     Write-Host ''
     if (-not $c.SkillsOk -or -not $c.DemoOk -or -not $c.ValOk) {
-        Write-Warn 'PHASE 2 is not fully validated. Prefer D then G, then 3.'
+        Write-Warn 'Install OSS is not fully validated. Prefer Hub 2, then 4.'
         $anyway = Read-Host 'Seed Private-Vault anyway? [y/N]'
         if ($anyway -notmatch '^[Yy]') {
-            Write-Warn 'Cancelled. Run D, G, then 3.'
+            Write-Warn 'Cancelled. Run Hub 2, then 4.'
             return
         }
     }
@@ -404,36 +399,28 @@ function Invoke-OssVaultSeed {
 
 function Pause-Oss {
     Write-Host ''
-    $n = Read-Host 'Press Enter for PHASE 2 menu, or type next key (D / G / F / U / 3 / 0)'
+    $n = Read-Host 'Press Enter for Hub map, or type next key (2 / 3 / OC / 4 / VC / 5 / 0)'
     if ($null -eq $n) { return '' }
     return $n.Trim()
 }
 
 function Show-OssPhaseMenu {
-    Write-OssPhaseHeader 'OSS bench menu'
+    Write-OssPhaseHeader 'OSS helpers (Hub map is the menu)'
     $bench = Get-OssBenchFolder
-    Write-Note ('Still Merit-Hub. Green = PHASE 2. Bench: ' + $bench)
-    Write-Note 'Laptop keys (1 / P / J) are PHASE 1. Here use D G F U 3.'
-    Write-Host ''
-    Write-Host '  D) Seed / update merit-demo' -ForegroundColor Green
-    Write-Host '  G) Validate OSS (closeout + smoke)   <- freeware done' -ForegroundColor Green
-    Write-Host '  U) Status (plain English, oss-bench.json)'
-    Write-Host '  F) Help (flow + vault teaser)'
-    Write-Host ''
-    Write-Host '  3) PHASE 3 - Private-Vault seed (optional; checklist first)' -ForegroundColor Magenta
-    Write-Host '  0) Back to PHASE 1 (laptop menu)'
-    Write-Host ''
+    Write-Note ('Still Merit-Hub. Bench: ' + $bench)
+    Write-Note 'Use Hub keys 1 2 3 OC 4 VC 5 0. Nested D/G menu is retired.'
+    if (Get-Command Write-HubMap -ErrorAction SilentlyContinue) { Write-HubMap }
 }
 
 function Invoke-OssPhaseChoice([string]$c) {
     switch -Regex ($c) {
-        '^(D|d)$' { Invoke-OssEnsureDemo; return Pause-Oss }
+        '^(D|d|2)$' { Invoke-OssEnsureDemo; return Pause-Oss }
         '^(G|g)$' { Invoke-OssValidate; return Pause-Oss }
         '^(U|u|S|s)$' { Show-OssStatus; return Pause-Oss }
         '^(F|f|H|h)$' { Show-OssHelp; return Pause-Oss }
-        '^3$' { Invoke-OssVaultSeed; return Pause-Oss }
+        '^(3|4)$' { Invoke-OssVaultSeed; return Pause-Oss }
         '^(0|Q|q)$' { return '__BACK__' }
-        default { Write-Warn 'Unknown PHASE 2 key. Use D, G, F, U, 3, or 0.'; return Pause-Oss }
+        default { Write-Warn 'Unknown key. Prefer Hub 1 2 3 OC 4 VC 5 0.'; return Pause-Oss }
     }
 }
 
@@ -452,17 +439,16 @@ function Invoke-OssPhaseMenu {
         }
         $pending = Invoke-OssPhaseChoice $c
         if ($pending -eq '__BACK__') {
-            Write-Note 'Back to PHASE 1 (Merit-Hub laptop menu).'
+            Write-Note 'Back to Hub map.'
             return
         }
     }
 }
 
 function Invoke-OssChainThenMenu {
-    Write-OssPhaseHeader 'Continuing from PHASE 1 jumpstart'
-    Write-Note 'Skills clone is done. Next: demo, then validate - same script, new phase.'
+    Write-OssPhaseHeader 'Install OSS'
+    Write-Note 'Skills clone is done. Next: demo, then quiet validate - same script.'
     Invoke-OssEnsureDemo
     Invoke-OssValidate
-    Write-Ok 'PHASE 2 D + G finished. Menu is next (F help, 3 vault, 0 back to laptop).'
-    Invoke-OssPhaseMenu
+    Write-Ok 'Install OSS finished (demo + quiet smoke). Hub map is next (3 Try it, OC, 4 Vault).'
 }

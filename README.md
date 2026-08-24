@@ -6,9 +6,9 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 
 | Goal | Path |
 |------|------|
-| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`. **Required** (do not double-click / `.\`): `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Internet downloads are blocked otherwise. Details: [Merit-Hub/README.md](Merit-Hub/README.md). **J** OSS · **V** vault · **P** reset. |
-| **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** â€” 3 steps, no accounts night one |
-| **OSS BootStrap** | Internal **PHASE 2** inside Merit-Hub (not a second product). Hub **J** dotsources `BootStrap/_oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
+| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`. **Required** (do not double-click / `.\`): `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Map: **1** Setup laptop · **2** Install OSS · **3** Try it · **OC** cloud · **4** Vault · **VC** · **5** Join MERIT. Details: [Merit-Hub/README.md](Merit-Hub/README.md). |
+| **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** — 3 steps, no accounts night one |
+| **OSS internals** | Hub **2** dotsources `BootStrap/_oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
 | **Launch/deploy PoV** | [docs/deploy.md](docs/deploy.md) â€” one local `.merit_launch.md`, one `merit` command |
 | **LLD map (audit)** | [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md) |
@@ -39,7 +39,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 |------|------------|----------------|
 | This repo **`merit.ps1` / `merit.sh`** | Public OSS CLI (`create` / `apply` / `verify` / `portal` / consumer `closeout`) | Vault operator CLI |
 | Vault **`scripts/merit.ps1`** | Operator CLI (`mXin`, `runtime`, `env`, hygiene) | Public create/deploy CLI |
-| This repo **`BootStrap/MERIT.json`** | Repo template / pointer (edition `oss`) | Live laptop state (that is `%MYMERITAPP%\oss-bench.json`) |
+| This repo **`BootStrap/oss-bench.json`** | Template field names for the laptop status file | Live laptop state (that is `%MYMERITAPP%\oss-bench.json`) |
 | Vault **`BootStrap/MERIT.json`** | Vault BootStrap template (edition `vault`) | Public OSS registry |
 | **`~/dev/MERIT.json`** | Live machine BootStrap state after first run | A committed repo file |
 

@@ -35,7 +35,11 @@ Commands:
                            [--profile fullstack-consumer] [--deploy]
                            [--vercel-scope <slug>] [--product-name <name>]
                            [--scaffold-only]  (alias of default platform mode)
+  oc --path <repo> [--consumer-id oc-...]
+                          OSS in the Cloud: publish + required store activate
+                          (optional platform here.now; laptop never needs a key)
   apps publish --path <repo>  Upload play/+cfg/ to merit-prod /apps/<app>/play (create phase 8)
+                          [--consumer-id <id>] override launch consumer_id
   apps refresh --path <repo>  Re-activate store + sync scaffold (never touches app_logic/)
                           Store free-community activate Â· UserGuide Â· community cfg Â· publish
   apps remove --path <repo> --yes
@@ -394,7 +398,9 @@ function Invoke-Verify {
     }
     foreach ($rel in @('cfg/community.json', 'cfg/collab_schedule.json', 'cfg/alerts.json')) {
         if (-not (Test-Path (Join-Path $TargetRoot $rel))) {
-            Write-Host "verify NOTE (optional): missing $rel - skip for OSS freeware; later: .\merit.ps1 community scaffold --path <repo>"
+            if ($env:MERIT_VERIFY_QUIET -ne '1') {
+                Write-Host "verify NOTE (optional): missing $rel - skip for OSS freeware; later: .\merit.ps1 community scaffold --path <repo>"
+            }
         }
     }
     $gitignore = Join-Path $TargetRoot '.gitignore'
@@ -1315,6 +1321,63 @@ function Invoke-AppsPublish {
     return $appUrl
 }
 
+function Test-OcConsumerId {
+    param([string]$ConsumerId)
+    $id = ([string]$ConsumerId).Trim().ToLowerInvariant()
+    if ($id -notmatch '^oc-[a-z0-9][a-z0-9-]{0,58}$') {
+        throw 'oc: consumer-id must look like oc-a1b2c3d4e5 (prefix oc-, a-z0-9- only)'
+    }
+    return $id
+}
+
+function Invoke-Oc {
+    param(
+        [string]$TargetRoot,
+        [string]$ConsumerId,
+        [string]$Gateway = 'https://merit-prod.vercel.app'
+    )
+    $cid = Test-OcConsumerId -ConsumerId $ConsumerId
+    $appUrl = Invoke-AppsPublish -TargetRoot $TargetRoot -ConsumerId $cid -Gateway $Gateway
+    $activateUri = "$Gateway/api/meritstore/v1/tenants/$cid/activate"
+    $activateBody = (@{ template = 'free-community'; display_name = $cid } | ConvertTo-Json -Compress)
+    try {
+        $null = Invoke-RestMethod -Uri $activateUri -Method Post -Body $activateBody -ContentType 'application/json' -TimeoutSec 60
+    } catch {
+        throw "OC activate is required and failed ($activateUri). $_"
+    }
+    $registerUrl = "$Gateway/store/$cid/register"
+    Write-Host "Store activated (free-community): $registerUrl"
+    $hereNow = ''
+    try {
+        $portalBody = (@{
+            consumerId = $cid
+            playUrl = $appUrl
+            registerUrl = $registerUrl
+        } | ConvertTo-Json -Compress)
+        $wr = Invoke-WebRequest -Uri "$Gateway/api/portal/publish" -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($portalBody)) -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 90
+        $presp = $wr.Content | ConvertFrom-Json
+        if ($presp.ok -and $presp.siteUrl) {
+            $hereNow = [string]$presp.siteUrl
+            Write-Host "OC here.now (platform key, laptop never sees it): $hereNow"
+        }
+    } catch {
+        $msg = [string]$_
+        if ($msg -match '503' -or $msg -match 'herenow_not_configured') {
+            Write-Host 'OC here.now: platform key not set (play + register still live).'
+        } else {
+            Write-Host "OC here.now optional skipped: $msg"
+        }
+    }
+    Write-Host "OC play:     $appUrl"
+    Write-Host "OC register: $registerUrl"
+    return [pscustomobject]@{
+        consumerId  = $cid
+        playUrl     = $appUrl
+        registerUrl = $registerUrl
+        hereNowUrl  = $hereNow
+    }
+}
+
 function Invoke-HereNowDeleteSite {
     param(
         [string]$Slug,
@@ -1739,7 +1802,11 @@ switch -Regex ($Command) {
     '^version$' { Write-Host "merit $MERIT_VERSION"; exit 0 }
     '^init$' { Invoke-Init -TargetRoot $target -ArgList $Rest; exit 0 }
     '^apply$' { Invoke-Apply -TargetRoot $target -ArgList $Rest; exit 0 }
-    '^verify$' { if (-not (Invoke-Verify -TargetRoot $target)) { exit 1 }; exit 0 }
+    '^verify$' {
+        if (Test-ArgFlag -ArgList $Rest -Name '--quiet') { $env:MERIT_VERIFY_QUIET = '1' }
+        if (-not (Invoke-Verify -TargetRoot $target)) { exit 1 }
+        exit 0
+    }
     '^deploy$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^vercel$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^portal$' { try { Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
@@ -1750,9 +1817,14 @@ switch -Regex ($Command) {
         $sub = "$($Rest[0])".ToLowerInvariant()
         try {
             if ($sub -eq 'publish') {
-                $launch = Get-LaunchPath -TargetRoot $target -ArgList $Rest
-                $settings = Get-LaunchSettings -Path $launch
-                $cid = Require-Setting -Settings $settings -Name 'consumer_id'
+                $cidArg = Get-ArgValue -ArgList $Rest -Name '--consumer-id'
+                if (-not $cidArg) { $cidArg = Get-ArgValue -ArgList $Rest -Name '--consumer_id' }
+                $cid = $cidArg
+                if (-not $cid) {
+                    $launch = Get-LaunchPath -TargetRoot $target -ArgList $Rest
+                    $settings = Get-LaunchSettings -Path $launch
+                    $cid = Require-Setting -Settings $settings -Name 'consumer_id'
+                }
                 $url = Invoke-AppsPublish -TargetRoot $target -ConsumerId $cid
                 Write-Host "apps publish OK: $url"
                 exit 0
@@ -1789,6 +1861,21 @@ switch -Regex ($Command) {
             }
             Write-MeritHelp
             exit 1
+        } catch {
+            Write-Host $_.Exception.Message
+            exit 1
+        }
+    }
+    '^oc$' {
+        try {
+            $cidArg = Get-ArgValue -ArgList $Rest -Name '--consumer-id'
+            if (-not $cidArg) { $cidArg = Get-ArgValue -ArgList $Rest -Name '--consumer_id' }
+            if (-not $cidArg) {
+                $cidArg = 'oc-' + ([guid]::NewGuid().ToString('n').Substring(0, 10))
+            }
+            $result = Invoke-Oc -TargetRoot $target -ConsumerId $cidArg
+            Write-Host "oc OK: $($result.playUrl)"
+            exit 0
         } catch {
             Write-Host $_.Exception.Message
             exit 1

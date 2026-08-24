@@ -43,12 +43,13 @@ The default promo path is `MERITAGENT`; the hosted provider owns credit budget, 
 
 Root `merit.ps1` / `merit.sh` remain the **CLI** (`init` / `apply` / `verify` / …).
 
-`BootStrap/` is **PHASE 2 internals** for Merit-Hub, not a second user product:
+`BootStrap/` is **Install OSS internals** for Merit-Hub, not a second user product:
 
-- Lives in GitHub under `merit-agent-skills/BootStrap/` (`_oss.ps1` + legacy name forwarders)
-- Hub **J** clones this repo under `%MYMERITAPP%\merit-agent-skills` and dotsources `_oss.ps1` in the same window
+- Lives in GitHub under `merit-agent-skills/BootStrap/` (`_oss.ps1`)
+- Hub **2** (alias **J**) clones this repo under `%MYMERITAPP%\merit-agent-skills` and dotsources `_oss.ps1` in the same window
 - **Do not** install a live copy to `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd` — that leftover drifted from git and is retired
 - Laptop status is `%MYMERITAPP%\oss-bench.json`
-- PHASE 3 (key **3**) can seed Private-Vault into `~/dev` when the operator has GitHub access (public teaser facts only; no vault product law in this repo)
+- Hub **4** can seed Private-Vault into `~/dev` when the operator has GitHub access (public teaser facts only; no vault product law in this repo)
+- **OC** publishes to merit-prod (activate required). **VC** is operator grade after local vault.
 
 See [bootstrap.design.md](bootstrap.design.md) for how this was introduced and pushed.
