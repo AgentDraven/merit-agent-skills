@@ -84,7 +84,7 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 | `git clone` public `merit-agent-skills` or `merit-demo` | **None** (anonymous HTTPS read) |
 | `merit apply` + `verify` | **None** |
 | Open `play/index.html` locally (static PAR from CDN) | **None** |
-| `scripts/smoke-freemium.ps1` / `scripts/smoke-freemium.sh` | **None** |
+| `scripts/smoke-freemium.ps1` / `scripts/smoke-freemium.sh` (Hub **G**) | **None** — ignore optional `verify NOTE` community files; do **not** create a here.now account |
 | `merit-demo`: `npm install`, `npm run verify`, `npm run e2e` (PAR CDN HEAD) | **None** (network only) |
 
 **GitHub account is optional** for Tier-2. Use it only when you **fork**, **push** your own remote, open PRs, or use `gh` against private repos. Cloning and working locally does not require signing in.
@@ -139,7 +139,7 @@ If `npm install` has not been run, the MERIT wrapper still performs non-visual c
 | **GitHub** | Fork, push, PRs | Optional until you publish source | You |
 | **MERIT package route** (`merit-prod.vercel.app/pkg/meritutils`) | Free workbench/journal widgets | Angle 1 â€” always public | **Nobody** â€” MERIT provider CDN behind gateway |
 | **Vercel** | Live app at `*.vercel.app` | Tier 4 / deploy | You (BYOK) |
-| **here.now** | Marketing at `{slug}.here.now` | Angle 2 / portal publish | You (BYOK `HERENOW_API_KEY`) |
+| **here.now** | **Your** marketing site at `{slug}.here.now` | Angle 2 only — **not** OSS Hub **G** / smoke | You (BYOK `HERENOW_API_KEY`) if you publish your own `portal/`. Subscribers and freeware play use **merit-prod**, not here.now. |
 | **Supabase** | Persistent journal/AMA + meritsubs data on **your** deploy | Full merit-demo deploy | You (consumer project) |
 | **meritstore tenant** | Checkout under **your** `consumer_id` | Angle 4 â€” operator provision | MERIT platform (after integration cert) |
 | **Square** (or tenant payment provider) | **Payout** from Plus subscriptions to you | After meritstore tenant + onboarding | You via platform tenant config |

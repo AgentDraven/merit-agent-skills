@@ -82,4 +82,4 @@ try {
 }
 
 Write-Host "[OK] freemium smoke passed (Make Art DualRail home)" -ForegroundColor Green
-Write-Host "here.now publish: set HERENOW_API_KEY and run merit portal on a consumer with portal/"
+Write-Host "OSS freeware done: no here.now account. Packages come from merit-prod. Optional later (Angle 2): your own marketing site on here.now is BYOK, not this smoke."

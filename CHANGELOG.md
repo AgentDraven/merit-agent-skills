@@ -1,3 +1,8 @@
+## 0.5.14 - 2026-08-23
+
+### Fixed
+- **OSS smoke does not ask for here.now.** Hub **G** / `smoke-freemium` already passed on **merit-prod** PAR (no account). The old footer (`set HERENOW_API_KEY`) was Angle 2 marketing-publish, not freeware validate. Subscriber register stays at `merit-prod.vercel.app/store/{id}/register`. `verify NOTE` community JSON files are optional.
+
 ## 0.5.13 - 2026-08-23
 
 ### Removed

@@ -394,7 +394,7 @@ function Invoke-Verify {
     }
     foreach ($rel in @('cfg/community.json', 'cfg/collab_schedule.json', 'cfg/alerts.json')) {
         if (-not (Test-Path (Join-Path $TargetRoot $rel))) {
-            Write-Host "verify NOTE: missing $rel (run: .\merit.ps1 community scaffold --path <repo>)"
+            Write-Host "verify NOTE (optional): missing $rel - skip for OSS freeware; later: .\merit.ps1 community scaffold --path <repo>"
         }
     }
     $gitignore = Join-Path $TargetRoot '.gitignore'
