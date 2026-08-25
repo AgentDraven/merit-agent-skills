@@ -1,3 +1,8 @@
+## 0.5.19 - 2026-08-24
+
+### Fixed
+- **Hub OC parse:** restore `Set-OcCreatorFace` brace after the DualRail `consumer_id` handoff (0.5.18 tag is unusable).
+
 ## 0.5.18 - 2026-08-24
 
 ### Fixed

@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.18'
+$MERIT_VERSION = '0.5.19'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -1368,6 +1368,8 @@ function Set-OcCreatorFace {
             } catch { }
         }
         Invoke-ParScaffold -TargetRoot $TargetRoot -Variant $variant -ConsumerId $ConsumerId
+    }
+    $portalJsonPath = Join-Path $TargetRoot 'portal/portal.json'
     if (Test-Path -LiteralPath $portalJsonPath) {
         $pj = Read-JsonFile $portalJsonPath
         if (-not $pj.brand) { $pj | Add-Member -NotePropertyName brand -NotePropertyValue ([pscustomobject]@{}) -Force }
