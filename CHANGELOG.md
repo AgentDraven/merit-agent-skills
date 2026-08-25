@@ -1,3 +1,11 @@
+## 0.5.24 - 2026-08-24
+
+### Fixed
+- **OC receipt reaches the Hub:** the `oc` dispatcher assigns `Invoke-Oc`'s return value, which was also swallowing the `OC_RECEIPT` line off the success stream. The receipt is written to the host stream now, so the Hub records confirmed URLs instead of warning `OC receipt line not captured` and falling back to expected shapes.
+
+### Changed
+- Hub pin **`skills-v0.5.24`**.
+
 ## 0.5.23 - 2026-08-24
 
 ### Fixed

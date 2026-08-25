@@ -1638,7 +1638,9 @@ function Invoke-Oc {
     Write-Host "OC register: $registerUrl"
     Write-Host "OC portal:   $siteUrl"
     Write-Host "OC product:  $name"
-    Write-Output ("OC_RECEIPT play={0} register={1} portal={2} herenow={3} product={4}" -f $appUrl, $registerUrl, $siteUrl, $hereNow, $name)
+    # Host stream, not Write-Output: callers assign the returned object, which would
+    # otherwise capture the receipt line and hide it from the Hub's stdout parse.
+    Write-Host ("OC_RECEIPT play={0} register={1} portal={2} herenow={3} product={4}" -f $appUrl, $registerUrl, $siteUrl, $hereNow, $name)
     return [pscustomobject]@{
         consumerId  = $cid
         productName = $name
