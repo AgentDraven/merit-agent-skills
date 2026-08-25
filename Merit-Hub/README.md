@@ -65,12 +65,30 @@ Raw: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Meri
 | **1** | Setup laptop (prereqs + MYMERIT* + merit-venv) |
 | **2** | Install OSS (skills pin + merit-demo + quiet smoke). Alias **J** |
 | **3** | Try it — open local `play/index.html` |
-| **OC** | OSS in the Cloud — merit-prod play + **required** store activate |
+| **OC** | OSS in the Cloud — DualRail play + **required** store activate + MERIT-hosted marketing site (`/play/site`) |
 | **4** | Vault clone (still local). Alias **V** |
 | **VC** | Venture Capable — operator/tenant grade vs freeware OC |
 | **5** | Join MERIT — portal / partners / register links |
 | **0** | Stop |
 | **P** | Pristine: wipe OSS bench, leftover `Tools\Merit-Hub\`, ~/dev, **MYMERIT* env** (next run prompts again), merit-venv. Keeps `C:\Tools\Merit-Hub.ps1`. |
+
+## Multi-creator benches (one PC)
+
+A second **creator** is another OSS bench, not another Tools tree and not a subscriber.
+
+Subscribers join `$0` on `/store/{oc-id}/register`. They never need `MYMERITAPP`.
+
+```powershell
+# Shared tools. Process-only bench (does not overwrite User MYMERITAPP).
+pwsh -NoProfile -File C:\MyMeritApps\merit-agent-skills\Merit-Hub\oc-bench.ps1 `
+  -Name creator-01 -ProductName 'Creator 01 DualRail' -All
+pwsh -NoProfile -File C:\MyMeritApps\merit-agent-skills\Merit-Hub\oc-bench.ps1 `
+  -Name creator-02 -ProductName 'Creator 02 DualRail' -All
+```
+
+Each bench is `%MYMERITAPP%` = `C:\MyMeritApps\benches\<name>` with its own `oss-bench.json` / `ocConsumerId`. `MYMERITTOOLS` stays `C:\MyMeritTools`. Same Hub, `-NewOc` if you want a second OC from **one** bench.
+
+Cloud isolation is `consumer_id` on merit-prod (v0.1.84+). Two benches on an older gateway still collide on `play/index.html`.
 
 ## What the script creates locally
 

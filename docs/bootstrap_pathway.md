@@ -41,7 +41,8 @@ flowchart TD
 - **Hub_2_clone_skills:** Merit-Hub **2** (alias **J**) clones this public repo at a release tag (`skills-v*`) into the bench. Internals: `_oss.ps1` inside that clone — not a second script.
 - **Install_OSS_demo_quiet_smoke:** Seed `merit-demo`, then validate (`closeout` + quiet `smoke`). Local freeware OSS is done here. Old D+G live inside this step.
 - **3_Try_it_local:** Open `merit-demo\play\index.html`. Not hosted yet.
-- **OC_OSS_in_the_Cloud:** Publish play+cfg to merit-prod; store activate **must** succeed. Optional platform here.now (laptop never sees the key).
+- **OC_OSS_in_the_Cloud:** Publish play+cfg + `portal/` as `/play/site` to merit-prod; store activate **must** succeed. here.now is a platform-key upgrade (laptop never sees the key).
+- **Multi-creator dogfood (one PC):** Process-only `MYMERITAPP` benches under `C:\MyMeritApps\benches\<name>` sharing one `MYMERITTOOLS`. Wrapper: `Merit-Hub/oc-bench.ps1 -Name creator-01 -All`. Do **not** copy Tools 5×. Subscribers are not benches.
 - **Want_Private_Vault:** Stay on OSS/OC, or continue with key **4**.
 - **4_clone_vault_local:** Clones the private vault at the pinned release tag (needs credentials / GCM). Still local.
 - **VC_Venture_Capable:** Operator/tenant grade vs freeware OC. Vault BootStrap on this laptop.

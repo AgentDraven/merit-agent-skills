@@ -1,3 +1,11 @@
+## 0.5.27 - 2026-08-25
+
+### Added
+- **Multi-creator benches on one laptop:** `MERIT_HUB_NO_PERSIST_ENV=1` keeps `MYMERITAPP` Process-only (does not SET User). Shared `MYMERITTOOLS`. Wrapper `Merit-Hub/oc-bench.ps1 -Name creator-01 -All`. Hub `-NewOc` mints a new `oc-*` instead of reusing `oss-bench.json`. Subscribers still do not get a bench — they join `/store/{id}/register`.
+
+### Changed
+- Hub pin **`skills-v0.5.27`**.
+
 ## 0.5.26 - 2026-08-25
 
 ### Fixed

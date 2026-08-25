@@ -19,6 +19,7 @@
     -OssPhase / -InstallOss  clone demo + quiet validate (after a skills clone exists)
     -TryIt                 open local merit-demo play
     -Oc                    OSS in the Cloud (publish + required activate)
+    -NewOc                 with -Oc: mint a new oc-* id (do not reuse oss-bench.json)
     -Vc                    Venture Capable receipt after local vault
     -JoinMerit             portal / partners / register links
     -InstallSkills <host>  copy skills/ to Cursor, Codex, Hermes, ... (needs OSS clone; menu I)
@@ -29,6 +30,7 @@
   Env (mirrors BootStrap):
     MYMERITAPP    OSS bench (default C:\MyMeritApp)
     MYMERITTOOLS  laptop tools root (default C:\Tools) - merit-venv, shims
+    MERIT_HUB_NO_PERSIST_ENV=1  Process-only MYMERIT* (multi-creator benches; do not SET User)
 
 .EXAMPLE
   pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
@@ -50,6 +52,7 @@ param(
     [switch]$InstallOss,
     [switch]$TryIt,
     [switch]$Oc,
+    [switch]$NewOc,
     [switch]$Vc,
     [switch]$JoinMerit,
     [switch]$Force,
@@ -80,7 +83,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.26",
+  "skillsPin": "skills-v0.5.27",
   "vaultPin": "vault-v0.5.8",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -284,8 +287,17 @@ function Ensure-HubElevated {
     exit 0
 }
 
+function Test-HubProcessBenchMode {
+    return ($env:MERIT_HUB_NO_PERSIST_ENV -eq '1')
+}
+
 function Set-UserEnvVar {
     param([string]$Name, [string]$Value)
+    if (Test-HubProcessBenchMode) {
+        Set-Item -Path "Env:$Name" -Value $Value
+        Write-Note "$Name Process-only (MERIT_HUB_NO_PERSIST_ENV=1). User env not changed - other terminals keep their bench."
+        return
+    }
     $existing = [Environment]::GetEnvironmentVariable($Name, 'User')
     [Environment]::SetEnvironmentVariable($Name, $Value, 'User')
     Set-Item -Path "Env:$Name" -Value $Value
@@ -1307,6 +1319,12 @@ function Ensure-MeritHubEnvAtStart {
     if ($Force) { return }
     Write-Header 'MYMERIT* environment'
     Write-HubEnvScopes
+    if (Test-HubProcessBenchMode) {
+        Write-Note 'MERIT_HUB_NO_PERSIST_ENV=1 — using Process MYMERIT* only (multi-creator bench). User env not written.'
+        Write-Ok "MYMERITTOOLS resolved = $(Get-MyMeritToolsRoot)"
+        Write-Ok "MYMERITAPP    resolved = $(Get-MyMeritAppRoot)"
+        return
+    }
     $toolsUser = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'User')
     $toolsProc = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'Process')
     if ([string]::IsNullOrWhiteSpace($toolsUser)) {
@@ -1605,8 +1623,9 @@ function Invoke-HubOc {
     }
     $cid = ''
     try { $cid = [string]$state.ocConsumerId } catch { }
-    if ([string]::IsNullOrWhiteSpace($cid) -or $cid -notmatch '^oc-') {
+    if ($NewOc -or [string]::IsNullOrWhiteSpace($cid) -or $cid -notmatch '^oc-') {
         $cid = New-HubOcConsumerId
+        if ($NewOc) { Write-Note " -NewOc: minting $cid (not reusing oss-bench.json)" }
     }
     $defaultName = 'My DualRail app'
     try {
@@ -1761,6 +1780,7 @@ function Show-MeritHubHelp {
     Write-Host '  2) Install OSS      skills pin + merit-demo + quiet smoke   (alias J)'
     Write-Host '  3) Try it           open local play/index.html'
     Write-Host '  OC) OSS in the Cloud  DualRail play + register + your marketing site'
+    Write-Host '      -NewOc with -Oc mints a new oc-* id (second creator on this bench)'
     Write-Host '  4) Vault            clone private vault (still local)       (alias V)'
     Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC'
     Write-Host '  5) Join MERIT       portal / partners / register links'
@@ -1838,14 +1858,14 @@ try {
     }
     if ($OssPhase -or $InstallOss) { Invoke-HubInstallOss; return }
     if ($TryIt) { Invoke-HubTryIt; return }
-    if ($Oc) { Invoke-HubOc; if ($Script:HubStepFailed) { exit 1 }; return }
+    if ($Oc -or $NewOc) { Invoke-HubOc; if ($Script:HubStepFailed) { exit 1 }; return }
     if ($Vc) { Invoke-HubVc; return }
     if ($JoinMerit) { Invoke-HubJoinMerit; return }
     if ($Jumpstart -eq 'Oss') { Invoke-HubInstallOss; return }
     if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
 
     $bound = $PSBoundParameters.Keys
-    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'Vc', 'JoinMerit') | Where-Object { $bound -contains $_ }
+    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'JoinMerit') | Where-Object { $bound -contains $_ }
     if (-not $hasAction) {
         Show-InteractiveMenu
     }
