@@ -1,3 +1,13 @@
+## 0.5.26 - 2026-08-25
+
+### Fixed
+- **Hub OC exit code:** `-Oc` now exits 1 when publish/activate/portal fails, and still prints the step receipt so the map + drill-in + receipt stay on screen.
+- Help line names the freeware face: DualRail play + register + **your marketing site** (MERIT-hosted; here.now is the platform-key upgrade).
+- **OC live-checks DualRail + marketing site** before printing `OC_RECEIPT`. Hub `-Oc` streams the CLI output and fails the receipt if play is the "not published" shell.
+
+### Changed
+- Hub pin **`skills-v0.5.26`**.
+
 ## 0.5.25 - 2026-08-24
 
 ### Added

@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.19'
+$MERIT_VERSION = '0.5.26'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -1457,9 +1457,13 @@ function Set-OcCreatorFace {
         if ($pj.providers) {
             foreach ($p in @($pj.providers)) {
                 $n = [string]$p.name
+                $href = [string]$p.href
                 if ($n -match 'workbench|play' -and $PlayUrl) { $p.href = $PlayUrl }
                 elseif ($n -match 'merit.?subs|register|store' -and $RegisterUrl) { $p.href = $RegisterUrl }
-                elseif ($PlayUrl -and ([string]$p.href) -match 'merit-demo\.vercel\.app') { $p.href = $PlayUrl }
+                elseif ($PlayUrl -and $href -match 'merit-demo\.vercel\.app|oc-yardstick01|merit-demo') { $p.href = $PlayUrl }
+                if ($ConsumerId -and $p.statusPath) {
+                    $p.statusPath = ([string]$p.statusPath).Replace('merit-demo', $ConsumerId)
+                }
             }
         }
         if ($PlayUrl -and $RegisterUrl) {
@@ -1470,6 +1474,17 @@ function Set-OcCreatorFace {
             ) -Force
         }
         Write-JsonFile -Path $portalJsonPath -Object $pj
+    }
+    $portalIndex = Join-Path $TargetRoot 'portal/index.html'
+    if ($PlayUrl -and $RegisterUrl -and (Test-Path -LiteralPath $portalIndex)) {
+        $idx = Get-Content -LiteralPath $portalIndex -Raw -Encoding UTF8
+        if ($idx -notmatch [regex]::Escape($RegisterUrl) -and $idx -notmatch 'Join free') {
+            $cta = "      <p class=`"oc-ctas`"><a href=`"$PlayUrl`">Open play</a> · <a href=`"$RegisterUrl`">Join free - Community Member `$0</a></p>"
+            if ($idx.Contains('<div class="actions" id="portal-ctas"></div>')) {
+                $idx = $idx.Replace('<div class="actions" id="portal-ctas"></div>', "<div class=`"actions`" id=`"portal-ctas`"></div>`r`n$cta")
+                [System.IO.File]::WriteAllText($portalIndex, $idx, [System.Text.UTF8Encoding]::new($false))
+            }
+        }
     }
 }
 
@@ -1550,6 +1565,43 @@ function Get-OcSiteFiles {
         throw "oc: no portal/ files under $portalDir"
     }
     return $files
+}
+
+function Confirm-OcLive {
+    param(
+        [string]$PlayUrl,
+        [string]$RegisterUrl,
+        [string]$SiteUrl,
+        [string]$ConsumerId,
+        [string]$ProductName
+    )
+    $playHtml = ''
+    $siteHtml = ''
+    $lastErr = $null
+    foreach ($attempt in 1..4) {
+        try {
+            $playHtml = [string](Invoke-WebRequest -Uri $PlayUrl -UseBasicParsing -TimeoutSec 45).Content
+            $siteHtml = [string](Invoke-WebRequest -Uri $SiteUrl -Headers @{ Accept = 'text/html' } -UseBasicParsing -TimeoutSec 45).Content
+            $lastErr = $null
+            break
+        } catch {
+            $lastErr = $_
+            Start-Sleep -Seconds (2 * $attempt)
+        }
+    }
+    if ($lastErr) {
+        throw "OC live-check could not GET play/site. $lastErr"
+    }
+    if ($playHtml -match 'Play UI not published' -or $playHtml -notmatch 'createAppShell' -or $playHtml -notmatch 'Register free') {
+        throw "OC play is not DualRail at $PlayUrl (got the unpublished shell or a non-Gloss face). Re-run oc."
+    }
+    if ($playHtml -notmatch [regex]::Escape("/store/$ConsumerId/register")) {
+        throw "OC play Register CTA is not this tenant ($ConsumerId). Re-run oc so DualRail is not merit-demo."
+    }
+    if ($siteHtml -match 'Play UI not published' -or $siteHtml -match '"error"\s*:\s*"not_found"' -or $siteHtml.Length -lt 300) {
+        throw "OC marketing site missing at $SiteUrl. Publish portal/ as play/site/**."
+    }
+    Write-Host "OC live-check OK ($ProductName DualRail play + marketing site)."
 }
 
 function Invoke-OcSitePublish {
@@ -1650,6 +1702,7 @@ function Invoke-Oc {
         $hereNow = [string]$presp.siteUrl
         Write-Host "OC here.now (platform key, laptop never sees it): $hereNow"
     }
+    Confirm-OcLive -PlayUrl $appUrl -RegisterUrl $registerUrl -SiteUrl $siteUrl -ConsumerId $cid -ProductName $name
     Write-Host "OC play:     $appUrl"
     Write-Host "OC register: $registerUrl"
     Write-Host "OC portal:   $siteUrl"

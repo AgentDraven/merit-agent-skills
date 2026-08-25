@@ -66,6 +66,7 @@ $Script:HubRoot = Split-Path -Parent $Script:HubScriptPath
 $Script:BackupRoot = Join-Path $Script:HubRoot 'backups'
 $Script:HistoryLog = Join-Path $Script:BackupRoot 'Merit-Hub-history.log'
 $Script:TranscriptStarted = $false
+$Script:HubStepFailed = $false
 $Script:HubOnWindows = (
     ($PSVersionTable.ContainsKey('PSPlatform') -and $PSVersionTable.PSPlatform -eq 'Win32NT') -or
     ($env:OS -match 'Windows')
@@ -79,7 +80,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.25",
+  "skillsPin": "skills-v0.5.26",
   "vaultPin": "vault-v0.5.8",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -1469,9 +1470,27 @@ function Write-HubReceipt {
             try { $pname = [string]$state.ocProductName } catch { }
             if ($cid) { Write-Ok "consumer_id: $cid" } else { Write-Warn 'No OC consumer_id yet' }
             if ($pname) { Write-Info "product   : $pname" }
-            if ($playUrl) { Write-Ok "play      : $playUrl" } else { Write-Warn 'play URL missing' }
+            $playLive = $false
+            $portalLive = $false
+            if ($playUrl -match '^https?://') {
+                try {
+                    $playHtml = [string](Invoke-WebRequest -Uri $playUrl -UseBasicParsing -TimeoutSec 45).Content
+                    $playLive = ($playHtml -match 'createAppShell' -and $playHtml -match 'Register free' -and $playHtml -notmatch 'Play UI not published')
+                } catch { $playLive = $false }
+            }
+            if ($portalUrl -match '^https?://') {
+                try {
+                    $siteHtml = [string](Invoke-WebRequest -Uri $portalUrl -Headers @{ Accept = 'text/html' } -UseBasicParsing -TimeoutSec 45).Content
+                    $portalLive = ($siteHtml.Length -gt 300 -and $siteHtml -notmatch 'Play UI not published' -and $siteHtml -notmatch '"error"\s*:\s*"not_found"')
+                } catch { $portalLive = $false }
+            }
+            if ($playUrl) {
+                if ($playLive) { Write-Ok "play      : $playUrl" } else { Write-Fail "play      : $playUrl (not DualRail yet — unpublished shell)"; $Script:HubStepFailed = $true }
+            } else { Write-Warn 'play URL missing' }
             if ($regUrl) { Write-Ok "register  : $regUrl" } else { Write-Warn 'register URL missing (activate required)' }
-            if ($portalUrl) { Write-Ok "portal    : $portalUrl" } else { Write-Warn 'marketing portal missing - OC publishes the demo portal/ tree' }
+            if ($portalUrl) {
+                if ($portalLive) { Write-Ok "portal    : $portalUrl" } else { Write-Fail "portal    : $portalUrl (marketing site not live)"; $Script:HubStepFailed = $true }
+            } else { Write-Warn 'marketing portal missing - OC publishes the demo portal/ tree' }
             if ($hn -match '^https?://') {
                 Write-Ok "here.now  : $hn"
             } elseif ($hn) {
@@ -1616,11 +1635,14 @@ function Invoke-HubOc {
     $runner = Get-OssRunner
     $env:MERIT_VERIFY_QUIET = '1'
     $ocLines = & $runner.Exe -NoProfile -File $cli 'oc' '--path' $demo '--consumer-id' $cid '--product-name' $pname 6>&1
+    foreach ($line in @($ocLines)) {
+        $text = [string]$line
+        if ($text.Trim()) { Write-Host $text }
+    }
     if ($LASTEXITCODE -ne 0) {
+        $Script:HubStepFailed = $true
         Write-Fail "OC failed (exit $LASTEXITCODE). Play publish, store activate, and the marketing portal are all required; play-only is not OC-done."
-        foreach ($line in @($ocLines | ForEach-Object { "$_" } | Select-Object -Last 8)) {
-            if ($line.Trim()) { Write-Note "  $line" }
-        }
+        Write-HubReceipt 'OC'
         return
     }
     $gw = 'https://merit-prod.vercel.app'
@@ -1738,7 +1760,7 @@ function Show-MeritHubHelp {
     Write-Host '  1) Setup laptop     prereqs + MYMERIT* + merit-venv'
     Write-Host '  2) Install OSS      skills pin + merit-demo + quiet smoke   (alias J)'
     Write-Host '  3) Try it           open local play/index.html'
-    Write-Host '  OC) OSS in the Cloud  DualRail play + register + here.now portal'
+    Write-Host '  OC) OSS in the Cloud  DualRail play + register + your marketing site'
     Write-Host '  4) Vault            clone private vault (still local)       (alias V)'
     Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC'
     Write-Host '  5) Join MERIT       portal / partners / register links'
@@ -1816,7 +1838,7 @@ try {
     }
     if ($OssPhase -or $InstallOss) { Invoke-HubInstallOss; return }
     if ($TryIt) { Invoke-HubTryIt; return }
-    if ($Oc) { Invoke-HubOc; return }
+    if ($Oc) { Invoke-HubOc; if ($Script:HubStepFailed) { exit 1 }; return }
     if ($Vc) { Invoke-HubVc; return }
     if ($JoinMerit) { Invoke-HubJoinMerit; return }
     if ($Jumpstart -eq 'Oss') { Invoke-HubInstallOss; return }
