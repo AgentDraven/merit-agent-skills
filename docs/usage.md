@@ -139,7 +139,7 @@ If `npm install` has not been run, the MERIT wrapper still performs non-visual c
 | **GitHub** | Fork, push, PRs | Optional until you publish source | You |
 | **MERIT package route** (`merit-prod.vercel.app/pkg/meritutils`) | Free workbench/journal widgets | Angle 1 â€” always public | **Nobody** â€” MERIT provider CDN behind gateway |
 | **Vercel** | Live app at `*.vercel.app` | Tier 4 / deploy | You (BYOK) |
-| **here.now** | **Your** marketing site at `{slug}.here.now` | Angle 2 BYOK, **or Hub OC** via merit-prod (laptop never sees a key) | Angle 2: you (`HERENOW_API_KEY`). **OC:** MERIT platform key publishes demo `portal/`; subscribers still join at `merit-prod.vercel.app/store/{id}/register`. |
+| **here.now** | **Your** marketing site at `{slug}.here.now` | Angle 2 BYOK, or an **OC upgrade** via merit-prod (laptop never sees a key) | Angle 2: you (`HERENOW_API_KEY`). **OC needs no here.now account:** Hub **OC** publishes your `portal/` tree to MERIT at `merit-prod.vercel.app/apps/{oc-id}/play/site`; subscribers join at `merit-prod.vercel.app/store/{oc-id}/register`. |
 | **Supabase** | Persistent journal/AMA + meritsubs data on **your** deploy | Full merit-demo deploy | You (consumer project) |
 | **meritstore tenant** | Checkout under **your** `consumer_id` | Angle 4 â€” operator provision | MERIT platform (after integration cert) |
 | **Square** (or tenant payment provider) | **Payout** from Plus subscriptions to you | After meritstore tenant + onboarding | You via platform tenant config |
@@ -149,6 +149,7 @@ You do **not** need all three of here.now, Vercel, and Supabase to **start** Tie
 ```text
 Tier 2 local only     â†’  git clone + merit + verify       (0 cloud accounts)
 Angle 1 play          â†’  PAR CDN only                     (0 cloud accounts)
+OC play + marketing   â†’  Hub OC on merit-prod             (0 cloud accounts)
 Angle 2 marketing     â†’  + here.now                       (1 account)
 Live consumer app     â†’  + Vercel                         (1 account)
 Full merit-demo stack â†’  + Vercel + Supabase              (2 accounts)

@@ -52,7 +52,7 @@ function Get-OssSkillsPin {
         $v = ((Get-Content -LiteralPath $verFile -Raw) -split '\r?\n')[0].Trim()
         if ($v -match '^\d+\.\d+') { return "skills-v$v" }
     }
-    return 'skills-v0.5.19'
+    return 'skills-v0.5.20'
 }
 
 function Get-OssVaultPin {
@@ -86,6 +86,7 @@ function New-OssBenchState {
         ocConsumerId        = ''
         ocPlayUrl           = ''
         ocRegisterUrl       = ''
+        ocPortalUrl         = ''
         ocHereNowUrl        = ''
         ocProductName       = ''
     }

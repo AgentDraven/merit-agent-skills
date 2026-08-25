@@ -79,7 +79,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.19",
+  "skillsPin": "skills-v0.5.20",
   "vaultPin": "vault-v0.5.8",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -1380,17 +1380,23 @@ function Invoke-GitClonePin {
 }
 
 function Write-HubMap {
+    param([string]$Here = '')
+    $mark = {
+        param([string]$Step, [string]$Text)
+        if ($Here -and $Step -eq $Here) { return "* $Text" }
+        return "  $Text"
+    }
     Write-Host ''
-    Write-Host '  MAP (always)' -ForegroundColor White
-    Write-Host '  1 Setup laptop'
-    Write-Host '       |'
-    Write-Host '       v'
-    Write-Host '  2 Install OSS  (J)'
-    Write-Host '       |'
-    Write-Host '       +--> 3 Try it --> OC  OSS in the Cloud'
-    Write-Host '       +--> 4 Vault (V, still local) --> VC  Venture Capable'
-    Write-Host '       +--> 5 Join MERIT'
-    Write-Host '       +--> 0 Stop'
+    Write-Host '  MAP (always)   * = you are here' -ForegroundColor White
+    Write-Host ('  ' + (& $mark '1' '1 Setup laptop'))
+    Write-Host '         |'
+    Write-Host '         v'
+    Write-Host ('  ' + (& $mark '2' '2 Install OSS  (J)'))
+    Write-Host '         |'
+    Write-Host ('         +--> ' + (& $mark '3' '3 Try it') + ' --> ' + (& $mark 'OC' 'OC  OSS in the Cloud'))
+    Write-Host ('         +--> ' + (& $mark '4' '4 Vault (V, still local)') + ' --> ' + (& $mark 'VC' 'VC  Venture Capable'))
+    Write-Host ('         +--> ' + (& $mark '5' '5 Join MERIT'))
+    Write-Host '         +--> 0 Stop'
 }
 
 function Write-HubDrillIn {
@@ -1399,7 +1405,7 @@ function Write-HubDrillIn {
         '1' { Write-Note 'Drill-in: git / gh / pwsh + MERIT Python venv under MYMERITTOOLS. Persist MYMERIT*. Not hosted.' }
         '2' { Write-Note 'Drill-in: clone skills pin + merit-demo; quiet smoke. Old D+G live here. Not cloud.' }
         '3' { Write-Note 'Drill-in: open local merit-demo\play\index.html. Still not hosted.' }
-        'OC' { Write-Note 'Drill-in: publish play+cfg to merit-prod; store activate MUST succeed. Optional platform here.now (no laptop key).' }
+        'OC' { Write-Note 'Drill-in: publish play+cfg + portal/ marketing site to merit-prod; store activate MUST succeed. here.now is a platform-key upgrade (no laptop key).' }
         '4' { Write-Note 'Drill-in: clone private vault into ~/dev. Still local. Not VC yet.' }
         'VC' { Write-Note 'Drill-in: operator/tenant grade vs freeware OC. Vault BootStrap on this laptop.' }
         '5' { Write-Note 'Drill-in: links only - portal, partners, register. Affiliate is ?affiliate= on register, not a here.now slug.' }
@@ -1457,10 +1463,23 @@ function Write-HubReceipt {
             try { $regUrl = [string]$state.ocRegisterUrl } catch { }
             $hn = ''
             try { $hn = [string]$state.ocHereNowUrl } catch { }
+            $portalUrl = ''
+            try { $portalUrl = [string]$state.ocPortalUrl } catch { }
+            $pname = ''
+            try { $pname = [string]$state.ocProductName } catch { }
             if ($cid) { Write-Ok "consumer_id: $cid" } else { Write-Warn 'No OC consumer_id yet' }
-            if ($playUrl) { Write-Ok "play:     $playUrl" } else { Write-Warn 'play URL missing' }
-            if ($regUrl) { Write-Ok "register: $regUrl" } else { Write-Warn 'register URL missing (activate required)' }
-            if ($hn) { Write-Ok "here.now: $hn" } else { Write-Warn 'here.now missing - OC-done requires the demo portal/ on here.now (or a reported key-missing blocker).' }
+            if ($pname) { Write-Info "product   : $pname" }
+            if ($playUrl) { Write-Ok "play      : $playUrl" } else { Write-Warn 'play URL missing' }
+            if ($regUrl) { Write-Ok "register  : $regUrl" } else { Write-Warn 'register URL missing (activate required)' }
+            if ($portalUrl) { Write-Ok "portal    : $portalUrl" } else { Write-Warn 'marketing portal missing - OC publishes the demo portal/ tree' }
+            if ($hn -match '^https?://') {
+                Write-Ok "here.now  : $hn"
+            } elseif ($hn) {
+                Write-Note "here.now  : not published ($hn). Marketing portal above is MERIT-hosted; no laptop key was ever asked for."
+            } else {
+                Write-Note 'here.now  : not published (platform-key upgrade).'
+            }
+            Write-Note 'Subscribers get: guest play, journal/AMA shells, marketing portal, Community Member $0. Not Plus, not payouts, not vault.'
         }
         '4' {
             if (Test-Path -LiteralPath (Join-Path $vault '.git')) { Write-Ok "Vault (local): $vault" } else { Write-Warn "Vault not cloned: $vault" }
@@ -1499,7 +1518,7 @@ function New-HubOcConsumerId {
 
 function Invoke-HubSetupLaptop {
     Write-Header '1 Setup laptop'
-    Write-HubMap
+    Write-HubMap -Here '1'
     Write-HubDrillIn '1'
     [void](Invoke-MeritPrereqs)
     Write-HubReceipt '1'
@@ -1509,7 +1528,7 @@ function Invoke-HubInstallOss {
     param([switch]$SkipPrereqs)
     $cfg = Get-HubConfig
     Write-Header "2 Install OSS @ $($cfg.skillsPin)"
-    Write-HubMap
+    Write-HubMap -Here '2'
     Write-HubDrillIn '2'
     if (-not $SkipPrereqs) { [void](Invoke-MeritPrereqs) }
     $bench = Ensure-MyMeritAppPrompt
@@ -1533,7 +1552,7 @@ function Invoke-HubInstallOss {
 
 function Invoke-HubTryIt {
     Write-Header '3 Try it'
-    Write-HubMap
+    Write-HubMap -Here '3'
     Write-HubDrillIn '3'
     if (-not (Ensure-HubOssHelpers)) { return }
     $state = Get-OssState
@@ -1551,7 +1570,7 @@ function Invoke-HubTryIt {
 
 function Invoke-HubOc {
     Write-Header 'OC  OSS in the Cloud'
-    Write-HubMap
+    Write-HubMap -Here 'OC'
     Write-HubDrillIn 'OC'
     if (-not (Ensure-HubOssHelpers)) { return }
     $state = Get-OssState
@@ -1598,7 +1617,7 @@ function Invoke-HubOc {
     $env:MERIT_VERIFY_QUIET = '1'
     $ocLines = & $runner.Exe -NoProfile -File $cli 'oc' '--path' $demo '--consumer-id' $cid '--product-name' $pname 6>&1
     if ($LASTEXITCODE -ne 0) {
-        Write-Fail "OC failed (exit $LASTEXITCODE). Activate + here.now portal files are required; play-only is not OC-done."
+        Write-Fail "OC failed (exit $LASTEXITCODE). Play publish, store activate, and the marketing portal are all required; play-only is not OC-done."
         return
     }
     $gw = 'https://merit-prod.vercel.app'
@@ -1606,18 +1625,20 @@ function Invoke-HubOc {
     $state.ocProductName = $pname
     $state.ocPlayUrl = "$gw/apps/$cid/play"
     $state.ocRegisterUrl = "$gw/store/$cid/register"
-    $state.ocHereNowUrl = "https://$cid.here.now/"
+    $state.ocPortalUrl = "$gw/apps/$cid/play/site"
+    $state.ocHereNowUrl = ''
     $receiptLine = @($ocLines | ForEach-Object { "$_" } | Where-Object { $_ -match 'OC_RECEIPT ' } | Select-Object -Last 1)
     if ($receiptLine -match 'herenow=(\S+)') { $state.ocHereNowUrl = $Matches[1] }
     if ($receiptLine -match 'play=(\S+)') { $state.ocPlayUrl = $Matches[1] }
     if ($receiptLine -match 'register=(\S+)') { $state.ocRegisterUrl = $Matches[1] }
+    if ($receiptLine -match 'portal=(\S+)') { $state.ocPortalUrl = $Matches[1] }
     Save-OssState $state
     Write-HubReceipt 'OC'
 }
 
 function Invoke-HubJoinMerit {
     Write-Header '5 Join MERIT'
-    Write-HubMap
+    Write-HubMap -Here '5'
     Write-HubDrillIn '5'
     Write-HubReceipt '5'
     $portal = 'https://merit-prod.vercel.app/portal/'
@@ -1626,7 +1647,7 @@ function Invoke-HubJoinMerit {
 
 function Invoke-HubVc {
     Write-Header 'VC  Venture Capable'
-    Write-HubMap
+    Write-HubMap -Here 'VC'
     Write-HubDrillIn 'VC'
     $vault = Get-HubVaultDest
     if (-not (Test-Path -LiteralPath (Join-Path $vault '.git'))) {
@@ -1660,7 +1681,7 @@ function Enter-HubOssPhase {
 function Invoke-JumpstartVault {
     $cfg = Get-HubConfig
     Write-Header "4 Vault (local) @ $($cfg.vaultPin)"
-    Write-HubMap
+    Write-HubMap -Here '4'
     Write-HubDrillIn '4'
     [void](Invoke-MeritPrereqs)
     $vaultDest = Get-HubVaultDest

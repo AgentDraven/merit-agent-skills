@@ -1,3 +1,14 @@
+## 0.5.20 - 2026-08-24
+
+### Added
+- **OC marketing portal is MERIT-hosted:** `merit.ps1 oc` publishes the demo `portal/` tree (index + legal/terms + css/js + ama/journal/subs) to `merit-prod` as `play/site/**`, live at `/apps/<oc-id>/play/site`. Creator gets play + register + a real marketing site with no Vercel and no here.now account.
+- **Creator face on the portal:** product name replaces MERIT Demo copy, CTAs point at this tenant's play + register, `Register Plus` becomes `Join free - Community Member $0`, and OC notes replace demo-repo notes.
+
+### Changed
+- **here.now is an upgrade, not a gate:** a missing `/api/portal/publish` route or unset platform key is reported (`pending-gateway-deploy` / `blocked-no-platform-key`) instead of failing OC or inventing a slug URL.
+- **Hub map** marks `*` you-are-here on every screen; **OC receipt** prints consumer_id, product, play, register, portal, here.now state, and what a subscriber actually gets.
+- Hub pin **`skills-v0.5.20`**.
+
 ## 0.5.19 - 2026-08-24
 
 ### Fixed

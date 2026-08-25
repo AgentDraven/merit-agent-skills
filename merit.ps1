@@ -37,7 +37,8 @@ Commands:
                            [--scaffold-only]  (alias of default platform mode)
   oc --path <repo> [--consumer-id oc-...] [--product-name <name>]
                           OSS in the Cloud: DualRail play + required store activate
-                          + demo portal/ on here.now (platform key; laptop never needs one)
+                          + demo portal/ as a MERIT-hosted marketing site
+                          (here.now is a platform-key upgrade; laptop never needs one)
   apps publish --path <repo>  Upload play/+cfg/ to merit-prod /apps/<app>/play (create phase 8)
                           [--consumer-id <id>] override launch consumer_id
   apps refresh --path <repo>  Re-activate store + sync scaffold (never touches app_logic/)
@@ -1284,20 +1285,36 @@ function Invoke-AppsPublish {
     try {
         $usageGateHash = Ensure-UsageOperatorPhrase -TargetRoot $TargetRoot -ConsumerId $ConsumerId
     } catch {
-        Write-Host "apps publish NOTE: usage operator phrase: $($_.Exception.Message)"
+        Write-Host 'apps publish NOTE: no local usage operator phrase (optional - the usage gate stays unset).'
     }
     $kb = [math]::Max(1, [math]::Round($totalBytes / 1KB, 1))
     Write-Host "Packed $($files.Count) file(s) (~$kb KB). Uploading one file at a time (avoids Vercel 4.5MB body limit)..."
 
+    $appUrl = Send-AppFileList -Files $files -ConsumerId $ConsumerId -Gateway $Gateway -UsageGateHash $usageGateHash -Label 'apps publish'
+    if (-not $appUrl) {
+        throw 'apps publish returned no appUrl'
+    }
+    Write-Host "Live app URL: $appUrl"
+    return $appUrl
+}
+
+function Send-AppFileList {
+    param(
+        [object[]]$Files,
+        [string]$ConsumerId,
+        [string]$Gateway = 'https://merit-prod.vercel.app',
+        [string]$UsageGateHash = '',
+        [string]$Label = 'apps publish'
+    )
     # Invoke-WebRequest: works on Windows PowerShell 5.1 without System.Net.Http assembly load.
     $appUrl = $null
     $n = 0
-    foreach ($file in $files) {
+    foreach ($file in $Files) {
         $n++
-        Write-Host "  [$n/$($files.Count)] $($file.path) ($($file.bytes) bytes)..."
+        Write-Host "  [$n/$($Files.Count)] $($file.path) ($($file.bytes) bytes)..."
         $payload = '{"consumerId":' + (ConvertTo-JsonEscapedString $ConsumerId)
-        if ($usageGateHash -and $n -eq 1) {
-            $payload += ',"usage_gate_hash":' + (ConvertTo-JsonEscapedString $usageGateHash)
+        if ($UsageGateHash -and $n -eq 1) {
+            $payload += ',"usage_gate_hash":' + (ConvertTo-JsonEscapedString $UsageGateHash)
         }
         $payload += ',"files":[{"path":' + (ConvertTo-JsonEscapedString $file.path) +
             ',"content":' + (ConvertTo-JsonEscapedString $file.content) +
@@ -1307,17 +1324,13 @@ function Invoke-AppsPublish {
             $wr = Invoke-WebRequest -Uri "$Gateway/api/apps/publish" -Method Post -Body $bodyBytes -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 60
             $resp = $wr.Content | ConvertFrom-Json
         } catch {
-            throw "apps publish failed on $($file.path) ($Gateway/api/apps/publish). Re-run: .\merit.ps1 apps publish --path `"$TargetRoot`" (safe + idempotent). $_"
+            throw "$Label failed on $($file.path) ($Gateway/api/apps/publish). Re-run is safe + idempotent. $_"
         }
         if (-not $resp.ok -or -not $resp.appUrl) {
-            throw "apps publish rejected for $($file.path): $($wr.Content)"
+            throw "$Label rejected for $($file.path): $($wr.Content)"
         }
         $appUrl = [string]$resp.appUrl
     }
-    if (-not $appUrl) {
-        throw 'apps publish returned no appUrl'
-    }
-    Write-Host "Live app URL: $appUrl"
     return $appUrl
 }
 
@@ -1374,12 +1387,23 @@ function Set-OcCreatorFace {
         $pj = Read-JsonFile $portalJsonPath
         if (-not $pj.brand) { $pj | Add-Member -NotePropertyName brand -NotePropertyValue ([pscustomobject]@{}) -Force }
         $pj.brand.name = $name
+        # Stock demo copy would read as a second merit-demo; creator-written copy is left alone.
+        if (([string]$pj.brand.tagline) -match 'MERIT Demo|hello-world') {
+            $pj.brand.tagline = "Play free, join free - $name runs on MERIT cloud."
+        }
+        if (([string]$pj.brand.description) -match 'MERIT Demo|hello-world') {
+            $pj.brand.description = "$name is a DualRail app: an open play surface plus free Community Member signup, hosted by MERIT. No Vercel or here.now account needed to run it."
+        }
         if ($PlayUrl) { $pj.appBaseUrl = $PlayUrl }
         if ($pj.ctas) {
             foreach ($cta in @($pj.ctas)) {
                 $label = [string]$cta.label
                 if ($label -match 'play|workbench|open' -and $PlayUrl) { $cta.href = $PlayUrl }
-                elseif ($label -match 'register|join|plus|member' -and $RegisterUrl) { $cta.href = $RegisterUrl }
+                elseif ($label -match 'register|join|plus|member' -and $RegisterUrl) {
+                    $cta.href = $RegisterUrl
+                    # OC is freeware: never advertise Plus/paid checkout on a Community Member face.
+                    $cta.label = 'Join free - Community Member $0'
+                }
             }
         }
         if ($pj.providers) {
@@ -1387,7 +1411,15 @@ function Set-OcCreatorFace {
                 $n = [string]$p.name
                 if ($n -match 'workbench|play' -and $PlayUrl) { $p.href = $PlayUrl }
                 elseif ($n -match 'merit.?subs|register|store' -and $RegisterUrl) { $p.href = $RegisterUrl }
+                elseif ($PlayUrl -and ([string]$p.href) -match 'merit-demo\.vercel\.app') { $p.href = $PlayUrl }
             }
+        }
+        if ($PlayUrl -and $RegisterUrl) {
+            $pj | Add-Member -NotePropertyName notes -NotePropertyValue @(
+                "$name runs on MERIT cloud - no Vercel or here.now account on the creator laptop.",
+                'Subscribers join free as Community Member $0; Plus and payouts are not part of OC.',
+                'Powered by MERIT.'
+            ) -Force
         }
         Write-JsonFile -Path $portalJsonPath -Object $pj
     }
@@ -1422,6 +1454,67 @@ function Get-OcPortalPublishFiles {
         throw "oc: no portal/ files under $portalDir"
     }
     return $files
+}
+
+function Get-OcSiteFiles {
+    param(
+        [string]$TargetRoot,
+        [string]$ConsumerId,
+        [string]$ProductName
+    )
+    $portalDir = Join-Path $TargetRoot 'portal'
+    if (-not (Test-Path -LiteralPath $portalDir)) {
+        throw "oc: missing portal/ under $TargetRoot - OC publishes the demo portal tree, not stub HTML"
+    }
+    $rootResolved = (Resolve-Path -LiteralPath $portalDir).Path
+    $base = "/apps/$ConsumerId/play/site/"
+    $files = [System.Collections.Generic.List[object]]::new()
+    Get-ChildItem -LiteralPath $portalDir -Recurse -File | ForEach-Object {
+        $rel = $_.FullName.Substring($rootResolved.Length).TrimStart('\', '/').Replace('\', '/')
+        if ($rel -match '(^|/)\.herenow(/|$)' -or $rel -match '(^|/)\.DS_Store$' -or $rel -match '(^|/)\.merit-keep$') { return }
+        if ($rel -notmatch '\.(html?|css|js|mjs|json|svg|txt|md)$') { return }
+        $content = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8
+        if ($null -eq $content) { $content = '' }
+        if ($rel -match '\.html?$') {
+            # The app host serves /apps/<id>/play/site (no trailing slash), so relative URLs
+            # would resolve one level up. <base> fixes assets and portal.json fetch alike.
+            if ($content -notmatch '(?i)<base\s') {
+                $content = [regex]::Replace($content, '(?i)(<head[^>]*>)', "`$1`r`n  <base href=`"$base`">", 1)
+            }
+            # Directory links (ama/) 404 on the host rewrite; point straight at index.html.
+            $content = [regex]::Replace($content, '(?i)(href=")([A-Za-z0-9._-]+)/(")', '$1$2/index.html$3')
+            if ($ProductName) {
+                $content = $content.Replace('MERIT Demo Portal', $ProductName).Replace('MERIT Demo', $ProductName)
+            }
+        }
+        $bytes = [System.Text.Encoding]::UTF8.GetByteCount($content)
+        if ($bytes -gt 200000) {
+            throw "oc site: $rel is $bytes bytes (max 200000)"
+        }
+        $files.Add([ordered]@{
+            path = "play/site/$rel"
+            content = $content
+            contentType = (Get-ContentTypeForPublish -RelPath $rel)
+            bytes = $bytes
+        })
+    }
+    if ($files.Count -lt 1) {
+        throw "oc: no portal/ files under $portalDir"
+    }
+    return $files
+}
+
+function Invoke-OcSitePublish {
+    param(
+        [string]$TargetRoot,
+        [string]$ConsumerId,
+        [string]$ProductName,
+        [string]$Gateway = 'https://merit-prod.vercel.app'
+    )
+    $files = Get-OcSiteFiles -TargetRoot $TargetRoot -ConsumerId $ConsumerId -ProductName $ProductName
+    Write-Host "Packing portal/ -> MERIT-hosted marketing site ($($files.Count) file(s))..."
+    [void](Send-AppFileList -Files $files -ConsumerId $ConsumerId -Gateway $Gateway -Label 'oc site publish')
+    return "$Gateway/apps/$ConsumerId/play/site"
 }
 
 function Invoke-Oc {
@@ -1459,56 +1552,66 @@ function Invoke-Oc {
     $registerUrl = "$Gateway/store/$cid/register"
     Write-Host "Store activated (free-community): $registerUrl"
     Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $appUrl -RegisterUrl $registerUrl -SkipScaffold
+    $siteUrl = Invoke-OcSitePublish -TargetRoot $TargetRoot -ConsumerId $cid -ProductName $name -Gateway $Gateway
+    Write-Host "Marketing portal (MERIT-hosted): $siteUrl"
+
+    # here.now is the optional platform-key upgrade. The laptop never holds the key, so a
+    # missing route or unset key is reported as a blocker - never as a fabricated slug URL.
+    $hereNow = ''
     $portalGet = $null
     try {
         $portalGet = Invoke-RestMethod -Uri "$Gateway/api/portal/publish" -Method Get -TimeoutSec 30
     } catch {
-        throw "OC here.now API missing (GET $Gateway/api/portal/publish failed). Wait for merit-prod deploy. $_"
+        $portalGet = $null
     }
     if (-not $portalGet -or -not $portalGet.ok) {
-        throw "OC here.now API missing (GET $Gateway/api/portal/publish not ok)."
+        $hereNow = 'pending-gateway-deploy'
+        Write-Host "OC here.now: not available yet (GET $Gateway/api/portal/publish is not live). Marketing portal is MERIT-hosted above."
+    } elseif ($portalGet.configured -ne $true) {
+        $hereNow = 'blocked-no-platform-key'
+        Write-Host 'OC here.now: platform HERENOW_API_KEY is not set on merit-prod (configured:false). Reported, not faked.'
+    } else {
+        $portalFiles = Get-OcPortalPublishFiles -TargetRoot $TargetRoot
+        $fileJsonParts = New-Object System.Collections.Generic.List[string]
+        foreach ($f in $portalFiles) {
+            $fileJsonParts.Add(
+                ('{"path":' + (ConvertTo-JsonEscapedString $f.path) +
+                 ',"content":' + (ConvertTo-JsonEscapedString $f.content) +
+                 ',"contentType":' + (ConvertTo-JsonEscapedString $f.contentType) + '}')
+            )
+        }
+        $portalPayload = '{"consumerId":' + (ConvertTo-JsonEscapedString $cid) +
+            ',"productName":' + (ConvertTo-JsonEscapedString $name) +
+            ',"playUrl":' + (ConvertTo-JsonEscapedString $appUrl) +
+            ',"registerUrl":' + (ConvertTo-JsonEscapedString $registerUrl) +
+            ',"files":[' + ($fileJsonParts -join ',') + ']}'
+        $wr = $null
+        try {
+            $wr = Invoke-WebRequest -Uri "$Gateway/api/portal/publish" -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($portalPayload)) -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 120
+        } catch {
+            throw "OC here.now publish failed ($Gateway/api/portal/publish). $_"
+        }
+        $presp = $wr.Content | ConvertFrom-Json
+        if (-not $presp.ok -or -not $presp.siteUrl) {
+            throw "OC here.now publish rejected: $($wr.Content)"
+        }
+        if ($presp.stub -eq $true) {
+            throw 'OC here.now published stub HTML - send portal/ files (index + css/js/legal), not the stub.'
+        }
+        $hereNow = [string]$presp.siteUrl
+        Write-Host "OC here.now (platform key, laptop never sees it): $hereNow"
     }
-    if ($portalGet.configured -ne $true) {
-        throw 'OC here.now BLOCKER: platform HERENOW_API_KEY is not set on merit-prod (configured:false). Play + register may be live; this gate does not fake a here.now URL.'
-    }
-    $portalFiles = Get-OcPortalPublishFiles -TargetRoot $TargetRoot
-    $fileJsonParts = New-Object System.Collections.Generic.List[string]
-    foreach ($f in $portalFiles) {
-        $fileJsonParts.Add(
-            ('{"path":' + (ConvertTo-JsonEscapedString $f.path) +
-             ',"content":' + (ConvertTo-JsonEscapedString $f.content) +
-             ',"contentType":' + (ConvertTo-JsonEscapedString $f.contentType) + '}')
-        )
-    }
-    $portalPayload = '{"consumerId":' + (ConvertTo-JsonEscapedString $cid) +
-        ',"productName":' + (ConvertTo-JsonEscapedString $name) +
-        ',"playUrl":' + (ConvertTo-JsonEscapedString $appUrl) +
-        ',"registerUrl":' + (ConvertTo-JsonEscapedString $registerUrl) +
-        ',"files":[' + ($fileJsonParts -join ',') + ']}'
-    $wr = $null
-    try {
-        $wr = Invoke-WebRequest -Uri "$Gateway/api/portal/publish" -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($portalPayload)) -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 120
-    } catch {
-        throw "OC here.now publish failed ($Gateway/api/portal/publish). $_"
-    }
-    $presp = $wr.Content | ConvertFrom-Json
-    if (-not $presp.ok -or -not $presp.siteUrl) {
-        throw "OC here.now publish rejected: $($wr.Content)"
-    }
-    if ($presp.stub -eq $true) {
-        throw 'OC here.now published stub HTML - send portal/ files (index + css/js/legal), not the stub.'
-    }
-    $hereNow = [string]$presp.siteUrl
-    Write-Host "OC here.now (platform key, laptop never sees it): $hereNow"
     Write-Host "OC play:     $appUrl"
     Write-Host "OC register: $registerUrl"
+    Write-Host "OC portal:   $siteUrl"
     Write-Host "OC product:  $name"
-    Write-Output ("OC_RECEIPT play={0} register={1} herenow={2} product={3}" -f $appUrl, $registerUrl, $hereNow, $name)
+    Write-Output ("OC_RECEIPT play={0} register={1} portal={2} herenow={3} product={4}" -f $appUrl, $registerUrl, $siteUrl, $hereNow, $name)
     return [pscustomobject]@{
         consumerId  = $cid
         productName = $name
         playUrl     = $appUrl
         registerUrl = $registerUrl
+        portalUrl   = $siteUrl
         hereNowUrl  = $hereNow
     }
 }
