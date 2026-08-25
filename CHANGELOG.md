@@ -1,3 +1,8 @@
+## 0.5.17 - 2026-08-24
+
+### Fixed
+- **Hub OC helpers:** dot-source `BootStrap/_oss.ps1` at script scope so `Get-OssState` survives `Ensure-HubOssHelpers`. `-Oc` / `-TryIt` no longer die after the helper returns. `MERIT_HUB_NO_ELEVATE=1` skips the interactive close prompt.
+
 ## 0.5.16 - 2026-08-24
 
 ### Added

@@ -79,7 +79,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.16",
+  "skillsPin": "skills-v0.5.17",
   "vaultPin": "vault-v0.5.8",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -241,6 +241,7 @@ function Stop-HubTranscript {
 
 function Wait-HubWindow {
     param([string]$Reason = 'Merit-Hub finished')
+    if ($env:MERIT_HUB_NO_ELEVATE -eq '1') { return }
     if (-not [Environment]::UserInteractive) { return }
     Write-Host ''
     Write-Note $Reason
@@ -1485,7 +1486,10 @@ function Ensure-HubOssHelpers {
         Write-Note 'Run Hub 2 first so merit-agent-skills is cloned under MYMERITAPP.'
         return $false
     }
-    . $oss
+    if (-not (Get-Command Get-OssState -ErrorAction SilentlyContinue)) {
+        Write-Fail "OSS helpers did not load Get-OssState from $oss (dot-source Hub at script scope)."
+        return $false
+    }
     return $true
 }
 
@@ -1766,6 +1770,10 @@ if ($Help) {
     return
 }
 Ensure-HubElevated
+$ossHelpers = Get-HubOssInternalScript
+if (Test-Path -LiteralPath $ossHelpers) {
+    . $ossHelpers
+}
 New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
 Start-HubTranscript
 try {
