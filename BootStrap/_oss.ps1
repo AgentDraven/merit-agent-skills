@@ -52,7 +52,7 @@ function Get-OssSkillsPin {
         $v = ((Get-Content -LiteralPath $verFile -Raw) -split '\r?\n')[0].Trim()
         if ($v -match '^\d+\.\d+') { return "skills-v$v" }
     }
-    return 'skills-v0.5.20'
+    return 'skills-v0.5.21'
 }
 
 function Get-OssVaultPin {
@@ -132,6 +132,18 @@ function ConvertFrom-LegacyMeritJson($old) {
     return $s
 }
 
+function Merge-OssStateDefaults($State) {
+    # Bench files written by an older Hub predate newer fields, and StrictMode makes
+    # assigning a missing property fatal. Backfill defaults before any step writes.
+    $defaults = New-OssBenchState
+    foreach ($prop in $defaults.PSObject.Properties) {
+        if (-not $State.PSObject.Properties[$prop.Name]) {
+            $State | Add-Member -NotePropertyName $prop.Name -NotePropertyValue $prop.Value -Force
+        }
+    }
+    return $State
+}
+
 function Get-OssState {
     $path = Get-OssJsonPath
     if (Test-Path -LiteralPath $path) {
@@ -139,7 +151,7 @@ function Get-OssState {
         $ver = 1
         try { $ver = [int]$raw.schemaVersion } catch { }
         if ($ver -ge 2 -and $raw.benchFolder) {
-            return $raw
+            return (Merge-OssStateDefaults $raw)
         }
         return ConvertFrom-LegacyMeritJson $raw
     }

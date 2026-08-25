@@ -1,3 +1,11 @@
+## 0.5.21 - 2026-08-24
+
+### Fixed
+- **Hub OC on an existing bench:** `Get-OssState` backfills fields a laptop's older `oss-bench.json` never had, so OC no longer dies with `The property 'ocConsumerId' cannot be found on this object` after publishing.
+
+### Changed
+- Hub pin **`skills-v0.5.21`**.
+
 ## 0.5.20 - 2026-08-24
 
 ### Added
