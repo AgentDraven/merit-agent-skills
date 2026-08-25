@@ -1,3 +1,11 @@
+## 0.5.25 - 2026-08-24
+
+### Added
+- **Play links the marketing site:** the OC hero gets a `Marketing site` CTA next to `Register free`, injected before `apps publish` so subscribers can round-trip play -> site -> register on the creator's own face.
+
+### Changed
+- Hub pin **`skills-v0.5.25`**.
+
 ## 0.5.24 - 2026-08-24
 
 ### Fixed

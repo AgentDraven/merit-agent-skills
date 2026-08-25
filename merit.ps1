@@ -1383,6 +1383,7 @@ function Set-OcCreatorFace {
         [string]$PlayUrl,
         [string]$RegisterUrl,
         [string]$ConsumerId = '',
+        [string]$SiteUrl = '',
         [switch]$SkipScaffold
     )
     $name = ([string]$ProductName).Trim()
@@ -1414,6 +1415,20 @@ function Set-OcCreatorFace {
             } catch { }
         }
         Invoke-ParScaffold -TargetRoot $TargetRoot -Variant $variant -ConsumerId $ConsumerId
+    }
+    # Play and the marketing site are one creator face, so the hero carries the round trip.
+    # Must run before apps publish: play/index.html is uploaded once, early in oc.
+    if ($SiteUrl) {
+        $playIndex = Join-Path $TargetRoot 'play/index.html'
+        if (Test-Path -LiteralPath $playIndex) {
+            $playHtml = Get-Content -LiteralPath $playIndex -Raw -Encoding UTF8
+            $seePlans = "'<a class=`"ma-cta ma-cta--ghost`" href=`"#plans`">See plans</a>' +"
+            if ($playHtml -notmatch 'Marketing site' -and $playHtml.Contains($seePlans)) {
+                $siteCta = "'<a class=`"ma-cta ma-cta--ghost`" href=`"$SiteUrl`">Marketing site</a>' +"
+                $playHtml = $playHtml.Replace($seePlans, $seePlans + "`r`n                " + $siteCta)
+                [System.IO.File]::WriteAllText($playIndex, $playHtml, [System.Text.UTF8Encoding]::new($false))
+            }
+        }
     }
     $portalJsonPath = Join-Path $TargetRoot 'portal/portal.json'
     if (Test-Path -LiteralPath $portalJsonPath) {
@@ -1573,7 +1588,8 @@ function Invoke-Oc {
     }
     $probePlay = "$Gateway/apps/$cid/play"
     $probeReg = "$Gateway/store/$cid/register"
-    Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $probePlay -RegisterUrl $probeReg -ConsumerId $cid
+    $probeSite = "$Gateway/apps/$cid/play/site"
+    Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $probePlay -RegisterUrl $probeReg -ConsumerId $cid -SiteUrl $probeSite
     $appUrl = Invoke-AppsPublish -TargetRoot $TargetRoot -ConsumerId $cid -Gateway $Gateway
     $activateUri = "$Gateway/api/meritstore/v1/tenants/$cid/activate"
     $activateBody = (@{ template = 'free-community'; display_name = $name } | ConvertTo-Json -Compress)
@@ -1584,7 +1600,7 @@ function Invoke-Oc {
     }
     $registerUrl = "$Gateway/store/$cid/register"
     Write-Host "Store activated (free-community): $registerUrl"
-    Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $appUrl -RegisterUrl $registerUrl -SkipScaffold
+    Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $appUrl -RegisterUrl $registerUrl -SiteUrl $probeSite -SkipScaffold
     $siteUrl = Invoke-OcSitePublish -TargetRoot $TargetRoot -ConsumerId $cid -ProductName $name -Gateway $Gateway
     Write-Host "Marketing portal (MERIT-hosted): $siteUrl"
 
