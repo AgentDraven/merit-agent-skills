@@ -79,7 +79,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.15",
+  "skillsPin": "skills-v0.5.16",
   "vaultPin": "vault-v0.5.8",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -1459,7 +1459,7 @@ function Write-HubReceipt {
             if ($cid) { Write-Ok "consumer_id: $cid" } else { Write-Warn 'No OC consumer_id yet' }
             if ($playUrl) { Write-Ok "play:     $playUrl" } else { Write-Warn 'play URL missing' }
             if ($regUrl) { Write-Ok "register: $regUrl" } else { Write-Warn 'register URL missing (activate required)' }
-            if ($hn) { Write-Ok "here.now: $hn" } else { Write-Note 'here.now optional (platform key). Play + register are enough.' }
+            if ($hn) { Write-Ok "here.now: $hn" } else { Write-Warn 'here.now missing - OC-done requires the demo portal/ on here.now (or a reported key-missing blocker).' }
         }
         '4' {
             if (Test-Path -LiteralPath (Join-Path $vault '.git')) { Write-Ok "Vault (local): $vault" } else { Write-Warn "Vault not cloned: $vault" }
@@ -1566,18 +1566,47 @@ function Invoke-HubOc {
     if ([string]::IsNullOrWhiteSpace($cid) -or $cid -notmatch '^oc-') {
         $cid = New-HubOcConsumerId
     }
+    $defaultName = 'My DualRail app'
+    try {
+        $bp = Join-Path $demo 'cfg\branding.json'
+        if (Test-Path -LiteralPath $bp) {
+            $b = Get-Content -LiteralPath $bp -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($b.product_name -and [string]$b.product_name -ne 'MERIT Demo') {
+                $defaultName = [string]$b.product_name
+            }
+        }
+    } catch { }
+    $pname = [string]$env:MERIT_OC_PRODUCT_NAME
+    if ([string]::IsNullOrWhiteSpace($pname)) {
+        try { $pname = [string]$state.ocProductName } catch { $pname = '' }
+    }
+    if ([string]::IsNullOrWhiteSpace($pname)) {
+        if ($env:MERIT_HUB_NO_ELEVATE -eq '1') {
+            $pname = $defaultName
+        } else {
+            $ans = Read-Host "Product name (your DualRail face) [$defaultName]"
+            $pname = if ([string]::IsNullOrWhiteSpace($ans)) { $defaultName } else { $ans.Trim() }
+        }
+    }
     Write-Info "consumer_id: $cid"
+    Write-Info "product:     $pname"
     $runner = Get-OssRunner
     $env:MERIT_VERIFY_QUIET = '1'
-    & $runner.Exe -NoProfile -File $cli 'oc' '--path' $demo '--consumer-id' $cid
+    $ocLines = & $runner.Exe -NoProfile -File $cli 'oc' '--path' $demo '--consumer-id' $cid '--product-name' $pname 6>&1
     if ($LASTEXITCODE -ne 0) {
-        Write-Fail "OC failed (exit $LASTEXITCODE). Activate is required; play-only is not OC."
+        Write-Fail "OC failed (exit $LASTEXITCODE). Activate + here.now portal files are required; play-only is not OC-done."
         return
     }
     $gw = 'https://merit-prod.vercel.app'
     $state.ocConsumerId = $cid
+    $state.ocProductName = $pname
     $state.ocPlayUrl = "$gw/apps/$cid/play"
     $state.ocRegisterUrl = "$gw/store/$cid/register"
+    $state.ocHereNowUrl = "https://$cid.here.now/"
+    $receiptLine = @($ocLines | ForEach-Object { "$_" } | Where-Object { $_ -match 'OC_RECEIPT ' } | Select-Object -Last 1)
+    if ($receiptLine -match 'herenow=(\S+)') { $state.ocHereNowUrl = $Matches[1] }
+    if ($receiptLine -match 'play=(\S+)') { $state.ocPlayUrl = $Matches[1] }
+    if ($receiptLine -match 'register=(\S+)') { $state.ocRegisterUrl = $Matches[1] }
     Save-OssState $state
     Write-HubReceipt 'OC'
 }
@@ -1676,7 +1705,7 @@ function Show-MeritHubHelp {
     Write-Host '  1) Setup laptop     prereqs + MYMERIT* + merit-venv'
     Write-Host '  2) Install OSS      skills pin + merit-demo + quiet smoke   (alias J)'
     Write-Host '  3) Try it           open local play/index.html'
-    Write-Host '  OC) OSS in the Cloud  merit-prod play + required register'
+    Write-Host '  OC) OSS in the Cloud  DualRail play + register + here.now portal'
     Write-Host '  4) Vault            clone private vault (still local)       (alias V)'
     Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC'
     Write-Host '  5) Join MERIT       portal / partners / register links'

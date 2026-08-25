@@ -139,7 +139,7 @@ If `npm install` has not been run, the MERIT wrapper still performs non-visual c
 | **GitHub** | Fork, push, PRs | Optional until you publish source | You |
 | **MERIT package route** (`merit-prod.vercel.app/pkg/meritutils`) | Free workbench/journal widgets | Angle 1 â€” always public | **Nobody** â€” MERIT provider CDN behind gateway |
 | **Vercel** | Live app at `*.vercel.app` | Tier 4 / deploy | You (BYOK) |
-| **here.now** | **Your** marketing site at `{slug}.here.now` | Angle 2 only — **not** OSS Hub **G** / smoke | You (BYOK `HERENOW_API_KEY`) if you publish your own `portal/`. Subscribers and freeware play use **merit-prod**, not here.now. |
+| **here.now** | **Your** marketing site at `{slug}.here.now` | Angle 2 BYOK, **or Hub OC** via merit-prod (laptop never sees a key) | Angle 2: you (`HERENOW_API_KEY`). **OC:** MERIT platform key publishes demo `portal/`; subscribers still join at `merit-prod.vercel.app/store/{id}/register`. |
 | **Supabase** | Persistent journal/AMA + meritsubs data on **your** deploy | Full merit-demo deploy | You (consumer project) |
 | **meritstore tenant** | Checkout under **your** `consumer_id` | Angle 4 â€” operator provision | MERIT platform (after integration cert) |
 | **Square** (or tenant payment provider) | **Payout** from Plus subscriptions to you | After meritstore tenant + onboarding | You via platform tenant config |

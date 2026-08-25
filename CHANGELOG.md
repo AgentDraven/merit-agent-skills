@@ -1,3 +1,11 @@
+## 0.5.16 - 2026-08-24
+
+### Added
+- **OC-done:** `merit.ps1 oc --product-name` resyncs DualRail play from PAR, stamps branding, publishes demo `portal/` files through merit-prod `/api/portal/publish` (platform here.now key). Hub OC prints play + register + here.now. Missing platform key is a hard blocker, not a fake URL.
+
+### Changed
+- Hub pin **`skills-v0.5.16`** / **`vault-v0.5.8`**.
+
 ## 0.5.15 - 2026-08-23
 
 ### Added

@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.0'
+$MERIT_VERSION = '0.5.16'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -35,9 +35,9 @@ Commands:
                            [--profile fullstack-consumer] [--deploy]
                            [--vercel-scope <slug>] [--product-name <name>]
                            [--scaffold-only]  (alias of default platform mode)
-  oc --path <repo> [--consumer-id oc-...]
-                          OSS in the Cloud: publish + required store activate
-                          (optional platform here.now; laptop never needs a key)
+  oc --path <repo> [--consumer-id oc-...] [--product-name <name>]
+                          OSS in the Cloud: DualRail play + required store activate
+                          + demo portal/ on here.now (platform key; laptop never needs one)
   apps publish --path <repo>  Upload play/+cfg/ to merit-prod /apps/<app>/play (create phase 8)
                           [--consumer-id <id>] override launch consumer_id
   apps refresh --path <repo>  Re-activate store + sync scaffold (never touches app_logic/)
@@ -1330,16 +1330,126 @@ function Test-OcConsumerId {
     return $id
 }
 
+function Set-OcCreatorFace {
+    param(
+        [string]$TargetRoot,
+        [string]$ProductName,
+        [string]$PlayUrl,
+        [string]$RegisterUrl,
+        [switch]$SkipScaffold
+    )
+    $name = ([string]$ProductName).Trim()
+    if (-not $name) { throw 'oc: product-name is required so DualRail is this creator face, not a second merit-demo' }
+    $cfgDir = Join-Path $TargetRoot 'cfg'
+    New-Item -ItemType Directory -Force -Path $cfgDir | Out-Null
+    $brandingPath = Join-Path $cfgDir 'branding.json'
+    $branding = $null
+    if (Test-Path -LiteralPath $brandingPath) {
+        try { $branding = Read-JsonFile $brandingPath } catch { $branding = $null }
+    }
+    if (-not $branding) {
+        $branding = [pscustomobject]@{ schema = 'merit.branding.v1'; product_name = $name }
+    } else {
+        $branding.product_name = $name
+    }
+    Write-JsonFile -Path $brandingPath -Object $branding
+    $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList @()
+    if (Test-Path -LiteralPath $launch) {
+        Set-LaunchIniValue -Path $launch -Name 'product_name' -Value $name
+    }
+    if (-not $SkipScaffold) {
+        $pinsProbePath = Join-Path $Root 'cfg/par_pins.free.json'
+        $variant = 'workbench'
+        if (Test-Path -LiteralPath $pinsProbePath) {
+            try {
+                $pinsProbe = Read-JsonFile $pinsProbePath
+                if ($pinsProbe.packages.journal) { $variant = 'workbench-journal' }
+            } catch { }
+        }
+        Invoke-ParScaffold -TargetRoot $TargetRoot -Variant $variant
+    }
+    $portalJsonPath = Join-Path $TargetRoot 'portal/portal.json'
+    if (Test-Path -LiteralPath $portalJsonPath) {
+        $pj = Read-JsonFile $portalJsonPath
+        if (-not $pj.brand) { $pj | Add-Member -NotePropertyName brand -NotePropertyValue ([pscustomobject]@{}) -Force }
+        $pj.brand.name = $name
+        if ($PlayUrl) { $pj.appBaseUrl = $PlayUrl }
+        if ($pj.ctas) {
+            foreach ($cta in @($pj.ctas)) {
+                $label = [string]$cta.label
+                if ($label -match 'play|workbench|open' -and $PlayUrl) { $cta.href = $PlayUrl }
+                elseif ($label -match 'register|join|plus|member' -and $RegisterUrl) { $cta.href = $RegisterUrl }
+            }
+        }
+        if ($pj.providers) {
+            foreach ($p in @($pj.providers)) {
+                $n = [string]$p.name
+                if ($n -match 'workbench|play' -and $PlayUrl) { $p.href = $PlayUrl }
+                elseif ($n -match 'merit.?subs|register|store' -and $RegisterUrl) { $p.href = $RegisterUrl }
+            }
+        }
+        Write-JsonFile -Path $portalJsonPath -Object $pj
+    }
+}
+
+function Get-OcPortalPublishFiles {
+    param([string]$TargetRoot)
+    $portalDir = Join-Path $TargetRoot 'portal'
+    if (-not (Test-Path -LiteralPath $portalDir)) {
+        throw "oc: missing portal/ under $TargetRoot - OC-done publishes the demo portal tree, not stub HTML"
+    }
+    $rootResolved = (Resolve-Path -LiteralPath $portalDir).Path
+    $files = [System.Collections.Generic.List[object]]::new()
+    Get-ChildItem -LiteralPath $portalDir -Recurse -File | ForEach-Object {
+        $rel = $_.FullName.Substring($rootResolved.Length).TrimStart('\', '/').Replace('\', '/')
+        if ($rel -match '(^|/)\.herenow(/|$)' -or $rel -match '(^|/)\.DS_Store$' -or $rel -match '(^|/)\.merit-keep$') { return }
+        if ($rel -notmatch '\.(html?|css|js|mjs|json|svg|txt|md)$') { return }
+        $content = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8
+        if ($null -eq $content) { $content = '' }
+        $bytes = [System.Text.Encoding]::UTF8.GetByteCount($content)
+        if ($bytes -gt 200000) {
+            throw "oc portal: $rel is $bytes bytes (max 200000)"
+        }
+        $files.Add([ordered]@{
+            path = $rel
+            content = $content
+            contentType = (Get-ContentTypeForHereNow -RelPath $rel)
+            bytes = $bytes
+        })
+    }
+    if ($files.Count -lt 1) {
+        throw "oc: no portal/ files under $portalDir"
+    }
+    return $files
+}
+
 function Invoke-Oc {
     param(
         [string]$TargetRoot,
         [string]$ConsumerId,
+        [string]$ProductName = '',
         [string]$Gateway = 'https://merit-prod.vercel.app'
     )
     $cid = Test-OcConsumerId -ConsumerId $ConsumerId
+    $name = ([string]$ProductName).Trim()
+    if (-not $name) {
+        $brandingPath = Join-Path $TargetRoot 'cfg/branding.json'
+        if (Test-Path -LiteralPath $brandingPath) {
+            try {
+                $b = Read-JsonFile $brandingPath
+                if ($b.product_name) { $name = [string]$b.product_name }
+            } catch { }
+        }
+    }
+    if (-not $name -or $name -eq 'MERIT Demo') {
+        $name = "OC $cid"
+    }
+    $probePlay = "$Gateway/apps/$cid/play"
+    $probeReg = "$Gateway/store/$cid/register"
+    Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $probePlay -RegisterUrl $probeReg
     $appUrl = Invoke-AppsPublish -TargetRoot $TargetRoot -ConsumerId $cid -Gateway $Gateway
     $activateUri = "$Gateway/api/meritstore/v1/tenants/$cid/activate"
-    $activateBody = (@{ template = 'free-community'; display_name = $cid } | ConvertTo-Json -Compress)
+    $activateBody = (@{ template = 'free-community'; display_name = $name } | ConvertTo-Json -Compress)
     try {
         $null = Invoke-RestMethod -Uri $activateUri -Method Post -Body $activateBody -ContentType 'application/json' -TimeoutSec 60
     } catch {
@@ -1347,31 +1457,55 @@ function Invoke-Oc {
     }
     $registerUrl = "$Gateway/store/$cid/register"
     Write-Host "Store activated (free-community): $registerUrl"
-    $hereNow = ''
+    Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $appUrl -RegisterUrl $registerUrl -SkipScaffold
+    $portalGet = $null
     try {
-        $portalBody = (@{
-            consumerId = $cid
-            playUrl = $appUrl
-            registerUrl = $registerUrl
-        } | ConvertTo-Json -Compress)
-        $wr = Invoke-WebRequest -Uri "$Gateway/api/portal/publish" -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($portalBody)) -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 90
-        $presp = $wr.Content | ConvertFrom-Json
-        if ($presp.ok -and $presp.siteUrl) {
-            $hereNow = [string]$presp.siteUrl
-            Write-Host "OC here.now (platform key, laptop never sees it): $hereNow"
-        }
+        $portalGet = Invoke-RestMethod -Uri "$Gateway/api/portal/publish" -Method Get -TimeoutSec 30
     } catch {
-        $msg = [string]$_
-        if ($msg -match '503' -or $msg -match 'herenow_not_configured') {
-            Write-Host 'OC here.now: platform key not set (play + register still live).'
-        } else {
-            Write-Host "OC here.now optional skipped: $msg"
-        }
+        throw "OC here.now API missing (GET $Gateway/api/portal/publish failed). Wait for merit-prod deploy. $_"
     }
+    if (-not $portalGet -or -not $portalGet.ok) {
+        throw "OC here.now API missing (GET $Gateway/api/portal/publish not ok)."
+    }
+    if ($portalGet.configured -ne $true) {
+        throw 'OC here.now BLOCKER: platform HERENOW_API_KEY is not set on merit-prod (configured:false). Play + register may be live; this gate does not fake a here.now URL.'
+    }
+    $portalFiles = Get-OcPortalPublishFiles -TargetRoot $TargetRoot
+    $fileJsonParts = New-Object System.Collections.Generic.List[string]
+    foreach ($f in $portalFiles) {
+        $fileJsonParts.Add(
+            ('{"path":' + (ConvertTo-JsonEscapedString $f.path) +
+             ',"content":' + (ConvertTo-JsonEscapedString $f.content) +
+             ',"contentType":' + (ConvertTo-JsonEscapedString $f.contentType) + '}')
+        )
+    }
+    $portalPayload = '{"consumerId":' + (ConvertTo-JsonEscapedString $cid) +
+        ',"productName":' + (ConvertTo-JsonEscapedString $name) +
+        ',"playUrl":' + (ConvertTo-JsonEscapedString $appUrl) +
+        ',"registerUrl":' + (ConvertTo-JsonEscapedString $registerUrl) +
+        ',"files":[' + ($fileJsonParts -join ',') + ']}'
+    $wr = $null
+    try {
+        $wr = Invoke-WebRequest -Uri "$Gateway/api/portal/publish" -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($portalPayload)) -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 120
+    } catch {
+        throw "OC here.now publish failed ($Gateway/api/portal/publish). $_"
+    }
+    $presp = $wr.Content | ConvertFrom-Json
+    if (-not $presp.ok -or -not $presp.siteUrl) {
+        throw "OC here.now publish rejected: $($wr.Content)"
+    }
+    if ($presp.stub -eq $true) {
+        throw 'OC here.now published stub HTML - send portal/ files (index + css/js/legal), not the stub.'
+    }
+    $hereNow = [string]$presp.siteUrl
+    Write-Host "OC here.now (platform key, laptop never sees it): $hereNow"
     Write-Host "OC play:     $appUrl"
     Write-Host "OC register: $registerUrl"
+    Write-Host "OC product:  $name"
+    Write-Output ("OC_RECEIPT play={0} register={1} herenow={2} product={3}" -f $appUrl, $registerUrl, $hereNow, $name)
     return [pscustomobject]@{
         consumerId  = $cid
+        productName = $name
         playUrl     = $appUrl
         registerUrl = $registerUrl
         hereNowUrl  = $hereNow
@@ -1873,7 +2007,9 @@ switch -Regex ($Command) {
             if (-not $cidArg) {
                 $cidArg = 'oc-' + ([guid]::NewGuid().ToString('n').Substring(0, 10))
             }
-            $result = Invoke-Oc -TargetRoot $target -ConsumerId $cidArg
+            $pnameArg = Get-ArgValue -ArgList $Rest -Name '--product-name'
+            if (-not $pnameArg) { $pnameArg = Get-ArgValue -ArgList $Rest -Name '--product_name' }
+            $result = Invoke-Oc -TargetRoot $target -ConsumerId $cidArg -ProductName $pnameArg
             Write-Host "oc OK: $($result.playUrl)"
             exit 0
         } catch {
