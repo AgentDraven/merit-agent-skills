@@ -79,7 +79,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.21",
+  "skillsPin": "skills-v0.5.22",
   "vaultPin": "vault-v0.5.8",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -1627,11 +1627,16 @@ function Invoke-HubOc {
     $state.ocRegisterUrl = "$gw/store/$cid/register"
     $state.ocPortalUrl = "$gw/apps/$cid/play/site"
     $state.ocHereNowUrl = ''
-    $receiptLine = @($ocLines | ForEach-Object { "$_" } | Where-Object { $_ -match 'OC_RECEIPT ' } | Select-Object -Last 1)
-    if ($receiptLine -match 'herenow=(\S+)') { $state.ocHereNowUrl = $Matches[1] }
-    if ($receiptLine -match 'play=(\S+)') { $state.ocPlayUrl = $Matches[1] }
-    if ($receiptLine -match 'register=(\S+)') { $state.ocRegisterUrl = $Matches[1] }
-    if ($receiptLine -match 'portal=(\S+)') { $state.ocPortalUrl = $Matches[1] }
+    # Scalar, not array: -match on an array filters and never fills $Matches.
+    $receiptLine = [string](@($ocLines | ForEach-Object { "$_" } | Where-Object { $_ -match 'OC_RECEIPT ' } | Select-Object -Last 1))
+    if ($receiptLine) {
+        if ($receiptLine -match 'play=(\S+)') { $state.ocPlayUrl = $Matches[1] }
+        if ($receiptLine -match 'register=(\S+)') { $state.ocRegisterUrl = $Matches[1] }
+        if ($receiptLine -match 'portal=(\S+)') { $state.ocPortalUrl = $Matches[1] }
+        if ($receiptLine -match 'herenow=(\S+)') { $state.ocHereNowUrl = $Matches[1] }
+    } else {
+        Write-Warn 'OC receipt line not captured from merit.ps1 - URLs below are the expected shapes, not confirmed output.'
+    }
     Save-OssState $state
     Write-HubReceipt 'OC'
 }

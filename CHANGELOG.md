@@ -1,3 +1,11 @@
+## 0.5.22 - 2026-08-24
+
+### Fixed
+- **OC receipt parse:** read `OC_RECEIPT` as a scalar so `-match` fills `$Matches`. The Hub now records the real play/register/portal URLs and the here.now state (`pending-gateway-deploy` / `blocked-no-platform-key`) instead of silently falling back to expected URL shapes.
+
+### Changed
+- Hub pin **`skills-v0.5.22`**.
+
 ## 0.5.21 - 2026-08-24
 
 ### Fixed
