@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.17'
+$MERIT_VERSION = '0.5.18'
 $Root = $PSScriptRoot
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
@@ -447,7 +447,7 @@ function Resolve-ScaffoldConsumerId {
 }
 
 function Invoke-ParScaffold {
-    param([string]$TargetRoot, [string]$Variant, [string]$Theme = '')
+    param([string]$TargetRoot, [string]$Variant, [string]$Theme = '', [string]$ConsumerId = '')
     $pinsSrc = Join-Path $Root 'cfg/par_pins.free.json'
     $destCfg = Join-Path $TargetRoot 'cfg'
     New-Item -ItemType Directory -Force -Path $destCfg | Out-Null
@@ -481,7 +481,7 @@ function Invoke-ParScaffold {
         $glossTheme = 'gloss-aurora'
         $themeArt = $ux.artifacts.themes.'gloss-aurora'
     }
-    $consumerId = Resolve-ScaffoldConsumerId -TargetRoot $TargetRoot
+    $consumerId = if ($ConsumerId) { ([string]$ConsumerId).Trim().ToLowerInvariant() } else { Resolve-ScaffoldConsumerId -TargetRoot $TargetRoot }
     $registerUrl = "https://merit-prod.vercel.app/store/$consumerId/register"
     $communityRailsUrl = 'https://merit-prod.vercel.app/portal/developers/community-rails/'
     $evidenceBaseUrl = 'https://merit-prod.vercel.app/portal/developers/community-rails/evidence'
@@ -1336,6 +1336,7 @@ function Set-OcCreatorFace {
         [string]$ProductName,
         [string]$PlayUrl,
         [string]$RegisterUrl,
+        [string]$ConsumerId = '',
         [switch]$SkipScaffold
     )
     $name = ([string]$ProductName).Trim()
@@ -1366,9 +1367,7 @@ function Set-OcCreatorFace {
                 if ($pinsProbe.packages.journal) { $variant = 'workbench-journal' }
             } catch { }
         }
-        Invoke-ParScaffold -TargetRoot $TargetRoot -Variant $variant
-    }
-    $portalJsonPath = Join-Path $TargetRoot 'portal/portal.json'
+        Invoke-ParScaffold -TargetRoot $TargetRoot -Variant $variant -ConsumerId $ConsumerId
     if (Test-Path -LiteralPath $portalJsonPath) {
         $pj = Read-JsonFile $portalJsonPath
         if (-not $pj.brand) { $pj | Add-Member -NotePropertyName brand -NotePropertyValue ([pscustomobject]@{}) -Force }
@@ -1446,7 +1445,7 @@ function Invoke-Oc {
     }
     $probePlay = "$Gateway/apps/$cid/play"
     $probeReg = "$Gateway/store/$cid/register"
-    Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $probePlay -RegisterUrl $probeReg
+    Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $probePlay -RegisterUrl $probeReg -ConsumerId $cid
     $appUrl = Invoke-AppsPublish -TargetRoot $TargetRoot -ConsumerId $cid -Gateway $Gateway
     $activateUri = "$Gateway/api/meritstore/v1/tenants/$cid/activate"
     $activateBody = (@{ template = 'free-community'; display_name = $name } | ConvertTo-Json -Compress)

@@ -1,3 +1,8 @@
+## 0.5.18 - 2026-08-24
+
+### Fixed
+- **OC DualRail register:** PAR scaffold now takes the OC `consumer_id`, so Register free goes to `/store/oc-…/register` instead of showcase `merit-demo` (which redirects to sku-commerce).
+
 ## 0.5.17 - 2026-08-24
 
 ### Fixed
