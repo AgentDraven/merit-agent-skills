@@ -79,7 +79,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.22",
+  "skillsPin": "skills-v0.5.23",
   "vaultPin": "vault-v0.5.8",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -1618,6 +1618,9 @@ function Invoke-HubOc {
     $ocLines = & $runner.Exe -NoProfile -File $cli 'oc' '--path' $demo '--consumer-id' $cid '--product-name' $pname 6>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Fail "OC failed (exit $LASTEXITCODE). Play publish, store activate, and the marketing portal are all required; play-only is not OC-done."
+        foreach ($line in @($ocLines | ForEach-Object { "$_" } | Select-Object -Last 8)) {
+            if ($line.Trim()) { Write-Note "  $line" }
+        }
         return
     }
     $gw = 'https://merit-prod.vercel.app'

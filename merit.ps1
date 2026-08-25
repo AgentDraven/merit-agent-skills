@@ -1288,7 +1288,7 @@ function Invoke-AppsPublish {
         Write-Host 'apps publish NOTE: no local usage operator phrase (optional - the usage gate stays unset).'
     }
     $kb = [math]::Max(1, [math]::Round($totalBytes / 1KB, 1))
-    Write-Host "Packed $($files.Count) file(s) (~$kb KB). Uploading one file at a time (avoids Vercel 4.5MB body limit)..."
+    Write-Host "Packed $($files.Count) file(s) (~$kb KB). Uploading in batches..."
 
     $appUrl = Send-AppFileList -Files $files -ConsumerId $ConsumerId -Gateway $Gateway -UsageGateHash $usageGateHash -Label 'apps publish'
     if (-not $appUrl) {
@@ -1306,28 +1306,61 @@ function Send-AppFileList {
         [string]$UsageGateHash = '',
         [string]$Label = 'apps publish'
     )
+    # Batch per request: the gateway counts requests against the free-community publish
+    # quota, and one-file-per-request burns it fast. Chunks stay well under the Vercel
+    # ~4.5MB body ceiling and the gateway's 40-file / 600KB payload limits.
+    $maxFilesPerRequest = 15
+    $maxBytesPerRequest = 400000
+    $chunks = [System.Collections.Generic.List[object]]::new()
+    $current = [System.Collections.Generic.List[object]]::new()
+    $currentBytes = 0
+    foreach ($file in $Files) {
+        if ($current.Count -ge $maxFilesPerRequest -or ($current.Count -gt 0 -and ($currentBytes + $file.bytes) -gt $maxBytesPerRequest)) {
+            $chunks.Add($current)
+            $current = [System.Collections.Generic.List[object]]::new()
+            $currentBytes = 0
+        }
+        $current.Add($file)
+        $currentBytes += $file.bytes
+    }
+    if ($current.Count -gt 0) { $chunks.Add($current) }
+
     # Invoke-WebRequest: works on Windows PowerShell 5.1 without System.Net.Http assembly load.
     $appUrl = $null
     $n = 0
-    foreach ($file in $Files) {
+    foreach ($chunk in $chunks) {
         $n++
-        Write-Host "  [$n/$($Files.Count)] $($file.path) ($($file.bytes) bytes)..."
+        $names = (@($chunk | ForEach-Object { $_.path }) -join ', ')
+        if ($names.Length -gt 90) { $names = $names.Substring(0, 90) + '...' }
+        Write-Host "  [$n/$($chunks.Count)] $($chunk.Count) file(s): $names"
+        $parts = New-Object System.Collections.Generic.List[string]
+        foreach ($file in $chunk) {
+            $parts.Add(
+                ('{"path":' + (ConvertTo-JsonEscapedString $file.path) +
+                 ',"content":' + (ConvertTo-JsonEscapedString $file.content) +
+                 ',"contentType":' + (ConvertTo-JsonEscapedString $file.contentType) + '}')
+            )
+        }
         $payload = '{"consumerId":' + (ConvertTo-JsonEscapedString $ConsumerId)
         if ($UsageGateHash -and $n -eq 1) {
             $payload += ',"usage_gate_hash":' + (ConvertTo-JsonEscapedString $UsageGateHash)
         }
-        $payload += ',"files":[{"path":' + (ConvertTo-JsonEscapedString $file.path) +
-            ',"content":' + (ConvertTo-JsonEscapedString $file.content) +
-            ',"contentType":' + (ConvertTo-JsonEscapedString $file.contentType) + '}]}'
+        $payload += ',"files":[' + ($parts -join ',') + ']}'
         $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
         try {
-            $wr = Invoke-WebRequest -Uri "$Gateway/api/apps/publish" -Method Post -Body $bodyBytes -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 60
+            $wr = Invoke-WebRequest -Uri "$Gateway/api/apps/publish" -Method Post -Body $bodyBytes -ContentType 'application/json; charset=utf-8' -UseBasicParsing -TimeoutSec 90
             $resp = $wr.Content | ConvertFrom-Json
         } catch {
-            throw "$Label failed on $($file.path) ($Gateway/api/apps/publish). Re-run is safe + idempotent. $_"
+            $detail = "$_"
+            if ($detail -match 'rate_limited') {
+                $wait = 300
+                if ($detail -match '"retry_after_sec"\s*:\s*(\d+)') { $wait = [int]$Matches[1] }
+                throw "$Label hit the free-community publish quota. Wait about $wait seconds and re-run (publishing is idempotent)."
+            }
+            throw "$Label failed on batch $n ($Gateway/api/apps/publish). Re-run is safe + idempotent. $detail"
         }
         if (-not $resp.ok -or -not $resp.appUrl) {
-            throw "$Label rejected for $($file.path): $($wr.Content)"
+            throw "$Label rejected on batch $n : $($wr.Content)"
         }
         $appUrl = [string]$resp.appUrl
     }

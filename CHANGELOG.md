@@ -1,3 +1,12 @@
+## 0.5.23 - 2026-08-24
+
+### Fixed
+- **OC no longer trips the free-community quota:** `apps publish` batches files per request instead of one request per file (21 requests -> 2 for the demo). A second OC run in the same hour used to fail with `rate_limited`; the quota message is now plain English with the retry window.
+- **Hub shows why OC failed:** the last lines of `merit.ps1 oc` are printed instead of only `exit 1`.
+
+### Changed
+- Hub pin **`skills-v0.5.23`**.
+
 ## 0.5.22 - 2026-08-24
 
 ### Fixed
