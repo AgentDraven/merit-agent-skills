@@ -1,3 +1,11 @@
+## 0.5.28 - 2026-08-26
+
+### Fixed
+- **Hub on Windows PowerShell 5.1:** `.\Merit-Hub.ps1` no longer ParserError on UTF-8 punctuation (OC DualRail em-dash). Source is ASCII-only so 5.1 can parse. If 5.1 starts the file, it prints the `pwsh -NoProfile -ExecutionPolicy Bypass -File ...` command and re-launches when pwsh is found (menu 1 still installs pwsh).
+
+### Changed
+- Hub pin **`skills-v0.5.28`**.
+
 ## 0.5.27 - 2026-08-25
 
 ### Added

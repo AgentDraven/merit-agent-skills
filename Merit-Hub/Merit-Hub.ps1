@@ -25,7 +25,7 @@
     -InstallSkills <host>  copy skills/ to Cursor, Codex, Hermes, ... (needs OSS clone; menu I)
     -Prereqs                 install/check git, gh, pwsh, MYMERITTOOLS Python venv
 
-  Recommended runner: PowerShell 7+ (pwsh). Windows PowerShell 5.1 can bootstrap the hub once.
+  Recommended runner: PowerShell 7+ (pwsh). If Windows PowerShell 5.1 starts this file, it prints the pwsh command and re-launches when pwsh is found (menu 1 can install pwsh).
 
   Env (mirrors BootStrap):
     MYMERITAPP    OSS bench (default C:\MyMeritApp)
@@ -66,6 +66,7 @@ $ErrorActionPreference = 'Stop'
 $Script:HubScriptPath = $PSCommandPath
 if (-not $Script:HubScriptPath) { $Script:HubScriptPath = $MyInvocation.MyCommand.Path }
 $Script:HubRoot = Split-Path -Parent $Script:HubScriptPath
+$Script:HubBoundParameters = [hashtable]$PSBoundParameters
 $Script:BackupRoot = Join-Path $Script:HubRoot 'backups'
 $Script:HistoryLog = Join-Path $Script:BackupRoot 'Merit-Hub-history.log'
 $Script:TranscriptStarted = $false
@@ -83,7 +84,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.27",
+  "skillsPin": "skills-v0.5.28",
   "vaultPin": "vault-v0.5.8",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -203,8 +204,9 @@ function Get-HubRelaunchArgumentList {
     $list.Add('Bypass')
     $list.Add('-File')
     $list.Add($Script:HubScriptPath)
-    foreach ($key in @($PSBoundParameters.Keys)) {
-        $val = $PSBoundParameters[$key]
+    $bound = if ($Script:HubBoundParameters) { $Script:HubBoundParameters } else { $PSBoundParameters }
+    foreach ($key in @($bound.Keys)) {
+        $val = $bound[$key]
         if ($val -is [switch]) {
             if ($val.IsPresent) { $list.Add("-$key") }
             continue
@@ -285,6 +287,35 @@ function Ensure-HubElevated {
     }
     Wait-HubWindow -Reason 'Elevated Merit-Hub is running in the other window. Press Enter to close this one.'
     exit 0
+}
+
+function Test-HubIsPwsh7 {
+    return ($PSVersionTable.PSVersion.Major -ge 7)
+}
+
+function Ensure-HubPwshHost {
+    if (Test-HubIsPwsh7) { return }
+    if ($env:MERIT_HUB_NO_PWSH_RELAUNCH -eq '1') { return }
+
+    $hint = Get-HubRunHint
+    Write-Header 'Use pwsh (PowerShell 7+)'
+    Write-Note 'Windows PowerShell 5.1 started this file. Daily use is pwsh -- this host is only a bootstrap.'
+    Write-Host ''
+    Write-Host "  $hint" -ForegroundColor Cyan
+    Write-Host ''
+
+    $pwshExe = Resolve-MeritPwshExe
+    if ($pwshExe) {
+        Write-Ok "pwsh found: $pwshExe"
+        Write-Note 'Re-launching with that command (same arguments).'
+        $argList = Get-HubRelaunchArgumentList
+        & $pwshExe @argList
+        exit $LASTEXITCODE
+    }
+
+    Write-Warn 'pwsh is not installed (or not on PATH).'
+    Show-PwshInstallGuide
+    Write-Note 'Continuing in Windows PowerShell 5.1 so menu 1 can install pwsh. After that, run the command above.'
 }
 
 function Test-HubProcessBenchMode {
@@ -713,7 +744,7 @@ function Invoke-RogueFolderReview {
     $cands = @(Get-HubRogueFolderCandidates)
     Write-Header 'Leftover folder scan'
     if ($cands.Count -eq 0) {
-        Write-Ok 'No catalog leftovers (HumanBala, DravenCode.OLD, Code, *Merit*, …)'
+        Write-Ok 'No catalog leftovers (HumanBala, DravenCode.OLD, Code, *Merit*, ...)'
         return
     }
     Write-Note 'These are NOT deleted automatically. Known leftover names under C:\, each C:\Users\<name>, and ~/dev.'
@@ -851,7 +882,7 @@ function Invoke-MeritCleanup {
     Write-Host ''
     Write-Ok "Cleanup finished ($ModeName)."
     Write-Info "Backup: $BackupDir"
-    Write-Info "Cold start: $(Get-HubRunHint)  →  J Jumpstart OSS"
+    Write-Info "Cold start: $(Get-HubRunHint)  ->  J Jumpstart OSS"
 }
 
 function Invoke-Mode {
@@ -902,8 +933,6 @@ function Resolve-MeritPwshExe {
         )) {
         if ($candidate -and (Test-Path -LiteralPath $candidate)) { return $candidate }
     }
-    $cmd = Get-Command pwsh -ErrorAction SilentlyContinue
-    if ($cmd -and $cmd.Source -and (Test-Path -LiteralPath $cmd.Source)) { return $cmd.Source }
     if ($Script:HubOnWindows) {
         foreach ($c in @(
                 (Join-Path $env:ProgramFiles 'PowerShell\7\pwsh.exe'),
@@ -912,6 +941,11 @@ function Resolve-MeritPwshExe {
             if ($c -and (Test-Path -LiteralPath $c)) { return $c }
         }
     }
+    $cmd = Get-Command pwsh -ErrorAction SilentlyContinue
+    if ($cmd -and $cmd.Source -and (Test-Path -LiteralPath $cmd.Source)) {
+        return $cmd.Source
+    }
+    if ($cmd) { return 'pwsh' }
     return $null
 }
 
@@ -1320,7 +1354,7 @@ function Ensure-MeritHubEnvAtStart {
     Write-Header 'MYMERIT* environment'
     Write-HubEnvScopes
     if (Test-HubProcessBenchMode) {
-        Write-Note 'MERIT_HUB_NO_PERSIST_ENV=1 — using Process MYMERIT* only (multi-creator bench). User env not written.'
+        Write-Note 'MERIT_HUB_NO_PERSIST_ENV=1 -- using Process MYMERIT* only (multi-creator bench). User env not written.'
         Write-Ok "MYMERITTOOLS resolved = $(Get-MyMeritToolsRoot)"
         Write-Ok "MYMERITAPP    resolved = $(Get-MyMeritAppRoot)"
         return
@@ -1503,7 +1537,7 @@ function Write-HubReceipt {
                 } catch { $portalLive = $false }
             }
             if ($playUrl) {
-                if ($playLive) { Write-Ok "play      : $playUrl" } else { Write-Fail "play      : $playUrl (not DualRail yet — unpublished shell)"; $Script:HubStepFailed = $true }
+                if ($playLive) { Write-Ok "play      : $playUrl" } else { Write-Fail "play      : $playUrl (not DualRail yet -- unpublished shell)"; $Script:HubStepFailed = $true }
             } else { Write-Warn 'play URL missing' }
             if ($regUrl) { Write-Ok "register  : $regUrl" } else { Write-Warn 'register URL missing (activate required)' }
             if ($portalUrl) {
@@ -1836,6 +1870,7 @@ function Show-InteractiveMenu {
 }
 
 # --- main ---
+Ensure-HubPwshHost
 if ($Help) {
     Show-MeritHubHelp
     return

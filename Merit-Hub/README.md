@@ -4,7 +4,7 @@
 
 ## Required: run the full command
 
-After you save the file, **you must start it with this entire line**. Do **not** double-click `Merit-Hub.ps1`, and do **not** type `.\Merit-Hub.ps1` in an already-open PowerShell window.
+After you save the file, **start it with this entire line**. Do **not** double-click `Merit-Hub.ps1`. If you type `.\Merit-Hub.ps1` in Windows PowerShell 5.1, the script prints this command and re-launches `pwsh` when it is installed (no ParserError).
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
@@ -16,7 +16,7 @@ Browser / SmartScreen **“this file can harm your computer”** is expected —
 
 ## PowerShell 7 (pwsh) — required for daily use
 
-Merit-Hub is written for **PowerShell 7+** (`pwsh`). You can **start once** with Windows PowerShell 5.1 (`powershell -NoProfile -ExecutionPolicy Bypass -File …`) to run menu **1** and install pwsh.
+Merit-Hub is written for **PowerShell 7+** (`pwsh`). Windows PowerShell 5.1 can start the file: it prints the `pwsh` command and re-launches when pwsh is present. If pwsh is missing, stay in 5.1 for menu **1** to install it.
 
 | Platform | Install |
 |----------|---------|
