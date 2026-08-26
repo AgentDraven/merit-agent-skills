@@ -1,3 +1,12 @@
+## 0.5.29 - 2026-08-26
+
+### Added
+- **Hub 5 R / RC:** clone catalog consumer or provider repos to `~/dev/<GitHub user>/<folder>` (first consumer: m4fi). RC is that repo's production host (Vercel), not OC DualRail.
+
+### Changed
+- **Hub map:** `1 2 3->OC · 4 V->VC · 5 R->RC · 6 Join`. Legend on every run (local letter vs C = hosted). Hub **4** keeps an existing working vault clone (does not detach to the cold-start pin). Join is now **6**.
+- Hub pin **`skills-v0.5.29`**. Cold-start vault pin **`vault-v0.5.14`**.
+
 ## 0.5.28 - 2026-08-26
 
 ### Fixed

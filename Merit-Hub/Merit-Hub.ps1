@@ -20,8 +20,12 @@
     -TryIt                 open local merit-demo play
     -Oc                    OSS in the Cloud (publish + required activate)
     -NewOc                 with -Oc: mint a new oc-* id (do not reuse oss-bench.json)
-    -Vc                    Venture Capable receipt after local vault
-    -JoinMerit             portal / partners / register links
+    -Vc                    Venture Capable (operator grade after local V; not hosted vault)
+    -R                     Catalog repo clone (local). Role = consumer|provider
+    -Rc                    That catalog repo's production host (usually Vercel; not OC)
+    -Role consumer|provider  with -R / -Rc
+    -CatalogProject <id>   catalog id (e.g. m4fi). Default consumer pick: m4fi
+    -JoinMerit             portal / partners / register links (Hub 6)
     -InstallSkills <host>  copy skills/ to Cursor, Codex, Hermes, ... (needs OSS clone; menu I)
     -Prereqs                 install/check git, gh, pwsh, MYMERITTOOLS Python venv
 
@@ -54,6 +58,11 @@ param(
     [switch]$Oc,
     [switch]$NewOc,
     [switch]$Vc,
+    [switch]$R,
+    [switch]$Rc,
+    [ValidateSet('consumer', 'provider')]
+    [string]$Role = '',
+    [string]$CatalogProject = '',
     [switch]$JoinMerit,
     [switch]$Force,
     [Alias('?')]
@@ -84,8 +93,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.28",
-  "vaultPin": "vault-v0.5.8",
+  "skillsPin": "skills-v0.5.29",
+  "vaultPin": "vault-v0.5.14",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
@@ -1432,6 +1441,14 @@ function Invoke-GitClonePin {
     return $true
 }
 
+function Write-HubLegend {
+    Write-Host ''
+    Write-Host '  LEGEND  local letter = clone on this laptop; C suffix = that artifact hosted' -ForegroundColor White
+    Write-Host '          OC  OSS demo on merit-prod (freeware DualRail) - not a product repo'
+    Write-Host '          VC  operator/tenant grade after V (BootStrap / gates) - vault stays git+local, not merit-prod'
+    Write-Host '          RC  this catalog repo on ITS host (usually Vercel) - not OC'
+}
+
 function Write-HubMap {
     param([string]$Here = '')
     $mark = {
@@ -1439,6 +1456,7 @@ function Write-HubMap {
         if ($Here -and $Step -eq $Here) { return "* $Text" }
         return "  $Text"
     }
+    Write-HubLegend
     Write-Host ''
     Write-Host '  MAP (always)   * = you are here' -ForegroundColor White
     Write-Host ('  ' + (& $mark '1' '1 Setup laptop'))
@@ -1447,8 +1465,9 @@ function Write-HubMap {
     Write-Host ('  ' + (& $mark '2' '2 Install OSS  (J)'))
     Write-Host '         |'
     Write-Host ('         +--> ' + (& $mark '3' '3 Try it') + ' --> ' + (& $mark 'OC' 'OC  OSS in the Cloud'))
-    Write-Host ('         +--> ' + (& $mark '4' '4 Vault (V, still local)') + ' --> ' + (& $mark 'VC' 'VC  Venture Capable'))
-    Write-Host ('         +--> ' + (& $mark '5' '5 Join MERIT'))
+    Write-Host ('         +--> ' + (& $mark '4' '4 V (local)') + ' --> ' + (& $mark 'VC' 'VC  Venture Capable'))
+    Write-Host ('         +--> ' + (& $mark '5' '5 R (local, role C|P)') + ' --> ' + (& $mark 'RC' 'RC  repo in the Cloud'))
+    Write-Host ('         +--> ' + (& $mark '6' '6 Join MERIT'))
     Write-Host '         +--> 0 Stop'
 }
 
@@ -1459,9 +1478,12 @@ function Write-HubDrillIn {
         '2' { Write-Note 'Drill-in: clone skills pin + merit-demo; quiet smoke. Old D+G live here. Not cloud.' }
         '3' { Write-Note 'Drill-in: open local merit-demo\play\index.html. Still not hosted.' }
         'OC' { Write-Note 'Drill-in: publish play+cfg + portal/ marketing site to merit-prod; store activate MUST succeed. here.now is a platform-key upgrade (no laptop key).' }
-        '4' { Write-Note 'Drill-in: clone private vault into ~/dev. Still local. Not VC yet.' }
-        'VC' { Write-Note 'Drill-in: operator/tenant grade vs freeware OC. Vault BootStrap on this laptop.' }
-        '5' { Write-Note 'Drill-in: links only - portal, partners, register. Affiliate is ?affiliate= on register, not a here.now slug.' }
+        '4' { Write-Note 'Drill-in: clone private vault into ~/dev. Still local. Existing working clone is kept (no detach to Hub pin).' }
+        'VC' { Write-Note 'Drill-in: operator/tenant grade vs freeware OC. Vault BootStrap on this laptop. Not a hosted vault.' }
+        '5' { Write-Note 'Drill-in: clone a catalog consumer or provider repo to ~/dev/<GitHub user>/<folder>. Requires 4. Not OC.' }
+        'R' { Write-Note 'Drill-in: same as 5 - local catalog clone. Pick role consumer|provider. First consumer: m4fi.' }
+        'RC' { Write-Note 'Drill-in: deploy THAT repo to its production host (merit.ps1 deploy vercel). Not merit-prod DualRail (that is OC).' }
+        '6' { Write-Note 'Drill-in: links only - portal, partners, register. Affiliate is ?affiliate= on register, not a here.now slug.' }
         default { }
     }
 }
@@ -1554,13 +1576,22 @@ function Write-HubReceipt {
         }
         '4' {
             if (Test-Path -LiteralPath (Join-Path $vault '.git')) { Write-Ok "Vault (local): $vault" } else { Write-Warn "Vault not cloned: $vault" }
-            Write-Note 'Still local. VC is the operator/cloud grade after this clone.'
+            Write-Note 'Still local. VC is operator grade (BootStrap/gates), not a hosted vault.'
         }
         'VC' {
             if (Test-Path -LiteralPath (Join-Path $vault '.git')) { Write-Ok "Vault local: $vault" } else { Write-Warn 'Run 4 first (clone vault).' }
-            Write-Note 'OC = freeware Community Member on merit-prod. VC = operator/tenant grade (vault BootStrap, operator gate).'
+            Write-Note 'OC = freeware Community Member on merit-prod. VC = operator/tenant grade. Vault is not published to merit-prod.'
         }
         '5' {
+            Write-Note 'R = local catalog clone under ~/dev/<user>/<folder>. Run 4 first. Pick role consumer or provider.'
+        }
+        'R' {
+            Write-Note 'R = local catalog clone. Next: RC for that repo host, or mXout from the clone.'
+        }
+        'RC' {
+            Write-Note 'RC = this catalog repo on its Vercel/host. Not OC (OSS demo on merit-prod).'
+        }
+        '6' {
             Write-Info 'https://merit-prod.vercel.app/portal/'
             Write-Info 'https://merit-prod.vercel.app/portal/partners.html'
             Write-Info 'After OC: https://merit-prod.vercel.app/store/{your-oc-id}/register'
@@ -1719,11 +1750,250 @@ function Invoke-HubOc {
     Write-HubReceipt 'OC'
 }
 
-function Invoke-HubJoinMerit {
-    Write-Header '5 Join MERIT'
+function Get-HubCatalogRows {
+    $vault = Get-HubVaultDest
+    $cfgPath = Join-Path $vault 'cfg\merit-config.json'
+    if (-not (Test-Path -LiteralPath $cfgPath)) {
+        Write-Fail "Vault catalog missing: $cfgPath"
+        Write-Note 'Run 4 first so the private vault is on this laptop.'
+        return @()
+    }
+    $cfg = Get-Content -LiteralPath $cfgPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $projects = $cfg.catalog.projects
+    $acronyms = $cfg.catalog.repo_acronyms.projects
+    $rows = @()
+    foreach ($prop in $projects.PSObject.Properties) {
+        $id = [string]$prop.Name
+        $row = $prop.Value
+        $status = ''
+        if ($row.PSObject.Properties['lifecycle_status']) { $status = [string]$row.lifecycle_status }
+        if ($status -eq 'archived') { continue }
+        $explicitRole = ''
+        if ($row.PSObject.Properties['role']) { $explicitRole = [string]$row.role }
+        if ($explicitRole -eq 'pristine_mirror') { continue }
+        $profile = ''
+        if ($row.PSObject.Properties['conformance_profile']) { $profile = [string]$row.conformance_profile }
+        $hubRole = ''
+        if ($profile -match 'provider') { $hubRole = 'provider' }
+        elseif ($profile -match 'consumer') { $hubRole = 'consumer' }
+        else { continue }
+        $folder = $id
+        if ($row.PSObject.Properties['folder'] -and $row.folder) { $folder = [string]$row.folder }
+        $github = ''
+        $acro = $acronyms.PSObject.Properties[$id]
+        if ($acro -and $acro.Value.github) {
+            $github = [string]$acro.Value.github
+        }
+        if ([string]::IsNullOrWhiteSpace($github)) {
+            if ($id -in @('merit-demo', 'merit-test')) {
+                $github = "Mr-PI-Bala/$folder"
+            }
+            else {
+                $github = "AgentDraven/$folder"
+            }
+        }
+        $owner, $repo = $github.Split('/', 2)
+        if ([string]::IsNullOrWhiteSpace($owner) -or [string]::IsNullOrWhiteSpace($repo)) { continue }
+        $dest = Join-Path (Join-Path (Get-DevRoot) $owner) $folder
+        $rows += [pscustomobject]@{
+            Id       = $id
+            Role     = $hubRole
+            Folder   = $folder
+            Owner    = $owner
+            Repo     = $repo
+            Github   = $github
+            Dest     = $dest
+            Cloned   = (Test-Path -LiteralPath (Join-Path $dest '.git'))
+        }
+    }
+    return $rows
+}
+
+function Show-HubCatalogPicker {
+    param(
+        [string]$WantRole,
+        [object[]]$Rows
+    )
+    $i = 1
+    foreach ($row in $Rows) {
+        $mark = if ($row.Cloned) { 'cloned' } else { 'missing' }
+        Write-Host ("    {0,2}. {1,-16} {2,-10} {3,-28} [{4}]" -f $i, $row.Id, $row.Role, $row.Github, $mark)
+        $i++
+    }
+    if ($WantRole -eq 'consumer') {
+        Write-Note 'First consumer on this laptop: m4fi (type m4fi or its number).'
+    }
+}
+
+function Invoke-HubCloneCatalogRow {
+    param($Row)
+    if (-not $Row) { return $false }
+    if ($Row.Cloned) {
+        Write-Ok ("Already cloned: {0}" -f $Row.Dest)
+        return $true
+    }
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Fail 'git not on PATH - run 1 first.'
+        return $false
+    }
+    $parent = Split-Path -Parent $Row.Dest
+    New-Item -ItemType Directory -Force -Path $parent | Out-Null
+    if ((Test-Path -LiteralPath $Row.Dest) -and -not (Test-Path -LiteralPath (Join-Path $Row.Dest '.git'))) {
+        $items = @(Get-ChildItem -LiteralPath $Row.Dest -Force -ErrorAction SilentlyContinue)
+        if ($items.Count -gt 0) {
+            Write-Fail ("{0} exists but is not a git clone - move aside and retry." -f $Row.Dest)
+            return $false
+        }
+        Write-Note ("Empty placeholder OK: {0}" -f $Row.Dest)
+    }
+    $url = "https://github.com/$($Row.Github).git"
+    Write-Info "Cloning $url -> $($Row.Dest)"
+    & git clone $url $Row.Dest
+    if ($LASTEXITCODE -ne 0) {
+        Write-Fail "git clone failed (exit $LASTEXITCODE). Sign in as $($Row.Owner) (GCM) and retry."
+        return $false
+    }
+    Write-Ok ("Cloned {0} -> {1}" -f $Row.Id, $Row.Dest)
+    Write-Note "Day-to-day: cd $($Row.Dest) then .\\scripts\\merit.ps1 mXout"
+    return $true
+}
+
+function Invoke-HubR {
+    Write-Header '5 R  catalog repo (local)'
     Write-HubMap -Here '5'
     Write-HubDrillIn '5'
-    Write-HubReceipt '5'
+    $vault = Get-HubVaultDest
+    if (-not (Test-Path -LiteralPath (Join-Path $vault '.git'))) {
+        Write-Fail 'Vault not cloned yet. Run 4 first (still local).'
+        Write-HubReceipt '5'
+        return
+    }
+    $rows = @(Get-HubCatalogRows)
+    if ($rows.Count -eq 0) { Write-HubReceipt '5'; return }
+
+    $wantRole = $Role
+    if ([string]::IsNullOrWhiteSpace($wantRole)) {
+        if ($Force -and $CatalogProject) {
+            $hit = $rows | Where-Object { $_.Id -eq $CatalogProject } | Select-Object -First 1
+            if ($hit) { $wantRole = [string]$hit.Role }
+        }
+        if ([string]::IsNullOrWhiteSpace($wantRole) -and -not $Force) {
+            $ans = Read-Host 'Role [C]onsumer / [P]rovider (default C)'
+            if ($ans -match '^[Pp]') { $wantRole = 'provider' } else { $wantRole = 'consumer' }
+        }
+        if ([string]::IsNullOrWhiteSpace($wantRole)) { $wantRole = 'consumer' }
+    }
+    $filtered = @($rows | Where-Object { $_.Role -eq $wantRole })
+    if ($filtered.Count -eq 0) {
+        Write-Fail "No $wantRole catalog repos found."
+        Write-HubReceipt '5'
+        return
+    }
+    Write-Info "Role: $wantRole"
+    Show-HubCatalogPicker -WantRole $wantRole -Rows $filtered
+
+    $pick = $CatalogProject
+    if ([string]::IsNullOrWhiteSpace($pick) -and -not $Force) {
+        $pick = Read-Host 'Project id or number (consumer default: m4fi)'
+    }
+    if ([string]::IsNullOrWhiteSpace($pick) -and $wantRole -eq 'consumer') { $pick = 'm4fi' }
+    $row = $null
+    if ($pick -match '^\d+$') {
+        $idx = [int]$pick
+        if ($idx -ge 1 -and $idx -le $filtered.Count) { $row = $filtered[$idx - 1] }
+    }
+    else {
+        $row = $filtered | Where-Object { $_.Id -eq $pick } | Select-Object -First 1
+    }
+    if (-not $row) {
+        Write-Fail "Unknown catalog pick: $pick"
+        Write-HubReceipt '5'
+        return
+    }
+    $ok = Invoke-HubCloneCatalogRow -Row $row
+    $script:HubLastCatalogRow = $row
+    Write-HubReceipt 'R'
+    if ($ok) {
+        Write-Ok ("R local: {0}" -f $row.Dest)
+        if (-not $Force) {
+            $next = Read-Host 'Run RC (deploy this repo to its host) now? [y/N]'
+            if ($next -match '^[Yy]') { Invoke-HubRc }
+        }
+    }
+}
+
+function Invoke-HubRc {
+    Write-Header 'RC  catalog repo in the Cloud'
+    Write-HubMap -Here 'RC'
+    Write-HubDrillIn 'RC'
+    $vault = Get-HubVaultDest
+    if (-not (Test-Path -LiteralPath (Join-Path $vault '.git'))) {
+        Write-Fail 'Vault not cloned yet. Run 4 then 5 R first.'
+        Write-HubReceipt 'RC'
+        return
+    }
+    $row = $null
+    if ($script:HubLastCatalogRow) { $row = $script:HubLastCatalogRow }
+    $rows = @(Get-HubCatalogRows)
+    $pick = $CatalogProject
+    if (-not $row -and $pick) {
+        $row = $rows | Where-Object { $_.Id -eq $pick } | Select-Object -First 1
+    }
+    if (-not $row -and -not $Force) {
+        $wantRole = $Role
+        if ([string]::IsNullOrWhiteSpace($wantRole)) { $wantRole = 'consumer' }
+        $filtered = @($rows | Where-Object { $_.Role -eq $wantRole -and $_.Cloned })
+        if ($filtered.Count -eq 0) {
+            Write-Fail "No cloned $wantRole repos. Run 5 R first."
+            Write-HubReceipt 'RC'
+            return
+        }
+        Show-HubCatalogPicker -WantRole $wantRole -Rows $filtered
+        $ans = Read-Host 'Project id or number to deploy'
+        if ($ans -match '^\d+$') {
+            $idx = [int]$ans
+            if ($idx -ge 1 -and $idx -le $filtered.Count) { $row = $filtered[$idx - 1] }
+        }
+        else {
+            $row = $filtered | Where-Object { $_.Id -eq $ans } | Select-Object -First 1
+        }
+    }
+    if (-not $row) {
+        Write-Fail 'RC needs a catalog project. Pass -CatalogProject m4fi or run 5 R first.'
+        Write-HubReceipt 'RC'
+        return
+    }
+    if (-not $row.Cloned) {
+        Write-Fail ("Not cloned yet: {0}. Run 5 R first." -f $row.Dest)
+        Write-HubReceipt 'RC'
+        return
+    }
+    Write-Ok ("R local: {0}" -f $row.Dest)
+    Write-Note 'RC = this repo on its host (Vercel). OC is the OSS demo on merit-prod - different product.'
+    $merit = Join-Path $vault 'scripts\merit.ps1'
+    Write-Info "From $($row.Dest):"
+    Write-Info "  & `"$merit`" deploy vercel -Project $($row.Id)"
+    Write-HubReceipt 'RC'
+    if ($Force) { return }
+    $go = Read-Host "Run deploy vercel -Project $($row.Id) now? [y/N]"
+    if ($go -notmatch '^[Yy]') {
+        Write-Note 'Skipped deploy. Repo is local; RC when you are ready.'
+        return
+    }
+    Push-Location $row.Dest
+    try {
+        & $merit deploy vercel -Project $row.Id
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Invoke-HubJoinMerit {
+    Write-Header '6 Join MERIT'
+    Write-HubMap -Here '6'
+    Write-HubDrillIn '6'
+    Write-HubReceipt '6'
     $portal = 'https://merit-prod.vercel.app/portal/'
     try { Start-Process $portal } catch { Write-Warn "Could not open $portal" }
 }
@@ -1763,21 +2033,43 @@ function Enter-HubOssPhase {
 
 function Invoke-JumpstartVault {
     $cfg = Get-HubConfig
-    Write-Header "4 Vault (local) @ $($cfg.vaultPin)"
+    Write-Header "4 V (local) @ $($cfg.vaultPin)"
     Write-HubMap -Here '4'
     Write-HubDrillIn '4'
     [void](Invoke-MeritPrereqs)
     $vaultDest = Get-HubVaultDest
+    $gitDir = Join-Path $vaultDest '.git'
+    if (Test-Path -LiteralPath $gitDir) {
+        Write-Ok "Vault already cloned (working copy preserved): $vaultDest"
+        Write-Note 'Cold-start pin is only for a missing clone. Hub will not detach this checkout to vaultPin.'
+        Write-HubReceipt '4'
+        if ($Force) { return }
+        $go = Read-Host 'Launch vault BootStrap now? [y/N] (needed before VC operator menus)'
+        if ($go -notmatch '^[Yy]') {
+            Write-Note 'Vault is local. Run VC when you want operator grade (BootStrap).'
+            return
+        }
+        $seedCmd = Join-Path $vaultDest 'BootStrap\seed-private-dev.cmd'
+        $bootCmd = Join-Path $vaultDest 'BootStrap\MERIT_BootStrap.cmd'
+        $bootPs1 = Join-Path $vaultDest 'BootStrap\MERIT_BootStrap.ps1'
+        if (Test-Path -LiteralPath $seedCmd) { Write-Ok 'Launching seed-private-dev.cmd ...'; & $seedCmd; return }
+        if (Test-Path -LiteralPath $bootCmd) { Write-Ok 'Launching vault MERIT_BootStrap.cmd ...'; & $bootCmd; return }
+        if (Test-Path -LiteralPath $bootPs1) { Write-Ok 'Launching vault MERIT_BootStrap.ps1 ...'; & $bootPs1; return }
+        Write-Fail 'Vault BootStrap not found on this clone.'
+        return
+    }
+
     $ok = Invoke-GitClonePin -Url ([string]$cfg.vaultUrl) -Pin ([string]$cfg.vaultPin) -Dest $vaultDest -Label 'merit-private-vault'
     if (-not $ok) { return }
 
     Write-HubReceipt '4'
+    if ($Force) { return }
     $seedCmd = Join-Path $vaultDest 'BootStrap\seed-private-dev.cmd'
     $bootCmd = Join-Path $vaultDest 'BootStrap\MERIT_BootStrap.cmd'
     $bootPs1 = Join-Path $vaultDest 'BootStrap\MERIT_BootStrap.ps1'
     $go = Read-Host 'Launch vault BootStrap now? [y/N] (needed before VC operator menus)'
     if ($go -notmatch '^[Yy]') {
-        Write-Note 'Vault is local. Run VC when you want the operator/cloud grade receipt.'
+        Write-Note 'Vault is local. Run VC when you want operator grade (BootStrap).'
         return
     }
     if (Test-Path -LiteralPath $seedCmd) {
@@ -1815,9 +2107,11 @@ function Show-MeritHubHelp {
     Write-Host '  3) Try it           open local play/index.html'
     Write-Host '  OC) OSS in the Cloud  DualRail play + register + your marketing site'
     Write-Host '      -NewOc with -Oc mints a new oc-* id (second creator on this bench)'
-    Write-Host '  4) Vault            clone private vault (still local)       (alias V)'
-    Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC'
-    Write-Host '  5) Join MERIT       portal / partners / register links'
+    Write-Host '  4) V (local)        clone private vault (working clone kept) (alias V)'
+    Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC (not hosted vault)'
+    Write-Host '  5) R (local)        catalog clone; role consumer|provider   (alias R)'
+    Write-Host '  RC) repo in Cloud   that repo on its host (Vercel) - not OC'
+    Write-Host '  6) Join MERIT       portal / partners / register links'
     Write-Host '  0) Stop'
     Write-Host ''
     Write-Host '  ALSO' -ForegroundColor White
@@ -1858,13 +2152,15 @@ function Show-InteractiveMenu {
             '^(OC|oc|Oc)$' { Invoke-HubOc; Read-Host 'Press Enter' | Out-Null }
             '^(4|V|v|Vault)$' { Invoke-JumpstartVault }
             '^(VC|vc|Vc)$' { Invoke-HubVc; Read-Host 'Press Enter' | Out-Null }
-            '^5$' { Invoke-HubJoinMerit; Read-Host 'Press Enter' | Out-Null }
+            '^(5|R)$' { Invoke-HubR; Read-Host 'Press Enter' | Out-Null }
+            '^(RC|rc|Rc)$' { Invoke-HubRc; Read-Host 'Press Enter' | Out-Null }
+            '^6$' { Invoke-HubJoinMerit; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('I', 'i', 'Install', 'InstallSkills') } { Invoke-InstallSkillsMenu; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; Read-Host 'Press Enter' | Out-Null }
             '^(H|h|\?|Help)$' { continue }
             '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, 0 (or P S B I M T H).' }
+            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or P S B I M T H).' }
         }
     }
 }
@@ -1895,12 +2191,14 @@ try {
     if ($TryIt) { Invoke-HubTryIt; return }
     if ($Oc -or $NewOc) { Invoke-HubOc; if ($Script:HubStepFailed) { exit 1 }; return }
     if ($Vc) { Invoke-HubVc; return }
+    if ($R) { Invoke-HubR; return }
+    if ($Rc) { Invoke-HubRc; return }
     if ($JoinMerit) { Invoke-HubJoinMerit; return }
     if ($Jumpstart -eq 'Oss') { Invoke-HubInstallOss; return }
     if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
 
     $bound = $PSBoundParameters.Keys
-    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'JoinMerit') | Where-Object { $bound -contains $_ }
+    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'R', 'Rc', 'JoinMerit') | Where-Object { $bound -contains $_ }
     if (-not $hasAction) {
         Show-InteractiveMenu
     }
