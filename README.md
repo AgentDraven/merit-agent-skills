@@ -6,7 +6,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 
 | Goal | Path |
 |------|------|
-| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`. **Required** (do not double-click / `.\`): `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Map: **1** Setup laptop · **2** Install OSS · **3** Try it · **OC** cloud · **4** Vault · **VC** · **5** Join MERIT. Details: [Merit-Hub/README.md](Merit-Hub/README.md). |
+| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`. **Required:** `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Then **1** → **2** → **3** (optional **OC**). Vault is **4**/**VC**; catalog **5**/**RC**; Join is **6**. Numbered sequence: [Merit-Hub/README.md](Merit-Hub/README.md#new-laptop-sequence). |
 | **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** — 3 steps, no accounts night one |
 | **OSS internals** | Hub **2** dotsources `BootStrap/_oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |

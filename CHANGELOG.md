@@ -1,3 +1,9 @@
+## 0.5.30 - 2026-08-26
+
+### Changed
+- Hub **RC** sets `MERIT_OPERATOR_CWD` to the catalog clone before `deploy vercel`, so the laptop clone is deployed (not a stale other-machine `repo_root`).
+- Hub pin **`skills-v0.5.30`**.
+
 ## 0.5.29 - 2026-08-26
 
 ### Added

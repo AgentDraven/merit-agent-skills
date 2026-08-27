@@ -1980,12 +1980,16 @@ function Invoke-HubRc {
         Write-Note 'Skipped deploy. Repo is local; RC when you are ready.'
         return
     }
+    $prevCwd = $env:MERIT_OPERATOR_CWD
+    $env:MERIT_OPERATOR_CWD = $row.Dest
     Push-Location $row.Dest
     try {
         & $merit deploy vercel -Project $row.Id
     }
     finally {
         Pop-Location
+        if ($null -eq $prevCwd -or $prevCwd -eq '') { Remove-Item Env:MERIT_OPERATOR_CWD -ErrorAction SilentlyContinue }
+        else { $env:MERIT_OPERATOR_CWD = $prevCwd }
     }
 }
 

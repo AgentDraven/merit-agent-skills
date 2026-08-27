@@ -2,6 +2,27 @@
 
 **Download one script:** [`Merit-Hub.ps1`](Merit-Hub.ps1) — standalone, no git, no folder, no `.json`, no extra launcher.
 
+`C:\Tools` (or `%MYMERITTOOLS%`) is a **laptop folder**, not a git repo. This file is what git stores. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
+
+## New laptop sequence
+
+1. Open [`Merit-Hub.ps1`](Merit-Hub.ps1) on GitHub → **Raw** → Save As `C:\Tools\Merit-Hub.ps1` (browser **Keep**). That is the only download.
+2. Run this entire line (do not double-click):
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+```
+
+3. First run: **Enter** for `MYMERITTOOLS` / `MYMERITAPP` (defaults `C:\Tools` / `C:\MyMeritApp`).
+4. **1** Setup laptop — git / gh / pwsh + `merit-venv`. Does not re-download this script.
+5. **2** (alias **J**) Install OSS — clones this repo at the `skills-v*` pin into `%MYMERITAPP%\merit-agent-skills` and seeds merit-demo.
+6. **3** Try it locally. **OC** when you want DualRail play hosted on merit-prod.
+7. **4** / **V** only if you have private-vault access (still local). **VC** is operator grade, not a hosted vault.
+8. **5** / **R** optional: clone a catalog consumer or provider. **RC** is that repo on its host (usually Vercel), not OC.
+9. **6** Join MERIT (portal / partners / register).
+
+The Hub prints this map every run. MOTW / pwsh notes below.
+
 ## Required: run the full command
 
 After you save the file, **start it with this entire line**. Do **not** double-click `Merit-Hub.ps1`. If you type `.\Merit-Hub.ps1` in Windows PowerShell 5.1, the script prints this command and re-launches `pwsh` when it is installed (no ParserError).
@@ -60,15 +81,19 @@ Raw: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Meri
 
 ## Hub menu (short)
 
+Do **1** then **2** first. The rest are branches from there.
+
 | Key | Action |
 |-----|--------|
 | **1** | Setup laptop (prereqs + MYMERIT* + merit-venv) |
 | **2** | Install OSS (skills pin + merit-demo + quiet smoke). Alias **J** |
 | **3** | Try it — open local `play/index.html` |
 | **OC** | OSS in the Cloud — DualRail play + **required** store activate + MERIT-hosted marketing site (`/play/site`) |
-| **4** | Vault clone (still local). Alias **V** |
-| **VC** | Venture Capable — operator/tenant grade vs freeware OC |
-| **5** | Join MERIT — portal / partners / register links |
+| **4** | Vault clone (still local; working clone kept). Alias **V** |
+| **VC** | Venture Capable — operator/tenant grade vs freeware OC (not a hosted vault) |
+| **5** | Catalog clone; role consumer or provider. Alias **R** |
+| **RC** | That catalog repo on its host (usually Vercel) — not OC |
+| **6** | Join MERIT — portal / partners / register links |
 | **0** | Stop |
 | **P** | Pristine: wipe OSS bench, leftover `Tools\Merit-Hub\`, ~/dev, **MYMERIT* env** (next run prompts again), merit-venv. Keeps `C:\Tools\Merit-Hub.ps1`. |
 
