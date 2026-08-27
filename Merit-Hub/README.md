@@ -21,7 +21,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 8. **5** / **R** optional: clone a catalog consumer or provider. **RC** is that repo on its host (usually Vercel), not OC.
 9. **6** Join MERIT (portal / partners / register).
 
-The Hub prints this map every run. MOTW / pwsh notes below.
+The Hub prints this map every run. MOTW (Mark of the Web) and pwsh notes are below. MOTW is Windows tagging a browser download as internet-sourced, so a plain run is blocked.
 
 ## Required: run the full command
 

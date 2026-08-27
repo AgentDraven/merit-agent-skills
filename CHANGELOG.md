@@ -1,3 +1,9 @@
+## 0.5.31 - 2026-08-26
+
+### Changed
+- Hub README: spell out **MOTW (Mark of the Web)** and note that Windows tags a browser download as internet-sourced, which is why a plain run is blocked.
+- Hub pin **`skills-v0.5.31`**.
+
 ## 0.5.30 - 2026-08-26
 
 ### Changed
