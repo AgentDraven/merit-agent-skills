@@ -1,3 +1,11 @@
+## 0.5.32 - 2026-08-26
+
+### Changed
+- **Hub baselined:** keys 1 2 3 OC 4 VC 5 R RC 6 are wired. OC DualRail product can still be validated separately.
+- **6 Join (sign up):** same key after **OC** (store register) or after **4** (operator/partner). Not OC-only.
+- README: **VC is not a hosted vault** — private GitHub remote, `git verify`, `runtime verify`. No vault play URL.
+- Hub pin **`skills-v0.5.32`**.
+
 ## 0.5.31 - 2026-08-26
 
 ### Changed

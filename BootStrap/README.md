@@ -12,7 +12,7 @@ This folder is **not** a second product. Hub **2** (alias **J**) dotsources [`_o
 1 Setup laptop --> 2 Install OSS --+--> 3 Try it --> OC (OSS in the Cloud)
                                    +--> 4 V (still local) --> VC (Venture Capable)
                                    +--> 5 R (catalog, local) --> RC (repo host)
-                                   +--> 6 Join MERIT
+                                   +--> 6 Join MERIT (sign up)  [after OC or 4]
                                    +--> Stop
 ```
 
@@ -25,4 +25,4 @@ Laptop status is **`%MYMERITAPP%\oss-bench.json`** (`benchFolder`, `skillsFolder
 
 ## Pathway
 
-Hub **1** then **2** → **3** Try it locally → **OC** for a live merit-prod app (no here.now account on the laptop). **4** clones the vault locally. **VC** is operator/tenant grade vs freeware OC. **5**/**RC** is a catalog repo on its own host. **6** Join MERIT.
+Hub **1** then **2** → **3** Try it locally → **OC** for a live merit-prod app. **4** clones the vault locally. **VC** is operator grade (private git, not a hosted vault). **5**/**RC** is a catalog repo on its own host. **6** Join (sign up) after **OC** or after **4**.

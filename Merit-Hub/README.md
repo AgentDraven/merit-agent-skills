@@ -19,7 +19,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 6. **3** Try it locally. **OC** when you want DualRail play hosted on merit-prod.
 7. **4** / **V** only if you have private-vault access (still local). **VC** is operator grade, not a hosted vault.
 8. **5** / **R** optional: clone a catalog consumer or provider. **RC** is that repo on its host (usually Vercel), not OC.
-9. **6** Join MERIT (portal / partners / register).
+9. **6** Join MERIT (**sign up**). Same key after **OC** (store register) or after **4** (operator/partner). Not OC-only.
 
 The Hub prints this map every run. MOTW (Mark of the Web) and pwsh notes are below. MOTW is Windows tagging a browser download as internet-sourced, so a plain run is blocked.
 
@@ -93,9 +93,29 @@ Do **1** then **2** first. The rest are branches from there.
 | **VC** | Venture Capable — operator/tenant grade vs freeware OC (not a hosted vault) |
 | **5** | Catalog clone; role consumer or provider. Alias **R** |
 | **RC** | That catalog repo on its host (usually Vercel) — not OC |
-| **6** | Join MERIT — portal / partners / register links |
+| **6** | Join MERIT (**sign up**) — portal + register. After **OC** or after **4** (not OC-only) |
 | **0** | Stop |
 | **P** | Pristine: wipe OSS bench, leftover `Tools\Merit-Hub\`, ~/dev, **MYMERIT* env** (next run prompts again), merit-venv. Keeps `C:\Tools\Merit-Hub.ps1`. |
+
+
+## Hub baseline
+
+Keys **1 2 3 OC 4 VC 5 R RC 6** are wired and working on the laptop Hub. **OC** DualRail product quality can still be validated separately; the Hub steps for those keys are baselined.
+
+## VC is not a hosted vault
+
+**4** clones the private vault onto this laptop. **VC** (Venture Capable) is operator grade on that clone: vault BootStrap, operator gates, `runtime out`. The vault is **not** published to merit-prod (that is OC / RC for other artifacts).
+
+**Protected** means a **private GitHub remote**, not a public website:
+
+1. `git remote -v` on the vault is the AgentDraven private remote (mXin) — never a public origin.
+2. `.\scripts\merit.ps1 git verify` — tag matches VERSION, tree clean.
+3. `.\scripts\merit.ps1 runtime out` then `runtime verify` — affiliate mirror.
+4. Secrets stay in vault `env/` (not git). Product deploys use operator-gate hashes.
+
+There is no vault play URL. If the vault tree is a public site, that is a fail.
+
+**Validate VC:** Hub **4** (clone exists) → **VC** (BootStrap) → those four checks from the vault clone.
 
 ## Multi-creator benches (one PC)
 

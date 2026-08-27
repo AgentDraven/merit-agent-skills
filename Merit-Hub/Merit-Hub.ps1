@@ -93,7 +93,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.31",
+  "skillsPin": "skills-v0.5.32",
   "vaultPin": "vault-v0.5.14",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -1447,6 +1447,7 @@ function Write-HubLegend {
     Write-Host '          OC  OSS demo on merit-prod (freeware DualRail) - not a product repo'
     Write-Host '          VC  operator/tenant grade after V (BootStrap / gates) - vault stays git+local, not merit-prod'
     Write-Host '          RC  this catalog repo on ITS host (usually Vercel) - not OC'
+    Write-Host '          6   Join (sign up) - portal + register; after OC or after 4 (not OC-only)'
 }
 
 function Write-HubMap {
@@ -1467,7 +1468,7 @@ function Write-HubMap {
     Write-Host ('         +--> ' + (& $mark '3' '3 Try it') + ' --> ' + (& $mark 'OC' 'OC  OSS in the Cloud'))
     Write-Host ('         +--> ' + (& $mark '4' '4 V (local)') + ' --> ' + (& $mark 'VC' 'VC  Venture Capable'))
     Write-Host ('         +--> ' + (& $mark '5' '5 R (local, role C|P)') + ' --> ' + (& $mark 'RC' 'RC  repo in the Cloud'))
-    Write-Host ('         +--> ' + (& $mark '6' '6 Join MERIT'))
+    Write-Host ('         +--> ' + (& $mark '6' '6 Join MERIT (sign up)  after OC or 4'))
     Write-Host '         +--> 0 Stop'
 }
 
@@ -1479,11 +1480,11 @@ function Write-HubDrillIn {
         '3' { Write-Note 'Drill-in: open local merit-demo\play\index.html. Still not hosted.' }
         'OC' { Write-Note 'Drill-in: publish play+cfg + portal/ marketing site to merit-prod; store activate MUST succeed. here.now is a platform-key upgrade (no laptop key).' }
         '4' { Write-Note 'Drill-in: clone private vault into ~/dev. Still local. Existing working clone is kept (no detach to Hub pin).' }
-        'VC' { Write-Note 'Drill-in: operator/tenant grade vs freeware OC. Vault BootStrap on this laptop. Not a hosted vault.' }
+        'VC' { Write-Note 'Drill-in: operator grade after 4. BootStrap + gates + runtime. Vault stays private git - not hosted on merit-prod. Validate: git remote private, merit git verify, runtime verify.' }
         '5' { Write-Note 'Drill-in: clone a catalog consumer or provider repo to ~/dev/<GitHub user>/<folder>. Requires 4. Not OC.' }
         'R' { Write-Note 'Drill-in: same as 5 - local catalog clone. Pick role consumer|provider. First consumer: m4fi.' }
         'RC' { Write-Note 'Drill-in: deploy THAT repo to its production host (merit.ps1 deploy vercel). Not merit-prod DualRail (that is OC).' }
-        '6' { Write-Note 'Drill-in: links only - portal, partners, register. Affiliate is ?affiliate= on register, not a here.now slug.' }
+        '6' { Write-Note 'Drill-in: Join = sign up. Same key after OC (store register) or after 4 (operator/partner). Links only. Affiliate is ?affiliate= on register.' }
         default { }
     }
 }
@@ -1595,7 +1596,7 @@ function Write-HubReceipt {
             Write-Info 'https://merit-prod.vercel.app/portal/'
             Write-Info 'https://merit-prod.vercel.app/portal/partners.html'
             Write-Info 'After OC: https://merit-prod.vercel.app/store/{your-oc-id}/register'
-            Write-Note 'Affiliate attribution: ?affiliate= on the register URL. Not a here.now slug.'
+            Write-Note 'Join (sign up) after OC or after 4 - same key. Affiliate: ?affiliate= on register. Not a here.now slug.'
         }
     }
 }
@@ -2115,7 +2116,7 @@ function Show-MeritHubHelp {
     Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC (not hosted vault)'
     Write-Host '  5) R (local)        catalog clone; role consumer|provider   (alias R)'
     Write-Host '  RC) repo in Cloud   that repo on its host (Vercel) - not OC'
-    Write-Host '  6) Join MERIT       portal / partners / register links'
+    Write-Host '  6) Join MERIT (sign up)  after OC or after 4; portal + register'
     Write-Host '  0) Stop'
     Write-Host ''
     Write-Host '  ALSO' -ForegroundColor White
@@ -2127,7 +2128,7 @@ function Show-MeritHubHelp {
     Write-Host '  T) Set MYMERITTOOLS root'
     Write-Host '  H) Help'
     Write-Host ''
-    Write-Note 'Cold start: 1 then 2. Do not double-click this file. ASCII hyphens only in this script.'
+    Write-Note 'Cold start: 1 then 2. 6 Join (sign up) after OC or after 4. Do not double-click this file.'
 }
 
 function Set-MyMeritToolsPrompt {
