@@ -1,5 +1,10 @@
 # CHANGELOG
 
+
+## [0.5.40] - 2026-08-30
+
+### Changed
+- Merit-Hub aultPin ? **vault-v0.5.46** (Pristine cold-start).
 ## [0.5.39] - 2026-08-30
 
 ### Changed
