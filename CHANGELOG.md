@@ -1,6 +1,11 @@
 # CHANGELOG
 
 
+## [0.5.41] - 2026-08-30
+
+### Changed
+- Merit-Hub embedded pins: **`skills-v0.5.41`**, **`vault-v0.5.48`** (CompatSet 2026.08.3 live alignment before Pristine).
+
 ## [0.5.40] - 2026-08-30
 
 ### Changed
