@@ -3,30 +3,30 @@
   "line": "oss",
   "packages": {
     "merit_workbench": {
-      "version": "0.4.0",
+      "version": "0.4.10",
       "cdn_base": "https://merit-prod.vercel.app/pkg/meritutils",
       "artifacts": {
         "js": {
-          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_workbench/0.4.0/merit-workbench.js",
-          "sri": "sha384-50h+5mm7tpQsOkVG/cxlvuu3Cl7+xw4C4H5EwGoKgqKScbeBRnxI29CxEtMcPOkf"
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_workbench/0.4.10/merit-workbench.js",
+          "sri": "sha384-aNcJZoKSEJlS1Lg7qrwJ/BtMhubnl742kwXLuBxBX7ft4TdPzydlG9BCZ1HxHAON"
         },
         "css": {
-          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_workbench/0.4.0/merit-workbench.css",
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_workbench/0.4.10/merit-workbench.css",
           "sri": "sha384-u21263n25R9YNIR6NchCkydfaHjBQvyobfiuzh71m2cXXH7jjPQiP/HP4l0Xbu6j"
         }
       }
     },
-    "journal": {
-      "version": "0.2.3",
+    "merit_journal": {
+      "version": "0.3.0",
       "cdn_base": "https://merit-prod.vercel.app/pkg/meritutils",
       "artifacts": {
         "mjs": {
-          "url": "https://merit-prod.vercel.app/pkg/meritutils/journal/0.2.3/journal.mjs",
-          "sri": "sha384-FxUXqIq2C91mGzV75nw+PN6VwO4cFYNVRQrm3V4Z54kLy39KyK0SRsHN3/NsiUJo"
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_journal/0.3.0/merit_journal.mjs",
+          "sri": "sha384-QSCIK0W/7lAxvCQTfpRPKlaWxr41es6QnAeEi7r0gjcWnfNUEn7igG2bnCzJjYZp"
         },
         "css": {
-          "url": "https://merit-prod.vercel.app/pkg/meritutils/journal/0.2.3/journal.css",
-          "sri": "sha384-5yxx9KbJ9X6gcIyv2XdjIbc5GyCn5N0KRHwmWIIWG9mI3Z7+iwu6IwJGqd+Pxdj2"
+          "url": "https://merit-prod.vercel.app/pkg/meritutils/merit_journal/0.3.0/merit_journal.css",
+          "sri": "sha384-NPULPTQqS/sVgFB+ZDY6AJ6NPN+qo8FGS1G0RBD2i1wb71Dz+YtusCMFCM+MMT50"
         }
       }
     },
@@ -87,6 +87,12 @@
           }
         }
       }
+    }
+  },
+  "deprecated_pins": {
+    "journal": {
+      "successor": "merit_journal",
+      "note": "Archived in merit-utils .archive/packages/journal"
     }
   }
 }
