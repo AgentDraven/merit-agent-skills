@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## [0.5.42] - 2026-08-30
+
+### Added
+- **Merit-Hub/README.md** — architecture + cold-start + branch-path mermaid diagrams; full menu (numbered + ALSO); CompatSet/pins; Pristine preflight.
+
+### Changed
+- Merit-Hub embedded pins: **`skills-v0.5.42`**, **`vault-v0.5.50`**.
+
 ## [0.5.41] - 2026-08-30
 
 ### Changed
