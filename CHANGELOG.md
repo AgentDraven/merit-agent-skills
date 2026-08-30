@@ -1,3 +1,8 @@
+# Changelog
+
+## [0.5.35] - 2026-08-30
+
+- Free pins: promote `merit_journal@0.3.0`; drop bare `journal`; bump `merit_workbench` pin to 0.4.10.
 ## 0.5.34 - 2026-08-30
 
 ### Added
