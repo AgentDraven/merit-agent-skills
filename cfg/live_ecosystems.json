@@ -1,0 +1,29 @@
+{
+  "schema": "merit.live_ecosystems.v1",
+  "updated_at": "2026-08-30",
+  "description": "Public catalog of ecosystems merit-agent-skills may bolt onto. Only status=live_public. Default = v00 until vault publishes v01 after full validation. Hobby is never listed as supported.",
+  "default_ecosystem_id": "v00",
+  "source": "Synced from merit-private-vault cfg/live_ecosystems.json after AgentDraven publish_gate.",
+  "ecosystems": [
+    {
+      "id": "v00",
+      "nn": "00",
+      "status": "live_public",
+      "display": "MERIT-v00 (production freeze)",
+      "gateway": "https://merit-prod.vercel.app",
+      "store": "https://meritstore.vercel.app",
+      "skills_default": true,
+      "note": "Default bolt-on until v01 is published here."
+    },
+    {
+      "id": "v01",
+      "nn": "01",
+      "status": "coming_soon",
+      "display": "MERIT-v01",
+      "gateway": "https://merit-prodv01.vercel.app",
+      "store": "https://merit-storev01.vercel.app",
+      "skills_default": false,
+      "note": "Operator mesh exists; not the skills default until vault publish_gate promotes to live_public."
+    }
+  ]
+}

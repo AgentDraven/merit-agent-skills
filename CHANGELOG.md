@@ -1,3 +1,8 @@
+## 0.5.34 - 2026-08-30
+
+### Added
+- `cfg/live_ecosystems.json` — public bolt-on catalog (default **v00**; **v01** coming_soon until vault publish_gate). README Start-here row.
+
 ## 0.5.33 - 2026-08-30
 
 ### Changed

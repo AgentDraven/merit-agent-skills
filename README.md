@@ -6,7 +6,8 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 
 | Goal | Path |
 |------|------|
-| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`. **Required:** `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Then **1** → **2** → **3** (optional **OC**). Vault is **4**/**VC**; catalog **5**/**RC**; **6** Join (sign up) after **OC** or after **4**. Numbered sequence: [Merit-Hub/README.md](Merit-Hub/README.md#new-laptop-sequence). |
+| **Live ecosystems (bolt-on targets)** | [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json) — default **v00** until vault publishes **v01** as `live_public`. Hobby is never listed. |
+| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`. **Required:** `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Then **1** → **2** → **3** (optional **OC**). Vault is **4**/**V**; catalog **5**/**RC**; **6** Join (sign up) after **OC** or after **4**. Numbered sequence: [Merit-Hub/README.md](Merit-Hub/README.md#new-laptop-sequence). |
 | **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** — 3 steps, no accounts night one |
 | **OSS internals** | Hub **2** dotsources `BootStrap/_oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
@@ -20,7 +21,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 | **Affiliate / design partner** | [`skills/merit-affiliate`](skills/merit-affiliate/SKILL.md) â€” free attribution + portal recipes (no billing) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha â€¦` |
 
-**Production MERIT base:** `https://merit-prod.vercel.app` for metered APIs, packages, and register paths. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
+**Production MERIT base (skills default):** `https://merit-prod.vercel.app` (**v00** in [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json)). Operator **v01** hosts exist but are not the skills default until vault `publish_gate` promotes them. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
 
 ## Public vs private SSOT
 
