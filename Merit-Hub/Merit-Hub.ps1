@@ -94,7 +94,7 @@ $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
   "skillsPin": "skills-v0.5.37",
-  "vaultPin": "vault-v0.5.44",
+  "vaultPin": "vault-v0.5.45",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
