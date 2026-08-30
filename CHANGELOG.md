@@ -1,6 +1,11 @@
 # CHANGELOG
 
-## [0.5.36] - 2026-08-30
+## [0.5.38] - 2026-08-30
+
+### Changed
+- Merit-Hub embedded pins: **`skills-v0.5.37`**, **`vault-v0.5.44`** (align CompatSet 2026.08.3 before Pristine).
+
+## [0.5.37] - 2026-08-30
 
 ### Changed
 - Rename marketing skill **`merit-affiliate` → `merit-referral`**; recipe `referral-portal.md`; attribution template uses `referral_code` / `?referral=` (store still accepts legacy `?affiliate=`). Operator `MERIT_AFFILIATE` / MeritAcme unchanged.
