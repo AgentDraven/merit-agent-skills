@@ -1,6 +1,6 @@
 ﻿# BootStrap pathway (OSS → Private handoff)
 
-Annotated flowchart for a **new laptop** on the public freeware path. Private-Vault continuation (affiliate **MAD**, persona/repo picker) lives in the vault doc [`vault_usage.md` §7c](https://github.com/AgentDraven/merit-private-vault/blob/main/docs/vault_usage.md#7c-device-bootstrap--affiliate-pathway) (operators only).
+Annotated flowchart for a **new laptop** on the public freeware path. Private-Vault continuation (affiliate **MeritAcme**, persona/repo picker) lives in the vault doc [`vault_usage.md` §7c](https://github.com/AgentDraven/merit-private-vault/blob/main/docs/vault_usage.md#7c-device-bootstrap--affiliate-pathway) (operators only).
 
 **Laptop shared:** `%MYMERITTOOLS%\merit-venv` (default `C:\Tools`) is installed by **OSS BootStrap menu 1** and Merit-Hub prereqs (same path Private-Vault uses). Affiliate / `runtime out` remain Private-Vault only.
 
@@ -53,7 +53,7 @@ Do **not** create `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd
 
 | Concern | OSS? | Where instead |
 |---------|------|----------------|
-| Affiliate id / `%USERPROFILE%\{id}` | No | Vault affiliate wizard → default **MAD** |
+| Affiliate id / `%USERPROFILE%\{id}` | No | Vault affiliate wizard → default **MeritAcme** (OwnerName **MeritAcmeOwner**) |
 | `runtime out` / `runtime verify` | No | Vault `scripts/merit.ps1` after affiliate configured |
 | Persona/repo bulk clone into `~/dev` | No | Vault BootStrap picker (after affiliate) |
 | Marketing attribution skill | Separate | Public skill `merit-affiliate` (not operator runtime) |

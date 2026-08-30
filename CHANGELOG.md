@@ -1,3 +1,8 @@
+## 0.5.33 - 2026-08-30
+
+### Changed
+- Operator runtime default folder is **MeritAcme** (not MAD/HumanBala). Affiliate Owner default **MeritAcmeOwner**. Public skill `merit-affiliate` stays marketing attribution (`?affiliate=`); only the `MERIT_AFFILIATE` naming-guard example changed.
+
 ## 0.5.32 - 2026-08-26
 
 ### Changed

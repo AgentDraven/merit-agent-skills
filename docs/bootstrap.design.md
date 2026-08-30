@@ -59,7 +59,7 @@ MERIT keeps **product law and persona policy inside the ecosystem**, not inside 
 
 | Tier | What it is | Where it lives (operators) | Public OSS builders |
 |------|------------|----------------------------|---------------------|
-| **L1** | Platform policy â€” `MERIT.instructions` | Vault `instructions/MERIT.instructions` â†’ `runtime out` â†’ `%USERPROFILE%\{affiliate}\MERIT.instructions` (**MAD** default) | **Pointer stubs only** in `{Name} docs/MERIT.instructions` â€” never a full fork |
+| **L1** | Platform policy â€” `MERIT.instructions` | Vault `instructions/MERIT.instructions` â†’ `runtime out` â†’ `%USERPROFILE%\{affiliate}\MERIT.instructions` (**MeritAcme** default) | **Pointer stubs only** in `{Name} docs/MERIT.instructions` â€” never a full fork |
 | **L2** | Persona / Chief-of-Staff layer (e.g. `AgentDraven.instructions`) | Vault `instructions/<Persona>.instructions` â†’ same affiliate runtime | Not published; OSS uses skills + usage docs |
 | **L3** | Optional project specialization | `{Project}.instructions` at **consumer repo root** (e.g. `DIRT.instructions`) | Allowed when scoped; must not contradict L1 |
 
@@ -67,7 +67,7 @@ MERIT keeps **product law and persona policy inside the ecosystem**, not inside 
 
 ```mermaid
 flowchart TD
-  vaultSsot[Vault_instructions_SSOT] -->|runtime_out| affiliateRuntime[PROFILE_affiliate_MAD]
+  vaultSsot[Vault_instructions_SSOT] -->|runtime_out| affiliateRuntime[PROFILE_affiliate_MeritAcme]
   affiliateRuntime --> l1[L1_MERIT.instructions]
   affiliateRuntime --> l2[L2_Persona.instructions]
   l1 --> agentRead[Any_AI_IDE_or_Agent]

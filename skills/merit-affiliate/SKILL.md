@@ -22,7 +22,7 @@ Free OSS marketing package for the MERIT **Affiliate & Design Partner** program.
 |------|---------|
 | `partner_kinds` | Cohort on **meritsubs** (`affiliate` \| `design_partner`) |
 | `affiliate_code` | Checkout attribution string on **meritstore** |
-| `MERIT_AFFILIATE` | Operator runtime folder (HumanBala) — **unrelated** |
+| `MERIT_AFFILIATE` | Operator runtime folder (default **MeritAcme**) — **unrelated** to this skill |
 
 ## Join vs attribute (do not mix)
 

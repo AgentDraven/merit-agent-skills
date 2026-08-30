@@ -28,7 +28,7 @@ Free **MERIT agent skills** and **`merit`** CLI — one-stop OSS cold start for 
 |--|----------------------------|--------------------------|
 | **What** | Skills, `merit` CLI recipes, dinner/tutorial, freemium docs | Full platform **product law**, L1, env, cert registry |
 | **Where** | **This README**, [docs/usage.md](docs/usage.md), [HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md), live [Portal](https://merit-prod.vercel.app/portal/) | Vault `docs/PRD_MERIT_AGENT_SKILLS_PLATFORM.md` (**ACCEPTED** technical SSOT â€” not published here) |
-| **Who** | Builders, agents on OSS path | HumanBala / AgentDraven with vault |
+| **Who** | Builders, agents on OSS path | Affiliate Owner (**MeritAcmeOwner** default) / AgentDraven with vault |
 | **Pin** | Clone **`skills-v*`** release tags (FR-SK-14 / L1 Â§E.0) | Not a substitute for product VERSION on consumers |
 
 **Do not** expect a public copy of the vault PRD. Implementers with vault access apply FR tables from the private PRD + provider IAR; builders follow **usage + Portal** only.
@@ -215,7 +215,7 @@ Guest OSS PAR â†’ free register (meritstore) â†’ hit freemium cap â�
 | Policy | Detail |
 |--------|--------|
 | Pre-GA tags | `skills-v0.x.y` â€” minor bumps in this program |
-| GA | `skills-v1.0.0` when **HumanBala** approves |
+| GA | `skills-v1.0.0` when the **Affiliate Owner** approves (this program: HumanBala) |
 | Pin | Release tags, not floating `main` (L1 Â§E.0 / FR-SK-14) |
 | Current tip (Portal pin) | **`skills-v0.5.2`** |
 | Current human-validation baseline | **`skills-v0.3.22`** |
