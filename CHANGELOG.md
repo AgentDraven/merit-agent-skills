@@ -1,4 +1,9 @@
-# Changelog
+# CHANGELOG
+
+## [0.5.36] - 2026-08-30
+
+### Changed
+- Rename marketing skill **`merit-affiliate` → `merit-referral`**; recipe `referral-portal.md`; attribution template uses `referral_code` / `?referral=` (store still accepts legacy `?affiliate=`). Operator `MERIT_AFFILIATE` / MeritAcme unchanged.
 
 ## [0.5.35] - 2026-08-30
 

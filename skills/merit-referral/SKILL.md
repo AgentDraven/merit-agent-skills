@@ -1,11 +1,11 @@
 ---
-name: merit-affiliate
-description: MERIT Affiliate & Design Partner funnel — attribution cfg, portal CTAs, what stays on platform (no secrets/billing).
+name: merit-referral
+description: MERIT Referral & Design Partner funnel — attribution cfg, portal CTAs, what stays on platform (no secrets/billing).
 ---
 
-# merit-affiliate
+# merit-referral
 
-Free OSS marketing package for the MERIT **Affiliate & Design Partner** program.
+Free OSS marketing package for the MERIT **Referral & Design Partner** program.
 
 `requires_vault: false` — anyone can publicize without a private vault.
 
@@ -20,9 +20,9 @@ Free OSS marketing package for the MERIT **Affiliate & Design Partner** program.
 
 | Term | Meaning |
 |------|---------|
-| `partner_kinds` | Cohort on **meritsubs** (`affiliate` \| `design_partner`) |
-| `affiliate_code` | Checkout attribution string on **meritstore** |
-| `MERIT_AFFILIATE` | Operator runtime folder (default **MeritAcme**) — **unrelated** to this skill |
+| `partner_kinds` | Cohort on **meritsubs** (`affiliate` \| `design_partner`) — product SKU labels, not this skill |
+| `referral_code` / query `?referral=` | Checkout attribution on **meritstore** (DB may still store as `affiliate_code`) |
+| `MERIT_AFFILIATE` | Operator **runtime** folder (default **MeritAcme**) — **unrelated**; keep the word *affiliate* for vault scripts |
 
 ## Join vs attribute (do not mix)
 
@@ -36,17 +36,17 @@ Operator-provisioned plans (`affiliate-join`, `design-partner-join`, `partner-re
 ## Attribute register URL shape
 
 ```text
-https://merit-prod.vercel.app/store/{consumer_id}/register?affiliate=YOUR_CODE&utm_source=…&utm_medium=…&utm_campaign=…
+https://merit-prod.vercel.app/store/{consumer_id}/register?referral=YOUR_CODE&utm_source=…&utm_medium=…&utm_campaign=…
 ```
 
-Canonical entry is the MERIT production gateway; `/store/{consumer_id}/…` rewrites to meritstore for provisioned apps.
+Legacy `?affiliate=` is still accepted by meritstore register. Canonical entry is the MERIT production gateway; `/store/{consumer_id}/…` rewrites to meritstore for provisioned apps.
 
 ## Apply attribution (non-secret)
 
 ```powershell
 # After merit init / apply — copy template into consumer cfg/
 Copy-Item cfg\consumer_attribution.json.template <consumer>\cfg\consumer_attribution.json
-# Edit consumer_id, affiliate_code, optional partner_kind hint
+# Edit consumer_id, referral_code, optional partner_kind hint
 ```
 
 ## Hard non-goals (FR-AFF-OSS-05 / FR-COM-03)
@@ -58,7 +58,7 @@ Forking or copying this skill **MUST NOT** grant:
 - Entitlement or partner cohort bypass
 - Square / ledger / billing access
 
-Paid surfaces stay on **meritstore** + **meritsubs**. See [docs/recipes/affiliate-portal.md](../../docs/recipes/affiliate-portal.md).
+Paid surfaces stay on **meritstore** + **meritsubs**. See [docs/recipes/referral-portal.md](../../docs/recipes/referral-portal.md).
 
 ## Related
 
@@ -66,3 +66,4 @@ Paid surfaces stay on **meritstore** + **meritsubs**. See [docs/recipes/affiliat
 - Secondary provider landing: meritstore `portal/`
 - Cohort + JWT: meritsubs `partner_kinds`
 - Money accrual: meritstore ledger `partner_share_cents`
+- Python helpers: `meritutils.referral` (not operator `MERIT_AFFILIATE`)

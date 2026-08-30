@@ -1,4 +1,4 @@
-# Affiliate portal recipe (FR-AFF-OSS-04)
+# Referral portal recipe (FR-AFF-OSS-04)
 
 Copyable CTA patterns for consumer `portal/`. Split **join** (program) from **attribute** (checkout referral).
 
@@ -26,10 +26,12 @@ Do **not** deep-link `/store/meritsubs/register?plan=affiliate-join` (or raw mer
 Share a provisioned app register URL with your code (gateway rewrite → meritstore):
 
 ```html
-<a href="https://merit-prod.vercel.app/store/YOUR_CONSUMER_ID/register?affiliate=YOUR_CODE&utm_source=portal&utm_medium=cta&utm_campaign=partner_referral">
+<a href="https://merit-prod.vercel.app/store/YOUR_CONSUMER_ID/register?referral=YOUR_CODE&utm_source=portal&utm_medium=cta&utm_campaign=partner_referral">
   Sign up with my referral
 </a>
 ```
+
+Legacy `?affiliate=` still works on meritstore register.
 
 ## Hosted program landing
 
