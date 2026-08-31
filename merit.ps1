@@ -3,8 +3,14 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.32'
+$MERIT_VERSION = '0.5.44'
 $Root = $PSScriptRoot
+
+$Script:MeritResolveRepoRoot = $Root
+try {
+    . (Join-Path $Root 'BootStrap\_resolve.ps1')
+}
+catch { }
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
 $Rest = if ($args.Count -gt 1) { @($args[1..($args.Count - 1)]) } else { @() }
@@ -23,6 +29,9 @@ Commands:
   portal --path <repo>     Apply launch file, then publish here.now portal targets
   all --path <repo>        Apply, deploy Vercel, then publish portal targets
   closeout --path <repo>   Verify, run git whitespace check, and print git baseline
+  where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
+  surface                  Alias for where
+  ship -Message <msg>      OSS release: commit + skills-v tag + push (skills repo only)
   par scaffold             Advanced: create play shell + cfg/par_pins.json
   branding scaffold        Advanced: create cfg/branding.json
   subs scaffold            Advanced: create meritsubs/meritstore cfg
@@ -973,8 +982,100 @@ function Invoke-Closeout {
             Write-Host 'closeout WARN: git not available on PATH'
         }
         Write-Host 'closeout: webpage-shell AP-MA-13. Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md'
-        Write-Host 'closeout NOTE: operator shipping of merit-agent-skills itself uses vault scripts/merit.ps1 mXin (TAG_PREFIX=skills-v) â€” not raw git.'
+        Write-Host 'closeout tiers: (1) OSS validate = this command; (2) OSS ship skills-v* = .\merit.ps1 ship -Message ...; (3) operator + vault on disk = vault scripts\merit.ps1 mXin'
     } finally {
+        Pop-Location
+    }
+}
+
+function Test-MeritSkillsShipRepo {
+    param([string]$RepoRoot)
+    $tagFile = Join-Path $RepoRoot 'TAG_PREFIX'
+    $verFile = Join-Path $RepoRoot 'VERSION'
+    $skills = Join-Path $RepoRoot 'skills'
+    if (-not (Test-Path -LiteralPath $tagFile)) { return $false }
+    if (-not (Test-Path -LiteralPath $verFile)) { return $false }
+    if (-not (Test-Path -LiteralPath $skills)) { return $false }
+    return $true
+}
+
+function Invoke-MeritWhere {
+    param([string[]]$ArgList)
+    $noWrite = Test-ArgFlag -ArgList $ArgList -Name '-NoWrite'
+    $asJson = Test-ArgFlag -ArgList $ArgList -Name '-Json'
+    if (-not (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue)) {
+        Write-Host 'where: BootStrap\_resolve.ps1 not loaded'
+        exit 1
+    }
+    $surf = Get-MeritSurface -NoWrite:$noWrite
+    Write-MeritSurfaceReport -Surface $surf -AsJson:$asJson
+    exit 0
+}
+
+function Invoke-MeritShip {
+    param([string[]]$ArgList)
+    $msg = Get-ArgValue -ArgList $ArgList -Name '-Message'
+    if (-not $msg) { $msg = Get-ArgValue -ArgList $ArgList -Name '-m' }
+    if ([string]::IsNullOrWhiteSpace($msg)) { throw 'ship requires -Message <summary>' }
+
+    $repoRoot = $Root
+    if (-not (Test-MeritSkillsShipRepo -RepoRoot $repoRoot)) {
+        throw 'ship: run from merit-agent-skills repo root (needs VERSION, TAG_PREFIX, skills/)'
+    }
+
+    if (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue) {
+        $surf = Get-MeritSurface -NoWrite
+        if ($surf.operatorMeritCli -and $env:MERIT_SHIP_OSS -ne '1') {
+            Write-Host "ship: vault operator CLI found at $($surf.operatorMeritCli)"
+            Write-Host 'ship: use vault scripts\merit.ps1 mXin for operator release, or set MERIT_SHIP_OSS=1 to force OSS ship'
+            exit 2
+        }
+    }
+
+    $version = ((Get-Content -LiteralPath (Join-Path $repoRoot 'VERSION') -Raw) -split '\r?\n')[0].Trim()
+    $prefix = ((Get-Content -LiteralPath (Join-Path $repoRoot 'TAG_PREFIX') -Raw) -split '\r?\n')[0].Trim()
+    $tag = "$prefix$version"
+
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) { throw 'ship: git not on PATH' }
+
+    Push-Location $repoRoot
+    try {
+        $branch = (& git rev-parse --abbrev-ref HEAD 2>$null).Trim()
+        if ($branch -eq 'HEAD') {
+            if (-not (Test-ArgFlag -ArgList $ArgList -Name '-AllowDetached')) {
+                throw 'ship: detached HEAD — checkout a branch or pass -AllowDetached'
+            }
+        }
+
+        & git add -A
+        $status = (& git status --porcelain 2>$null)
+        if ($status) {
+            & git commit -m $msg
+            if ($LASTEXITCODE -ne 0) { throw "ship: git commit failed (exit $LASTEXITCODE)" }
+        }
+
+        $cfg = Get-MeritSurfaceConfig
+        $defaultBranch = if ($cfg -and $cfg.defaultShipBranch) { [string]$cfg.defaultShipBranch } else { 'main' }
+
+        if ($branch -ne 'HEAD' -and $branch -ne $defaultBranch) {
+            & git push origin "${branch}:${branch}"
+        }
+        else {
+            & git push origin "HEAD:${defaultBranch}"
+        }
+        if ($LASTEXITCODE -ne 0) { throw "ship: git push branch failed (exit $LASTEXITCODE)" }
+
+        $existing = (& git tag --points-at HEAD 2>$null) | Where-Object { $_ -eq $tag }
+        if (-not $existing) {
+            & git tag -a $tag -m "${tag}: $msg"
+            if ($LASTEXITCODE -ne 0) { throw "ship: git tag failed (exit $LASTEXITCODE)" }
+        }
+        & git push origin $tag
+        if ($LASTEXITCODE -ne 0) { throw "ship: git push tag failed (exit $LASTEXITCODE)" }
+
+        Write-Host "ship OK: $tag on $(git rev-parse --short HEAD)"
+    }
+    finally {
         Pop-Location
     }
 }
@@ -2154,6 +2255,8 @@ switch -Regex ($Command) {
     '^portal$' { try { Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^all$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^closeout$' { try { Invoke-Closeout -TargetRoot $target; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^(where|surface)$' { Invoke-MeritWhere -ArgList $Rest }
+    '^ship$' { try { Invoke-MeritShip -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^apps$' {
         if (-not $Rest -or $Rest.Count -lt 1) { Write-MeritHelp; exit 1 }
         $sub = "$($Rest[0])".ToLowerInvariant()

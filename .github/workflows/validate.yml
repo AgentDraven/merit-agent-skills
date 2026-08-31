@@ -12,6 +12,12 @@ jobs:
       - name: Validate MERIT public skills
         shell: pwsh
         run: ./merit.ps1 closeout --path .
+      - name: Merit Surface where (read-only)
+        shell: pwsh
+        run: ./merit.ps1 where -NoWrite
+      - name: Merit Surface unit tests
+        shell: pwsh
+        run: ./scripts/test-merit-surface.ps1
       - name: Freemium smoke
         shell: bash
         run: ./scripts/smoke-freemium.sh

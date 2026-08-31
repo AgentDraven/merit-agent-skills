@@ -10,6 +10,12 @@ if (-not (Get-Command Write-Ok -ErrorAction SilentlyContinue)) {
     function Write-Info([string]$t) { Write-Host "  $t" }
 }
 
+$Script:MeritResolveRepoRoot = $null
+try {
+    . (Join-Path $PSScriptRoot '_resolve.ps1')
+}
+catch { }
+
 function Write-OssPhaseHeader([string]$Title) {
     Write-Host ''
     Write-Host ('=' * 72) -ForegroundColor Green
@@ -89,6 +95,11 @@ function New-OssBenchState {
         ocPortalUrl         = ''
         ocHereNowUrl        = ''
         ocProductName       = ''
+        vaultFolder         = ''
+        hubScript           = ''
+        ideSkillsHosts      = @()
+        skillsRootResolvedFrom = ''
+        surfaceEdition      = ''
     }
 }
 
@@ -169,7 +180,7 @@ function Get-OssState {
 }
 
 function Save-OssState($State) {
-    $State.schemaVersion = 2
+    $State.schemaVersion = 3
     $State.whatThisFileIs = 'Local OSS bench status on this laptop. No secrets. Not the merit CLI.'
     $State.edition = 'oss'
     $State.updatedAt = (Get-Date).ToString('o')
@@ -178,6 +189,18 @@ function Save-OssState($State) {
     $State.demoFolder = Join-Path $State.benchFolder 'merit-demo'
     $State.skillsPin = Get-OssSkillsPin
     $State.vaultPin = Get-OssVaultPin
+    if (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue) {
+        try {
+            $Script:MeritResolveRepoRoot = $State.skillsFolder
+            $surf = Get-MeritSurface -NoWrite
+            $State.surfaceEdition = [string]$surf.edition
+            $State.skillsRootResolvedFrom = [string]$surf.resolvedFrom.skills
+            if ($surf.vaultRoot) { $State.vaultFolder = [string]$surf.vaultRoot }
+            if ($surf.hubScript) { $State.hubScript = [string]$surf.hubScript }
+            if ($surf.ideHosts.Count -gt 0) { $State.ideSkillsHosts = @($surf.ideHosts) }
+        }
+        catch { }
+    }
     $path = Get-OssJsonPath
     New-Item -ItemType Directory -Force -Path (Split-Path $path) | Out-Null
     ($State | ConvertTo-Json -Depth 6) | Set-Content -LiteralPath $path -Encoding UTF8
@@ -228,7 +251,18 @@ function Invoke-OssValidate {
     Write-OssPhaseHeader 'Validate OSS (quiet smoke)'
     $env:MERIT_VERIFY_QUIET = '1'
     $state = Get-OssState
-    $cli = Join-Path $state.skillsFolder 'merit.ps1'
+    $cli = Join-Path ([string]$state.skillsFolder) 'merit.ps1'
+    if (-not (Test-Path -LiteralPath $cli)) {
+        if (Get-Command Resolve-MeritSkillsRepoRoot -ErrorAction SilentlyContinue) {
+            $Script:MeritResolveRepoRoot = [string]$state.skillsFolder
+            $resolved = Resolve-MeritSkillsRepoRoot -AllowIdeMarker
+            if ($resolved.Root) {
+                $state.skillsFolder = $resolved.Root
+                $cli = Join-Path $resolved.Root 'merit.ps1'
+                Save-OssState $state
+            }
+        }
+    }
     if (-not (Test-Path -LiteralPath $cli)) {
         Write-Fail ('merit.ps1 missing at ' + $cli + ' - Hub J / skills clone first.')
         return

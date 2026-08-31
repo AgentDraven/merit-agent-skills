@@ -1,6 +1,23 @@
 # CHANGELOG
 
 
+## [0.5.44] - 2026-08-30
+
+### Added
+- **Merit Surface** — `BootStrap/_resolve.ps1`, `cfg/merit_surface.json`, `Get-MeritSurface` for independent A/B/C/H/D discovery.
+- **`merit.ps1 where` / `surface`** — surface map + recovery hints; `-NoWrite` for CI.
+- **`merit.ps1 ship`** — OSS skills release (commit + `skills-v*` tag + push); vault redirect unless `MERIT_SHIP_OSS=1`.
+- **`oss-bench.json` schema v3** — `vaultFolder`, `hubScript`, `ideSkillsHosts`, `surfaceEdition`.
+- **`.merit-surface.json`** — IDE host marker from `install.ps1` / Hub **I**.
+- **skill `merit-surface`** — matrix + agent path resolution.
+- **`docs/merit_surface_matrix.md`** — canonical 8-combo reference.
+- **`scripts/test-merit-surface.ps1`** — resolver unit tests + CI `where -NoWrite`.
+
+### Changed
+- **Merit-Hub** — menu **W** / `-Surface`, startup surface receipt, embedded pre-B resolver, demo gate on **3**/**OC**, `agentCloseout` OSS tiers.
+- **AGENTS.md** / **merit-closeout** — tiered closeout (OSS `ship` vs vault `mXin`).
+- Merit-Hub embedded pins: **`skills-v0.5.44`**, **`vault-v0.5.50`**.
+
 ## [0.5.43] - 2026-08-30
 
 ### Fixed

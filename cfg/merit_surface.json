@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Merit Surface resolver — search paths and combo behaviors for OSS / IDE / vault discovery.",
+  "defaultShipBranch": "main",
+  "vaultOwner": "AgentDraven",
+  "vaultRepo": "merit-private-vault",
+  "skillsSearchPaths": [
+    "%MYMERITAPP%\\merit-agent-skills",
+    "C:\\DevApps\\merit-agent-skills",
+    "C:\\MyMeritApp\\merit-agent-skills",
+    "%USERPROFILE%\\MyMeritApp\\merit-agent-skills",
+    "~/MyMeritApp/merit-agent-skills"
+  ],
+  "vaultSearchPaths": [
+    "%MERIT_VAULT_ROOT%",
+    "%USERPROFILE%\\dev\\AgentDraven\\merit-private-vault",
+    "~/dev/AgentDraven/merit-private-vault",
+    "C:\\DevApps\\merit-private-vault"
+  ],
+  "hubSearchPaths": [
+    "%MYMERITTOOLS%\\Merit-Hub.ps1",
+    "C:\\Tools\\Merit-Hub.ps1"
+  ],
+  "comboBehaviors": {
+    "none": { "recovery": ["Download Merit-Hub.ps1 Raw to %MYMERITTOOLS%", "Run Hub 1 then 2"] },
+    "ide-only": { "recovery": ["Hub 2 clones OSS bench", "Or git clone merit-agent-skills to %MYMERITAPP%"] },
+    "oss": { "recovery": ["merit.ps1 where", "Hub W for surface receipt"] },
+    "vault-only": { "recovery": ["Hub 2 for OSS/OC path", "Vault scripts/merit.ps1 for operator"] }
+  }
+}

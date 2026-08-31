@@ -127,6 +127,21 @@ Get-ChildItem -LiteralPath $skillsSrc -Directory | ForEach-Object {
     $count++
 }
 Write-Host "Installed $count skills to $destRoot (Target=$Target)"
+$pin = ''
+$verFile = Join-Path $repoRoot 'VERSION'
+if (Test-Path -LiteralPath $verFile) {
+    $v = ((Get-Content -LiteralPath $verFile -Raw) -split '\r?\n')[0].Trim()
+    if ($v) { $pin = "skills-v$v" }
+}
+$marker = @{
+    schemaVersion  = 1
+    skillsRepoRoot = $repoRoot
+    installedAt    = (Get-Date).ToString('o')
+    pin            = $pin
+    installTarget  = $resolved
+} | ConvertTo-Json -Depth 3
+Set-Content -LiteralPath (Join-Path $destRoot '.merit-surface.json') -Value $marker -Encoding UTF8
+Write-Host "Wrote surface marker -> $(Join-Path $destRoot '.merit-surface.json')"
 if ($resolved -eq 'OpenClaw') {
     Write-Host 'Tip: openclaw skills install ./skills/<skill-name> for CLI-managed single-skill installs.'
 }

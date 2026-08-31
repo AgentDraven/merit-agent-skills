@@ -64,6 +64,7 @@ param(
     [string]$Role = '',
     [string]$CatalogProject = '',
     [switch]$JoinMerit,
+    [switch]$Surface,
     [switch]$Force,
     [Alias('?')]
     [switch]$Help
@@ -93,10 +94,10 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.43",
+  "skillsPin": "skills-v0.5.44",
   "vaultPin": "vault-v0.5.50",
   "agentCloseoutRequired": true,
-  "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
+  "agentCloseout": "OSS: merit.ps1 closeout + ship (skills-v*) + chat 3-3. Operator when vault on disk: vault scripts/merit.ps1 mXin + git verify. Exception: WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",
@@ -132,6 +133,252 @@ function Write-Header([string]$t) {
 
 function Get-HubConfig {
     return ($Script:EmbeddedHubConfigJson | ConvertFrom-Json)
+}
+
+function Import-HubMeritResolve {
+    if (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue) { return $true }
+    $candidates = [System.Collections.Generic.List[string]]::new()
+    $benchSkills = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\BootStrap\_resolve.ps1'
+    [void]$candidates.Add($benchSkills)
+    if ($env:MERIT_SKILLS_ROOT) {
+        [void]$candidates.Add((Join-Path $env:MERIT_SKILLS_ROOT 'BootStrap\_resolve.ps1'))
+    }
+    foreach ($bench in @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP')) {
+        [void]$candidates.Add((Join-Path $bench 'merit-agent-skills\BootStrap\_resolve.ps1'))
+    }
+    foreach ($path in @('C:\DevApps\merit-agent-skills', 'C:\MyMeritApp\merit-agent-skills')) {
+        [void]$candidates.Add((Join-Path $path 'BootStrap\_resolve.ps1'))
+    }
+    foreach ($resolve in $candidates) {
+        if (-not (Test-Path -LiteralPath $resolve)) { continue }
+        try {
+            $Script:MeritResolveRepoRoot = Split-Path -Parent (Split-Path -Parent $resolve)
+            $Script:MeritResolveHubScript = $Script:HubScriptPath
+            $cfg = Get-HubConfig
+            $Script:MeritResolveHubPin = [string]$cfg.skillsPin
+            . $resolve
+            return $true
+        }
+        catch { }
+    }
+    Initialize-HubMeritSurfaceEmbed
+    return [bool](Get-Command Get-MeritSurface -ErrorAction SilentlyContinue)
+}
+
+function Initialize-HubMeritSurfaceEmbed {
+    if (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue) { return }
+    function script:Expand-HubMeritPath {
+        param([string]$Path)
+        if ([string]::IsNullOrWhiteSpace($Path)) { return $null }
+        $p = $Path.Trim()
+        if ($p -match '^%([A-Za-z_][A-Za-z0-9_]*)%\\?(.*)$') {
+            $val = [Environment]::GetEnvironmentVariable($Matches[1], 'Process')
+            if ([string]::IsNullOrWhiteSpace($val)) { $val = [Environment]::GetEnvironmentVariable($Matches[1], 'User') }
+            if ([string]::IsNullOrWhiteSpace($val)) { $val = [Environment]::GetEnvironmentVariable($Matches[1], 'Machine') }
+            if ([string]::IsNullOrWhiteSpace($val)) { return $null }
+            $p = if ($Matches[2]) { Join-Path $val $Matches[2] } else { $val }
+        }
+        if ($p.StartsWith('~/') -or $p -eq '~') {
+            $homeRoot = if ($env:USERPROFILE) { $env:USERPROFILE } else { $env:HOME }
+            if (-not $homeRoot) { return $null }
+            $p = Join-Path $homeRoot ($p.TrimStart([char[]]@('~', '/', '\')))
+        }
+        try { return [IO.Path]::GetFullPath($p) } catch { return $null }
+    }
+    function script:Test-HubSkillsRoot {
+        param([string]$Path)
+        $full = Expand-HubMeritPath $Path
+        if (-not $full) { return $false }
+        return ((Test-Path -LiteralPath (Join-Path $full 'merit.ps1')) -and (Test-Path -LiteralPath (Join-Path $full 'skills')))
+    }
+    function script:Test-HubVaultRoot {
+        param([string]$Path)
+        $full = Expand-HubMeritPath $Path
+        if (-not $full) { return $false }
+        return (Test-Path -LiteralPath (Join-Path $full 'scripts\merit.ps1'))
+    }
+    function Get-MeritSurface {
+        param([switch]$NoWrite, [string]$HubPin = '', [string]$HubScript = '')
+        if ($HubScript) { $Script:MeritResolveHubScript = $HubScript }
+        $skillsSearch = [System.Collections.Generic.List[string]]::new()
+        if ($env:MERIT_SKILLS_ROOT) { [void]$skillsSearch.Add($env:MERIT_SKILLS_ROOT) }
+        foreach ($scope in @('Process', 'User', 'Machine')) {
+            $app = [Environment]::GetEnvironmentVariable('MYMERITAPP', $scope)
+            if ($app) { [void]$skillsSearch.Add((Join-Path $app 'merit-agent-skills')) }
+        }
+        foreach ($p in @('C:\DevApps\merit-agent-skills', 'C:\MyMeritApp\merit-agent-skills')) { [void]$skillsSearch.Add($p) }
+        $benchJson = $null
+        foreach ($scope in @('Process', 'User', 'Machine')) {
+            $app = [Environment]::GetEnvironmentVariable('MYMERITAPP', $scope)
+            if (-not $app) { continue }
+            $bj = Join-Path $app 'oss-bench.json'
+            if (Test-Path -LiteralPath $bj) {
+                $benchJson = $bj
+                try {
+                    $raw = Get-Content -LiteralPath $bj -Raw -Encoding UTF8 | ConvertFrom-Json
+                    if ($raw.skillsFolder) { [void]$skillsSearch.Add([string]$raw.skillsFolder) }
+                }
+                catch { }
+                break
+            }
+        }
+        $skillsRoot = $null
+        foreach ($c in $skillsSearch) {
+            if (Test-HubSkillsRoot $c) { $skillsRoot = Expand-HubMeritPath $c; break }
+        }
+        $vaultSearch = [System.Collections.Generic.List[string]]::new()
+        if ($env:MERIT_VAULT_ROOT) { [void]$vaultSearch.Add($env:MERIT_VAULT_ROOT) }
+        $homeRoot = if ($env:USERPROFILE) { $env:USERPROFILE } else { $env:HOME }
+        if ($homeRoot) { [void]$vaultSearch.Add((Join-Path (Join-Path (Join-Path $homeRoot 'dev') 'AgentDraven') 'merit-private-vault')) }
+        $vaultRoot = $null
+        foreach ($c in $vaultSearch) {
+            if (Test-HubVaultRoot $c) { $vaultRoot = Expand-HubMeritPath $c; break }
+        }
+        $ideHosts = [System.Collections.Generic.List[string]]::new()
+        $staleIdeMarker = $false
+        $homeRoot = if ($env:USERPROFILE) { $env:USERPROFILE } else { $env:HOME }
+        foreach ($pair in @(
+                @{ id = 'cursor'; dest = (Join-Path $homeRoot '.cursor\skills') },
+                @{ id = 'claude'; dest = (Join-Path $homeRoot '.claude\skills') },
+                @{ id = 'codex'; dest = (Join-Path (if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $homeRoot '.codex' }) 'skills') },
+                @{ id = 'vscode'; dest = (Join-Path $homeRoot '.agents\skills') }
+            )) {
+            if (-not (Test-Path -LiteralPath $pair.dest)) { continue }
+            $meritDirs = @(Get-ChildItem -LiteralPath $pair.dest -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -like 'merit-*' })
+            if ($meritDirs.Count -lt 1) { continue }
+            [void]$ideHosts.Add($pair.id)
+            $marker = Join-Path $pair.dest '.merit-surface.json'
+            if (Test-Path -LiteralPath $marker) {
+                try {
+                    $m = Get-Content -LiteralPath $marker -Raw -Encoding UTF8 | ConvertFrom-Json
+                    if ($m.skillsRepoRoot -and -not (Test-HubSkillsRoot ([string]$m.skillsRepoRoot))) { $staleIdeMarker = $true }
+                }
+                catch { }
+            }
+        }
+        $hasA = ($ideHosts.Count -gt 0)
+        $hasB = [bool]$skillsRoot
+        $hasC = [bool]$vaultRoot
+        $edition = 'none'
+        if ($hasA -and $hasB -and $hasC) { $edition = 'full' }
+        elseif ($hasB -and $hasC) { $edition = 'oss+vault' }
+        elseif ($hasA -and $hasC) { $edition = 'vault+ide' }
+        elseif ($hasA -and $hasB) { $edition = 'oss+ide' }
+        elseif ($hasB) { $edition = 'oss' }
+        elseif ($hasA) { $edition = 'ide-only' }
+        elseif ($hasC) { $edition = 'vault-only' }
+        $demoFolder = $null
+        if ($skillsRoot) {
+            foreach ($scope in @('Process', 'User', 'Machine')) {
+                $app = [Environment]::GetEnvironmentVariable('MYMERITAPP', $scope)
+                if ($app) { $demoFolder = Join-Path $app 'merit-demo'; break }
+            }
+        }
+        $hubScript = if ($Script:MeritResolveHubScript) { $Script:MeritResolveHubScript } else { $null }
+        if (-not $hubScript) {
+            foreach ($scope in @('Process', 'User', 'Machine')) {
+                $tools = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', $scope)
+                if ($tools) {
+                    $cand = Join-Path $tools 'Merit-Hub.ps1'
+                    if (Test-Path -LiteralPath $cand) { $hubScript = $cand; break }
+                }
+            }
+        }
+        $skillsVersion = ''
+        if ($skillsRoot) {
+            $verFile = Join-Path $skillsRoot 'VERSION'
+            if (Test-Path -LiteralPath $verFile) {
+                $skillsVersion = ((Get-Content -LiteralPath $verFile -Raw) -split '\r?\n')[0].Trim()
+            }
+        }
+        $hubPinVal = if ($HubPin) { $HubPin } elseif ($Script:MeritResolveHubPin) { $Script:MeritResolveHubPin } else { '' }
+        $pinMismatch = $false
+        if ($hubPinVal -and $skillsVersion -and ($hubPinVal -ne "skills-v$skillsVersion")) { $pinMismatch = $true }
+        $hints = [System.Collections.Generic.List[string]]::new()
+        switch ($edition) {
+            'none' { [void]$hints.Add('Download Merit-Hub.ps1 Raw to %MYMERITTOOLS%'); [void]$hints.Add('Run Hub 1 then 2') }
+            'ide-only' {
+                [void]$hints.Add('Hub 2 clones merit-agent-skills to %MYMERITAPP%')
+                if ($staleIdeMarker) { [void]$hints.Add('IDE .merit-surface.json is stale — re-run Hub 2 after Pristine') }
+            }
+            default { [void]$hints.Add('Run Hub 2 when B missing; merit.ps1 where when B present') }
+        }
+        return [pscustomobject]@{
+            edition          = $edition
+            skillsRepoRoot   = $skillsRoot
+            publicMeritCli   = if ($skillsRoot) { Join-Path $skillsRoot 'merit.ps1' } else { $null }
+            demoFolder       = $demoFolder
+            vaultRoot        = $vaultRoot
+            operatorMeritCli = if ($vaultRoot) { Join-Path $vaultRoot 'scripts\merit.ps1' } else { $null }
+            hubScript        = $hubScript
+            ossBenchJson     = $benchJson
+            ideHosts         = @($ideHosts)
+            staleIdeMarker   = $staleIdeMarker
+            hubPin           = $hubPinVal
+            skillsVersion    = $skillsVersion
+            pinMismatch      = $pinMismatch
+            resolvedFrom     = @{ skills = 'hub-embed'; vault = 'hub-embed' }
+            recoveryHints    = @($hints)
+        }
+    }
+    function Write-MeritSurfaceReport {
+        param($Surface, [switch]$AsJson)
+        if ($AsJson) { $Surface | ConvertTo-Json -Depth 5; return }
+        Write-Host ''
+        Write-Host '  MERIT SURFACE (Hub embed — run Hub 2 for full resolver)' -ForegroundColor Cyan
+        Write-Host ('  edition:       {0}' -f $Surface.edition)
+        Write-Host ('  A IDE skills:  {0}' -f $(if ($Surface.ideHosts.Count) { $Surface.ideHosts -join ', ' } else { '(none)' }))
+        Write-Host ('  B OSS bench:   {0}' -f $(if ($Surface.skillsRepoRoot) { $Surface.skillsRepoRoot } else { '(missing)' }))
+        Write-Host ('  C vault:       {0}' -f $(if ($Surface.vaultRoot) { $Surface.vaultRoot } else { '(missing)' }))
+        Write-Host ('  D merit-demo:  {0}' -f $(if ($Surface.demoFolder -and (Test-Path -LiteralPath $Surface.demoFolder)) { $Surface.demoFolder } else { '(missing)' }))
+        Write-Host ('  H Hub:         {0}' -f $(if ($Surface.hubScript) { $Surface.hubScript } else { '(missing)' }))
+        if ($Surface.publicMeritCli) {
+            Write-Host ('  merit.ps1:     {0}' -f $Surface.publicMeritCli) -ForegroundColor Green
+            Write-Host ('  run:           pwsh -NoProfile -File "{0}" where' -f $Surface.publicMeritCli) -ForegroundColor DarkGray
+        }
+        if ($Surface.pinMismatch) {
+            Write-Host ('  WARN pin:      Hub {0} != B VERSION {1}' -f $Surface.hubPin, $Surface.skillsVersion) -ForegroundColor Yellow
+        }
+        if ($Surface.staleIdeMarker) {
+            Write-Host '  WARN:          stale IDE .merit-surface.json (B path gone) — Hub 2 to re-clone' -ForegroundColor Yellow
+        }
+        if ($Surface.recoveryHints.Count -gt 0) {
+            Write-Host '  recovery:' -ForegroundColor DarkYellow
+            foreach ($h in $Surface.recoveryHints) { Write-Host "    - $h" }
+        }
+        Write-Host ''
+    }
+}
+
+function Write-MeritSurfaceReceipt {
+    [void](Import-HubMeritResolve)
+    if (-not (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue)) {
+        Write-Warn 'Merit Surface resolver unavailable.'
+        return
+    }
+    $cfg = Get-HubConfig
+    $surf = Get-MeritSurface -HubPin ([string]$cfg.skillsPin) -HubScript $Script:HubScriptPath
+    if (Get-Command Write-MeritSurfaceReport -ErrorAction SilentlyContinue) {
+        Write-MeritSurfaceReport -Surface $surf
+    }
+}
+
+function Invoke-HubSurface {
+    Write-Header 'Merit Surface (W)'
+    Write-MeritSurfaceReceipt
+}
+
+function Test-HubDemoReady {
+    $demo = Join-Path (Get-MyMeritAppRoot) 'merit-demo'
+    $play = Join-Path $demo 'play\index.html'
+    if (Test-Path -LiteralPath $play) { return $true }
+    $state = $null
+    if (Get-Command Get-OssState -ErrorAction SilentlyContinue) { $state = Get-OssState }
+    if ($state -and $state.demoFolder) {
+        $play = Join-Path ([string]$state.demoFolder) 'play\index.html'
+        return (Test-Path -LiteralPath $play)
+    }
+    return $false
 }
 
 function Expand-HomePath([string]$Path) {
@@ -1088,6 +1335,11 @@ function Install-MeritToolsPwshPortable {
 }
 
 function Get-SkillsRepoRoot {
+    [void](Import-HubMeritResolve)
+    if (Get-Command Resolve-MeritSkillsRepoRoot -ErrorAction SilentlyContinue) {
+        $resolved = Resolve-MeritSkillsRepoRoot -AllowIdeMarker
+        if ($resolved.Root) { return $resolved.Root }
+    }
     $bench = Get-MyMeritAppRoot
     return Join-Path $bench 'merit-agent-skills'
 }
@@ -1177,6 +1429,21 @@ function Invoke-InstallMeritSkills {
         $count++
     }
     Write-Ok "Installed $count skills (Target=$Target)"
+    $pin = ''
+    $verFile = Join-Path $repoRoot 'VERSION'
+    if (Test-Path -LiteralPath $verFile) {
+        $v = ((Get-Content -LiteralPath $verFile -Raw) -split '\r?\n')[0].Trim()
+        if ($v) { $pin = "skills-v$v" }
+    }
+    $marker = @{
+        schemaVersion  = 1
+        skillsRepoRoot = $repoRoot
+        installedAt    = (Get-Date).ToString('o')
+        pin            = $pin
+        installTarget  = $resolved
+    } | ConvertTo-Json -Depth 3
+    Set-Content -LiteralPath (Join-Path $destRoot '.merit-surface.json') -Value $marker -Encoding UTF8
+    Write-Ok "Surface marker -> $(Join-Path $destRoot '.merit-surface.json')"
     if ($resolved -eq 'OpenClaw') {
         Write-Note 'Tip: openclaw skills install ./skills/<skill> for CLI single-skill installs.'
     }
@@ -1762,6 +2029,12 @@ function Invoke-HubTryIt {
     Write-HubMap -Here '3'
     Write-HubDrillIn '3'
     if (-not (Ensure-HubOssHelpers)) { return }
+    if (-not (Test-HubDemoReady)) {
+        Write-Fail 'merit-demo play missing (D). Run 2 Install OSS first.'
+        Write-Note 'Hub 2 seeds merit-demo under MYMERITAPP.'
+        Write-HubReceipt '3'
+        return
+    }
     $state = Get-OssState
     $play = Join-Path ([string]$state.demoFolder) 'play\index.html'
     if (-not (Test-Path -LiteralPath $play)) {
@@ -1780,6 +2053,12 @@ function Invoke-HubOc {
     Write-HubMap -Here 'OC'
     Write-HubDrillIn 'OC'
     if (-not (Ensure-HubOssHelpers)) { return }
+    if (-not (Test-HubDemoReady)) {
+        Write-Fail 'merit-demo play missing (D). Run 2 Install OSS first.'
+        Write-Note 'Hub 2 seeds merit-demo under MYMERITAPP.'
+        Write-HubReceipt 'OC'
+        return
+    }
     $state = Get-OssState
     $cli = Join-Path ([string]$state.skillsFolder) 'merit.ps1'
     $demo = [string]$state.demoFolder
@@ -2129,11 +2408,6 @@ function Invoke-JumpstartOss {
     Invoke-HubInstallOss
 }
 
-function Get-HubOssInternalScript {
-    $bench = Get-MyMeritAppRoot
-    return Join-Path $bench 'merit-agent-skills\BootStrap\_oss.ps1'
-}
-
 function Enter-HubOssPhase {
     param([switch]$Chain)
     Remove-RetiredOssLiveBootStrap
@@ -2170,6 +2444,11 @@ function Invoke-JumpstartVault {
 
     $ok = Invoke-GitClonePin -Url ([string]$cfg.vaultUrl) -Pin ([string]$cfg.vaultPin) -Dest $vaultDest -Label 'merit-private-vault'
     if (-not $ok) { return }
+    if (Get-Command Save-OssState -ErrorAction SilentlyContinue) {
+        $st = Get-OssState
+        $st.vaultFolder = $vaultDest
+        Save-OssState $st
+    }
 
     Write-HubReceipt '4'
     if ($Force) { return }
@@ -2230,6 +2509,7 @@ function Show-MeritHubHelp {
     Write-Host '  I) Install skills   Cursor, Codex, Hermes, ...'
     Write-Host '  M) Set MYMERITAPP bench path'
     Write-Host '  T) Set MYMERITTOOLS root'
+    Write-Host '  W) Where / Surface   A+B+C+D+H diagnostic map'
     Write-Host '  H) Help'
     Write-Host ''
     Write-Note 'Cold start: 1 then 2. 6 Join (sign up) after OC or after 4. Do not double-click this file.'
@@ -2246,6 +2526,7 @@ function Set-MyMeritToolsPrompt {
 function Show-InteractiveMenu {
     Ensure-MeritHubEnvAtStart
     Remove-RetiredOssLiveBootStrap
+    Write-MeritSurfaceReceipt
     while ($true) {
         Show-MeritHubHelp
         Write-Host '  Recommended cold start:  1 then 2' -ForegroundColor Yellow
@@ -2267,9 +2548,10 @@ function Show-InteractiveMenu {
             { $_ -in @('I', 'i', 'Install', 'InstallSkills') } { Invoke-InstallSkillsMenu; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; Read-Host 'Press Enter' | Out-Null }
+            { $_ -in @('W', 'w', 'Where', 'Surface') } { Invoke-HubSurface; Read-Host 'Press Enter' | Out-Null }
             '^(H|h|\?|Help)$' { continue }
             '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or P S B I M T H).' }
+            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or P S B I M T W H).' }
         }
     }
 }
@@ -2282,6 +2564,7 @@ if ($Help) {
 }
 Ensure-HubElevated
 Sync-HubMeritEnvFromUser
+[void](Import-HubMeritResolve)
 [void](Import-HubOssHelpers)
 New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
 Start-HubTranscript
@@ -2289,6 +2572,7 @@ try {
     if ($Pristine) { Invoke-Mode -Mode Pristine; return }
     if ($Soft) { Invoke-Mode -Mode Soft; return }
     if ($BackupOnly) { Invoke-Mode -Mode BackupOnly; return }
+    if ($Surface) { Invoke-HubSurface; return }
     if ($Prereqs) { Invoke-HubSetupLaptop; return }
     if ($InstallSkills) {
         [void](Invoke-InstallMeritSkills -Target $InstallSkills -ProjectPath $InstallSkillsPath)
@@ -2305,7 +2589,7 @@ try {
     if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
 
     $bound = $PSBoundParameters.Keys
-    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'R', 'Rc', 'JoinMerit') | Where-Object { $bound -contains $_ }
+    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'R', 'Rc', 'JoinMerit', 'Surface') | Where-Object { $bound -contains $_ }
     if (-not $hasAction) {
         Show-InteractiveMenu
     }

@@ -72,6 +72,8 @@ Cold start may use `git clone` **once**. After that:
 
 Do not agent-closeout with raw `git commit`/`tag`/`push`. See vault §7c.7.
 
+**Merit Surface:** run `.\merit.ps1 where` (B present) or `Merit-Hub.ps1 -Surface` / menu **W** (B missing). See [docs/merit_surface_matrix.md](merit_surface_matrix.md).
+
 ## Related
 
 - [BootStrap/README.md](../BootStrap/README.md) — how to run
