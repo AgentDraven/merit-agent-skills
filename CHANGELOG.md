@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## [0.5.43] - 2026-08-30
+
+### Fixed
+- **Merit-Hub** — `Import-HubOssHelpers` reloads `BootStrap\_oss.ps1` on demand (steps 2/3 no longer require exit/reopen after skills clone).
+- **Merit-Hub Pristine** — wipe all known `MYMERITAPP` / `MYMERITTOOLS` paths (Process/User/Machine, defaults, backup `env-snapshot.json` history) before clearing env; benches/tools wiped before env clear.
+
+### Changed
+- Merit-Hub embedded pins: **`skills-v0.5.43`**, **`vault-v0.5.50`**.
+
 ## [0.5.42] - 2026-08-30
 
 ### Added

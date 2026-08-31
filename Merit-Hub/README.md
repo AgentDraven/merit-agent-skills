@@ -4,7 +4,7 @@
 
 `C:\Tools` (or `%MYMERITTOOLS%`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.42` · `vault-v0.5.50` — see [CompatSet](#compatset--pins).
+**Embedded pins (current release):** `skills-v0.5.43` · `vault-v0.5.50` — see [CompatSet](#compatset--pins).
 
 ---
 
@@ -84,7 +84,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 
 3. First run: **Enter** for `MYMERITTOOLS` / `MYMERITAPP` (defaults `C:\Tools` / `C:\MyMeritApp`).
 4. **1** Setup laptop — git / gh / pwsh + `merit-venv`.
-5. **2** (alias **J**) Install OSS — clone skills pin + merit-demo + quiet smoke.
+5. **2** (alias **J**) Install OSS — clone skills pin + merit-demo + quiet smoke. OSS helpers reload automatically in the same session (no exit/reopen).
 6. **3** Try it locally — open `merit-demo\play\index.html`.
 7. Branch: **OC** (creator cloud) · **4/V** (vault local) · **5/R** (catalog clone).
 8. **6** Join MERIT — after **OC** (store register) or after **4** (operator/partner). Not OC-only.
@@ -154,7 +154,7 @@ Do **1** then **2** first. The Hub prints this map every run.
 
 | Key | Action |
 |-----|--------|
-| **P** | **Pristine v2** — wipe OSS bench, leftover `Tools\Merit-Hub\`, `~/dev`, MYMERIT* env (re-prompt next run), merit-venv. Keeps `C:\Tools\Merit-Hub.ps1` |
+| **P** | **Pristine v2** — wipe every known MYMERITAPP/MYMERITTOOLS path (incl. stale Process env + backup history), `~/dev`, MYMERIT* env (re-prompt next run), merit-venv. Keeps `C:\Tools\Merit-Hub.ps1` |
 | **S** | **Soft** — bench + status cleanup; keep `~/dev` clones |
 | **B** | **Backup only** — snapshot next to script |
 | **I** | Install skills to AI host (Cursor, Codex, Hermes, …). Replaces per folder |
@@ -172,7 +172,7 @@ Merit-Hub embeds release pins — no separate JSON required:
 
 | Pin | Repo | Role |
 |-----|------|------|
-| `skills-v0.5.42` | merit-agent-skills | OSS cold-start clone |
+| `skills-v0.5.43` | merit-agent-skills | OSS cold-start clone |
 | `vault-v0.5.50` | merit-private-vault | Operator cold-start clone |
 
 **Active CompatSet:** `2026.08.3` (vault `cfg/compat/`). F0+F1 + **m4fi** are **live-verified** on the operator laptop; F2–F4/FX rows are **inventory carry-forward** until each repo completes clone → git verify → mXin.

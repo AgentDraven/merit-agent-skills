@@ -93,7 +93,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.42",
+  "skillsPin": "skills-v0.5.43",
   "vaultPin": "vault-v0.5.50",
   "agentCloseoutRequired": true,
   "agentCloseout": "Never end a completed scope without merit.ps1 mXin + git verify + chat 3-3 (Done, State with VERSION/tag, Next). Exception only if user said WIP / no commit / local-only.",
@@ -183,6 +183,84 @@ function Get-DevRoot {
     $cfg = Get-HubConfig
     $sub = if ($cfg.devSubdir) { [string]$cfg.devSubdir } else { 'dev' }
     return Expand-HomePath (Join-Path $HOME $sub)
+}
+
+function Add-HubKnownPath {
+    param(
+        [System.Collections.Generic.HashSet[string]]$Seen,
+        [string]$Path
+    )
+    if ([string]::IsNullOrWhiteSpace($Path)) { return }
+    try {
+        $full = Expand-HomePath $Path
+        [void]$Seen.Add($full)
+    }
+    catch { }
+}
+
+function Get-AllKnownMeritEnvPaths {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('MYMERITAPP', 'MYMERITTOOLS')]
+        [string]$Name,
+        [string]$BackupDir = ''
+    )
+    $seen = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    foreach ($scope in @('Process', 'User', 'Machine')) {
+        Add-HubKnownPath -Seen $seen -Path ([Environment]::GetEnvironmentVariable($Name, $scope))
+    }
+    if ($Name -eq 'MYMERITAPP') {
+        Add-HubKnownPath -Seen $seen -Path (Get-DefaultMyMeritApp)
+    }
+    else {
+        Add-HubKnownPath -Seen $seen -Path (Get-DefaultMyMeritTools)
+    }
+    $snapDirs = New-Object System.Collections.Generic.List[string]
+    if ($BackupDir) { [void]$snapDirs.Add($BackupDir) }
+    if ($Script:BackupRoot -and (Test-Path -LiteralPath $Script:BackupRoot)) {
+        Get-ChildItem -LiteralPath $Script:BackupRoot -Directory -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 5 |
+            ForEach-Object { [void]$snapDirs.Add($_.FullName) }
+    }
+    foreach ($dir in $snapDirs) {
+        $snap = Join-Path $dir 'env-snapshot.json'
+        if (-not (Test-Path -LiteralPath $snap)) { continue }
+        try {
+            $meta = Get-Content -LiteralPath $snap -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($Name -eq 'MYMERITAPP') {
+                Add-HubKnownPath -Seen $seen -Path ([string]$meta.ossBench)
+                Add-HubKnownPath -Seen $seen -Path ([string]$meta.myMeritAppUser)
+                Add-HubKnownPath -Seen $seen -Path ([string]$meta.myMeritAppProc)
+            }
+            else {
+                Add-HubKnownPath -Seen $seen -Path ([string]$meta.myMeritTools)
+                Add-HubKnownPath -Seen $seen -Path ([string]$meta.myMeritToolsUser)
+            }
+        }
+        catch { }
+    }
+    return @($seen)
+}
+
+function Sync-HubMeritEnvFromUser {
+    if (Test-HubProcessBenchMode) { return }
+    foreach ($name in @('MYMERITTOOLS', 'MYMERITAPP')) {
+        $user = [Environment]::GetEnvironmentVariable($name, 'User')
+        $proc = [Environment]::GetEnvironmentVariable($name, 'Process')
+        if (-not [string]::IsNullOrWhiteSpace($user)) {
+            if ($proc -ne $user) {
+                Set-Item -Path "Env:$name" -Value $user
+                if ($proc) {
+                    Write-Note "Synced Process $name to User ($user); was $proc"
+                }
+            }
+        }
+        elseif (-not [string]::IsNullOrWhiteSpace($proc)) {
+            Remove-Item "Env:$name" -ErrorAction SilentlyContinue
+            Write-Note "Dropped stale Process $name ($proc) — User is empty"
+        }
+    }
 }
 
 function Test-HubAdmin {
@@ -347,6 +425,9 @@ function Set-UserEnvVar {
     }
     Write-Ok "SET User env $Name = $Value (was $(if ($existing) { $existing } else { 'empty' }))"
     Write-Note 'Open a NEW terminal to see User env in other windows. This process already has it.'
+    if ($Name -eq 'MYMERITAPP') {
+        [void](Import-HubOssHelpers)
+    }
 }
 
 function Clear-EnvVarAllScopes {
@@ -622,15 +703,14 @@ function Invoke-WipeLegacyMeritHubFolder {
 }
 
 function Invoke-WipeOssBenches {
-    param([string]$ConfiguredOss)
-    $seen = @{}
-    $targets = @()
-    foreach ($p in @($ConfiguredOss, (Get-DefaultMyMeritApp))) {
-        if ([string]::IsNullOrWhiteSpace($p)) { continue }
-        $full = Expand-HomePath $p
-        if ($seen.ContainsKey($full)) { continue }
-        $seen[$full] = $true
-        $targets += $full
+    param(
+        [string]$ConfiguredOss,
+        [string]$BackupDir = ''
+    )
+    $targets = @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP' -BackupDir $BackupDir)
+    if (-not [string]::IsNullOrWhiteSpace($ConfiguredOss)) {
+        $full = Expand-HomePath $ConfiguredOss
+        if ($targets -notcontains $full) { $targets += $full }
     }
     $hubDir = Expand-HomePath $Script:HubRoot
     foreach ($fullOss in $targets) {
@@ -651,11 +731,9 @@ function Remove-RetiredOssLiveBootStrap {
     # Old OSS BootStrap copied a second product to %MYMERITAPP%\BootStrap plus a
     # bench-root MERIT_BootStrap.cmd. Hub never creates those. Git source stays at
     # %MYMERITAPP%\merit-agent-skills\BootStrap\_oss.ps1.
-    $benches = New-Object System.Collections.Generic.List[string]
-    foreach ($p in @((Get-MyMeritAppRoot), (Get-DefaultMyMeritApp))) {
-        if ([string]::IsNullOrWhiteSpace($p)) { continue }
-        $full = Expand-HomePath $p
-        if (-not $benches.Contains($full)) { [void]$benches.Add($full) }
+    $benches = [System.Collections.Generic.List[string]]::new()
+    foreach ($p in @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP')) {
+        if (-not $benches.Contains($p)) { [void]$benches.Add($p) }
     }
     foreach ($bench in $benches) {
         if (-not (Test-Path -LiteralPath $bench)) { continue }
@@ -780,25 +858,32 @@ function Invoke-RogueFolderReview {
 }
 
 function Invoke-WipeMeritToolsArtifacts {
-    param([bool]$IncludeGhShims = $true)
-    $tools = Get-MyMeritToolsRoot
-    Write-Info "MYMERITTOOLS = $tools"
-    Invoke-WipeLegacyMeritHubFolder
-    Remove-PathSafe -Path (Join-Path $tools 'merit-venv') -Label 'merit-venv'
-    foreach ($f in @('merit-python.cmd', 'merit-python', 'merit-python.ps1', 'pwsh.cmd')) {
-        Remove-PathSafe -Path (Join-Path $tools $f) -Label $f
+    param(
+        [bool]$IncludeGhShims = $true,
+        [string]$BackupDir = ''
+    )
+    $toolsPaths = @(Get-AllKnownMeritEnvPaths -Name 'MYMERITTOOLS' -BackupDir $BackupDir)
+    if ($toolsPaths.Count -eq 0) {
+        $toolsPaths = @(Get-MyMeritToolsRoot)
     }
-    # Keep %MYMERITTOOLS%\pwsh\ tree on Pristine (re-download via menu 1); remove only if empty aside shim
-    if ($IncludeGhShims) {
-        foreach ($f in @('gh.cmd', 'gh')) {
-            $p = Join-Path $tools $f
-            if (Test-Path -LiteralPath $p -PathType Leaf) {
-                $size = (Get-Item -LiteralPath $p).Length
-                if ($size -lt 2048) {
-                    Remove-PathSafe -Path $p -Label "Tools shim $f"
-                }
-                else {
-                    Write-Info ('skip large Tools\' + $f + ' (' + $size + ' bytes) - not assumed MERIT shim')
+    Write-Info ("MYMERITTOOLS wipe targets: " + ($toolsPaths -join '; '))
+    Invoke-WipeLegacyMeritHubFolder
+    foreach ($tools in $toolsPaths) {
+        Remove-PathSafe -Path (Join-Path $tools 'merit-venv') -Label "merit-venv @ $tools"
+        foreach ($f in @('merit-python.cmd', 'merit-python', 'merit-python.ps1', 'pwsh.cmd')) {
+            Remove-PathSafe -Path (Join-Path $tools $f) -Label "$f @ $tools"
+        }
+        if ($IncludeGhShims) {
+            foreach ($f in @('gh.cmd', 'gh')) {
+                $p = Join-Path $tools $f
+                if (Test-Path -LiteralPath $p -PathType Leaf) {
+                    $size = (Get-Item -LiteralPath $p).Length
+                    if ($size -lt 2048) {
+                        Remove-PathSafe -Path $p -Label "Tools shim $f @ $tools"
+                    }
+                    else {
+                        Write-Info ('skip large ' + $p + ' (' + $size + ' bytes) - not assumed MERIT shim')
+                    }
                 }
             }
         }
@@ -821,8 +906,10 @@ function Invoke-MeritCleanup {
 
     Write-Header "Cleanup plan ($ModeName)"
     Write-Info "Backup:     $BackupDir"
-    Write-Info "MYMERITAPP: $oss (wipe=$DoWipeOss)"
-    Write-Info "MYMERITTOOLS: $tools (wipe MERIT artifacts=$DoWipeToolsArtifacts)"
+    $benchList = @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP' -BackupDir $BackupDir)
+    $toolsList = @(Get-AllKnownMeritEnvPaths -Name 'MYMERITTOOLS' -BackupDir $BackupDir)
+    Write-Info ("MYMERITAPP benches to wipe ($($benchList.Count)): " + ($benchList -join '; '))
+    Write-Info ("MYMERITTOOLS trees to wipe ($($toolsList.Count)): " + ($toolsList -join '; '))
     Write-Info "~/dev:      $dev (wipe tree=$DoWipeDevTree)"
     Write-Info 'Will clear MYMERITAPP + MYMERITTOOLS (User/Machine/Process where allowed)'
     Write-Info 'That is why a later hub run has empty MYMERIT* until you answer the prompts again (Enter = defaults).'
@@ -870,19 +957,21 @@ function Invoke-MeritCleanup {
         }
     }
 
+    if ($DoWipeOss) {
+        Invoke-WipeOssBenches -ConfiguredOss $oss -BackupDir $BackupDir
+    }
+    if ($DoWipeToolsArtifacts) {
+        Invoke-WipeMeritToolsArtifacts -BackupDir $BackupDir
+    }
+
     Clear-EnvVarAllScopes -Name 'MYMERITAPP'
     if ($DoWipeToolsArtifacts) {
         Clear-EnvVarAllScopes -Name 'MYMERITTOOLS'
-        Invoke-WipeMeritToolsArtifacts
     }
     Write-Note 'MYMERITAPP / MYMERITTOOLS cleared. Next interactive run will prompt (Enter = defaults).'
     Write-HubEnvScopes
 
     Remove-PathFromUserEnvPath -PathsToRemove @($dev)
-
-    if ($DoWipeOss) {
-        Invoke-WipeOssBenches -ConfiguredOss $oss
-    }
 
     if ($ModeName -eq 'Pristine') {
         Invoke-RogueFolderReview
@@ -899,7 +988,7 @@ function Invoke-Mode {
     switch ($Mode) {
         'Pristine' {
             Write-Header 'Mode: PRISTINE v2 (brand-new laptop)'
-            Write-Info 'Wipes OSS bench (MYMERITAPP and default C:\MyMeritApp), leftover Tools\Merit-Hub folder, ~/dev tree, MYMERIT* env, merit-venv/shims.'
+            Write-Info 'Wipes every known MYMERITAPP bench (Process/User/Machine, defaults, backup history) and MYMERITTOOLS merit-venv/shims, ~/dev tree, MYMERIT* env.'
             Write-Info "Keeps this hub script only: $Script:HubScriptPath"
             $backup = New-MeritBackup
             Invoke-MeritCleanup -BackupDir $backup -ModeName $Mode -ConfirmWord 'PRISTINE' `
@@ -1003,6 +1092,17 @@ function Get-SkillsRepoRoot {
     return Join-Path $bench 'merit-agent-skills'
 }
 
+function Get-HubOssInternalScript {
+    return Join-Path (Get-SkillsRepoRoot) 'BootStrap\_oss.ps1'
+}
+
+function Import-HubOssHelpers {
+    $oss = Get-HubOssInternalScript
+    if (-not (Test-Path -LiteralPath $oss)) { return $false }
+    . $oss
+    return [bool](Get-Command Get-OssState -ErrorAction SilentlyContinue)
+}
+
 function Ensure-SkillsRepo {
     $cfg = Get-HubConfig
     $dest = Get-SkillsRepoRoot
@@ -1014,6 +1114,7 @@ function Ensure-SkillsRepo {
     if (-not (Invoke-GitClonePin -Url ([string]$cfg.skillsUrl) -Pin ([string]$cfg.skillsPin) -Dest $dest -Label 'merit-agent-skills')) {
         return $null
     }
+    [void](Import-HubOssHelpers)
     return $dest
 }
 
@@ -1390,6 +1491,7 @@ function Ensure-MeritHubEnvAtStart {
         $path = if ([string]::IsNullOrWhiteSpace($ans)) { $def } else { $ans }
         Set-UserEnvVar -Name 'MYMERITAPP' -Value (Expand-HomePath $path)
     }
+    [void](Import-HubOssHelpers)
 }
 
 function Ensure-MyMeritAppPrompt {
@@ -1425,6 +1527,7 @@ function Invoke-GitClonePin {
         Write-Info "Fetching / checking out $Pin ..."
         & git -C $Dest fetch --tags origin 2>&1 | Out-Host
         & git -C $Dest checkout --detach "refs/tags/$Pin" 2>&1 | Out-Host
+        if ($Dest -match '[\\/]merit-agent-skills$') { [void](Import-HubOssHelpers) }
         return ($LASTEXITCODE -eq 0)
     }
     if (Test-Path -LiteralPath $Dest) {
@@ -1438,6 +1541,7 @@ function Invoke-GitClonePin {
         return $false
     }
     Write-Ok "Cloned $Label @ $Pin"
+    if ($Dest -match '[\\/]merit-agent-skills$') { [void](Import-HubOssHelpers) }
     return $true
 }
 
@@ -1608,8 +1712,8 @@ function Ensure-HubOssHelpers {
         Write-Note 'Run Hub 2 first so merit-agent-skills is cloned under MYMERITAPP.'
         return $false
     }
-    if (-not (Get-Command Get-OssState -ErrorAction SilentlyContinue)) {
-        Write-Fail "OSS helpers did not load Get-OssState from $oss (dot-source Hub at script scope)."
+    if (-not (Import-HubOssHelpers)) {
+        Write-Fail "OSS helpers did not load Get-OssState from $oss"
         return $false
     }
     return $true
@@ -2177,10 +2281,8 @@ if ($Help) {
     return
 }
 Ensure-HubElevated
-$ossHelpers = Get-HubOssInternalScript
-if (Test-Path -LiteralPath $ossHelpers) {
-    . $ossHelpers
-}
+Sync-HubMeritEnvFromUser
+[void](Import-HubOssHelpers)
 New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
 Start-HubTranscript
 try {
