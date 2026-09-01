@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.50] - 2026-08-31
+
+### Changed
+- Removed one-off `scripts/ship-prepristine-049.ps1` helper from main.
+- Merit-Hub pin: **skills-v0.5.50**.
 
 ## [0.5.49] - 2026-08-31
 
