@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [0.5.54] - 2026-08-31
+
+### Changed
+- **Merit-Hub menu rationalization** — sprawl scan **G** / `-SprawlScan` (fixes **V** collision with vault); vault clone **4** only.
+- **Merit-Hub/README.md** — full menu reference, persona "If you want to…" table, cleanup sequences (G→A→P).
+- Root README pin sync; dinner tutorial → `docs/howto/launch-over-dinner.md`.
+- Hub embed `vaultPin` → `vault-v0.5.54`.
+
 ## [0.5.53] - 2026-08-31
 
 ### Added

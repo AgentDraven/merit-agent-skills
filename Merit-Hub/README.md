@@ -2,9 +2,59 @@
 
 **Download one script:** [`Merit-Hub.ps1`](Merit-Hub.ps1) — standalone, no git, no folder, no `.json`, no extra launcher.
 
-`C:\Tools` (or `%MYMERITTOOLS%`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
+`%MYMERITTOOLS%` (e.g. `C:\Tools` or `C:\DevTools`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.53` · `vault-v0.5.50` — see [CompatSet](#compatset--pins).
+**Embedded pins (current release):** `skills-v0.5.54` · `vault-v0.5.54` — see [CompatSet](#compatset--pins).
+
+**Raw download:** `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
+
+---
+
+## If you want to… (personas)
+
+| If you want to… | Then |
+|-----------------|------|
+| **Cold-start MERIT on a new laptop** | Download Raw `Merit-Hub.ps1` → `%MYMERITTOOLS%\` → run full `-File` line → **1** → **2** → **3** |
+| **Publish a creator app in the cloud (no vault)** | After **2** → **OC** → **6** Join |
+| **Work as vault operator (AgentDraven / partner)** | After **2** → **4** → **VC** → `runtime out` + `runtime verify` → **6** |
+| **Clone and deploy a catalog repo (m4fi, …)** | After **2** → **5** → **RC** |
+| **Install MERIT skills into Cursor / Codex / etc.** | After **2** → **I** (or `-InstallSkills Cursor`) |
+| **See what is on this laptop (A+B+C+D+H)** | **W** or `-Surface` |
+| **Preview leftover MERIT folders before cleanup** | **G** or `-SprawlScan` (no changes) |
+| **Archive laptop state without wiping** | **A** or `-PrePristine` |
+| **Full reset and walk cold-start again** | Fresh Raw Hub → **G** (optional) → **A** → **P** → **1** → **2** → **3** |
+| **Wipe bench only; keep `~/dev` clones** | **S** or `-Soft` |
+| **Change where OSS bench or tools live** | **M** (`MYMERITAPP`) or **T** (`MYMERITTOOLS`) |
+| **Second creator on same PC** | Separate `MYMERITAPP` bench + [`oc-bench.ps1`](oc-bench.ps1) or Hub **OC -NewOc** |
+
+---
+
+## Recommended sequences
+
+### New laptop (first time)
+
+```text
+Download Hub → pwsh -NoProfile -ExecutionPolicy Bypass -File %MYMERITTOOLS%\Merit-Hub.ps1
+→ 1 Setup → 2 Install OSS → 3 Try it → (OC | 4 | 5) → 6 Join
+```
+
+### Messy laptop (sprawl from testing MYMERIT* names)
+
+```text
+Fresh Raw Hub → G (sprawl preview) → A (archive + sprawl review) → P (wipe) → 1 → 2 → 3 → W
+```
+
+### Operator validation laptop
+
+```text
+A → -Help (confirm pin) → P → 1 → 2 → I → 4 → VC → runtime out/verify
+```
+
+### Cleanup-only (no full wipe)
+
+```text
+G → A    (or S for bench-only soft cleanup)
+```
 
 ---
 
@@ -12,267 +62,181 @@
 
 ```mermaid
 flowchart TB
-  subgraph tools ["MYMERITTOOLS (e.g. C:\\Tools)"]
+  subgraph tools ["MYMERITTOOLS"]
     HUB["Merit-Hub.ps1"]
     VENV["merit-venv + shims"]
-    PWSH["pwsh portable (optional)"]
+    BACK["backups/"]
   end
 
-  subgraph bench ["MYMERITAPP (e.g. C:\\MyMeritApp)"]
+  subgraph bench ["MYMERITAPP"]
     SKILLS["merit-agent-skills/"]
     DEMO["merit-demo play/"]
     BENCH["oss-bench.json"]
   end
 
-  subgraph dev ["~/dev (operator clones)"]
+  subgraph dev ["~/dev"]
     VAULT["merit-private-vault"]
-    CATALOG["catalog repos m4fi, …"]
+    CATALOG["catalog repos"]
   end
 
-  subgraph hosts ["Hosted planes"]
-    V00["merit-prod v00 — public default"]
-    V01["merit-prodv01 — operator mesh"]
-    STORE["meritstore / storev01"]
-  end
-
-  subgraph ai ["AI hosts"]
-    CURSOR["~/.cursor/skills"]
-    AGENTS["~/.agents/skills"]
-  end
-
-  HUB -->|"1 Setup"| VENV
-  HUB -->|"2 / J Install OSS"| SKILLS
-  HUB -->|"2 seeds"| DEMO
-  HUB -->|"4 / V"| VAULT
+  HUB -->|"1"| VENV
+  HUB -->|"2 / J"| SKILLS
+  HUB -->|"4"| VAULT
   HUB -->|"5 / R"| CATALOG
-  HUB -->|"I Install skills"| CURSOR
-  HUB -->|"I Install skills"| AGENTS
-  HUB -->|"OC"| V00
-  HUB -->|"OC register"| STORE
-  VAULT -->|"runtime out"| AGENTS
-  SKILLS -->|"cfg/live_ecosystems.json"| V00
+  HUB -->|"G A P"| BACK
 ```
 
-**Law:** Hub owns **cold start on one laptop**. Vault owns **policy + CompatSet**. Skills repo owns **OSS catalog + public docs**. Hosted v00 is the public bolt-on default until vault `publish_gate` promotes v01.
+**Law:** Hub owns **cold start on one laptop**. Vault owns **policy + CompatSet**. Skills repo owns **OSS catalog + public docs**.
 
 ---
 
 ## Cold-start sequence
 
-```mermaid
-flowchart LR
-  A["Download Hub.ps1\n→ C:\\Tools"] --> B["pwsh -NoProfile\n-ExecutionPolicy Bypass\n-File …"]
-  B --> C["1 Setup laptop"]
-  C --> D["2 Install OSS"]
-  D --> E["3 Try local play"]
-  E --> F{"Path?"}
-  F -->|Creator| G["OC → 6 Join"]
-  F -->|Operator| H["4 V → VC → runtime out"]
-  F -->|Catalog| I["5 R → RC"]
-  H --> J["6 Join partner"]
-  G --> J
-```
+<a id="cold-start-sequence"></a>
 
-### Numbered steps (minimum)
-
-1. Open [`Merit-Hub.ps1`](Merit-Hub.ps1) on GitHub → **Raw** → Save As `C:\Tools\Merit-Hub.ps1` (browser **Keep**).
+1. Open [`Merit-Hub.ps1`](Merit-Hub.ps1) on GitHub → **Raw** → Save As `%MYMERITTOOLS%\Merit-Hub.ps1` (browser **Keep**).
 2. Run this entire line (do **not** double-click):
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1
 ```
 
-3. First run: **Enter** for `MYMERITTOOLS` / `MYMERITAPP` (defaults `C:\Tools` / `C:\MyMeritApp`).
+3. First run: **Enter** for `MYMERITTOOLS` / `MYMERITAPP` defaults.
 4. **1** Setup laptop — git / gh / pwsh + `merit-venv`.
-5. **2** (alias **J**) Install OSS — clone skills pin + merit-demo + quiet smoke. OSS helpers reload automatically in the same session (no exit/reopen).
-6. **3** Try it locally — open `merit-demo\play\index.html`.
-7. Branch: **OC** (creator cloud) · **4/V** (vault local) · **5/R** (catalog clone).
-8. **6** Join MERIT — after **OC** (store register) or after **4** (operator/partner). Not OC-only.
+5. **2** (alias **J**) Install OSS — clone skills pin + merit-demo + quiet smoke.
+6. **3** Try it — open `merit-demo\play\index.html`.
+7. Branch: **OC** · **4** (vault) · **5** (catalog).
+8. **6** Join MERIT — after **OC** or after **4**.
+
+---
+
+## Full menu reference
+
+Do **1** then **2** first unless you are only running cleanup keys (**G A P S**).
+
+### Numbered keys (cold start)
+
+| Key | CLI flags | Action |
+|-----|-----------|--------|
+| **1** | `-Prereqs` | Setup laptop — git, gh, pwsh, `MYMERITTOOLS` Python venv |
+| **2** | `-Jumpstart Oss`, `-InstallOss`, `-OssPhase`, **J** | Install OSS — skills pin + merit-demo + quiet smoke |
+| **3** | `-TryIt` | Open local `merit-demo\play\index.html` |
+| **OC** | `-Oc`, `-NewOc` | OSS in the Cloud — DualRail play + store activate |
+| **4** | `-Jumpstart Vault` | Clone private vault (local working copy) |
+| **VC** | `-Vc` | Venture Capable — operator BootStrap + gates (after **4**) |
+| **5** | `-R` | Catalog clone — consumer or provider role |
+| **RC** | `-Rc` | Deploy **that** catalog repo to its host (Vercel) — not OC |
+| **6** | `-JoinMerit` | Portal / register links — after **OC** or **4** |
+| **0** | — | Stop |
+
+### Cleanup keys (ALSO)
+
+| Key | CLI flags | Archive? | Wipe? | When to use |
+|-----|-----------|----------|-------|-------------|
+| **G** | `-SprawlScan`, `-VestigialScan` | No | No | Preview leftover MERIT roots, duplicate skills clones, stale Hub copies |
+| **A** | `-PrePristine`, `-BackupOnly`, **B** | Yes | No | Save env + Hub + oss-bench + sprawl archive; refresh Tools Hub |
+| **P** | `-Pristine`, `-Force` | Yes | Full | Cold-start reset; keeps canonical Tools Hub + `backups\` |
+| **S** | `-Soft` | Yes | Bench only | Clear bench/status; keep `~/dev` clones |
+
+**Sprawl review flow (built into A and P):** Hub lists vestigial paths → prompt `[y/N/review]` → moves accepted items to `backups\<stamp>\vestigial-archived\` → writes `vestigial-scan.json`. Protected: `Setup_LocalModels*`, `backups\`, canonical `MYMERIT*` trees.
+
+### Utility keys
+
+| Key | CLI flags | Action |
+|-----|-----------|--------|
+| **I** | `-InstallSkills <host>` | Copy `skills/` to Cursor, Codex, Hermes, … (after **2**) |
+| **M** | — | Set `MYMERITAPP` bench path |
+| **T** | — | Set `MYMERITTOOLS` root |
+| **W** | `-Surface` | Where / Surface — A+B+C+D+H diagnostic map |
+| **H** | `-Help` | Reprint menu |
+
+---
+
+## CLI reference (non-interactive)
+
+```powershell
+# Cold start
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -Prereqs
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -InstallOss
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -TryIt
+
+# Cleanup
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -SprawlScan
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -PrePristine
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -Pristine
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -Soft
+
+# Branch paths
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -Oc
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -Jumpstart Vault
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -Vc
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -R -Role consumer
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -InstallSkills Cursor
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -Surface
+```
 
 ---
 
 ## Branch paths
 
-```mermaid
-flowchart TB
-  START["After 1 → 2 → 3"]
-
-  subgraph creator ["Creator (freeware OC)"]
-    OC["OC — DualRail play + store activate"]
-    OC --> OCURL["/play/{oc-id}/ on merit-prod"]
-    OC --> REG["/store/{oc-id}/register"]
-    OC --> JOIN6A["6 Join — portal links"]
-  end
-
-  subgraph operator ["Operator (private vault)"]
-    V4["4 / V — clone vault"]
-    VC["VC — BootStrap + gates"]
-    RO["runtime out + verify"]
-    V4 --> VC --> RO
-    RO --> JOIN6B["6 Join — partner links"]
-  end
-
-  subgraph catalog ["Catalog consumer/provider"]
-    R5["5 / R — clone to ~/dev"]
-    RC["RC — deploy repo to Vercel"]
-    R5 --> RC
-  end
-
-  START --> OC
-  START --> V4
-  START --> R5
-```
-
 | Path | Keys | Hosted? | Who |
 |------|------|---------|-----|
 | **Creator OC** | 2 → OC → 6 | Yes — merit-prod DualRail | Public creator |
 | **Operator VC** | 2 → 4 → VC → 6 | No — vault stays private git | AgentDraven / partner |
-| **Catalog** | 2 → 4 → 5 → RC | Yes — that repo's Vercel host | Consumer or provider |
-
----
-
-## Full menu
-
-Do **1** then **2** first. The Hub prints this map every run.
-
-### Numbered keys
-
-| Key | Action |
-|-----|--------|
-| **1** | Setup laptop — prereqs + MYMERIT* + merit-venv |
-| **2** | Install OSS — skills pin + merit-demo + quiet smoke. Alias **J** |
-| **3** | Try it — open local `play/index.html` |
-| **OC** | OSS in the Cloud — DualRail play + **required** store activate + marketing site (`/play/site`). `-NewOc` mints a second `oc-*` id on this bench |
-| **4** | Vault clone (local; working clone kept). Alias **V** |
-| **VC** | Venture Capable — operator grade after **4** (BootStrap, gates, `runtime out`). Not a hosted vault |
-| **5** | Catalog clone — consumer or provider. Alias **R** |
-| **RC** | Deploy **that** catalog repo to its host (Vercel) — not OC |
-| **6** | Join MERIT (sign up) — portal + register. After **OC** or after **4** |
-| **0** | Stop |
-
-### ALSO keys
-
-| Key | Action |
-|-----|--------|
-| **A** | **Pre-Pristine** — vestigial sprawl review + archive; env/Hub/oss-bench pack. Alias **B** / `-PrePristine` |
-| **V** | **Vestigial scan** — report leftover MERIT roots (no archive). `-VestigialScan` |
-| **P** | **Pristine v2** — Pre-Pristine + full wipe. Keeps canonical Tools Hub + backups |
-| **S** | **Soft** — bench + status cleanup; keep `~/dev` clones |
-| **I** | Install skills to AI host (Cursor, Codex, Hermes, …). Replaces per folder |
-| **M** | Set MYMERITAPP bench path |
-| **T** | Set MYMERITTOOLS root |
-| **W** | **Where / Surface** — A+B+C+D+H diagnostic map (before **2** when B missing; after **2** when paths unclear) |
-| **H** | Help — reprint menu |
-
-CLI: `-InstallSkills Cursor` after **J** (same as menu **I**).
-
----
-
-## CompatSet & pins
-
-Merit-Hub embeds release pins — no separate JSON required:
-
-| Pin | Repo | Role |
-|-----|------|------|
-| `skills-v0.5.52` | merit-agent-skills | OSS cold-start clone |
-| `vault-v0.5.50` | merit-private-vault | Operator cold-start clone |
-
-**Active CompatSet:** `2026.08.3` (vault `cfg/compat/`). F0+F1 + **m4fi** are **live-verified** on the operator laptop; F2–F4/FX rows are **inventory carry-forward** until each repo completes clone → git verify → mXin.
-
-**Live ecosystems** ([`cfg/live_ecosystems.json`](../cfg/live_ecosystems.json)):
-
-| Plane | Status in public skills copy | Bolt-on default? |
-|-------|------------------------------|------------------|
-| **v00** | `live_public` | Yes — merit-prod.vercel.app |
-| **v01** | `coming_soon` | No — operator mesh exists; vault `publish_gate` not cleared |
-| **hobby** | not listed | Never supported |
+| **Catalog** | 2 → 5 → RC | Yes — that repo's Vercel host | Consumer or provider |
 
 ---
 
 ## Pristine restart (from zero)
 
-Use this when you want a **clean laptop MERIT surface** and to walk the cold-start path again.
+1. **Fresh Hub (mandatory)** — download Raw and overwrite `%MYMERITTOOLS%\Merit-Hub.ps1`. Confirm `-Help` shows current pin.
+2. **G** (optional) — sprawl preview only.
+3. **A** — archive + sprawl review; no wipe.
+4. **P** — same archive pack, then full wipe (type `PRISTINE`).
+5. **1 → 2 → 3** — cold start.
+6. **W** — verify surface; `merit.ps1 where` + `merit.ps1 law closeout` from bench clone.
+7. **I** (optional) — refresh IDE skill folders.
 
-1. **Fresh Hub (mandatory)** — download Raw and overwrite `%MYMERITTOOLS%\Merit-Hub.ps1`. Confirm help shows current pin in [CompatSet](#compatset--pins). An old copy will clone the wrong tag.
-2. **Vestigial scan (optional preview)** — menu **V** or `-VestigialScan`. Lists leftover MERIT roots, duplicate skills clones, stale Hub copies. No archive.
-3. **Pre-Pristine archive** — menu **A** (or **B** / `-PrePristine`). Runs vestigial review first (prompt `[y/N/review]` to archive sprawl into `vestigial-archived\`), then writes `backups\<stamp>\`: env snapshot, Hub copy, `vestigial-scan.json`, `oss-bench.*.json`, `WARNING.txt`. **No wipe.**
-4. **Pristine** — menu **P** (or `-Pristine`). Same Pre-Pristine pack (including vestigial review), then wipes known `MYMERITAPP` / tools artifacts, `~/dev`, User `MYMERIT*` env. **Keeps** canonical `%MYMERITTOOLS%\Merit-Hub.ps1` and `backups\`.
-5. **Cold start** — **1** Setup laptop → **2** Install OSS → **3** Try it.
-6. **Verify** — menu **W** or `-Surface`; after clone, `merit.ps1 where` and `merit.ps1 law closeout` from `%MYMERITAPP%\merit-agent-skills`.
-7. **Skills to IDE (optional)** — menu **I** after **2** (replaces `merit-*` skill folders; does not wipe all of `~/.cursor`).
-
-Hub **P** does not delete `%USERPROFILE%\.cursor\` wholesale; stale IDE skill copies are refreshed by **I**, not **P**.
+Hub **P** does not delete `%USERPROFILE%\.cursor\` wholesale; use **I** for skill refresh.
 
 ---
 
-## Pristine preflight (operator)
+## CompatSet & pins
 
-Before menu **P** on a validation laptop:
+| Pin | Repo | Role |
+|-----|------|------|
+| `skills-v0.5.54` | merit-agent-skills | OSS cold-start clone |
+| `vault-v0.5.54` | merit-private-vault | Operator cold-start clone |
 
-1. Vault + skills at CompatSet pins (`git verify` PASS on both).
-2. Download **fresh** Raw `Merit-Hub.ps1` and confirm embedded `skillsPin` matches CompatSet (see help output).
-3. **P** → **1** → **2** → optional **I** → **4/V** → **VC** → `runtime out` + `runtime verify` from vault clone.
-
-Hub **P** does **not** wipe `%USERPROFILE%\.cursor\`; menu **I** replaces skill folders. `runtime out` merges vault-admin skills.
+**Active CompatSet:** `2026.08.3` (vault `cfg/compat/`).
 
 ---
 
 ## Required: run the full command
 
-After you save the file, **start it with this entire line**. Do **not** double-click `Merit-Hub.ps1`.
-
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1
 ```
 
-Windows treats an internet download as a security risk (unsigned script + **Mark of the Web**). `-ExecutionPolicy Bypass` applies to **this process only**. The script then **Unblock-File**s itself.
-
-Browser / SmartScreen **“this file can harm your computer”** is expected — **Keep**.
-
-Raw: `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
+Windows treats internet downloads as unsigned scripts. `-ExecutionPolicy Bypass` is for **this process only**. Browser **Keep** when prompted.
 
 ---
 
 ## PowerShell 7 (pwsh)
 
-Merit-Hub is written for **PowerShell 7+** (`pwsh`). Windows PowerShell 5.1 can start the file and re-launch `pwsh` when installed.
-
-| Platform | Install |
-|----------|---------|
-| **Windows (winget)** | `winget install Microsoft.PowerShell` |
-| **Windows (portable under Tools)** | Menu **1** → **[P]ortable** → `%MYMERITTOOLS%\pwsh\` + shim |
-| **macOS** | `brew install powershell/tap/powershell` |
-| **Linux** | [Microsoft docs](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux) |
+Merit-Hub requires **PowerShell 7+**. Menu **1** can install portable `pwsh` under `%MYMERITTOOLS%\pwsh\`.
 
 ---
 
 ## VC is not a hosted vault
 
-**4** clones the private vault onto this laptop. **VC** is operator grade: BootStrap, operator gates, `runtime out`.
-
-**Protected** means **private GitHub remote**, not a public website:
-
-1. `git remote -v` — AgentDraven private (mXin), never public origin.
-2. `.\scripts\merit.ps1 git verify` — tag matches VERSION, tree clean.
-3. `runtime out` then `runtime verify` — affiliate mirror.
-4. Secrets in vault `env/` (not git).
-
-**Validate VC:** Hub **4** → **VC** → four checks above from vault clone.
+**4** clones the private vault. **VC** is operator grade: BootStrap, gates, `runtime out`. Protected = private GitHub remote, not a public website.
 
 ---
 
-## Multi-creator benches (one PC)
+## Multi-creator benches
 
-A second **creator** is another OSS bench, not another Tools tree.
-
-```powershell
-pwsh -NoProfile -File C:\MyMeritApps\merit-agent-skills\Merit-Hub\oc-bench.ps1 `
-  -Name creator-01 -ProductName 'Creator 01 DualRail' -All
-```
-
-Each bench: `%MYMERITAPP%` = `C:\MyMeritApps\benches\<name>` with its own `oss-bench.json` / `ocConsumerId`. `MYMERITTOOLS` stays shared. Hub **OC -NewOc** mints a second OC from one bench.
-
-Cloud isolation is `consumer_id` on merit-prod (v0.1.84+).
+See [`oc-bench.ps1`](oc-bench.ps1). Each bench gets its own `MYMERITAPP` + `oss-bench.json`; `MYMERITTOOLS` stays shared.
 
 ---
 
@@ -280,18 +244,19 @@ Cloud isolation is `consumer_id` on merit-prod (v0.1.84+).
 
 | Path | When |
 |------|------|
-| `backups\` | Next to the script |
-| `%MYMERITTOOLS%\pwsh\` | Menu **1 → Portable** (optional) |
-| `%MYMERITTOOLS%\merit-venv\` | Menu **1** |
-| `%MYMERITAPP%\merit-agent-skills\` | Menu **J** or **2** |
-| `%MYMERITAPP%\oss-bench.json` | Laptop status (OC URLs, etc.) |
-| `~/.cursor/skills\` (etc.) | Menu **I** / `-InstallSkills` |
-| `~/dev/{persona}/{repo}` | Menu **4**, **5** |
-
-Hub does **not** create `%MYMERITAPP%\BootStrap\` or `MERIT_BootStrap.cmd` (retired).
+| `%MYMERITTOOLS%\backups\` | **A**, **P**, **S** |
+| `%MYMERITTOOLS%\merit-venv\` | **1** |
+| `%MYMERITAPP%\merit-agent-skills\` | **2** |
+| `%MYMERITAPP%\oss-bench.json` | **2** |
+| `~/dev/{persona}/{repo}` | **4**, **5** |
+| `~/.cursor/skills\` (etc.) | **I** |
 
 ---
 
 ## Hub baseline
 
-Keys **1 2 3 OC 4 VC 5 R RC 6** and **P S B I M T** are wired on current Hub. Freemium smoke lives in repo `scripts/smoke-freemium.ps1` (not a Hub menu key).
+**Cold start:** `1 2 3 OC 4 VC 5 R RC 6` · **Cleanup:** `G A P S` · **Util:** `I M T W H`
+
+Freemium smoke: repo `scripts/smoke-freemium.ps1` (not a Hub menu key).
+
+IAR: [MAS-IAR-HUB-PP-01](../docs/IAR/MAS-IAR-HUB-PP-01.md) · [MAS-IAR-HUB-PP-02](../docs/IAR/MAS-IAR-HUB-PP-02.md) · [MAS-IAR-HUB-PP-03](../docs/IAR/MAS-IAR-HUB-PP-03.md)

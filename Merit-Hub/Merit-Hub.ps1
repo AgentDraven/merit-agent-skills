@@ -12,8 +12,8 @@
   Cleanup:
     -Pristine     pre-pristine archive + full cold-start wipe (~/dev, OSS benches, tools artifacts, env)
     -Soft         archive + wipe bench/status; keep ~/dev clones
-    -BackupOnly / -PrePristine   archive only (env, Hub copy, oss-bench.json, vestigial scan, wipe warning)
-    -VestigialScan              scan (and optionally archive) leftover MERIT folders outside canonical MYMERIT*
+    -BackupOnly / -PrePristine   archive only (env, Hub copy, oss-bench.json, sprawl scan, wipe warning)
+    -SprawlScan / -VestigialScan  report leftover MERIT folders outside canonical MYMERIT* (no archive)
 
     Jumpstart:
     -Jumpstart Oss|Vault   clone pinned release; OSS continues as Install OSS (step 2)
@@ -69,6 +69,7 @@ param(
     [string]$CatalogProject = '',
     [switch]$JoinMerit,
     [switch]$Surface,
+    [Alias('SprawlScan')]
     [switch]$VestigialScan,
     [switch]$Force,
     [Alias('?')]
@@ -100,8 +101,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.53",
-  "vaultPin": "vault-v0.5.50",
+  "skillsPin": "skills-v0.5.54",
+  "vaultPin": "vault-v0.5.54",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
@@ -430,7 +431,7 @@ function Write-HubVestigialReport {
         return
     }
     $actionable = @($Candidates | Where-Object { $_.Kind -ne 'env-mismatch' })
-    Write-Header 'Vestigial MERIT scan'
+    Write-Header 'MERIT sprawl scan'
     if ($actionable.Count -eq 0) {
         Write-Ok 'No vestigial folders/files detected outside canonical MYMERIT* roots.'
     }
@@ -3052,10 +3053,14 @@ function Invoke-JumpstartVault {
     Write-Fail 'Vault BootStrap not found on pinned tag.'
 }
 
-function Invoke-HubVestigialScan {
-    Write-Header 'Vestigial scan (V)'
+function Invoke-HubSprawlScan {
+    Write-Header 'Sprawl scan (G)'
     [void](Initialize-HubBackupRoot)
     [void](Invoke-HubVestigialReview -ScanOnly)
+}
+
+function Invoke-HubVestigialScan {
+    Invoke-HubSprawlScan
 }
 
 function Show-MeritHubHelp {
@@ -3075,7 +3080,7 @@ function Show-MeritHubHelp {
     Write-Host '  3) Try it           open local play/index.html'
     Write-Host '  OC) OSS in the Cloud  DualRail play + register + your marketing site'
     Write-Host '      -NewOc with -Oc mints a new oc-* id (second creator on this bench)'
-    Write-Host '  4) V (local)        clone private vault (working clone kept) (alias V)'
+    Write-Host '  4) Vault (local)    clone private vault (working clone kept)'
     Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC (not hosted vault)'
     Write-Host '  5) R (local)        catalog clone; role consumer|provider   (alias R)'
     Write-Host '  RC) repo in Cloud   that repo on its host (Vercel) - not OC'
@@ -3083,10 +3088,10 @@ function Show-MeritHubHelp {
     Write-Host '  0) Stop'
     Write-Host ''
     Write-Host '  ALSO' -ForegroundColor White
-    Write-Host '  A) Pre-Pristine     archive + vestigial sprawl review (no bench wipe)  (alias B)'
-    Write-Host '  V) Vestigial scan   find leftover MERIT folders (no archive)'
-    Write-Host '  P) Pristine v2   vestigial review + archive, then full cold-start wipe'
-    Write-Host '  S) Soft          bench + status; keep ~/dev clones'
+    Write-Host '  G) Sprawl scan      find leftover MERIT folders (no archive)  (-SprawlScan)'
+    Write-Host '  A) Pre-Pristine     archive + sprawl review (no bench wipe)  (alias B / -PrePristine)'
+    Write-Host '  P) Pristine v2      sprawl review + archive, then full cold-start wipe'
+    Write-Host '  S) Soft             bench + status; keep ~/dev clones'
     Write-Host '  I) Install skills   Cursor, Codex, Hermes, ...'
     Write-Host '  M) Set MYMERITAPP bench path'
     Write-Host '  T) Set MYMERITTOOLS root'
@@ -3124,7 +3129,7 @@ function Show-InteractiveMenu {
             '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss }
             '^3$' { Invoke-HubTryIt; Read-Host 'Press Enter' | Out-Null }
             '^(OC|oc|Oc)$' { Invoke-HubOc; Read-Host 'Press Enter' | Out-Null }
-            '^(4|V|v|Vault)$' { Invoke-JumpstartVault }
+            '^(4|Vault)$' { Invoke-JumpstartVault }
             '^(VC|vc|Vc)$' { Invoke-HubVc; Read-Host 'Press Enter' | Out-Null }
             '^(5|R)$' { Invoke-HubR; Read-Host 'Press Enter' | Out-Null }
             '^(RC|rc|Rc)$' { Invoke-HubRc; Read-Host 'Press Enter' | Out-Null }
@@ -3133,10 +3138,10 @@ function Show-InteractiveMenu {
             { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('W', 'w', 'Where', 'Surface') } { Invoke-HubSurface; Read-Host 'Press Enter' | Out-Null }
-            { $_ -in @('V', 'v', 'Vestigial') } { Invoke-HubVestigialScan; Read-Host 'Press Enter' | Out-Null }
+            { $_ -in @('G', 'g', 'Sprawl', 'Vestigial') } { Invoke-HubSprawlScan; Read-Host 'Press Enter' | Out-Null }
             '^(H|h|\?|Help)$' { continue }
             '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or A V P S I M T W H).' }
+            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or G A P S I M T W H).' }
         }
     }
 }
@@ -3158,7 +3163,7 @@ try {
     if ($Soft) { Invoke-Mode -Mode Soft; return }
     if ($BackupOnly -or $PrePristine) { Invoke-Mode -Mode PrePristine; return }
     if ($Surface) { Invoke-HubSurface; return }
-    if ($VestigialScan) { Invoke-HubVestigialScan; return }
+    if ($VestigialScan) { Invoke-HubSprawlScan; return }
     if ($Prereqs) { Invoke-HubSetupLaptop; return }
     if ($InstallSkills) {
         [void](Invoke-InstallMeritSkills -Target $InstallSkills -ProjectPath $InstallSkillsPath)
@@ -3175,7 +3180,7 @@ try {
     if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
 
     $bound = $PSBoundParameters.Keys
-    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'PrePristine', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'R', 'Rc', 'JoinMerit', 'Surface', 'VestigialScan') | Where-Object { $bound -contains $_ }
+    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'PrePristine', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'R', 'Rc', 'JoinMerit', 'Surface', 'VestigialScan', 'SprawlScan') | Where-Object { $bound -contains $_ }
     if (-not $hasAction) {
         Show-InteractiveMenu
     }

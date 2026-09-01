@@ -7,8 +7,8 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 | Goal | Path |
 |------|------|
 | **Live ecosystems (bolt-on targets)** | [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json) � default **v00** until vault publishes **v01** as `live_public`. Hobby is never listed. |
-| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `C:\Tools\`. **Required:** `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1`. Then **1** ? **2** ? **3** (optional **OC**). Vault is **4**/**V**; catalog **5**/**RC**; **6** Join (sign up) after **OC** or after **4**. Numbered sequence: [Merit-Hub/README.md](Merit-Hub/README.md#new-laptop-sequence). |
-| **Build over dinner (start here)** | **[HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)** � 3 steps, no accounts night one |
+| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `%MYMERITTOOLS%`. **Required:** `pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1`. Then **1** → **2** → **3** (optional **OC**). Vault **4**; catalog **5**/**RC**; **6** Join after **OC** or **4**. Full menu + personas: [Merit-Hub/README.md](Merit-Hub/README.md). |
+| **Build over dinner (start here)** | **[docs/howto/launch-over-dinner.md](docs/howto/launch-over-dinner.md)** — 3 steps, no accounts night one |
 | **OSS internals** | Hub **2** dotsources `BootStrap/_oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
 | **Launch/deploy PoV** | [docs/deploy.md](docs/deploy.md) — one local `.merit_launch.md`, one `merit` command |
@@ -28,7 +28,7 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 | | Public (this repo + Portal) | Private (operators only) |
 |--|----------------------------|--------------------------|
 | **What** | Skills, `merit` CLI recipes, dinner/tutorial, freemium docs | Full platform **product law**, L1, env, cert registry |
-| **Where** | **This README**, [docs/usage.md](docs/usage.md), [HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md), live [Portal](https://merit-prod.vercel.app/portal/) | Vault `docs/PRD_MERIT_AGENT_SKILLS_PLATFORM.md` (**ACCEPTED** technical SSOT — not published here) |
+| **Where** | **This README**, [docs/usage.md](docs/usage.md), [docs/howto/launch-over-dinner.md](docs/howto/launch-over-dinner.md), [Merit-Hub/README.md](Merit-Hub/README.md), live [Portal](https://merit-prod.vercel.app/portal/) | Vault `docs/PRD_MERIT_AGENT_SKILLS_PLATFORM.md` (**ACCEPTED** technical SSOT — not published here) |
 | **Who** | Builders, agents on OSS path | Affiliate Owner (**MeritAcmeOwner** default) / AgentDraven with vault |
 | **Pin** | Clone **`skills-v*`** release tags (FR-SK-14 / L1 §E.0) | Not a substitute for product VERSION on consumers |
 
@@ -46,22 +46,20 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 
 ## Quick install
 
-**Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (**Raw**) to `C:\Tools\`. **Required � use the full command.** Do not double-click the file or run `.\Merit-Hub.ps1`. Windows (and other OS quarantine) treats an internet-downloaded script as a security risk and will block a plain run.
+**Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (**Raw**) to `%MYMERITTOOLS%`. **Required — use the full command.** Do not double-click the file or run `.\Merit-Hub.ps1`.
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1
 ```
 
-`-ExecutionPolicy Bypass` is for **this process only**. Browser �harmful file� warnings are expected � **Keep**.
-
-Menu **J** / **V** clones pinned OSS/vault for you � no full repo clone required first.
+Menu **2** / **J** clones pinned OSS for you — no full repo clone required first. Cleanup keys (**G** sprawl scan, **A** archive, **P** pristine): [Merit-Hub/README.md](Merit-Hub/README.md).
 
 **Full repo install** (OSS bench = `%MYMERITAPP%`, default `C:\MyMeritApp`):
 
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.5.2 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.54 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # omit -Target to print usage (no default host)
@@ -74,7 +72,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.5.2 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.54 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
@@ -114,7 +112,7 @@ We add vetted hosts to [`cfg/agent_hosts.json`](cfg/agent_hosts.json) and promot
 
 Use this review order for human validation once code, docs, and E2E are complete:
 
-1. **Start here:** [HowToLaunch-Over-Dinner-Tutorial.md](HowToLaunch-Over-Dinner-Tutorial.md)
+1. **Start here:** [docs/howto/launch-over-dinner.md](docs/howto/launch-over-dinner.md)
    - Goal: confirm the zero-account, first-night story makes sense.
 2. **Understand the commands:** [docs/usage.md](docs/usage.md)
    - Goal: verify clone, install, `init`, `apply`, `verify`, optional `e2e`, and optional `deploy`.
@@ -218,8 +216,8 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when the **Affiliate Owner** approves (this program: HumanBala) |
 | Pin | Release tags, not floating `main` (L1 §E.0 / FR-SK-14) |
-| Current tip (Portal pin) | **`skills-v0.5.2`** |
-| Current human-validation baseline | **`skills-v0.3.22`** |
+| Current tip (Portal pin) | **`skills-v0.5.54`** |
+| Current human-validation baseline | **`skills-v0.5.54`** |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
 

@@ -30,7 +30,7 @@ Pre-Pristine and Pristine must not leave unknown MERIT folder sprawl on the lapt
 
 ```powershell
 # Preview only
-pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -VestigialScan
+pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -SprawlScan
 
 # Pre-Pristine (prompts y/N/review; archives into backups\<stamp>\vestigial-archived\)
 pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1 -PrePristine
