@@ -1,6 +1,13 @@
 # CHANGELOG
 
 
+## [0.5.46] - 2026-08-31
+
+### Changed
+- **Merit-Hub** — `agentCloseout` embed names full MERIT closeout (`law closeout` → validate → `ship` / vault `mXin` + 3-3); printed on surface receipt, help, and OSS install receipt.
+- **`Write-MeritSurfaceReport`** — closeout hint when plane **B** present (`merit.ps1 law closeout`).
+- Merit-Hub pin: **`skills-v0.5.46`**.
+
 ## [0.5.45] - 2026-08-30
 
 ### Added

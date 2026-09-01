@@ -423,6 +423,7 @@ function Write-MeritSurfaceReport {
     if ($Surface.publicMeritCli) {
         Write-Host ('  merit.ps1:     {0}' -f $Surface.publicMeritCli) -ForegroundColor Green
         Write-Host ('  run:           pwsh -NoProfile -File "{0}" where' -f $Surface.publicMeritCli) -ForegroundColor DarkGray
+        Write-Host ('  closeout:      pwsh -NoProfile -File "{0}" law closeout' -f $Surface.publicMeritCli) -ForegroundColor DarkGray
     }
     if ($Surface.operatorMeritCli) {
         Write-Host ('  vault CLI:     {0}' -f $Surface.operatorMeritCli)

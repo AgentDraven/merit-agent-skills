@@ -94,10 +94,10 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.45",
+  "skillsPin": "skills-v0.5.46",
   "vaultPin": "vault-v0.5.50",
   "agentCloseoutRequired": true,
-  "agentCloseout": "OSS: merit.ps1 closeout + ship (skills-v*) + chat 3-3. Operator when vault on disk: vault scripts/merit.ps1 mXin + git verify. Exception: WIP / no commit / local-only.",
+  "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",
@@ -133,6 +133,26 @@ function Write-Header([string]$t) {
 
 function Get-HubConfig {
     return ($Script:EmbeddedHubConfigJson | ConvertFrom-Json)
+}
+
+function Write-HubAgentCloseoutHint {
+    param([switch]$Compact)
+    $cfg = Get-HubConfig
+    if (-not $cfg.agentCloseoutRequired) { return }
+    $text = [string]$cfg.agentCloseout
+    if ([string]::IsNullOrWhiteSpace($text)) { return }
+    if ($Compact) {
+        Write-Note "Agent closeout: $text"
+        return
+    }
+    Write-Host ''
+    Write-Host '  AGENT CLOSEOUT (MERIT binding — not validate-only closeout)' -ForegroundColor DarkYellow
+    Write-Host "  $text"
+    $skills = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\merit.ps1'
+    if (Test-Path -LiteralPath $skills) {
+        Write-Host ('  run:           pwsh -NoProfile -File "{0}" law closeout' -f $skills) -ForegroundColor DarkGray
+    }
+    Write-Host ''
 }
 
 function Import-HubMeritResolve {
@@ -335,6 +355,7 @@ function Initialize-HubMeritSurfaceEmbed {
         if ($Surface.publicMeritCli) {
             Write-Host ('  merit.ps1:     {0}' -f $Surface.publicMeritCli) -ForegroundColor Green
             Write-Host ('  run:           pwsh -NoProfile -File "{0}" where' -f $Surface.publicMeritCli) -ForegroundColor DarkGray
+            Write-Host ('  closeout:      pwsh -NoProfile -File "{0}" law closeout' -f $Surface.publicMeritCli) -ForegroundColor DarkGray
         }
         if ($Surface.pinMismatch) {
             Write-Host ('  WARN pin:      Hub {0} != B VERSION {1}' -f $Surface.hubPin, $Surface.skillsVersion) -ForegroundColor Yellow
@@ -360,6 +381,9 @@ function Write-MeritSurfaceReceipt {
     $surf = Get-MeritSurface -HubPin ([string]$cfg.skillsPin) -HubScript $Script:HubScriptPath
     if (Get-Command Write-MeritSurfaceReport -ErrorAction SilentlyContinue) {
         Write-MeritSurfaceReport -Surface $surf
+    }
+    if ($surf.publicMeritCli) {
+        Write-HubAgentCloseoutHint
     }
 }
 
@@ -1893,6 +1917,7 @@ function Write-HubReceipt {
             if (Test-Path -LiteralPath (Join-Path $demo '.git')) { Write-Ok "Demo   : $demo" } else { Write-Warn "Demo missing: $demo" }
             Write-Info "Status : $status"
             Write-Note 'Not cloud. Folders on this laptop only.'
+            Write-HubAgentCloseoutHint -Compact
         }
         '3' {
             $play = Join-Path $demo 'play\index.html'
@@ -2513,6 +2538,9 @@ function Show-MeritHubHelp {
     Write-Host '  H) Help'
     Write-Host ''
     Write-Note 'Cold start: 1 then 2. 6 Join (sign up) after OC or after 4. Do not double-click this file.'
+    if (Test-Path -LiteralPath (Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\merit.ps1')) {
+        Write-HubAgentCloseoutHint -Compact
+    }
 }
 
 function Set-MyMeritToolsPrompt {
