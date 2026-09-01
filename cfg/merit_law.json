@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "blobVersion": "1.0.0",
   "blobFile": "merit.blob",
-  "skillsVersion": "0.5.48",
+  "skillsVersion": "0.5.49",
   "skillMap": {
     "merit-closeout": [
       "VIII.F",

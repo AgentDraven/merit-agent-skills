@@ -10,9 +10,9 @@
   Pins are embedded; no .json or extra launcher required. Run with no args for interactive menu.
 
   Cleanup:
-    -Pristine   backup + full cold-start wipe (~/dev folder, OSS bench, MERIT tools artifacts, env)
-    -Soft       backup + wipe bench/status; keep ~/dev clones
-    -BackupOnly snapshot only
+    -Pristine     pre-pristine archive + full cold-start wipe (~/dev, OSS benches, tools artifacts, env)
+    -Soft         archive + wipe bench/status; keep ~/dev clones
+    -BackupOnly / -PrePristine   archive only (env, Hub copy, oss-bench.json, wipe warning + next steps)
 
     Jumpstart:
     -Jumpstart Oss|Vault   clone pinned release; OSS continues as Install OSS (step 2)
@@ -38,6 +38,7 @@
 
 .EXAMPLE
   pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1 -PrePristine
   pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1 -Pristine -Force
   pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1 -Jumpstart Oss
 #>
@@ -46,6 +47,8 @@ param(
     [switch]$Pristine,
     [switch]$Soft,
     [switch]$BackupOnly,
+    [Alias('Archive')]
+    [switch]$PrePristine,
     [ValidateSet('Oss', 'Vault')]
     [string]$Jumpstart,
     [ValidateSet('Cursor', 'ClaudeCode', 'Claude', 'Codex', 'VSCode', 'Agents', 'Hermes', 'OpenClaw', 'GrokBot', 'Grok', 'Devin', 'Project')]
@@ -94,7 +97,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.48",
+  "skillsPin": "skills-v0.5.49",
   "vaultPin": "vault-v0.5.50",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -892,25 +895,56 @@ function New-MeritBackup {
     $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
     $dir = Join-Path $Script:BackupRoot $stamp
     New-Item -ItemType Directory -Force -Path $dir | Out-Null
-    Write-Header "Backup -> $dir"
+    Write-Header "Pre-pristine archive -> $dir"
+
+    $benches = @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP' -BackupDir $dir)
+    $toolsRoots = @(Get-AllKnownMeritEnvPaths -Name 'MYMERITTOOLS' -BackupDir $dir)
+    $pathMap = [ordered]@{}
+    foreach ($p in @(
+            $Script:HubScriptPath,
+            $tools,
+            $oss,
+            $dev,
+            (Join-Path $tools 'Merit-Hub.ps1'),
+            (Join-Path $oss 'merit-agent-skills'),
+            (Join-Path $oss 'oss-bench.json'),
+            (Join-Path $oss 'merit-demo')
+        ) + $benches + $toolsRoots) {
+        if ([string]::IsNullOrWhiteSpace($p)) { continue }
+        try {
+            $full = Expand-HomePath $p
+            if (-not ($pathMap.Keys -contains $full)) {
+                $pathMap[$full] = [bool](Test-Path -LiteralPath $full)
+            }
+        }
+        catch { }
+    }
 
     $meta = [ordered]@{
-        backedUpAt       = (Get-Date).ToString('o')
-        machine          = $env:COMPUTERNAME
-        user             = $env:USERNAME
-        home             = $HOME
-        hubRoot          = $Script:HubRoot
-        myMeritTools     = $tools
-        myMeritToolsUser = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'User')
-        devRoot          = $dev
-        ossBench         = $oss
-        myMeritAppUser   = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'User')
-        myMeritAppProc   = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'Process')
-        skillsPin        = [string]$cfg.skillsPin
-        vaultPin         = [string]$cfg.vaultPin
-        userPath         = [Environment]::GetEnvironmentVariable('Path', 'User')
+        backedUpAt         = (Get-Date).ToString('o')
+        kind               = 'pre-pristine'
+        machine            = $env:COMPUTERNAME
+        user               = $env:USERNAME
+        home               = $HOME
+        hubRoot            = $Script:HubRoot
+        hubScript          = $Script:HubScriptPath
+        myMeritTools       = $tools
+        myMeritToolsUser   = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'User')
+        myMeritToolsProc   = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'Process')
+        myMeritToolsMachine = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'Machine')
+        devRoot            = $dev
+        ossBench           = $oss
+        myMeritAppUser     = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'User')
+        myMeritAppProc     = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'Process')
+        myMeritAppMachine  = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'Machine')
+        skillsPin          = [string]$cfg.skillsPin
+        vaultPin           = [string]$cfg.vaultPin
+        userPath           = [Environment]::GetEnvironmentVariable('Path', 'User')
+        benchesToWipe      = @($benches)
+        toolsRootsKnown    = @($toolsRoots)
+        paths              = $pathMap
     }
-    ($meta | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $dir 'env-snapshot.json') -Encoding UTF8
+    ($meta | ConvertTo-Json -Depth 6) | Set-Content -LiteralPath (Join-Path $dir 'env-snapshot.json') -Encoding UTF8
     Write-Ok 'env-snapshot.json'
 
     foreach ($pair in @(
@@ -923,21 +957,87 @@ function New-MeritBackup {
         }
     }
 
+    # Also keep a flat copy next to the README (handy when browsing the archive).
+    if (Copy-IfExists -Source $Script:HubScriptPath -DestDir $dir -DestName 'Merit-Hub.ps1.archived') {
+        Write-Ok 'Merit-Hub.ps1.archived'
+    }
+
+    foreach ($bench in $benches) {
+        if ([string]::IsNullOrWhiteSpace($bench)) { continue }
+        $bj = Join-Path $bench 'oss-bench.json'
+        if (-not (Test-Path -LiteralPath $bj)) { continue }
+        $safe = (($bench -replace '[:\\/]', '_').Trim('_'))
+        if ([string]::IsNullOrWhiteSpace($safe)) { $safe = 'bench' }
+        $destName = "oss-bench.$safe.json"
+        try {
+            Copy-Item -LiteralPath $bj -Destination (Join-Path $dir $destName) -Force
+            Write-Ok $destName
+        }
+        catch {
+            Write-Warn "could not archive $bj : $($_.Exception.Message)"
+        }
+    }
+
     $runHint = Get-HubRunHint
+    $benchWipe = if ($benches.Count) { ($benches -join '; ') } else { '(none resolved yet)' }
     $readme = @'
-# Merit-Hub backup {0}
+# Merit-Hub pre-pristine archive {0}
 
-After **Pristine**, cold-start from the hub (no prior clone required):
+Pins in this Hub copy: skills={2} vault={3}
 
+## What is here
+- env-snapshot.json — MYMERIT* scopes, benches, path existence
+- hub/Merit-Hub.ps1 (+ Merit-Hub.ps1.archived) — Hub script at archive time
+- oss-bench.*.json — live bench status copies (if present)
+- WARNING.txt — wipe scope for this machine
+
+## Survives Pristine?
+- This Hub script path — YES (Pristine keeps the running Merit-Hub.ps1)
+- backups\ next to Hub — usually YES (not a MYMERITAPP bench)
+- MYMERITAPP benches below — NO (wiped)
+- ~/dev clones — NO on full Pristine
+- GitHub remotes — YES; Hub 2 / 4 re-clone from pins
+
+## MYMERITAPP benches Pristine will wipe
+{4}
+
+## Next steps (you run)
 ```powershell
-{1}
-# J = Jumpstart OSS  |  V = Jumpstart Vault  |  1 = Prereqs only
-```
+# Confirm pin
+{1} -Help
 
-Pins: skills={2} vault={3}
-'@ -f $stamp, $runHint, [string]$cfg.skillsPin, [string]$cfg.vaultPin
+# Wipe (interactive UAC; type PRISTINE when asked)
+{1} -Pristine
+
+# Cold start
+{1}
+# Menu: 1 → 2 → 3
+```
+'@ -f $stamp, $runHint, [string]$cfg.skillsPin, [string]$cfg.vaultPin, $benchWipe
     Set-Content -LiteralPath (Join-Path $dir 'README.md') -Value $readme -Encoding UTF8
     Write-Ok 'README.md'
+
+    $warning = @"
+WARNING — Pristine wipe scope ($stamp)
+
+Hub script : $Script:HubScriptPath
+MYMERITAPP : $oss
+  User     : $($meta.myMeritAppUser)
+  Process  : $($meta.myMeritAppProc)
+MYMERITTOOLS: $tools
+  User     : $($meta.myMeritToolsUser)
+  Process  : $($meta.myMeritToolsProc)
+
+Benches to wipe:
+$(($benches | ForEach-Object { "  - $_" }) -join "`n")
+
+Git remotes are safe if already pushed. Re-clone via Hub menu 2 (OSS) / 4 (vault).
+Run Hub with the full -File line — do not double-click.
+"@
+    Set-Content -LiteralPath (Join-Path $dir 'WARNING.txt') -Value $warning -Encoding UTF8
+    Write-Ok 'WARNING.txt'
+    Write-Note "Archive ready: $dir"
+    Write-Info 'Next: confirm -Help pin, then -Pristine, then menu 1 → 2 → 3.'
     return $dir
 }
 
@@ -1255,11 +1355,11 @@ function Invoke-MeritCleanup {
 }
 
 function Invoke-Mode {
-    param([ValidateSet('Pristine', 'Soft', 'BackupOnly')]$Mode)
+    param([ValidateSet('Pristine', 'Soft', 'BackupOnly', 'PrePristine')]$Mode)
     switch ($Mode) {
         'Pristine' {
             Write-Header 'Mode: PRISTINE v2 (brand-new laptop)'
-            Write-Info 'Wipes every known MYMERITAPP bench (Process/User/Machine, defaults, backup history) and MYMERITTOOLS merit-venv/shims, ~/dev tree, MYMERIT* env.'
+            Write-Info 'First archives (pre-pristine), then wipes every known MYMERITAPP bench, MYMERITTOOLS merit-venv/shims, ~/dev, MYMERIT* env.'
             Write-Info "Keeps this hub script only: $Script:HubScriptPath"
             $backup = New-MeritBackup
             Invoke-MeritCleanup -BackupDir $backup -ModeName $Mode -ConfirmWord 'PRISTINE' `
@@ -1271,10 +1371,13 @@ function Invoke-Mode {
             Invoke-MeritCleanup -BackupDir $backup -ModeName $Mode -ConfirmWord 'CLEAN' `
                 -DoWipeOss $true -DoWipeDevTree $false -DoWipeToolsArtifacts $false
         }
-        'BackupOnly' {
-            Write-Header 'Mode: BACKUP ONLY'
+        { $_ -in @('BackupOnly', 'PrePristine') } {
+            Write-Header 'Mode: PRE-PRISTINE ARCHIVE (no wipe)'
+            Write-Info 'Snapshots env, Hub copy, oss-bench.json, and wipe warnings. Does not delete anything.'
             $backup = New-MeritBackup
-            Write-Ok "Backup-only: $backup"
+            Write-Ok "Pre-pristine archive: $backup"
+            Write-Host ''
+            Write-Note 'When ready to wipe: run Hub -Pristine (or menu P). Cold start after: 1 then 2 then 3.'
         }
     }
 }
@@ -2528,9 +2631,9 @@ function Show-MeritHubHelp {
     Write-Host '  0) Stop'
     Write-Host ''
     Write-Host '  ALSO' -ForegroundColor White
-    Write-Host '  P) Pristine v2   full cold-start wipe'
+    Write-Host '  A) Pre-Pristine     archive env + Hub + oss-bench (no wipe)  (alias B)'
+    Write-Host '  P) Pristine v2   full cold-start wipe (archives first)'
     Write-Host '  S) Soft          bench + status; keep ~/dev clones'
-    Write-Host '  B) Backup only'
     Write-Host '  I) Install skills   Cursor, Codex, Hermes, ...'
     Write-Host '  M) Set MYMERITAPP bench path'
     Write-Host '  T) Set MYMERITTOOLS root'
@@ -2563,7 +2666,7 @@ function Show-InteractiveMenu {
         switch -Regex ($c) {
             '^(P|p|Pristine)$' { Invoke-Mode -Mode Pristine; return }
             '^(S|s|Soft)$' { Invoke-Mode -Mode Soft; return }
-            '^(B|b|BackupOnly)$' { Invoke-Mode -Mode BackupOnly; return }
+            '^(A|a|B|b|BackupOnly|PrePristine|Archive)$' { Invoke-Mode -Mode PrePristine; return }
             '^1$' { Invoke-HubSetupLaptop; Read-Host 'Press Enter' | Out-Null }
             '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss }
             '^3$' { Invoke-HubTryIt; Read-Host 'Press Enter' | Out-Null }
@@ -2579,7 +2682,7 @@ function Show-InteractiveMenu {
             { $_ -in @('W', 'w', 'Where', 'Surface') } { Invoke-HubSurface; Read-Host 'Press Enter' | Out-Null }
             '^(H|h|\?|Help)$' { continue }
             '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or P S B I M T W H).' }
+            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or A P S I M T W H).' }
         }
     }
 }
@@ -2599,7 +2702,7 @@ Start-HubTranscript
 try {
     if ($Pristine) { Invoke-Mode -Mode Pristine; return }
     if ($Soft) { Invoke-Mode -Mode Soft; return }
-    if ($BackupOnly) { Invoke-Mode -Mode BackupOnly; return }
+    if ($BackupOnly -or $PrePristine) { Invoke-Mode -Mode PrePristine; return }
     if ($Surface) { Invoke-HubSurface; return }
     if ($Prereqs) { Invoke-HubSetupLaptop; return }
     if ($InstallSkills) {
@@ -2617,7 +2720,7 @@ try {
     if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
 
     $bound = $PSBoundParameters.Keys
-    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'R', 'Rc', 'JoinMerit', 'Surface') | Where-Object { $bound -contains $_ }
+    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'PrePristine', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'R', 'Rc', 'JoinMerit', 'Surface') | Where-Object { $bound -contains $_ }
     if (-not $hasAction) {
         Show-InteractiveMenu
     }

@@ -1,11 +1,18 @@
 # CHANGELOG
 
 
+## [0.5.49] - 2026-08-31
+
+### Changed
+- **Merit-Hub** ? built-in **Pre-Pristine** archive (`-PrePristine` / `-BackupOnly` / menu **A**): env snapshot, Hub copy, `oss-bench.*.json`, `WARNING.txt`, next-step README. **P**/`-Pristine` always archives first with the same pack.
+- Merit-Hub pin: **skills-v0.5.49**.
+
 ## [0.5.48] - 2026-08-31
 
 ### Changed
-- **Merit-Hub/README.md** ? CompatSet and embedded pin docs synced to **skills-v0.5.47**; **Pristine restart** checklist; menu **W** documented.
+- **Merit-Hub/README.md** ? CompatSet and embedded pin docs synced; **Pristine restart** checklist; menu **W** documented.
 - **`oss-bench.json` template** ? `skillsPin` synced to current Hub pin.
+- Merit-Hub pin: **skills-v0.5.48**.
 
 ## [0.5.47] - 2026-08-31
 
