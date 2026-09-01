@@ -12,7 +12,8 @@
   Cleanup:
     -Pristine     pre-pristine archive + full cold-start wipe (~/dev, OSS benches, tools artifacts, env)
     -Soft         archive + wipe bench/status; keep ~/dev clones
-    -BackupOnly / -PrePristine   archive only (env, Hub copy, oss-bench.json, wipe warning + next steps)
+    -BackupOnly / -PrePristine   archive only (env, Hub copy, oss-bench.json, vestigial scan, wipe warning)
+    -VestigialScan              scan (and optionally archive) leftover MERIT folders outside canonical MYMERIT*
 
     Jumpstart:
     -Jumpstart Oss|Vault   clone pinned release; OSS continues as Install OSS (step 2)
@@ -68,6 +69,7 @@ param(
     [string]$CatalogProject = '',
     [switch]$JoinMerit,
     [switch]$Surface,
+    [switch]$VestigialScan,
     [switch]$Force,
     [Alias('?')]
     [switch]$Help
@@ -98,7 +100,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.52",
+  "skillsPin": "skills-v0.5.53",
   "vaultPin": "vault-v0.5.50",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -215,6 +217,336 @@ function Write-HubFoolproofGate {
             Write-Fail "Working clone will be wiped: $skillsUnderApp"
             Write-Info 'Confirm skills-v* is already pushed before typing PRISTINE.'
         }
+    }
+}
+
+function Test-HubProtectedVestigialLeaf {
+    param([string]$Name)
+    if ([string]::IsNullOrWhiteSpace($Name)) { return $false }
+    if ($Name -like 'Setup_LocalModels*') { return $true }
+    if ($Name -eq 'Setup_LocalModels_Log.txt') { return $true }
+    if ($Name -like 'Wiring OpenModel*') { return $true }
+    if ($Name -in @('backups', '.archive', 'node_modules')) { return $true }
+    return $false
+}
+
+function Get-HubCanonicalMeritPaths {
+    $tools = Expand-HomePath (Get-MyMeritToolsRoot)
+    $app = Expand-HomePath (Get-MyMeritAppRoot)
+    $keep = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    foreach ($p in @($tools, $app, $Script:HubScriptPath, $Script:BackupRoot, $Script:HubRoot)) {
+        if ([string]::IsNullOrWhiteSpace($p)) { continue }
+        try { [void]$keep.Add((Expand-HomePath $p)) } catch { }
+    }
+    $toolsHub = Join-Path $tools 'Merit-Hub.ps1'
+    if (Test-Path -LiteralPath $toolsHub) {
+        try { [void]$keep.Add((Expand-HomePath $toolsHub)) } catch { }
+    }
+    $skills = Join-Path $app 'merit-agent-skills'
+    if (Test-Path -LiteralPath (Join-Path $skills 'merit.ps1')) {
+        try { [void]$keep.Add((Expand-HomePath $skills)) } catch { }
+    }
+    if ($Script:BackupRoot) {
+        try { [void]$keep.Add((Expand-HomePath $Script:BackupRoot)) } catch { }
+    }
+    return [pscustomobject]@{
+        ToolsRoot  = $tools
+        AppRoot    = $app
+        ToolsHub   = $toolsHub
+        SkillsRoot = if (Test-Path -LiteralPath (Join-Path $skills 'merit.ps1')) { (Expand-HomePath $skills) } else { $null }
+        Keep       = $keep
+    }
+}
+
+function Test-HubPathIsKept {
+    param(
+        [string]$Path,
+        $KeepSet
+    )
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $true }
+    try {
+        $full = Expand-HomePath $Path
+        foreach ($k in $KeepSet) {
+            if ($full -eq $k) { return $true }
+            if ($full.StartsWith(($k.TrimEnd('\', '/') + '\'), [StringComparison]::OrdinalIgnoreCase)) { return $true }
+        }
+    }
+    catch { }
+    return $false
+}
+
+function Get-HubSkillsCloneDetail {
+    param([string]$Path)
+    $cli = Join-Path $Path 'merit.ps1'
+    $git = Join-Path $Path '.git'
+    $ver = ''
+    $verFile = Join-Path $Path 'VERSION'
+    if (Test-Path -LiteralPath $verFile) {
+        $ver = ((Get-Content -LiteralPath $verFile -Raw) -split '\r?\n')[0].Trim()
+    }
+    return [pscustomobject]@{
+        Path      = $Path
+        HasCli    = (Test-Path -LiteralPath $cli)
+        HasGit    = (Test-Path -LiteralPath $git)
+        Version   = $ver
+        IsStub    = -not (Test-Path -LiteralPath $cli)
+    }
+}
+
+function Get-HubVestigialCandidates {
+    $canonical = Get-HubCanonicalMeritPaths
+    $keep = $canonical.Keep
+    $rows = [System.Collections.Generic.List[object]]::new()
+    $seenPath = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+
+    function Add-VestigialRow {
+        param([string]$Path, [string]$Kind, [string]$Detail, [string]$Severity = 'warn')
+        if ([string]::IsNullOrWhiteSpace($Path)) { return }
+        try { $full = Expand-HomePath $Path } catch { return }
+        if (-not (Test-Path -LiteralPath $full)) { return }
+        if (Test-HubPathIsKept -Path $full -KeepSet $keep) { return }
+        if ($seenPath.Contains($full)) { return }
+        [void]$seenPath.Add($full)
+        [void]$rows.Add([pscustomobject]@{
+                Path     = $full
+                Kind     = $Kind
+                Detail   = $Detail
+                Severity = $Severity
+            })
+    }
+
+    function Add-VestigialDirectoryOrChildren {
+        param([string]$Path, [string]$Kind, [string]$Detail)
+        if ([string]::IsNullOrWhiteSpace($Path)) { return }
+        try { $full = Expand-HomePath $Path } catch { return }
+        if (-not (Test-Path -LiteralPath $full)) { return }
+        if (Test-HubPathIsKept -Path $full -KeepSet $keep) { return }
+        if (-not (Test-Path -LiteralPath $full -PathType Container)) {
+            Add-VestigialRow -Path $full -Kind $Kind -Detail $Detail
+            return
+        }
+        $kids = @(Get-ChildItem -LiteralPath $full -Force -ErrorAction SilentlyContinue)
+        $protected = @($kids | Where-Object { Test-HubProtectedVestigialLeaf $_.Name })
+        $actionable = @($kids | Where-Object { -not (Test-HubProtectedVestigialLeaf $_.Name) })
+        if ($protected.Count -gt 0) {
+            if ($actionable.Count -eq 0) { return }
+            foreach ($child in $actionable) {
+                $childDetail = if ($protected.Count -gt 0) { "$Detail; protected sibling(s) kept in parent" } else { $Detail }
+                Add-VestigialRow -Path $child.FullName -Kind $Kind -Detail $childDetail
+            }
+            return
+        }
+        Add-VestigialRow -Path $full -Kind $Kind -Detail $Detail
+    }
+
+    foreach ($name in @('MYMERITAPP', 'MYMERITTOOLS')) {
+        $user = [Environment]::GetEnvironmentVariable($name, 'User')
+        $proc = [Environment]::GetEnvironmentVariable($name, 'Process')
+        if ($user -and $proc -and ($user -ne $proc)) {
+            [void]$rows.Add([pscustomobject]@{
+                    Path     = "env:$name"
+                    Kind     = 'env-mismatch'
+                    Detail   = "User=$user  Process=$proc (Hub syncs User→Process on start)"
+                    Severity = 'info'
+                })
+        }
+    }
+
+    # Known historical MYMERIT* roots from env + defaults + backup snapshots
+    foreach ($bench in @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP')) {
+        if ($bench -ne $canonical.AppRoot) {
+            Add-VestigialDirectoryOrChildren -Path $bench -Kind 'extra-app-bench' -Detail 'MYMERITAPP candidate not current bench'
+        }
+        if (Test-Path -LiteralPath $bench) {
+            Get-ChildItem -LiteralPath $bench -Directory -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name -like 'merit-agent-skills*' } |
+                ForEach-Object {
+                    $d = Get-HubSkillsCloneDetail $_.FullName
+                    if ($d.IsStub) {
+                        Add-VestigialRow -Path $_.FullName -Kind 'stub-skills-clone' -Detail 'merit-agent-skills folder without merit.ps1'
+                    }
+                    elseif ($canonical.SkillsRoot -and ($_.FullName -ne $canonical.SkillsRoot)) {
+                        $ver = if ($d.Version) { "VERSION $($d.Version)" } else { 'no VERSION' }
+                        Add-VestigialRow -Path $_.FullName -Kind 'duplicate-skills-clone' -Detail "extra git/skills tree; $ver"
+                    }
+                }
+        }
+    }
+    foreach ($toolsRoot in @(Get-AllKnownMeritEnvPaths -Name 'MYMERITTOOLS')) {
+        if ($toolsRoot -ne $canonical.ToolsRoot) {
+            $detail = 'alternate MYMERITTOOLS root'
+            if (Test-Path -LiteralPath (Join-Path $toolsRoot 'merit-venv')) { $detail += '; has merit-venv' }
+            if (Test-Path -LiteralPath (Join-Path $toolsRoot 'Merit-Hub.ps1')) { $detail += '; has Merit-Hub.ps1' }
+            Add-VestigialDirectoryOrChildren -Path $toolsRoot -Kind 'extra-tools-root' -Detail $detail
+        }
+    }
+
+    # Drive-root MERIT folder names (Windows cold-start sprawl)
+    if ($Script:HubOnWindows -and $env:SystemDrive) {
+        $cfg = Get-HubConfig
+        $rootNames = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+        foreach ($n in @($cfg.rogueDriveRootNames) + @('DApps', 'DevApps', 'DTools', 'DevTools', 'MyMeritApp', 'MyMeritTools')) {
+            if ($n) { [void]$rootNames.Add([string]$n) }
+        }
+        $driveRoot = $env:SystemDrive + '\'
+        foreach ($n in $rootNames) {
+            Add-VestigialDirectoryOrChildren -Path (Join-Path $driveRoot $n) -Kind 'drive-merit-root' -Detail 'legacy / test MERIT root at drive letter'
+        }
+    }
+
+    # Stale Merit-Hub copies outside canonical tools Hub
+    $hubScanRoots = [System.Collections.Generic.List[string]]::new()
+    foreach ($t in @(Get-AllKnownMeritEnvPaths -Name 'MYMERITTOOLS')) { [void]$hubScanRoots.Add($t) }
+    if ($Script:HubOnWindows -and $env:SystemDrive) {
+        [void]$hubScanRoots.Add($env:SystemDrive + '\Tools')
+    }
+    foreach ($root in $hubScanRoots) {
+        if (-not (Test-Path -LiteralPath $root)) { continue }
+        Get-ChildItem -LiteralPath $root -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -like 'Merit-Hub*.ps1' } |
+            ForEach-Object {
+                if (Test-HubPathIsKept -Path $_.FullName -KeepSet $keep) { return }
+                Add-VestigialRow -Path $_.FullName -Kind 'stale-hub-script' -Detail 'Merit-Hub.ps1 outside canonical MYMERITTOOLS copy'
+            }
+        Get-ChildItem -LiteralPath $root -File -ErrorAction SilentlyContinue |
+            Where-Object { -not (Test-HubProtectedVestigialLeaf $_.Name) } |
+            Where-Object { $_.Name -like 'Merit-Hub*.ps1' -or $_.Name -like 'Merit-Hub*.old' } |
+            ForEach-Object {
+                if (Test-HubPathIsKept -Path $_.FullName -KeepSet $keep) { return }
+                Add-VestigialRow -Path $_.FullName -Kind 'stale-hub-artifact' -Detail 'old Hub backup file in tools folder'
+            }
+    }
+
+    return @($rows | Sort-Object Kind, Path)
+}
+
+function Write-HubVestigialReport {
+    param(
+        $Candidates,
+        [switch]$AsJson
+    )
+    if ($AsJson) {
+        $Candidates | ConvertTo-Json -Depth 4
+        return
+    }
+    $actionable = @($Candidates | Where-Object { $_.Kind -ne 'env-mismatch' })
+    Write-Header 'Vestigial MERIT scan'
+    if ($actionable.Count -eq 0) {
+        Write-Ok 'No vestigial folders/files detected outside canonical MYMERIT* roots.'
+    }
+    else {
+        Write-Warn ("Found $($actionable.Count) vestigial path(s) — review before Pristine:")
+        $i = 1
+        foreach ($row in $actionable) {
+            Write-Host ("  {0,2}) [{1}] {2}" -f $i, $row.Kind, $row.Path) -ForegroundColor Yellow
+            Write-Host ("      {0}" -f $row.Detail) -ForegroundColor DarkGray
+            $i++
+        }
+    }
+    $envRows = @($Candidates | Where-Object { $_.Kind -eq 'env-mismatch' })
+    foreach ($row in $envRows) {
+        Write-Note "$($row.Path): $($row.Detail)"
+    }
+    Write-Host ''
+}
+
+function Invoke-HubVestigialReview {
+    param(
+        [string]$ArchiveParent = '',
+        [switch]$ScanOnly
+    )
+    [void](Initialize-HubBackupRoot)
+    $candidates = @(Get-HubVestigialCandidates)
+    Write-HubVestigialReport -Candidates $candidates
+    if ($ScanOnly) {
+        return [pscustomobject]@{ Archived = @(); Kept = @(); Candidates = $candidates }
+    }
+    $actionable = @($candidates | Where-Object { $_.Kind -ne 'env-mismatch' })
+    if ($actionable.Count -eq 0) {
+        return [pscustomobject]@{ Archived = @(); Kept = @(); Candidates = $candidates }
+    }
+    if ($ArchiveParent) {
+        $archive = $ArchiveParent
+    }
+    else {
+        $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+        $archive = Join-Path $Script:BackupRoot "merit-vestigial-$stamp"
+    }
+    New-Item -ItemType Directory -Force -Path $archive | Out-Null
+    $manifest = [System.Collections.Generic.List[string]]::new()
+    $archived = [System.Collections.Generic.List[string]]::new()
+    $kept = [System.Collections.Generic.List[string]]::new()
+
+    Write-Host ''
+    if ($Force) {
+        $bulk = 'y'
+        Write-Note '-Force: archive all vestigial paths to backup (no per-item prompts).'
+    }
+    else {
+        Write-Note "Archive vestigial items to: $archive"
+        $bulk = Read-Host 'Archive ALL listed vestigial paths? [y/N/review]'
+    }
+    $reviewEach = ($bulk -match '^[Rr]')
+
+    foreach ($row in $actionable) {
+        $doArchive = $false
+        if ($bulk -match '^[Yy]$' -or $Force) {
+            $doArchive = $true
+        }
+        elseif ($reviewEach) {
+            Write-Host ''
+            Write-Warn "$($row.Kind): $($row.Path)"
+            Write-Info $row.Detail
+            $ans = Read-Host 'Archive this path? [y/N]'
+            $doArchive = ($ans -match '^[Yy]')
+        }
+        if (-not $doArchive) {
+            [void]$kept.Add($row.Path)
+            continue
+        }
+        $leaf = ($row.Path -replace '[:\\/]', '_').Trim('_')
+        if ([string]::IsNullOrWhiteSpace($leaf)) { $leaf = 'item' }
+        $dest = Join-Path $archive $leaf
+        if (Test-Path -LiteralPath $dest) {
+            $dest = Join-Path $archive ("{0}-{1}" -f $leaf, ([guid]::NewGuid().ToString('n').Substring(0, 6)))
+        }
+        try {
+            Move-Item -LiteralPath $row.Path -Destination $dest -Force
+            if (Test-Path -LiteralPath $row.Path) {
+                Write-Fail "Archive failed (still exists): $($row.Path)"
+                [void]$kept.Add($row.Path)
+                continue
+            }
+            [void]$archived.Add($row.Path)
+            [void]$manifest.Add("ARCHIVED $($row.Path) -> $dest ($($row.Kind))")
+            Write-Ok "archived $($row.Path)"
+            $parent = Split-Path -Parent $row.Path
+            if ($parent -and (Test-Path -LiteralPath $parent)) {
+                $kids = @(Get-ChildItem -LiteralPath $parent -Force -ErrorAction SilentlyContinue)
+                if ($kids.Count -eq 0) {
+                    Remove-Item -LiteralPath $parent -Force -ErrorAction SilentlyContinue
+                    if (-not (Test-Path -LiteralPath $parent)) {
+                        [void]$manifest.Add("REMOVED empty parent $parent")
+                    }
+                }
+            }
+        }
+        catch {
+            Write-Fail "Could not archive $($row.Path): $($_.Exception.Message)"
+            [void]$kept.Add($row.Path)
+        }
+    }
+
+    ($manifest + @("KEPT: $($kept -join '; ')")) | Set-Content (Join-Path $archive 'MANIFEST.txt') -Encoding UTF8
+    ($candidates | ConvertTo-Json -Depth 4) | Set-Content (Join-Path $archive 'vestigial-scan.json') -Encoding UTF8
+    if ($archived.Count -gt 0) {
+        Write-Ok "Vestigial archive: $archive ($($archived.Count) moved)"
+    }
+    return [pscustomobject]@{
+        ArchiveDir = $archive
+        Archived   = @($archived)
+        Kept       = @($kept)
+        Candidates = $candidates
     }
 }
 
@@ -721,6 +1053,7 @@ function Complete-HubSession {
 function Ensure-HubElevated {
     if (-not $Script:HubOnWindows) { return }
     if ($Help) { return }
+    if ($VestigialScan) { return }
     if ($env:MERIT_HUB_NO_ELEVATE -eq '1') { return }
     if (Test-HubAdmin) {
         Write-Ok 'Running elevated (Administrator)'
@@ -996,6 +1329,10 @@ function New-MeritBackup {
     New-Item -ItemType Directory -Force -Path $dir | Out-Null
     Write-Header "Pre-pristine archive -> $dir"
 
+    $vestigial = Invoke-HubVestigialReview -ArchiveParent (Join-Path $dir 'vestigial-archived')
+    ($vestigial.Candidates | ConvertTo-Json -Depth 4) | Set-Content -LiteralPath (Join-Path $dir 'vestigial-scan.json') -Encoding UTF8
+    Write-Ok 'vestigial-scan.json'
+
     $benches = @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP' -BackupDir $dir)
     $toolsRoots = @(Get-AllKnownMeritEnvPaths -Name 'MYMERITTOOLS' -BackupDir $dir)
     $pathMap = [ordered]@{}
@@ -1087,6 +1424,7 @@ Pins in this Hub copy: skills={2} vault={3}
 
 ## What is here
 - env-snapshot.json — MYMERIT* scopes, benches, path existence
+- vestigial-scan.json + vestigial-archived/ — leftover MERIT folders archived before wipe
 - hub/Merit-Hub.ps1 (+ Merit-Hub.ps1.archived) — Hub script at archive time
 - oss-bench.*.json — live bench status copies (if present)
 - WARNING.txt — wipe scope for this machine
@@ -1481,7 +1819,7 @@ function Invoke-Mode {
         }
         { $_ -in @('BackupOnly', 'PrePristine') } {
             Write-Header 'Mode: PRE-PRISTINE ARCHIVE (no wipe)'
-            Write-Info 'Snapshots env, Hub copy, oss-bench.json, and wipe warnings. Does not delete anything.'
+            Write-Info 'Snapshots env, vestigial sprawl review, Hub copy, oss-bench.json. Does not delete MYMERITAPP bench yet.'
             $backup = New-MeritBackup
             Write-Ok "Pre-pristine archive: $backup"
             Write-Host ''
@@ -2714,6 +3052,12 @@ function Invoke-JumpstartVault {
     Write-Fail 'Vault BootStrap not found on pinned tag.'
 }
 
+function Invoke-HubVestigialScan {
+    Write-Header 'Vestigial scan (V)'
+    [void](Initialize-HubBackupRoot)
+    [void](Invoke-HubVestigialReview -ScanOnly)
+}
+
 function Show-MeritHubHelp {
     $cfg = Get-HubConfig
     Write-Header 'Merit-Hub'
@@ -2739,8 +3083,9 @@ function Show-MeritHubHelp {
     Write-Host '  0) Stop'
     Write-Host ''
     Write-Host '  ALSO' -ForegroundColor White
-    Write-Host '  A) Pre-Pristine     archive env + Hub + oss-bench (no wipe)  (alias B)'
-    Write-Host '  P) Pristine v2   full cold-start wipe (archives first)'
+    Write-Host '  A) Pre-Pristine     archive + vestigial sprawl review (no bench wipe)  (alias B)'
+    Write-Host '  V) Vestigial scan   find leftover MERIT folders (no archive)'
+    Write-Host '  P) Pristine v2   vestigial review + archive, then full cold-start wipe'
     Write-Host '  S) Soft          bench + status; keep ~/dev clones'
     Write-Host '  I) Install skills   Cursor, Codex, Hermes, ...'
     Write-Host '  M) Set MYMERITAPP bench path'
@@ -2788,9 +3133,10 @@ function Show-InteractiveMenu {
             { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; Read-Host 'Press Enter' | Out-Null }
             { $_ -in @('W', 'w', 'Where', 'Surface') } { Invoke-HubSurface; Read-Host 'Press Enter' | Out-Null }
+            { $_ -in @('V', 'v', 'Vestigial') } { Invoke-HubVestigialScan; Read-Host 'Press Enter' | Out-Null }
             '^(H|h|\?|Help)$' { continue }
             '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or A P S I M T W H).' }
+            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or A V P S I M T W H).' }
         }
     }
 }
@@ -2801,17 +3147,18 @@ if ($Help) {
     Show-MeritHubHelp
     return
 }
+[void](Initialize-HubBackupRoot)
 Ensure-HubElevated
 Sync-HubMeritEnvFromUser
 [void](Import-HubMeritResolve)
 [void](Import-HubOssHelpers)
-[void](Initialize-HubBackupRoot)
 Start-HubTranscript
 try {
     if ($Pristine) { Invoke-Mode -Mode Pristine; return }
     if ($Soft) { Invoke-Mode -Mode Soft; return }
     if ($BackupOnly -or $PrePristine) { Invoke-Mode -Mode PrePristine; return }
     if ($Surface) { Invoke-HubSurface; return }
+    if ($VestigialScan) { Invoke-HubVestigialScan; return }
     if ($Prereqs) { Invoke-HubSetupLaptop; return }
     if ($InstallSkills) {
         [void](Invoke-InstallMeritSkills -Target $InstallSkills -ProjectPath $InstallSkillsPath)
@@ -2828,7 +3175,7 @@ try {
     if ($Jumpstart -eq 'Vault') { Invoke-JumpstartVault; return }
 
     $bound = $PSBoundParameters.Keys
-    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'PrePristine', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'R', 'Rc', 'JoinMerit', 'Surface') | Where-Object { $bound -contains $_ }
+    $hasAction = @('Pristine', 'Soft', 'BackupOnly', 'PrePristine', 'Prereqs', 'Jumpstart', 'InstallSkills', 'Help', 'OssPhase', 'InstallOss', 'TryIt', 'Oc', 'NewOc', 'Vc', 'R', 'Rc', 'JoinMerit', 'Surface', 'VestigialScan') | Where-Object { $bound -contains $_ }
     if (-not $hasAction) {
         Show-InteractiveMenu
     }

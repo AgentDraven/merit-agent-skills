@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.50'
+$MERIT_VERSION = '0.5.53'
 $Root = $PSScriptRoot
 
 $Script:MeritResolveRepoRoot = $Root

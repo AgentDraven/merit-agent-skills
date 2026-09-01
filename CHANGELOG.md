@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.53] - 2026-08-31
+
+### Added
+- **Merit-Hub vestigial sprawl scan** — detects extra MYMERIT* roots, duplicate/stub skills clones, stale Hub copies; interactive archive during **Pre-Pristine** / **Pristine**; menu **V** / `-VestigialScan`. Protects `Setup_LocalModels*` and `backups\`.
+
 ## [0.5.52] - 2026-08-31
 
 ### Changed

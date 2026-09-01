@@ -4,7 +4,7 @@
 
 `C:\Tools` (or `%MYMERITTOOLS%`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.52` · `vault-v0.5.50` — see [CompatSet](#compatset--pins).
+**Embedded pins (current release):** `skills-v0.5.53` · `vault-v0.5.50` — see [CompatSet](#compatset--pins).
 
 ---
 
@@ -154,8 +154,9 @@ Do **1** then **2** first. The Hub prints this map every run.
 
 | Key | Action |
 |-----|--------|
-| **A** | **Pre-Pristine** — archive only (env, Hub copy, oss-bench, WARNING + next steps). Alias **B** / `-PrePristine` / `-BackupOnly` |
-| **P** | **Pristine v2** — archive first, then wipe known MYMERITAPP benches, tools artifacts, `~/dev`, MYMERIT* env. Keeps this `Merit-Hub.ps1` |
+| **A** | **Pre-Pristine** — vestigial sprawl review + archive; env/Hub/oss-bench pack. Alias **B** / `-PrePristine` |
+| **V** | **Vestigial scan** — report leftover MERIT roots (no archive). `-VestigialScan` |
+| **P** | **Pristine v2** — Pre-Pristine + full wipe. Keeps canonical Tools Hub + backups |
 | **S** | **Soft** — bench + status cleanup; keep `~/dev` clones |
 | **I** | Install skills to AI host (Cursor, Codex, Hermes, …). Replaces per folder |
 | **M** | Set MYMERITAPP bench path |
@@ -193,11 +194,12 @@ Merit-Hub embeds release pins — no separate JSON required:
 Use this when you want a **clean laptop MERIT surface** and to walk the cold-start path again.
 
 1. **Fresh Hub (mandatory)** — download Raw and overwrite `%MYMERITTOOLS%\Merit-Hub.ps1`. Confirm help shows current pin in [CompatSet](#compatset--pins). An old copy will clone the wrong tag.
-2. **Pre-Pristine archive** — menu **A** (or **B** / `-PrePristine` / `-BackupOnly`). Writes `backups\<stamp>\` next to Hub: env snapshot, Hub copy, `oss-bench.*.json`, `WARNING.txt`, next-step README. **No wipe.**
-3. **Pristine** — menu **P** (or `-Pristine`). Archives first, then wipes known `MYMERITAPP` / tools artifacts, `~/dev`, User `MYMERIT*` env. **Keeps** this `Merit-Hub.ps1`.
-4. **Cold start** — **1** Setup laptop → **2** Install OSS → **3** Try it.
-5. **Verify** — menu **W** or `-Surface`; after clone, `merit.ps1 where` and `merit.ps1 law closeout` from `%MYMERITAPP%\merit-agent-skills`.
-6. **Skills to IDE (optional)** — menu **I** after **2** (replaces `merit-*` skill folders; does not wipe all of `~/.cursor`).
+2. **Vestigial scan (optional preview)** — menu **V** or `-VestigialScan`. Lists leftover MERIT roots, duplicate skills clones, stale Hub copies. No archive.
+3. **Pre-Pristine archive** — menu **A** (or **B** / `-PrePristine`). Runs vestigial review first (prompt `[y/N/review]` to archive sprawl into `vestigial-archived\`), then writes `backups\<stamp>\`: env snapshot, Hub copy, `vestigial-scan.json`, `oss-bench.*.json`, `WARNING.txt`. **No wipe.**
+4. **Pristine** — menu **P** (or `-Pristine`). Same Pre-Pristine pack (including vestigial review), then wipes known `MYMERITAPP` / tools artifacts, `~/dev`, User `MYMERIT*` env. **Keeps** canonical `%MYMERITTOOLS%\Merit-Hub.ps1` and `backups\`.
+5. **Cold start** — **1** Setup laptop → **2** Install OSS → **3** Try it.
+6. **Verify** — menu **W** or `-Surface`; after clone, `merit.ps1 where` and `merit.ps1 law closeout` from `%MYMERITAPP%\merit-agent-skills`.
+7. **Skills to IDE (optional)** — menu **I** after **2** (replaces `merit-*` skill folders; does not wipe all of `~/.cursor`).
 
 Hub **P** does not delete `%USERPROFILE%\.cursor\` wholesale; stale IDE skill copies are refreshed by **I**, not **P**.
 
