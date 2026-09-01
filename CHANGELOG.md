@@ -1,6 +1,13 @@
 # CHANGELOG
 
 
+## [0.5.47] - 2026-08-31
+
+### Changed
+- **merit.blob** — re-exported law pack; embedded skills version synced to **0.5.47** (was stale at 0.5.45 in blob).
+- **merit.ps1** — `` aligned with VERSION file.
+- Merit-Hub pin: **skills-v0.5.47**.
+
 ## [0.5.46] - 2026-08-31
 
 ### Changed

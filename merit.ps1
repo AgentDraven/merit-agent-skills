@@ -1,9 +1,9 @@
-﻿# MERIT public CLI - one entrypoint for free users.
+# MERIT public CLI - one entrypoint for free users.
 
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.45'
+$MERIT_VERSION = '0.5.47'
 $Root = $PSScriptRoot
 
 $Script:MeritResolveRepoRoot = $Root
@@ -32,7 +32,7 @@ Commands:
   deploy --path <repo>     Apply launch file, link Vercel if needed, deploy production
   portal --path <repo>     Apply launch file, then publish here.now portal targets
   all --path <repo>        Apply, deploy Vercel, then publish portal targets
-  closeout --path <repo>   Validate only (verify + git diff --check) — NOT full MERIT closeout
+  closeout --path <repo>   Validate only (verify + git diff --check) � NOT full MERIT closeout
   law [list|closeout|edition|<section>]  OSS L1 excerpt from merit.blob (in-memory unpack)
                            law --section VIII.F | law --for-skill merit-portal
   where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
@@ -57,7 +57,7 @@ Commands:
   apps publish --path <repo>  Upload play/+cfg/ to merit-prod /apps/<app>/play (create phase 8)
                           [--consumer-id <id>] override launch consumer_id
   apps refresh --path <repo>  Re-activate store + sync scaffold (never touches app_logic/)
-                          Store free-community activate Â· UserGuide Â· community cfg Â· publish
+                          Store free-community activate · UserGuide · community cfg · publish
   apps remove --path <repo> --yes
                           Remove platform /apps/<id> files (local delete does NOT)
                           [--tenant-all] also wipe tenant collections for that id
@@ -1050,7 +1050,7 @@ function Invoke-MeritShip {
         $branch = (& git rev-parse --abbrev-ref HEAD 2>$null).Trim()
         if ($branch -eq 'HEAD') {
             if (-not (Test-ArgFlag -ArgList $ArgList -Name '-AllowDetached')) {
-                throw 'ship: detached HEAD — checkout a branch or pass -AllowDetached'
+                throw 'ship: detached HEAD � checkout a branch or pass -AllowDetached'
             }
         }
 
@@ -1234,13 +1234,13 @@ function Write-UserGuideScaffold {
         $body = Get-Content -LiteralPath $tpl -Raw -Encoding UTF8
         $body = $body.Replace('{{PRODUCT_NAME}}', $ProductName).Replace('{{CONSUMER_ID}}', $ConsumerId).Replace('{{PLAY_URL}}', $playUrl).Replace('{{REGISTER_URL}}', $registerUrl)
         Set-Content -LiteralPath $guidePath -Value $body -Encoding UTF8
-        Write-Host "UserGuide OK -> $guidePath (ToC Â· If/Then Â· OH/Consult Â· OIDs)"
+        Write-Host "UserGuide OK -> $guidePath (ToC · If/Then · OH/Consult · OIDs)"
     } else {
         Set-Content -LiteralPath $guidePath -Value @"
 ---
 # MERIT_SCAFFOLD:user-guide:v1
 ---
-# User Guide â€” $ProductName
+# User Guide — $ProductName
 
 Play: $playUrl  
 Register: $registerUrl  
@@ -1263,7 +1263,7 @@ function Invoke-AppsRefresh {
     Write-Host "apps refresh: consumer_id=$ConsumerId (never edits app_logic/)"
     $logicProbe = Join-Path $TargetRoot 'app_logic'
     if (-not (Test-Path -LiteralPath $logicProbe)) {
-        Write-Host 'apps refresh NOTE: app_logic/ missing â€” create first if this is a new app.'
+        Write-Host 'apps refresh NOTE: app_logic/ missing — create first if this is a new app.'
     }
 
     # 1) Store free-community re-activate (idempotent catalog refresh).
@@ -1303,7 +1303,7 @@ function Invoke-AppsRefresh {
         Write-Host "apps refresh NOTE: par pin resync: $($_.Exception.Message)"
     }
 
-    # 3) UserGuide â€” refresh when scaffold marker present (or missing).
+    # 3) UserGuide — refresh when scaffold marker present (or missing).
     Write-UserGuideScaffold -TargetRoot $TargetRoot -ProductName $display -ConsumerId $ConsumerId -Force:$false -Gateway $Gateway
 
     # 4) Republish play/+cfg/ to platform.
@@ -1587,7 +1587,7 @@ function Set-OcCreatorFace {
     if ($PlayUrl -and $RegisterUrl -and (Test-Path -LiteralPath $portalIndex)) {
         $idx = Get-Content -LiteralPath $portalIndex -Raw -Encoding UTF8
         if ($idx -notmatch [regex]::Escape($RegisterUrl) -and $idx -notmatch 'Join free') {
-            $cta = "      <p class=`"oc-ctas`"><a href=`"$PlayUrl`">Open play</a> · <a href=`"$RegisterUrl`">Join free - Community Member `$0</a></p>"
+            $cta = "      <p class=`"oc-ctas`"><a href=`"$PlayUrl`">Open play</a> � <a href=`"$RegisterUrl`">Join free - Community Member `$0</a></p>"
             if ($idx.Contains('<div class="actions" id="portal-ctas"></div>')) {
                 $idx = $idx.Replace('<div class="actions" id="portal-ctas"></div>', "<div class=`"actions`" id=`"portal-ctas`"></div>`r`n$cta")
                 [System.IO.File]::WriteAllText($portalIndex, $idx, [System.Text.UTF8Encoding]::new($false))
@@ -2108,7 +2108,7 @@ function Invoke-Create {
     if ($theme -and $theme -notmatch '^gloss-(aurora|graphite|daylight)$') {
         throw "create: --theme must be gloss-aurora, gloss-graphite, or gloss-daylight (got '$theme')"
     }
-    if ($theme) { Write-Host "create NOTE: --theme $theme â†’ DualRail Gloss play shell (par scaffold)." }
+    if ($theme) { Write-Host "create NOTE: --theme $theme → DualRail Gloss play shell (par scaffold)." }
     if ($wantDeploy) {
         $scopeCheck = Get-ArgValue -ArgList $ArgList -Name '--vercel-scope'
         if (-not $scopeCheck -and -not $env:VERCEL_SCOPE) {
