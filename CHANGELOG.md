@@ -1,19 +1,25 @@
 # CHANGELOG
 
 
+## [0.5.48] - 2026-08-31
+
+### Changed
+- **Merit-Hub/README.md** ? CompatSet and embedded pin docs synced to **skills-v0.5.47**; **Pristine restart** checklist; menu **W** documented.
+- **`oss-bench.json` template** ? `skillsPin` synced to current Hub pin.
+
 ## [0.5.47] - 2026-08-31
 
 ### Changed
-- **merit.blob** � re-exported law pack; embedded skills version synced to **0.5.47** (was stale at 0.5.45 in blob).
-- **merit.ps1** � `` aligned with VERSION file.
+- **merit.blob** ? re-exported law pack; embedded skills version synced to **0.5.47** (was stale at 0.5.45 in blob).
+- **merit.ps1** ? `$MERIT_VERSION` aligned with VERSION file.
 - Merit-Hub pin: **skills-v0.5.47**.
 
 ## [0.5.46] - 2026-08-31
 
 ### Changed
-- **Merit-Hub** — `agentCloseout` embed names full MERIT closeout (`law closeout` → validate → `ship` / vault `mXin` + 3-3); printed on surface receipt, help, and OSS install receipt.
-- **`Write-MeritSurfaceReport`** — closeout hint when plane **B** present (`merit.ps1 law closeout`).
-- Merit-Hub pin: **`skills-v0.5.46`**.
+- **Merit-Hub** ? `agentCloseout` embed names full MERIT closeout (`law closeout` ? validate ? `ship` / vault `mXin` + 3-3); printed on surface receipt, help, and OSS install receipt.
+- **`Write-MeritSurfaceReport`** ? closeout hint when plane **B** present (`merit.ps1 law closeout`).
+- Merit-Hub pin: **skills-v0.5.46**.
 
 ## [0.5.45] - 2026-08-30
 

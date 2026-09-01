@@ -4,7 +4,7 @@
 
 `C:\Tools` (or `%MYMERITTOOLS%`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.46` · `vault-v0.5.50` — see [CompatSet](#compatset--pins).
+**Embedded pins (current release):** `skills-v0.5.48` · `vault-v0.5.50` — see [CompatSet](#compatset--pins).
 
 ---
 
@@ -160,6 +160,7 @@ Do **1** then **2** first. The Hub prints this map every run.
 | **I** | Install skills to AI host (Cursor, Codex, Hermes, …). Replaces per folder |
 | **M** | Set MYMERITAPP bench path |
 | **T** | Set MYMERITTOOLS root |
+| **W** | **Where / Surface** — A+B+C+D+H diagnostic map (before **2** when B missing; after **2** when paths unclear) |
 | **H** | Help — reprint menu |
 
 CLI: `-InstallSkills Cursor` after **J** (same as menu **I**).
@@ -172,7 +173,7 @@ Merit-Hub embeds release pins — no separate JSON required:
 
 | Pin | Repo | Role |
 |-----|------|------|
-| `skills-v0.5.43` | merit-agent-skills | OSS cold-start clone |
+| `skills-v0.5.48` | merit-agent-skills | OSS cold-start clone |
 | `vault-v0.5.50` | merit-private-vault | Operator cold-start clone |
 
 **Active CompatSet:** `2026.08.3` (vault `cfg/compat/`). F0+F1 + **m4fi** are **live-verified** on the operator laptop; F2–F4/FX rows are **inventory carry-forward** until each repo completes clone → git verify → mXin.
@@ -187,12 +188,27 @@ Merit-Hub embeds release pins — no separate JSON required:
 
 ---
 
+## Pristine restart (from zero)
+
+Use this when you want a **clean laptop MERIT surface** and to walk the cold-start path again.
+
+1. **Fresh Hub (mandatory)** — download Raw and overwrite `%MYMERITTOOLS%\Merit-Hub.ps1`. Confirm help shows `skills-v0.5.48` (or current pin in [CompatSet](#compatset--pins)). An old copy (e.g. `skills-v0.5.42`) will clone the wrong tag.
+2. **Backup (optional)** — menu **B** or `-BackupOnly` before wipe.
+3. **Pristine** — menu **P** (or `-Pristine -Force`). Wipes known `MYMERITAPP` / `MYMERITTOOLS` benches, `~/dev`, merit-venv, and User `MYMERIT*` env. **Keeps** `Merit-Hub.ps1` in Tools.
+4. **Cold start** — **1** Setup laptop → **2** Install OSS → **3** Try it.
+5. **Verify** — menu **W** or `-Surface`; after clone, `merit.ps1 where` and `merit.ps1 law closeout` from `%MYMERITAPP%\merit-agent-skills`.
+6. **Skills to IDE (optional)** — menu **I** after **2** (replaces `merit-*` skill folders; does not wipe all of `~/.cursor`).
+
+Hub **P** does not delete `%USERPROFILE%\.cursor\` wholesale; stale IDE skill copies are refreshed by **I**, not **P**.
+
+---
+
 ## Pristine preflight (operator)
 
 Before menu **P** on a validation laptop:
 
 1. Vault + skills at CompatSet pins (`git verify` PASS on both).
-2. Download **fresh** Raw `Merit-Hub.ps1` (or confirm embedded pins match CompatSet).
+2. Download **fresh** Raw `Merit-Hub.ps1` and confirm embedded `skillsPin` matches CompatSet (see help output).
 3. **P** → **1** → **2** → optional **I** → **4/V** → **VC** → `runtime out` + `runtime verify` from vault clone.
 
 Hub **P** does **not** wipe `%USERPROFILE%\.cursor\`; menu **I** replaces skill folders. `runtime out` merges vault-admin skills.
