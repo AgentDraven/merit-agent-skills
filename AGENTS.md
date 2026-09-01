@@ -2,21 +2,32 @@
 
 **merit-agent-skills** — public MERIT skills and CLI distribution.
 
+## Law authority (no plaintext L1 in repo)
+
+Full vault L1 (`MERIT.instructions`) is **not** shipped here. OSS law lives in **`merit.blob`** (obfuscated pack) unpacked only by **`merit.ps1 law`**.
+
+| Need | Command |
+|------|---------|
+| Full closeout law | `.\merit.ps1 law closeout` |
+| Section | `.\merit.ps1 law --section VIII.F` |
+| Skill slice | `.\merit.ps1 law --for-skill <name>` |
+| Edition tier | `.\merit.ps1 law edition` |
+
+Skills are **index cards** pointing at `merit.ps1 law`. See skill **merit-law**.
+
 ## Closeout (binding — never skip)
 
-**There is no `MERIT.instructions` in this repo** (vault L1 only). This section + skill **`merit-closeout`** are the binding closeout law for **merit-agent-skills**.
-
-Work is **not done** until **validate + git ship + 3-3**. The CLI verb `closeout` is **validate only** — not the full closeout.
+Work is **not done** until **validate + git ship + 3-3**.
 
 | Step | OSS laptop (no vault) | Operator (vault on disk) |
 |------|------------------------|---------------------------|
+| Law | `.\merit.ps1 law closeout` | same |
 | Validate | `.\merit.ps1 closeout --path .` | same |
 | Git release | `.\merit.ps1 ship -Message "..."` | vault `scripts\merit.ps1` **`mXin`** + **`git verify`** |
-| Chat | **3-3**: Done · State (VERSION/tag) · Next | same |
 
-Before `ship`: checkout a branch (`main`) — detached HEAD is refused unless `-AllowDetached`.
+The CLI verb **`closeout`** = validate only — not MERIT closeout.
 
-Diagnostic (optional): `.\merit.ps1 where` or Hub `-Surface` / menu **W**.
+Before `ship`: checkout a branch (`main`).
 
 Exception only if the user said **WIP** / **no commit** / **local-only**.
 

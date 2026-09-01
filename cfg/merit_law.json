@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "blobVersion": "1.0.0",
+  "blobFile": "merit.blob",
+  "skillsVersion": "0.5.45",
+  "skillMap": {
+    "merit-closeout": [
+      "VIII.F",
+      "H",
+      "CLI"
+    ],
+    "merit-surface": [
+      "SURFACE",
+      "CLI",
+      "VIII.F"
+    ],
+    "merit-onboard": [
+      "SURFACE",
+      "CLI",
+      "VIII.F"
+    ],
+    "merit-portal": [
+      "PORTAL",
+      "CLI"
+    ],
+    "merit-deploy-vercel": [
+      "DEPLOY",
+      "CLI"
+    ],
+    "merit-admin-gate": [
+      "GATE",
+      "CLI"
+    ],
+    "meritcert": [
+      "CERT",
+      "CLI"
+    ],
+    "merit-iar": [
+      "CERT",
+      "CLI"
+    ],
+    "merit-subs": [
+      "SUBS",
+      "CLI"
+    ],
+    "merit-livealpha": [
+      "LIVEALPHA",
+      "CLI"
+    ],
+    "merit-prd": [
+      "II",
+      "CLI"
+    ],
+    "merit-applogic": [
+      "II",
+      "CLI"
+    ],
+    "merit-mm-upgrade": [
+      "VIII.G",
+      "II"
+    ],
+    "merit-par-workbench": [
+      "II",
+      "CLI"
+    ],
+    "merit-ama": [
+      "II",
+      "CLI"
+    ],
+    "merit-referral": [
+      "II",
+      "CLI"
+    ],
+    "merit-law": [
+      "II",
+      "CLI",
+      "VIII.F",
+      "H",
+      "SURFACE"
+    ]
+  },
+  "sectionIndex": [
+    "II",
+    "CLI",
+    "SURFACE",
+    "VIII.F",
+    "H",
+    "VIII.G",
+    "PORTAL",
+    "DEPLOY",
+    "CERT",
+    "GATE",
+    "SUBS",
+    "LIVEALPHA"
+  ]
+}

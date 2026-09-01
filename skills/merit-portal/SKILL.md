@@ -9,25 +9,31 @@ description: >-
 
 here.now only — not Vercel app deploy. Operator white-label branding in `portal/` + `cfg/branding.json`.
 
-## Before publish
+## Law
 
-1. Prefer a filled `docs/PRODUCT.prd.md` (or `*prd.md`) — use **`/merit-prd`** if empty.  
-2. Map § **Marketing portal** (hero, CTAs, sections) into `portal/` / `portal.json`.  
-3. Optional: `*usage.md` / `*design.md` for tone — still no secrets in `portal/`.
+```powershell
+.\merit.ps1 law --for-skill merit-portal
+```
+
+## OSS (always — plane B)
+
+1. Prefer filled `docs/PRODUCT.prd.md` — use **`/merit-prd`** if empty.
+2. Map § Marketing portal into `portal/` / `cfg/portals.json`.
 
 ```powershell
 .\merit.ps1 portal --path <consumer-repo>
-.\merit.ps1 portal --path <consumer-repo> --all
 ```
 
-BYOK: `HERENOW_API_KEY` or `~/.herenow/credentials`. Multi-slug manifest: `cfg/portals.json`.
+BYOK: `HERENOW_API_KEY` or `~/.herenow/credentials`.
 
-Vault operators:
+Footer: **MERIT Powered**. Include `portal/legal.html` and `portal/terms.html`.
+
+## Operator (plane C only)
+
+Resolve vault CLI: `.\merit.ps1 where` → use `operatorMeritCli`.
 
 ```powershell
-.\scripts\merit.ps1 portal publish
+& '<vault>\scripts\merit.ps1' portal publish
 ```
 
-Footer must include **MERIT Powered**; operator branding in header (SomaTune shell pattern).
-
-Include **`portal/legal.html`** and **`portal/terms.html`** in the consumer or vault-owned `portal/` folder. This skill does not bundle a Portal implementation; it operates on the caller's own Portal.
+Never use `.\scripts\merit.ps1` from merit-agent-skills (that path does not exist on plane B).

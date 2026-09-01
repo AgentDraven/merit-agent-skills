@@ -18,6 +18,12 @@ jobs:
       - name: Merit Surface unit tests
         shell: pwsh
         run: ./scripts/test-merit-surface.ps1
+      - name: Merit law pack tests
+        shell: pwsh
+        run: ./scripts/test-merit-law.ps1
+      - name: Skill path lint
+        shell: pwsh
+        run: ./scripts/test-skill-paths.ps1
       - name: Freemium smoke
         shell: bash
         run: ./scripts/smoke-freemium.sh

@@ -3,12 +3,16 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.44'
+$MERIT_VERSION = '0.5.45'
 $Root = $PSScriptRoot
 
 $Script:MeritResolveRepoRoot = $Root
 try {
     . (Join-Path $Root 'BootStrap\_resolve.ps1')
+}
+catch { }
+try {
+    . (Join-Path $Root 'BootStrap\_law.ps1')
 }
 catch { }
 
@@ -28,7 +32,9 @@ Commands:
   deploy --path <repo>     Apply launch file, link Vercel if needed, deploy production
   portal --path <repo>     Apply launch file, then publish here.now portal targets
   all --path <repo>        Apply, deploy Vercel, then publish portal targets
-  closeout --path <repo>   Verify, run git whitespace check, and print git baseline
+  closeout --path <repo>   Validate only (verify + git diff --check) — NOT full MERIT closeout
+  law [list|closeout|edition|<section>]  OSS L1 excerpt from merit.blob (in-memory unpack)
+                           law --section VIII.F | law --for-skill merit-portal
   where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
   surface                  Alias for where
   ship -Message <msg>      OSS release: commit + skills-v tag + push (skills repo only)
@@ -981,8 +987,9 @@ function Invoke-Closeout {
         } else {
             Write-Host 'closeout WARN: git not available on PATH'
         }
+        Write-Host 'closeout: validate only. Full MERIT closeout: .\merit.ps1 law closeout then ship or vault mXin'
         Write-Host 'closeout: webpage-shell AP-MA-13. Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md'
-        Write-Host 'closeout tiers: (1) OSS validate = this command; (2) OSS ship skills-v* = .\merit.ps1 ship -Message ...; (3) operator + vault on disk = vault scripts\merit.ps1 mXin'
+        Write-Host 'closeout tiers: (1) validate = this command; (2) OSS ship = .\merit.ps1 ship; (3) operator = vault mXin'
     } finally {
         Pop-Location
     }
@@ -2255,6 +2262,7 @@ switch -Regex ($Command) {
     '^portal$' { try { Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^all$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^closeout$' { try { Invoke-Closeout -TargetRoot $target; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^law$' { try { Invoke-MeritLaw -ArgList $Rest -RepoRoot $Root; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^(where|surface)$' { Invoke-MeritWhere -ArgList $Rest }
     '^ship$' { try { Invoke-MeritShip -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^apps$' {

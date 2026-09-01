@@ -5,19 +5,28 @@ description: MERIT foundation certification, capability integration, graph statu
 
 # meritcert
 
-Vocabulary for certification commands. OSS users document status; vault operators run writes.
+Vocabulary for certification. OSS documents status; vault operators run writes.
+
+## Law
+
+```powershell
+.\merit.ps1 law --for-skill meritcert
+```
+
+## OSS (always)
 
 ```powershell
 .\merit.ps1 verify --path <consumer-repo>
 ```
 
-Vault operators (cert registry writes):
+## Operator (plane C only)
+
+Resolve: `.\merit.ps1 where` → `operatorMeritCli`.
 
 ```powershell
-.\scripts\merit.ps1 cert foundation <project-id>
-.\scripts\merit.ps1 cert integration <provider> <consumer> --capability <id> --iar-ref "<path>" --pin <package@version>
-.\scripts\merit.ps1 cert status [project-id]
-.\scripts\merit.ps1 cert validate --json --diagram ascii
+& '<vault>\scripts\merit.ps1' cert foundation <project-id>
+& '<vault>\scripts\merit.ps1' cert integration <provider> <consumer> --capability <id> --iar-ref "<path>" --pin <package@version>
+& '<vault>\scripts\merit.ps1' cert status [project-id]
 ```
 
-All explicit technical approval goes through AgentDraven. Requester-IAR ACCEPT is required for operational readiness.
+Requester-IAR ACCEPT required for operational readiness.

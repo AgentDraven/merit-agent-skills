@@ -94,7 +94,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.44",
+  "skillsPin": "skills-v0.5.45",
   "vaultPin": "vault-v0.5.50",
   "agentCloseoutRequired": true,
   "agentCloseout": "OSS: merit.ps1 closeout + ship (skills-v*) + chat 3-3. Operator when vault on disk: vault scripts/merit.ps1 mXin + git verify. Exception: WIP / no commit / local-only.",

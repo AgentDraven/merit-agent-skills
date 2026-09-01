@@ -5,17 +5,27 @@ description: MeritAdminGate phrase auth (adj-noun-pin); demo init via merit CLI;
 
 # merit-admin-gate
 
-Phrase format: `{adjective}-{noun}-{####}` (four digits). Wordlists are public; hashes are never in git.
+Phrase format: `{adjective}-{noun}-{####}`. Wordlists are public; hashes never in git.
+
+## Law
+
+```powershell
+.\merit.ps1 law --for-skill merit-admin-gate
+```
+
+## OSS (always)
 
 ```powershell
 .\merit.ps1 admin gate demo-init --path <consumer-repo>
 ```
 
-Vault operators (production hash slots + Vercel sync):
+## Operator (plane C only)
+
+Resolve: `.\merit.ps1 where` → `operatorMeritCli`.
 
 ```powershell
-.\scripts\merit.ps1 admin operator-gate hash -Project <id> --phrase adj-noun-#### --label <tag>
-.\scripts\merit.ps1 deploy vercel -Project <id> --sync-env
+& '<vault>\scripts\merit.ps1' admin operator-gate hash -Project <id> --phrase adj-noun-#### --label <tag>
+& '<vault>\scripts\merit.ps1' deploy vercel -Project <id> --sync-env
 ```
 
-Revoke: `admin operator-gate revoke --label <tag>`. Phrase never in chat/git.
+Revoke via vault CLI. Phrase never in chat/git.

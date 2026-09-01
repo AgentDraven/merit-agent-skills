@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## [0.5.45] - 2026-08-30
+
+### Added
+- **`merit.blob`** — obfuscated OSS L1 law pack; unpacked in-memory by `merit.ps1 law` only.
+- **`cfg/merit_law.json`** — section index + skill→section map.
+- **`BootStrap/_law.ps1`** — law unpack/query; **`scripts/export-merit-law-blob.ps1`** for regeneration.
+- **`merit.ps1 law`** — `list`, `closeout`, `edition`, `--section`, `--for-skill`.
+- **skill `merit-law`** — law router for agents.
+- **`scripts/test-merit-law.ps1`**, **`scripts/test-skill-paths.ps1`** — CI law + skill path lint.
+- **`docs/merit_law_pack.md`** — public law pack documentation.
+
+### Changed
+- **AGENTS.md** — authority = `merit.ps1 law` + `merit.blob`; `closeout` verb = validate only.
+- **10 mixed skills** — OSS / Law / Operator (plane C) tiers; no ambiguous `.\scripts\merit.ps1`.
+- **`merit-closeout`**, **`merit-surface`**, **`merit-onboard`** — thin index cards → `law closeout`.
+- **`docs/bootstrap.design.md`** — OSS `ship` + `law closeout` in operator law table.
+- Merit-Hub pin: **`skills-v0.5.45`**.
+
 ## [0.5.44] - 2026-08-30
 
 ### Added
