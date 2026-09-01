@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [0.5.52] - 2026-08-31
+
+### Changed
+- **Merit-Hub foolproof scrub** — archives under `%MYMERITTOOLS%\backups`; `Install-HubToToolsRoot`; `Write-HubFoolproofGate`; Pristine cold-start uses Tools Hub path.
+- **IAR** — `docs/IAR/MAS-IAR-HUB-PP-01.md`; vault `VAULT_EVIDENCE` § merit-hub-pre-pristine.
+- Merit-Hub pin: **skills-v0.5.52**.
+
+## [0.5.51] - 2026-08-31
+
+### Changed
+- Law blob re-export; Hub foolproof prep (partial — completed in 0.5.52).
+
 ## [0.5.50] - 2026-08-31
 
 ### Changed

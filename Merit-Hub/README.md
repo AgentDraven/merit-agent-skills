@@ -4,7 +4,7 @@
 
 `C:\Tools` (or `%MYMERITTOOLS%`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.50` · `vault-v0.5.50` — see [CompatSet](#compatset--pins).
+**Embedded pins (current release):** `skills-v0.5.52` · `vault-v0.5.50` — see [CompatSet](#compatset--pins).
 
 ---
 
@@ -173,7 +173,7 @@ Merit-Hub embeds release pins — no separate JSON required:
 
 | Pin | Repo | Role |
 |-----|------|------|
-| `skills-v0.5.50` | merit-agent-skills | OSS cold-start clone |
+| `skills-v0.5.52` | merit-agent-skills | OSS cold-start clone |
 | `vault-v0.5.50` | merit-private-vault | Operator cold-start clone |
 
 **Active CompatSet:** `2026.08.3` (vault `cfg/compat/`). F0+F1 + **m4fi** are **live-verified** on the operator laptop; F2–F4/FX rows are **inventory carry-forward** until each repo completes clone → git verify → mXin.

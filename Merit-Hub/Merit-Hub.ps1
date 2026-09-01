@@ -80,8 +80,9 @@ $Script:HubScriptPath = $PSCommandPath
 if (-not $Script:HubScriptPath) { $Script:HubScriptPath = $MyInvocation.MyCommand.Path }
 $Script:HubRoot = Split-Path -Parent $Script:HubScriptPath
 $Script:HubBoundParameters = [hashtable]$PSBoundParameters
-$Script:BackupRoot = Join-Path $Script:HubRoot 'backups'
-$Script:HistoryLog = Join-Path $Script:BackupRoot 'Merit-Hub-history.log'
+# Prefer MYMERITTOOLS\backups so Pristine (which wipes MYMERITAPP) cannot delete the archive.
+$Script:BackupRoot = $null
+$Script:HistoryLog = $null
 $Script:TranscriptStarted = $false
 $Script:HubStepFailed = $false
 $Script:HubOnWindows = (
@@ -97,7 +98,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.50",
+  "skillsPin": "skills-v0.5.52",
   "vaultPin": "vault-v0.5.50",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -120,6 +121,101 @@ $Script:EmbeddedHubConfigJson = @'
 
 function Get-HubRunHint {
     return "pwsh -NoProfile -ExecutionPolicy Bypass -File `"$($Script:HubScriptPath)`""
+}
+
+function Initialize-HubBackupRoot {
+    $tools = $null
+    try { $tools = Get-MyMeritToolsRoot } catch { }
+    if ([string]::IsNullOrWhiteSpace($tools)) {
+        foreach ($scope in @('Process', 'User', 'Machine')) {
+            $v = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', $scope)
+            if (-not [string]::IsNullOrWhiteSpace($v)) { $tools = $v; break }
+        }
+    }
+    if ([string]::IsNullOrWhiteSpace($tools)) {
+        $tools = if ($Script:HubOnWindows) { 'C:\Tools' } else { (Join-Path $HOME 'Tools') }
+    }
+    try { $tools = Expand-HomePath $tools } catch { }
+    $candidate = Join-Path $tools 'backups'
+    $app = $null
+    try { $app = Get-MyMeritAppRoot } catch { }
+    if ($app) {
+        try {
+            $appFull = Expand-HomePath $app
+            $candFull = Expand-HomePath $candidate
+            if ($candFull.StartsWith(($appFull.TrimEnd('\', '/') + '\'), [StringComparison]::OrdinalIgnoreCase) -or
+                $candFull -eq $appFull) {
+                $hubDir = Expand-HomePath $Script:HubRoot
+                if (-not ($hubDir.StartsWith(($appFull.TrimEnd('\', '/') + '\'), [StringComparison]::OrdinalIgnoreCase))) {
+                    $candidate = Join-Path $Script:HubRoot 'backups'
+                }
+                else {
+                    $candidate = Join-Path $env:USERPROFILE 'MeritHub-backups'
+                }
+            }
+        }
+        catch { }
+    }
+    $Script:BackupRoot = $candidate
+    New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
+    $Script:HistoryLog = Join-Path $Script:BackupRoot 'Merit-Hub-history.log'
+    return $Script:BackupRoot
+}
+
+function Install-HubToToolsRoot {
+    $tools = Get-MyMeritToolsRoot
+    if ([string]::IsNullOrWhiteSpace($tools)) { return $null }
+    New-Item -ItemType Directory -Force -Path $tools | Out-Null
+    $dest = Join-Path $tools 'Merit-Hub.ps1'
+    $src = $Script:HubScriptPath
+    if (-not $src -or -not (Test-Path -LiteralPath $src)) { return $null }
+    try {
+        $srcFull = Expand-HomePath $src
+        $destFull = Expand-HomePath $dest
+        if ($srcFull -ne $destFull) {
+            Copy-Item -LiteralPath $src -Destination $dest -Force
+            Write-Ok "Hub installed to tools root: $dest"
+        }
+        else {
+            Write-Ok "Hub already at tools root: $dest"
+        }
+        if ($Script:HubOnWindows) {
+            try { Unblock-File -LiteralPath $dest -ErrorAction SilentlyContinue } catch { }
+        }
+        return $dest
+    }
+    catch {
+        Write-Warn "Could not install Hub to $dest : $($_.Exception.Message)"
+        return $null
+    }
+}
+
+function Write-HubFoolproofGate {
+    param([switch]$BeforeWipe)
+    $cfg = Get-HubConfig
+    $tools = Get-MyMeritToolsRoot
+    $oss = Get-MyMeritAppRoot
+    $toolsHub = Join-Path $tools 'Merit-Hub.ps1'
+    Write-Header 'Foolproof gate'
+    Write-Info ("skillsPin = {0}   vaultPin = {1}" -f $cfg.skillsPin, $cfg.vaultPin)
+    Write-Info ("This script = {0}" -f $Script:HubScriptPath)
+    Write-Info ("MYMERITTOOLS = {0}" -f $tools)
+    Write-Info ("MYMERITAPP   = {0}" -f $oss)
+    Write-Info ("Tools Hub    = {0}  exists={1}" -f $toolsHub, (Test-Path -LiteralPath $toolsHub))
+    Write-Info ("Archive root = {0}" -f $(if ($Script:BackupRoot) { $Script:BackupRoot } else { '(init on first archive)' }))
+    Write-Host ''
+    Write-Note 'Always start Hub with the full -File line (never double-click). Prefer the Tools Hub path after Pre-Pristine.'
+    Write-Host ("  pwsh -NoProfile -ExecutionPolicy Bypass -File `"$toolsHub`"") -ForegroundColor Cyan
+    if ($BeforeWipe) {
+        Write-Host ''
+        Write-Warn 'PRISTINE will WIPE every known MYMERITAPP bench (git clones under that tree go away).'
+        Write-Warn 'GitHub remotes stay; Hub menu 2 / 4 re-clone from pins.'
+        $skillsUnderApp = Join-Path $oss 'merit-agent-skills'
+        if (Test-Path -LiteralPath (Join-Path $skillsUnderApp '.git')) {
+            Write-Fail "Working clone will be wiped: $skillsUnderApp"
+            Write-Info 'Confirm skills-v* is already pushed before typing PRISTINE.'
+        }
+    }
 }
 
 function Write-Ok([string]$t) { Write-Host "  [OK]   $t" -ForegroundColor Green }
@@ -887,6 +983,9 @@ function Copy-IfExists {
 }
 
 function New-MeritBackup {
+    [void](Initialize-HubBackupRoot)
+    [void](Install-HubToToolsRoot)
+    Write-HubFoolproofGate
     $cfg = Get-HubConfig
     $tools = Get-MyMeritToolsRoot
     $oss = Get-MyMeritAppRoot
@@ -978,7 +1077,8 @@ function New-MeritBackup {
         }
     }
 
-    $runHint = Get-HubRunHint
+    $runHintTools = "pwsh -NoProfile -ExecutionPolicy Bypass -File `"$(Join-Path $tools 'Merit-Hub.ps1')`""
+    $runHint = $runHintTools
     $benchWipe = if ($benches.Count) { ($benches -join '; ') } else { '(none resolved yet)' }
     $readme = @'
 # Merit-Hub pre-pristine archive {0}
@@ -992,8 +1092,8 @@ Pins in this Hub copy: skills={2} vault={3}
 - WARNING.txt — wipe scope for this machine
 
 ## Survives Pristine?
-- This Hub script path — YES (Pristine keeps the running Merit-Hub.ps1)
-- backups\ next to Hub — usually YES (not a MYMERITAPP bench)
+- %MYMERITTOOLS%\Merit-Hub.ps1 — YES (kept; Pre-Pristine also refreshes this copy)
+- %MYMERITTOOLS%\backups\ — YES (archive root is forced here so APP wipe cannot eat it)
 - MYMERITAPP benches below — NO (wiped)
 - ~/dev clones — NO on full Pristine
 - GitHub remotes — YES; Hub 2 / 4 re-clone from pins
@@ -1003,13 +1103,13 @@ Pins in this Hub copy: skills={2} vault={3}
 
 ## Next steps (you run)
 ```powershell
-# Confirm pin
+# Confirm pin (use Tools Hub path)
 {1} -Help
 
 # Wipe (interactive UAC; type PRISTINE when asked)
 {1} -Pristine
 
-# Cold start
+# Cold start (fresh device)
 {1}
 # Menu: 1 → 2 → 3
 ```
@@ -1021,6 +1121,8 @@ Pins in this Hub copy: skills={2} vault={3}
 WARNING — Pristine wipe scope ($stamp)
 
 Hub script : $Script:HubScriptPath
+Tools Hub  : $(Join-Path $tools 'Merit-Hub.ps1')
+Archive    : $dir
 MYMERITAPP : $oss
   User     : $($meta.myMeritAppUser)
   Process  : $($meta.myMeritAppProc)
@@ -1032,12 +1134,15 @@ Benches to wipe:
 $(($benches | ForEach-Object { "  - $_" }) -join "`n")
 
 Git remotes are safe if already pushed. Re-clone via Hub menu 2 (OSS) / 4 (vault).
-Run Hub with the full -File line — do not double-click.
+Always run:
+  $runHint
+Do not double-click. Do not run Hub from a path under MYMERITAPP after Pre-Pristine.
 "@
     Set-Content -LiteralPath (Join-Path $dir 'WARNING.txt') -Value $warning -Encoding UTF8
     Write-Ok 'WARNING.txt'
     Write-Note "Archive ready: $dir"
     Write-Info 'Next: confirm -Help pin, then -Pristine, then menu 1 → 2 → 3.'
+    Write-Host ("  $runHint") -ForegroundColor Cyan
     return $dir
 }
 
@@ -1351,7 +1456,7 @@ function Invoke-MeritCleanup {
     Write-Host ''
     Write-Ok "Cleanup finished ($ModeName)."
     Write-Info "Backup: $BackupDir"
-    Write-Info "Cold start: $(Get-HubRunHint)  ->  J Jumpstart OSS"
+    Write-Info "Cold start: pwsh -NoProfile -ExecutionPolicy Bypass -File `"$(Join-Path (Get-MyMeritToolsRoot) 'Merit-Hub.ps1')`"  ->  1 then 2 then 3"
 }
 
 function Invoke-Mode {
@@ -1360,7 +1465,10 @@ function Invoke-Mode {
         'Pristine' {
             Write-Header 'Mode: PRISTINE v2 (brand-new laptop)'
             Write-Info 'First archives (pre-pristine), then wipes every known MYMERITAPP bench, MYMERITTOOLS merit-venv/shims, ~/dev, MYMERIT* env.'
-            Write-Info "Keeps this hub script only: $Script:HubScriptPath"
+            Write-Info "Keeps tools Hub: $(Join-Path (Get-MyMeritToolsRoot) 'Merit-Hub.ps1')"
+            [void](Initialize-HubBackupRoot)
+            [void](Install-HubToToolsRoot)
+            Write-HubFoolproofGate -BeforeWipe
             $backup = New-MeritBackup
             Invoke-MeritCleanup -BackupDir $backup -ModeName $Mode -ConfirmWord 'PRISTINE' `
                 -DoWipeOss $true -DoWipeDevTree $true -DoWipeToolsArtifacts $true
@@ -2697,7 +2805,7 @@ Ensure-HubElevated
 Sync-HubMeritEnvFromUser
 [void](Import-HubMeritResolve)
 [void](Import-HubOssHelpers)
-New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
+[void](Initialize-HubBackupRoot)
 Start-HubTranscript
 try {
     if ($Pristine) { Invoke-Mode -Mode Pristine; return }
