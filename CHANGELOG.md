@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.56] - 2026-09-02
+
+### Changed
+- Hub pins → `skills-v0.5.56` / `vault-v0.5.56` (env/lmodels + Ollama identity binary checkout).
+
 ## [0.5.54] - 2026-08-31
 
 ### Changed
