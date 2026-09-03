@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.57] - 2026-09-02
+
+### Changed
+- Hub operator menu does the next key after G (type **A** at `Next`) instead of discarding it; agent closeout law is `-Help` only, not every Select screen.
+
 ## [0.5.56] - 2026-09-02
 
 ### Changed

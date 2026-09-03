@@ -101,7 +101,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.56",
+  "skillsPin": "skills-v0.5.57",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -804,6 +804,7 @@ function Initialize-HubMeritSurfaceEmbed {
 }
 
 function Write-MeritSurfaceReceipt {
+    param([switch]$IncludeAgentLaw)
     [void](Import-HubMeritResolve)
     if (-not (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue)) {
         Write-Warn 'Merit Surface resolver unavailable.'
@@ -814,7 +815,7 @@ function Write-MeritSurfaceReceipt {
     if (Get-Command Write-MeritSurfaceReport -ErrorAction SilentlyContinue) {
         Write-MeritSurfaceReport -Surface $surf
     }
-    if ($surf.publicMeritCli) {
+    if ($surf.publicMeritCli -and $IncludeAgentLaw) {
         Write-HubAgentCloseoutHint
     }
 }
@@ -2411,7 +2412,7 @@ function Write-HubMap {
     Write-Host ('  ' + (& $mark '2' '2 Install OSS  (J)'))
     Write-Host '         |'
     Write-Host ('         +--> ' + (& $mark '3' '3 Try it') + ' --> ' + (& $mark 'OC' 'OC  OSS in the Cloud'))
-    Write-Host ('         +--> ' + (& $mark '4' '4 V (local)') + ' --> ' + (& $mark 'VC' 'VC  Venture Capable'))
+    Write-Host ('         +--> ' + (& $mark '4' '4 Vault (local)') + ' --> ' + (& $mark 'VC' 'VC  Venture Capable'))
     Write-Host ('         +--> ' + (& $mark '5' '5 R (local, role C|P)') + ' --> ' + (& $mark 'RC' 'RC  repo in the Cloud'))
     Write-Host ('         +--> ' + (& $mark '6' '6 Join MERIT (sign up)  after OC or 4'))
     Write-Host '         +--> 0 Stop'
@@ -2467,7 +2468,6 @@ function Write-HubReceipt {
             if (Test-Path -LiteralPath (Join-Path $demo '.git')) { Write-Ok "Demo   : $demo" } else { Write-Warn "Demo missing: $demo" }
             Write-Info "Status : $status"
             Write-Note 'Not cloud. Folders on this laptop only.'
-            Write-HubAgentCloseoutHint -Compact
         }
         '3' {
             $play = Join-Path $demo 'play\index.html'
@@ -3064,6 +3064,7 @@ function Invoke-HubVestigialScan {
 }
 
 function Show-MeritHubHelp {
+    param([switch]$AgentLaw)
     $cfg = Get-HubConfig
     Write-Header 'Merit-Hub'
     Write-Info "Location: $Script:HubScriptPath"
@@ -3098,10 +3099,16 @@ function Show-MeritHubHelp {
     Write-Host '  W) Where / Surface   A+B+C+D+H diagnostic map'
     Write-Host '  H) Help'
     Write-Host ''
-    Write-Note 'Cold start: 1 then 2. 6 Join (sign up) after OC or after 4. Do not double-click this file.'
-    if (Test-Path -LiteralPath (Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\merit.ps1')) {
+    Write-Note 'Cold start: 1 then 2. Cleanup: G then A then P (type the next key at Next, or Enter for menu).'
+    if ($AgentLaw) {
         Write-HubAgentCloseoutHint -Compact
     }
+}
+
+function Read-HubContinue {
+    $ans = (Read-Host 'Next (Enter=menu, or key e.g. A)').Trim()
+    if ([string]::IsNullOrWhiteSpace($ans)) { return '' }
+    return $ans
 }
 
 function Set-MyMeritToolsPrompt {
@@ -3116,32 +3123,38 @@ function Show-InteractiveMenu {
     Ensure-MeritHubEnvAtStart
     Remove-RetiredOssLiveBootStrap
     Write-MeritSurfaceReceipt
+    $pending = ''
     while ($true) {
-        Show-MeritHubHelp
-        Write-Host '  Recommended cold start:  1 then 2' -ForegroundColor Yellow
-        Write-Host ''
-        $c = (Read-Host 'Select').Trim()
+        if (-not $pending) {
+            Show-MeritHubHelp
+            Write-Host '  Recommended:  1 then 2  ·  cleanup: G then A then P' -ForegroundColor Yellow
+            Write-Host ''
+        }
+        $c = if ($pending) { $pending } else { (Read-Host 'Select').Trim() }
+        $pending = ''
         switch -Regex ($c) {
             '^(P|p|Pristine)$' { Invoke-Mode -Mode Pristine; return }
             '^(S|s|Soft)$' { Invoke-Mode -Mode Soft; return }
             '^(A|a|B|b|BackupOnly|PrePristine|Archive)$' { Invoke-Mode -Mode PrePristine; return }
-            '^1$' { Invoke-HubSetupLaptop; Read-Host 'Press Enter' | Out-Null }
-            '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss }
-            '^3$' { Invoke-HubTryIt; Read-Host 'Press Enter' | Out-Null }
-            '^(OC|oc|Oc)$' { Invoke-HubOc; Read-Host 'Press Enter' | Out-Null }
-            '^(4|Vault)$' { Invoke-JumpstartVault }
-            '^(VC|vc|Vc)$' { Invoke-HubVc; Read-Host 'Press Enter' | Out-Null }
-            '^(5|R)$' { Invoke-HubR; Read-Host 'Press Enter' | Out-Null }
-            '^(RC|rc|Rc)$' { Invoke-HubRc; Read-Host 'Press Enter' | Out-Null }
-            '^6$' { Invoke-HubJoinMerit; Read-Host 'Press Enter' | Out-Null }
-            { $_ -in @('I', 'i', 'Install', 'InstallSkills') } { Invoke-InstallSkillsMenu; Read-Host 'Press Enter' | Out-Null }
-            { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; Read-Host 'Press Enter' | Out-Null }
-            { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; Read-Host 'Press Enter' | Out-Null }
-            { $_ -in @('W', 'w', 'Where', 'Surface') } { Invoke-HubSurface; Read-Host 'Press Enter' | Out-Null }
-            { $_ -in @('G', 'g', 'Sprawl', 'Vestigial') } { Invoke-HubSprawlScan; Read-Host 'Press Enter' | Out-Null }
+            '^1$' { Invoke-HubSetupLaptop; $pending = Read-HubContinue }
+            '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss; $pending = Read-HubContinue }
+            '^3$' { Invoke-HubTryIt; $pending = Read-HubContinue }
+            '^(OC|oc|Oc)$' { Invoke-HubOc; $pending = Read-HubContinue }
+            '^(4|Vault)$' { Invoke-JumpstartVault; $pending = Read-HubContinue }
+            '^(VC|vc|Vc)$' { Invoke-HubVc; $pending = Read-HubContinue }
+            '^(5|R)$' { Invoke-HubR; $pending = Read-HubContinue }
+            '^(RC|rc|Rc)$' { Invoke-HubRc; $pending = Read-HubContinue }
+            '^6$' { Invoke-HubJoinMerit; $pending = Read-HubContinue }
+            { $_ -in @('I', 'i', 'Install', 'InstallSkills') } { Invoke-InstallSkillsMenu; $pending = Read-HubContinue }
+            { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; $pending = Read-HubContinue }
+            { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; $pending = Read-HubContinue }
+            { $_ -in @('W', 'w', 'Where', 'Surface') } { Invoke-HubSurface; $pending = Read-HubContinue }
+            { $_ -in @('G', 'g', 'Sprawl', 'Vestigial') } { Invoke-HubSprawlScan; $pending = Read-HubContinue }
             '^(H|h|\?|Help)$' { continue }
             '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or G A P S I M T W H).' }
+            default {
+                if ($c) { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or G A P S I M T W H).' }
+            }
         }
     }
 }
@@ -3149,7 +3162,7 @@ function Show-InteractiveMenu {
 # --- main ---
 Ensure-HubPwshHost
 if ($Help) {
-    Show-MeritHubHelp
+    Show-MeritHubHelp -AgentLaw
     return
 }
 [void](Initialize-HubBackupRoot)

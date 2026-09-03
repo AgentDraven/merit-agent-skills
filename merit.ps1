@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.56'
+$MERIT_VERSION = '0.5.57'
 $Root = $PSScriptRoot
 
 $Script:MeritResolveRepoRoot = $Root
@@ -57,7 +57,7 @@ Commands:
   apps publish --path <repo>  Upload play/+cfg/ to merit-prod /apps/<app>/play (create phase 8)
                           [--consumer-id <id>] override launch consumer_id
   apps refresh --path <repo>  Re-activate store + sync scaffold (never touches app_logic/)
-                          Store free-community activate ∑ UserGuide ∑ community cfg ∑ publish
+                          Store free-community activate ù UserGuide ù community cfg ù publish
   apps remove --path <repo> --yes
                           Remove platform /apps/<id> files (local delete does NOT)
                           [--tenant-all] also wipe tenant collections for that id
@@ -1234,13 +1234,13 @@ function Write-UserGuideScaffold {
         $body = Get-Content -LiteralPath $tpl -Raw -Encoding UTF8
         $body = $body.Replace('{{PRODUCT_NAME}}', $ProductName).Replace('{{CONSUMER_ID}}', $ConsumerId).Replace('{{PLAY_URL}}', $playUrl).Replace('{{REGISTER_URL}}', $registerUrl)
         Set-Content -LiteralPath $guidePath -Value $body -Encoding UTF8
-        Write-Host "UserGuide OK -> $guidePath (ToC ∑ If/Then ∑ OH/Consult ∑ OIDs)"
+        Write-Host "UserGuide OK -> $guidePath (ToC ù If/Then ù OH/Consult ù OIDs)"
     } else {
         Set-Content -LiteralPath $guidePath -Value @"
 ---
 # MERIT_SCAFFOLD:user-guide:v1
 ---
-# User Guide ó $ProductName
+# User Guide ù $ProductName
 
 Play: $playUrl  
 Register: $registerUrl  
@@ -1263,7 +1263,7 @@ function Invoke-AppsRefresh {
     Write-Host "apps refresh: consumer_id=$ConsumerId (never edits app_logic/)"
     $logicProbe = Join-Path $TargetRoot 'app_logic'
     if (-not (Test-Path -LiteralPath $logicProbe)) {
-        Write-Host 'apps refresh NOTE: app_logic/ missing ó create first if this is a new app.'
+        Write-Host 'apps refresh NOTE: app_logic/ missing ù create first if this is a new app.'
     }
 
     # 1) Store free-community re-activate (idempotent catalog refresh).
@@ -1303,7 +1303,7 @@ function Invoke-AppsRefresh {
         Write-Host "apps refresh NOTE: par pin resync: $($_.Exception.Message)"
     }
 
-    # 3) UserGuide ó refresh when scaffold marker present (or missing).
+    # 3) UserGuide ù refresh when scaffold marker present (or missing).
     Write-UserGuideScaffold -TargetRoot $TargetRoot -ProductName $display -ConsumerId $ConsumerId -Force:$false -Gateway $Gateway
 
     # 4) Republish play/+cfg/ to platform.
