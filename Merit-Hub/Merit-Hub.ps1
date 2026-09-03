@@ -101,7 +101,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.57",
+  "skillsPin": "skills-v0.5.58",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -485,7 +485,7 @@ function Invoke-HubVestigialReview {
     }
     else {
         Write-Note "Archive vestigial items to: $archive"
-        $bulk = Read-Host 'Archive ALL listed vestigial paths? [y/N/review]'
+        $bulk = Read-HubYesNo -Prompt 'Archive ALL listed vestigial paths? [y/N/review]' -AllowExtra '^(r|review)$'
     }
     $reviewEach = ($bulk -match '^[Rr]')
 
@@ -498,7 +498,7 @@ function Invoke-HubVestigialReview {
             Write-Host ''
             Write-Warn "$($row.Kind): $($row.Path)"
             Write-Info $row.Detail
-            $ans = Read-Host 'Archive this path? [y/N]'
+            $ans = Read-HubYesNo -Prompt 'Archive this path? [y/N]'
             $doArchive = ($ans -match '^[Yy]')
         }
         if (-not $doArchive) {
@@ -561,6 +561,110 @@ function Write-Header([string]$t) {
     Write-Host ('=' * 72) -ForegroundColor Cyan
     Write-Host "  Merit-Hub  |  $t" -ForegroundColor Cyan
     Write-Host ('=' * 72) -ForegroundColor Cyan
+}
+
+function Test-HubMenuChoice {
+    param([string]$Raw)
+    if ([string]::IsNullOrWhiteSpace($Raw)) { return $null }
+    $t = $Raw.Trim()
+    switch -Regex ($t) {
+        '^(P|p|Pristine)$' { return 'P' }
+        '^(S|s|Soft)$' { return 'S' }
+        '^(A|a|B|b|BackupOnly|PrePristine|Archive)$' { return 'A' }
+        '^1$' { return '1' }
+        '^(2|J|j|Jumpstart|Oss)$' { return '2' }
+        '^3$' { return '3' }
+        '^(OC|oc|Oc)$' { return 'OC' }
+        '^(4|Vault)$' { return '4' }
+        '^(VC|vc|Vc)$' { return 'VC' }
+        '^(5|R)$' { return '5' }
+        '^(RC|rc|Rc)$' { return 'RC' }
+        '^6$' { return '6' }
+        { $t -in @('I', 'i', 'Install', 'InstallSkills') } { return 'I' }
+        { $t -in @('M', 'm') } { return 'M' }
+        { $t -in @('T', 't') } { return 'T' }
+        { $t -in @('W', 'w', 'Where', 'Surface') } { return 'W' }
+        { $t -in @('G', 'g', 'Sprawl', 'Vestigial') } { return 'G' }
+        '^(H|h|\?|Help)$' { return 'H' }
+        '^(0|Q|q|Exit)$' { return '0' }
+        default { return $null }
+    }
+}
+
+function Write-HubWrongPrompt {
+    param(
+        [string]$Got,
+        [string]$Needed,
+        [string]$WillDo = ''
+    )
+    Write-Host ''
+    Write-Host ('!' * 72) -ForegroundColor Red
+    Write-Host "  WRONG PLACE: you typed '$Got' on a prompt that is not Select." -ForegroundColor Red
+    Write-Host "  Needed here: $Needed" -ForegroundColor Red
+    if ($WillDo) {
+        Write-Host "  $WillDo" -ForegroundColor Yellow
+    }
+    Write-Host ('!' * 72) -ForegroundColor Red
+    Write-Host ''
+}
+
+function Read-HubContinue {
+    $ans = (Read-Host 'Next (Enter=menu, or a menu key like A)').Trim()
+    if ([string]::IsNullOrWhiteSpace($ans)) { return '' }
+    $key = Test-HubMenuChoice $ans
+    if ($key) {
+        Write-HubWrongPrompt -Got $ans -Needed 'Enter to return to the menu — or a menu key if you meant the next step' -WillDo "Running '$key' now (not discarded)."
+        return $key
+    }
+    Write-HubWrongPrompt -Got $ans -Needed 'Enter (menu) or a Hub key (1-6, G, A, P, …)' -WillDo 'Ignored. Back to Select.'
+    return ''
+}
+
+function Read-HubEnterToClose {
+    $ans = ''
+    try { $ans = (Read-Host 'Press Enter to close (menu keys do not run here)').Trim() } catch { return }
+    $key = Test-HubMenuChoice $ans
+    if ($key) {
+        Write-HubWrongPrompt -Got $ans -Needed 'Enter only — this window is closing' -WillDo "Did NOT run '$key'. Open Hub again and type $key at Select."
+    }
+    elseif ($ans) {
+        Write-HubWrongPrompt -Got $ans -Needed 'Enter only' -WillDo 'Closing anyway.'
+    }
+}
+
+function Read-HubYesNo {
+    param(
+        [string]$Prompt,
+        [string]$AllowExtra = ''
+    )
+    while ($true) {
+        $ans = (Read-Host $Prompt).Trim()
+        if ([string]::IsNullOrWhiteSpace($ans)) { return '' }
+        $low = $ans.ToLowerInvariant()
+        if ($low -in @('y', 'yes', 'n', 'no')) { return $ans }
+        if ($AllowExtra -and ($low -match $AllowExtra)) { return $ans }
+        $key = Test-HubMenuChoice $ans
+        if ($key) {
+            Write-HubWrongPrompt -Got $ans -Needed $Prompt -WillDo "Did NOT run '$key'. Type y or N here (or review if offered), then type $key at Select / Next."
+            continue
+        }
+        Write-HubWrongPrompt -Got $ans -Needed $Prompt -WillDo 'Try again.'
+    }
+}
+
+function Read-HubLiteralConfirm {
+    param(
+        [string]$Word,
+        [string]$Prompt = 'Confirm'
+    )
+    $ans = (Read-Host $Prompt).Trim()
+    if ($ans -eq $Word) { return $ans }
+    $key = Test-HubMenuChoice $ans
+    if ($key) {
+        Write-HubWrongPrompt -Got $ans -Needed "the word $Word (this is not the menu)" -WillDo "Did NOT run '$key'. Type $Word to proceed, or anything else to abort."
+        $ans = (Read-Host $Prompt).Trim()
+    }
+    return $ans
 }
 
 function Get-HubConfig {
@@ -1043,7 +1147,7 @@ function Wait-HubWindow {
     Write-Host ''
     Write-Note $Reason
     if ($Script:HistoryLog) { Write-Info "History: $Script:HistoryLog" }
-    try { [void](Read-Host 'Press Enter to close') } catch { }
+    try { Read-HubEnterToClose } catch { }
 }
 
 function Complete-HubSession {
@@ -1660,14 +1764,14 @@ function Invoke-RogueFolderReview {
         Write-Warn '-Force skips leftover deletes (too dangerous). Re-run without -Force to review.'
         return
     }
-    $go = Read-Host 'Review leftovers for possible delete? [y/N]'
+    $go = Read-HubYesNo -Prompt 'Review leftovers for possible delete? [y/N]'
     if ($go -notmatch '^[Yy]') { Write-Info 'Skipped leftover review.'; return }
     foreach ($p in $cands) {
         Write-Host ''
         Write-Warn "Candidate: $p"
-        $d = Read-Host 'Delete this folder? [y/N]'
+        $d = Read-HubYesNo -Prompt 'Delete this folder? [y/N]'
         if ($d -notmatch '^[Yy]') { Write-Info "kept $p"; continue }
-        $ok = Read-Host "Type DELETE to confirm removal of $p"
+        $ok = Read-HubLiteralConfirm -Word 'DELETE' -Prompt "Type DELETE to confirm removal of $p"
         if ($ok -ne 'DELETE') { Write-Warn "not confirmed - kept $p"; continue }
         Remove-PathSafe -Path $p -Label "leftover $p"
     }
@@ -1735,7 +1839,7 @@ function Invoke-MeritCleanup {
     if (-not $Force -and -not $WhatIfPreference) {
         Write-Host ''
         Write-Warn "Type $ConfirmWord to proceed (or -Force)."
-        $ans = Read-Host 'Confirm'
+        $ans = Read-HubLiteralConfirm -Word $ConfirmWord
         if ($ans -ne $ConfirmWord) {
             Write-Warn 'Aborted - backup kept.'
             return
@@ -3099,16 +3203,10 @@ function Show-MeritHubHelp {
     Write-Host '  W) Where / Surface   A+B+C+D+H diagnostic map'
     Write-Host '  H) Help'
     Write-Host ''
-    Write-Note 'Cold start: 1 then 2. Cleanup: G then A then P (type the next key at Next, or Enter for menu).'
+    Write-Note 'Cold start: 1 then 2. Cleanup: G then A then P. After a step, Enter=menu; a menu key at Next still runs (red if it was the wrong prompt).'
     if ($AgentLaw) {
         Write-HubAgentCloseoutHint -Compact
     }
-}
-
-function Read-HubContinue {
-    $ans = (Read-Host 'Next (Enter=menu, or key e.g. A)').Trim()
-    if ([string]::IsNullOrWhiteSpace($ans)) { return '' }
-    return $ans
 }
 
 function Set-MyMeritToolsPrompt {

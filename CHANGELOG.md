@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.58] - 2026-09-02
+
+### Changed
+- Hub traps menu keys typed at Enter / y-N / PRISTINE prompts: **red WRONG PLACE** banner; Next still runs the key; Confirm/y-N re-asks so the step is not lost.
+
 ## [0.5.57] - 2026-09-02
 
 ### Changed
