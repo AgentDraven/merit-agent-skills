@@ -4,9 +4,12 @@
   Merit-Hub - laptop cleanup (Pristine v2), jumpstart OSS/vault, shared tools (MYMERITTOOLS).
 
 .DESCRIPTION
-  Standalone script - save as e.g. C:\Tools\Merit-Hub.ps1 (default %MYMERITTOOLS%).
-  REQUIRED after download (do not double-click or .\\Merit-Hub.ps1; OS blocks internet scripts):
-    pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+  Standalone script. Suggested download folder: C:\Tools (any folder is fine — MYMERITTOOLS need not exist yet).
+  After download, from that folder (do not double-click; use Bypass -File):
+    cd C:\Tools
+    pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1
+  Or full path: pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
+  Menu 1 persists MYMERITTOOLS / MYMERITAPP (you choose paths; C:\Tools is only a suggestion).
   Pins are embedded; no .json or extra launcher required. Run with no args for interactive menu.
 
   Cleanup:
@@ -16,9 +19,9 @@
     -SprawlScan / -VestigialScan  report leftover MERIT folders outside canonical MYMERIT* (no archive)
 
     Jumpstart:
-    -Jumpstart Oss|Vault   clone pinned release; OSS continues as Install OSS (step 2)
-    -OssPhase / -InstallOss  clone demo + quiet validate (after a skills clone exists)
-    -TryIt                 open local merit-demo play
+    -Jumpstart Oss|Vault   clone pinned release; OSS = skills pin only (step 2)
+    -OssPhase / -InstallOss  same as Hub 2 (skills pin; demo is -TryIt / 3)
+    -TryIt                 clone public merit-demo + open play
     -Oc                    OSS in the Cloud (publish + required activate)
     -NewOc                 with -Oc: mint a new oc-* id (do not reuse oss-bench.json)
     -Vc                    Venture Capable (operator grade after local V; not hosted vault)
@@ -78,6 +81,10 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+# pwsh 7+ would otherwise treat native git/winget stderr+nonzero as terminating and kill the menu.
+if ($null -ne (Get-Variable -Name PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue)) {
+    $PSNativeCommandUseErrorActionPreference = $false
+}
 
 $Script:HubScriptPath = $PSCommandPath
 if (-not $Script:HubScriptPath) { $Script:HubScriptPath = $MyInvocation.MyCommand.Path }
@@ -101,7 +108,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.59",
+  "skillsPin": "skills-v0.5.60",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -609,7 +616,7 @@ function Write-HubWrongPrompt {
 }
 
 function Read-HubContinue {
-    $ans = (Read-Host 'Next (Enter=menu, or a menu key like A)').Trim()
+    $ans = (Read-Host 'Next (Enter=menu; or a menu key like 3/OC; 0 later at Select to exit)').Trim()
     if ([string]::IsNullOrWhiteSpace($ans)) { return '' }
     $key = Test-HubMenuChoice $ans
     if ($key) {
@@ -618,6 +625,30 @@ function Read-HubContinue {
     }
     Write-HubWrongPrompt -Got $ans -Needed 'Enter (menu) or a Hub key (1-6, G, A, P, …)' -WillDo 'Ignored. Back to Select.'
     return ''
+}
+
+function Write-HubNextSteps {
+    param([string]$Step)
+    Write-Host ''
+    Write-Host '  NEXT' -ForegroundColor Cyan
+    switch ($Step) {
+        '1' {
+            Write-Note 'Next: 2 Install OSS (skills pin only). Enter returns to menu; 0 exits at Select.'
+        }
+        '2' {
+            Write-Note 'Next: 3 Try it — clones public merit-demo (Mr-PI-Bala) and opens play.'
+            Write-Info 'Docs: merit-agent-skills\docs\howto\launch-over-dinner.md'
+            Write-Info 'Demo: https://github.com/Mr-PI-Bala/merit-demo  (public; no GitHub login to clone)'
+        }
+        '3' {
+            Write-Note 'Showcase skills via the open play page; then OC (cloud) or I (install skills to Cursor).'
+            Write-Info 'Docs: docs\howto\launch-over-dinner.md · TRY_BUNDLES.md'
+            Write-Note 'Enter = menu to continue. Prefer 0 at Select when you are done (do not rely on window close).'
+        }
+        'OC' { Write-Note 'Next: 6 Join, or keep exploring from the menu (Enter).' }
+        '4' { Write-Note 'Next: VC for operator grade, or 5 for catalog. Docs stay in the vault clone.' }
+        default { Write-Note 'Enter returns to menu. Type 0 at Select to stop Hub.' }
+    }
 }
 
 function Read-HubEnterToClose {
@@ -852,7 +883,7 @@ function Initialize-HubMeritSurfaceEmbed {
         if ($hubPinVal -and $skillsVersion -and ($hubPinVal -ne "skills-v$skillsVersion")) { $pinMismatch = $true }
         $hints = [System.Collections.Generic.List[string]]::new()
         switch ($edition) {
-            'none' { [void]$hints.Add('Download Merit-Hub.ps1 Raw to %MYMERITTOOLS%'); [void]$hints.Add('Run Hub 1 then 2') }
+            'none' { [void]$hints.Add('Download Merit-Hub.ps1 Raw to C:\Tools (MYMERITTOOLS need not exist yet)'); [void]$hints.Add('Run Hub 1 then 2 then 3') }
             'ide-only' {
                 [void]$hints.Add('Hub 2 clones merit-agent-skills to %MYMERITAPP%')
                 if ($staleIdeMarker) { [void]$hints.Add('IDE .merit-surface.json is stale — re-run Hub 2 after Pristine') }
@@ -2216,6 +2247,27 @@ function Get-MeritVenvPython {
     return Join-Path $tools 'merit-venv/bin/python3'
 }
 
+function Set-MeritPythonShim {
+    param([Parameter(Mandatory = $true)][string]$PythonExe)
+    $tools = Get-MyMeritToolsRoot
+    New-Item -ItemType Directory -Force -Path $tools | Out-Null
+    if (-not (Test-Path -LiteralPath $PythonExe)) {
+        Write-Fail "Python exe missing for shim: $PythonExe"
+        return $false
+    }
+    if ($Script:HubOnWindows) {
+        Set-Content -LiteralPath (Join-Path $tools 'merit-python.cmd') -Value "@echo off`r`n`"$PythonExe`" %*`r`n" -Encoding ASCII
+        Write-Ok "Shim: $(Join-Path $tools 'merit-python.cmd') -> $PythonExe"
+    }
+    else {
+        $shim = Join-Path $tools 'merit-python'
+        Set-Content -LiteralPath $shim -Value "#!/usr/bin/env bash`nexec `"$PythonExe`" `"$@`"`n" -Encoding UTF8
+        try { & chmod +x $shim } catch { }
+        Write-Ok "Shim: $shim -> $PythonExe"
+    }
+    return $true
+}
+
 function Install-MeritToolsPython {
     $tools = Get-MyMeritToolsRoot
     Write-Header "Creating MERIT Python venv under MYMERITTOOLS ($tools)"
@@ -2224,9 +2276,7 @@ function Install-MeritToolsPython {
     New-Item -ItemType Directory -Force -Path $tools | Out-Null
     if (Test-Path -LiteralPath $venvPy) {
         Write-Ok "Already present: $venvPy"
-        if ($Script:HubOnWindows) {
-            Set-Content -LiteralPath (Join-Path $tools 'merit-python.cmd') -Value "@echo off`r`n`"$venvPy`" %*`r`n" -Encoding ASCII
-        }
+        [void](Set-MeritPythonShim -PythonExe $venvPy)
         return $true
     }
     $base = Resolve-BasePythonExe
@@ -2251,9 +2301,7 @@ function Install-MeritToolsPython {
         Write-Fail "venv create failed at $venvDir"
         return $false
     }
-    if ($Script:HubOnWindows) {
-        Set-Content -LiteralPath (Join-Path $tools 'merit-python.cmd') -Value "@echo off`r`n`"$venvPy`" %*`r`n" -Encoding ASCII
-    }
+    [void](Set-MeritPythonShim -PythonExe $venvPy)
     Write-Ok "MERIT laptop Python: $venvPy"
     return $true
 }
@@ -2315,16 +2363,25 @@ function Invoke-MeritPrereqs {
     $venvPy = Get-MeritVenvPython
     $needPy = -not (Test-Path -LiteralPath $venvPy)
     $basePy = Resolve-BasePythonExe
+    $toolsShim = if ($Script:HubOnWindows) { Join-Path $tools 'merit-python.cmd' } else { Join-Path $tools 'merit-python' }
+    $pythonReady = (-not $needPy) -or (Test-Path -LiteralPath $toolsShim)
     if (-not $needPy) {
         Write-Ok "MERIT Python venv - $venvPy"
+    }
+    elseif ($pythonReady) {
+        Write-Ok "MERIT Python shim present - $toolsShim (venv optional)"
+        $needPy = $false
     }
     else {
         Write-Warn "MERIT Python venv - MISSING at $venvPy"
         if ($basePy) {
-            Write-Note "Base Python is present ($basePy). y will create the venv under MYMERITTOOLS (not a reinstall of Git/gh/pwsh)."
+            Write-Note "System Python found ($basePy)."
+            Write-Info '  Venv (recommended): isolated packages under MYMERITTOOLS; does not change your global Python.'
+            Write-Info '  Global: point merit-python.cmd at system Python (no venv). Fine for light use; less isolated.'
+            Write-Info '  Skip: leave unset; some MERIT recipes that call merit-python may fail until you choose V or G later.'
         }
         else {
-            Write-Note 'Base Python is also missing. y will install Python 3.12 then create the venv under MYMERITTOOLS.'
+            Write-Note 'Base Python is also missing. Choosing V later will install Python 3.12 then create the venv.'
         }
     }
 
@@ -2332,7 +2389,7 @@ function Invoke-MeritPrereqs {
     if ($needGit) { $missingTools.Add('Git') }
     if ($needPwsh) { $missingTools.Add('pwsh (PowerShell 7+)') }
     if ($needGh) { $missingTools.Add('GitHub CLI (gh) - optional') }
-    if ($needPy) { $missingTools.Add("MERIT Python venv ($venvPy)") }
+    if ($needPy) { $missingTools.Add("MERIT Python (venv under MYMERITTOOLS, or global shim)") }
     $needAnyTool = $needGit -or $needPwsh -or $needGh -or $needPy
     $needAnyEnv = $needPersistTools -or $needPersistApp
 
@@ -2349,7 +2406,7 @@ function Invoke-MeritPrereqs {
         foreach ($item in $missingTools) { Write-Info "    - $item" }
     }
     else {
-        Write-Ok 'No packages to install (Git, gh, pwsh, and MERIT Python venv are present).'
+        Write-Ok 'No packages to install (Git, gh, pwsh, and MERIT Python are present).'
     }
     if ($needAnyEnv) {
         Write-Note 'Set User environment variables:'
@@ -2402,7 +2459,26 @@ function Invoke-MeritPrereqs {
         }
     }
     if ($needGh) { [void](Install-WingetPkg -Id 'GitHub.cli' -Name 'GitHub CLI') }
-    if ($needPy) { [void](Install-MeritToolsPython) }
+    if ($needPy) {
+        if ($basePy) {
+            Write-Host ''
+            Write-Note 'Python: isolated venv vs your already-installed system Python.'
+            $pyHow = Read-Host 'Python: [V]env under MYMERITTOOLS (recommended) / [G]lobal shim / [S]kip [V/G/S]'
+            switch -Regex ($pyHow) {
+                '^[Gg]' {
+                    if (Set-MeritPythonShim -PythonExe $basePy) {
+                        Write-Ok "Using global Python for MERIT via merit-python shim ($basePy)."
+                        Write-Note 'No merit-venv created. Re-run 1 and choose V later if you want isolation.'
+                    }
+                }
+                '^[Ss]' { Write-Warn 'Python skipped — merit-python shim not set.' }
+                default { [void](Install-MeritToolsPython) }
+            }
+        }
+        else {
+            [void](Install-MeritToolsPython)
+        }
+    }
 }
 
 function Ensure-MeritHubEnvAtStart {
@@ -2525,9 +2601,9 @@ function Write-HubMap {
 function Write-HubDrillIn {
     param([string]$Step)
     switch ($Step) {
-        '1' { Write-Note 'Drill-in: git / gh / pwsh + MERIT Python venv under MYMERITTOOLS. Persist MYMERIT*. Not hosted.' }
-        '2' { Write-Note 'Drill-in: clone skills pin + merit-demo; quiet smoke. Old D+G live here. Not cloud.' }
-        '3' { Write-Note 'Drill-in: open local merit-demo\play\index.html. Still not hosted.' }
+        '1' { Write-Note 'Drill-in: git / gh / pwsh + MERIT Python (venv or global shim) under MYMERITTOOLS. Persist MYMERIT*. Not hosted.' }
+        '2' { Write-Note 'Drill-in: clone merit-agent-skills pin only (no merit-demo). Optional host install via I. Not cloud.' }
+        '3' { Write-Note 'Drill-in: clone public Mr-PI-Bala/merit-demo under MYMERITAPP, then open play\index.html. Still not hosted.' }
         'OC' { Write-Note 'Drill-in: publish play+cfg + portal/ marketing site to merit-prod; store activate MUST succeed. here.now is a platform-key upgrade (no laptop key).' }
         '4' { Write-Note 'Drill-in: clone private vault into ~/dev. Still local. Existing working clone is kept (no detach to Hub pin).' }
         'VC' { Write-Note 'Drill-in: operator grade after 4. BootStrap + gates + runtime. Vault stays private git - not hosted on merit-prod. Validate: git remote private, merit git verify, runtime verify.' }
@@ -2569,13 +2645,12 @@ function Write-HubReceipt {
         }
         '2' {
             if (Test-Path -LiteralPath (Join-Path $skills 'merit.ps1')) { Write-Ok "Skills : $skills" } else { Write-Warn "Skills missing: $skills" }
-            if (Test-Path -LiteralPath (Join-Path $demo '.git')) { Write-Ok "Demo   : $demo" } else { Write-Warn "Demo missing: $demo" }
             Write-Info "Status : $status"
-            Write-Note 'Not cloud. Folders on this laptop only.'
+            Write-Note 'Skills only on this step. merit-demo is Hub 3 (public Mr-PI-Bala clone).'
         }
         '3' {
             $play = Join-Path $demo 'play\index.html'
-            if (Test-Path -LiteralPath $play) { Write-Ok "Local play: $play" } else { Write-Warn "Local play missing: $play (run 2 first)" }
+            if (Test-Path -LiteralPath $play) { Write-Ok "Local play: $play" } else { Write-Warn "Local play missing: $play (re-run 3; needs network for github.com/Mr-PI-Bala/merit-demo)" }
             Write-Note 'Not hosted yet. OC puts this on merit-prod.'
         }
         'OC' {
@@ -2675,6 +2750,7 @@ function Invoke-HubSetupLaptop {
     Write-HubDrillIn '1'
     [void](Invoke-MeritPrereqs)
     Write-HubReceipt '1'
+    Write-HubNextSteps '1'
 }
 
 function Invoke-HubInstallOss {
@@ -2687,7 +2763,12 @@ function Invoke-HubInstallOss {
     $bench = Ensure-MyMeritAppPrompt
     $skillsDest = Join-Path $bench 'merit-agent-skills'
     $ok = Invoke-GitClonePin -Url ([string]$cfg.skillsUrl) -Pin ([string]$cfg.skillsPin) -Dest $skillsDest -Label 'merit-agent-skills'
-    if (-not $ok) { return }
+    if (-not $ok) {
+        Write-Fail 'Skills clone failed. Fix git/network and retry 2. Menu stays available after Next.'
+        Write-HubReceipt '2'
+        Write-HubNextSteps '2'
+        return
+    }
 
     if (-not $Force) {
         $ins = Read-Host 'Install MERIT skills to an AI host now? [y/N] (menu I later)'
@@ -2696,31 +2777,53 @@ function Invoke-HubInstallOss {
         }
     }
 
-    if (-not (Ensure-HubOssHelpers)) { return }
-    $env:MERIT_VERIFY_QUIET = '1'
-    Invoke-OssEnsureDemo
-    Invoke-OssValidate
+    if (Ensure-HubOssHelpers) {
+        try {
+            $st = Get-OssState
+            Save-OssState $st
+        }
+        catch {
+            Write-Warn ("Could not refresh oss-bench.json: " + $_.Exception.Message)
+        }
+    }
+    Write-Ok 'Install OSS complete (skills pin). merit-demo is not part of step 2 — use 3 Try it.'
     Write-HubReceipt '2'
+    Write-HubNextSteps '2'
 }
 
 function Ensure-HubDemoPlay {
     if (Test-HubDemoReady) { return $true }
-    Write-Warn 'merit-demo play missing — seeding now (same work Hub 2 does for the demo).'
+    Write-Warn 'merit-demo play missing — cloning public showcase now (Hub 3 work; not Hub 2).'
+    $cfg = Get-HubConfig
     $bench = Get-MyMeritAppRoot
     $skillsDest = Join-Path $bench 'merit-agent-skills'
     if (-not (Test-Path -LiteralPath (Join-Path $skillsDest 'merit.ps1'))) {
-        Write-Note 'Skills clone missing — running Install OSS (2) first, then retrying Try it.'
-        Invoke-HubInstallOss -SkipPrereqs
+        Write-Note 'Skills clone missing — cloning skills pin first (still not seeding demo via 2).'
+        $okSkills = Invoke-GitClonePin -Url ([string]$cfg.skillsUrl) -Pin ([string]$cfg.skillsPin) -Dest $skillsDest -Label 'merit-agent-skills'
+        if (-not $okSkills) {
+            Write-Fail 'Cannot seed demo without merit-agent-skills. Fix git/network and retry 2 or 3.'
+            return $false
+        }
     }
-    elseif (-not (Ensure-HubOssHelpers)) {
+    if (-not (Ensure-HubOssHelpers)) {
         Write-Fail 'OSS helpers unavailable after skills check.'
         return $false
     }
-    else {
-        Invoke-OssEnsureDemo
+    $seeded = $false
+    try {
+        $seeded = [bool](Invoke-OssEnsureDemo)
+    }
+    catch {
+        Write-Fail ("merit-demo seed threw: " + $_.Exception.Message)
+        Write-Fail 'Expected public clone: https://github.com/Mr-PI-Bala/merit-demo.git (no GitHub login).'
+        return $false
+    }
+    if (-not $seeded) {
+        Write-Fail 'merit-demo seed returned failure. Check network / git. Repo is public under Mr-PI-Bala (not AgentDraven).'
+        return $false
     }
     if (-not (Test-HubDemoReady)) {
-        Write-Fail 'merit-demo still missing after seed. Check network / re-run 2 Install OSS.'
+        Write-Fail 'merit-demo still missing play\index.html after clone. Inspect MYMERITAPP\merit-demo.'
         return $false
     }
     Write-Ok 'merit-demo seeded under MYMERITAPP.'
@@ -2733,19 +2836,26 @@ function Invoke-HubTryIt {
     Write-HubDrillIn '3'
     if (-not (Ensure-HubDemoPlay)) {
         Write-HubReceipt '3'
+        Write-HubNextSteps '3'
         return
     }
-    if (-not (Ensure-HubOssHelpers)) { return }
+    if (-not (Ensure-HubOssHelpers)) {
+        Write-HubReceipt '3'
+        Write-HubNextSteps '3'
+        return
+    }
     $state = Get-OssState
     $play = Join-Path ([string]$state.demoFolder) 'play\index.html'
     if (-not (Test-Path -LiteralPath $play)) {
         Write-Fail "Local play missing: $play"
         Write-HubReceipt '3'
+        Write-HubNextSteps '3'
         return
     }
     Write-Ok "Opening $play"
     try { Start-Process $play } catch { Write-Warn "Could not open browser: $($_.Exception.Message)" }
     Write-HubReceipt '3'
+    Write-HubNextSteps '3'
 }
 
 function Invoke-HubOc {
@@ -3199,9 +3309,9 @@ function Show-MeritHubHelp {
     Write-HubMap
     Write-Host ''
     Write-Host '  KEYS' -ForegroundColor White
-    Write-Host '  1) Setup laptop     prereqs + MYMERIT* + merit-venv'
-    Write-Host '  2) Install OSS      skills pin + merit-demo + quiet smoke   (alias J)'
-    Write-Host '  3) Try it           open local play/index.html'
+    Write-Host '  1) Setup laptop     prereqs + MYMERIT* + Python (venv or global shim)'
+    Write-Host '  2) Install OSS      skills pin only (no merit-demo)   (alias J)'
+    Write-Host '  3) Try it           clone public merit-demo + open play/index.html'
     Write-Host '  OC) OSS in the Cloud  DualRail play + register + your marketing site'
     Write-Host '      -NewOc with -Oc mints a new oc-* id (second creator on this bench)'
     Write-Host '  4) Vault (local)    clone private vault (working clone kept)'
@@ -3222,7 +3332,7 @@ function Show-MeritHubHelp {
     Write-Host '  W) Where / Surface   A+B+C+D+H diagnostic map'
     Write-Host '  H) Help'
     Write-Host ''
-    Write-Note 'Cold start: 1 then 2. Cleanup: G then A then P. After a step, Enter=menu; a menu key at Next still runs (red if it was the wrong prompt).'
+    Write-Note 'Cold start: 1 → 2 (skills) → 3 (demo). Cleanup: G then A then P. After a step, Enter=menu; Hub stays open until 0.'
     if ($AgentLaw) {
         Write-HubAgentCloseoutHint -Compact
     }
@@ -3244,34 +3354,41 @@ function Show-InteractiveMenu {
     while ($true) {
         if (-not $pending) {
             Show-MeritHubHelp
-            Write-Host '  Recommended:  1 then 2  ·  cleanup: G then A then P' -ForegroundColor Yellow
+            Write-Host '  Recommended:  1 then 2 then 3  ·  cleanup: G then A then P' -ForegroundColor Yellow
             Write-Host ''
         }
         $c = if ($pending) { $pending } else { (Read-Host 'Select').Trim() }
         $pending = ''
-        switch -Regex ($c) {
-            '^(P|p|Pristine)$' { Invoke-Mode -Mode Pristine; return }
-            '^(S|s|Soft)$' { Invoke-Mode -Mode Soft; return }
-            '^(A|a|B|b|BackupOnly|PrePristine|Archive)$' { Invoke-Mode -Mode PrePristine; return }
-            '^1$' { Invoke-HubSetupLaptop; $pending = Read-HubContinue }
-            '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss; $pending = Read-HubContinue }
-            '^3$' { Invoke-HubTryIt; $pending = Read-HubContinue }
-            '^(OC|oc|Oc)$' { Invoke-HubOc; $pending = Read-HubContinue }
-            '^(4|Vault)$' { Invoke-JumpstartVault; $pending = Read-HubContinue }
-            '^(VC|vc|Vc)$' { Invoke-HubVc; $pending = Read-HubContinue }
-            '^(5|R)$' { Invoke-HubR; $pending = Read-HubContinue }
-            '^(RC|rc|Rc)$' { Invoke-HubRc; $pending = Read-HubContinue }
-            '^6$' { Invoke-HubJoinMerit; $pending = Read-HubContinue }
-            { $_ -in @('I', 'i', 'Install', 'InstallSkills') } { Invoke-InstallSkillsMenu; $pending = Read-HubContinue }
-            { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; $pending = Read-HubContinue }
-            { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; $pending = Read-HubContinue }
-            { $_ -in @('W', 'w', 'Where', 'Surface') } { Invoke-HubSurface; $pending = Read-HubContinue }
-            { $_ -in @('G', 'g', 'Sprawl', 'Vestigial') } { Invoke-HubSprawlScan; $pending = Read-HubContinue }
-            '^(H|h|\?|Help)$' { continue }
-            '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
-            default {
-                if ($c) { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or G A P S I M T W H).' }
+        try {
+            switch -Regex ($c) {
+                '^(P|p|Pristine)$' { Invoke-Mode -Mode Pristine; return }
+                '^(S|s|Soft)$' { Invoke-Mode -Mode Soft; return }
+                '^(A|a|B|b|BackupOnly|PrePristine|Archive)$' { Invoke-Mode -Mode PrePristine; return }
+                '^1$' { Invoke-HubSetupLaptop; $pending = Read-HubContinue }
+                '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss; $pending = Read-HubContinue }
+                '^3$' { Invoke-HubTryIt; $pending = Read-HubContinue }
+                '^(OC|oc|Oc)$' { Invoke-HubOc; $pending = Read-HubContinue }
+                '^(4|Vault)$' { Invoke-JumpstartVault; $pending = Read-HubContinue }
+                '^(VC|vc|Vc)$' { Invoke-HubVc; $pending = Read-HubContinue }
+                '^(5|R)$' { Invoke-HubR; $pending = Read-HubContinue }
+                '^(RC|rc|Rc)$' { Invoke-HubRc; $pending = Read-HubContinue }
+                '^6$' { Invoke-HubJoinMerit; $pending = Read-HubContinue }
+                { $_ -in @('I', 'i', 'Install', 'InstallSkills') } { Invoke-InstallSkillsMenu; $pending = Read-HubContinue }
+                { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; $pending = Read-HubContinue }
+                { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; $pending = Read-HubContinue }
+                { $_ -in @('W', 'w', 'Where', 'Surface') } { Invoke-HubSurface; $pending = Read-HubContinue }
+                { $_ -in @('G', 'g', 'Sprawl', 'Vestigial') } { Invoke-HubSprawlScan; $pending = Read-HubContinue }
+                '^(H|h|\?|Help)$' { continue }
+                '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }
+                default {
+                    if ($c) { Write-Warn 'Unknown - choose 1, 2, 3, OC, 4, VC, 5, R, RC, 6, 0 (or G A P S I M T W H).' }
+                }
             }
+        }
+        catch {
+            Write-Fail ("Step error: " + $_.Exception.Message)
+            Write-Note 'Menu stays open. Fix the issue and retry, or pick another key. Type 0 at Select to exit.'
+            $pending = Read-HubContinue
         }
     }
 }

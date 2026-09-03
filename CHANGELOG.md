@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [0.5.60] - 2026-09-03
+
+### Changed
+- Hub cold-start: pwsh 7 native git/winget errors no longer kill the menu; after a step Hub stays open until **0**.
+- Hub **2** is skills pin only; Hub **3** clones public `Mr-PI-Bala/merit-demo` (no GitHub login) and opens play.
+- Python on **1**: **V**env / **G**lobal shim / **S**kip; `merit-python` shim helper.
+- Next-step hints after **1** / **2** / **3** / **OC**. Download Hub to `C:\Tools` even when `MYMERITTOOLS` is unset.
+- `Invoke-OssEnsureDemo` returns bool and fails with the public demo URL.
+
 ## [0.5.59] - 2026-09-02
 
 ### Changed

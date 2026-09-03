@@ -1,6 +1,6 @@
 # BootStrap pathway (OSS ? Private handoff)
 
-Annotated flowchart for a **new laptop** on the public freeware path. Private-Vault continuation (affiliate **MeritAcme**, persona/repo picker) lives in the vault doc [`vault_usage.md` ß7c](https://github.com/AgentDraven/merit-private-vault/blob/main/docs/vault_usage.md#7c-device-bootstrap--affiliate-pathway) (operators only).
+Annotated flowchart for a **new laptop** on the public freeware path. Private-Vault continuation (affiliate **MeritAcme**, persona/repo picker) lives in the vault doc [`vault_usage.md` ù7c](https://github.com/AgentDraven/merit-private-vault/blob/main/docs/vault_usage.md#7c-device-bootstrap--affiliate-pathway) (operators only).
 
 **Laptop shared:** `%MYMERITTOOLS%\merit-venv` (default `C:\Tools`) is installed by **OSS BootStrap menu 1** and Merit-Hub prereqs (same path Private-Vault uses). Affiliate / `runtime out` remain Private-Vault only.
 
@@ -10,7 +10,7 @@ Annotated flowchart for a **new laptop** on the public freeware path. Private-Va
 pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
-Save Hub via **Raw** first. Menu **2** (alias **J**) clones the current `skills-v*` pin into `%MYMERITAPP%\merit-agent-skills` and continues Install OSS in the same window. Do **not** copy `BootStrap/` to `%MYMERITAPP%\BootStrap\`.
+Save Hub via **Raw** first (any folder; `C:\Tools` is the suggestion). Menu **2** (alias **J**) clones the current `skills-v*` pin into `%MYMERITAPP%\merit-agent-skills`. Menu **3** clones public `Mr-PI-Bala/merit-demo` and opens play. Do **not** copy `BootStrap/` to `%MYMERITAPP%\BootStrap\`.
 
 Use the current public pin (see repo `VERSION` / tags). Clone **from** the bench folder only if you are installing skills by hand so the repo lands at `%MYMERITAPP%\merit-agent-skills`.
 
@@ -22,10 +22,9 @@ flowchart TD
 
   ossOrPriv -->|OSS_freeware| ossA[mkdir_MYMERITAPP]
   ossA --> ossB[Hub_2_clone_skills]
-  ossB --> ossC[Install_OSS_demo_quiet_smoke]
+  ossB --> ossC[Hub_3_demo_play]
   ossC --> ossDone([OSS_local_done])
-  ossDone --> tryIt[3_Try_it_local]
-  tryIt --> oc[OC_OSS_in_the_Cloud]
+  ossDone --> oc[OC_OSS_in_the_Cloud]
   ossDone --> wantPriv{Want_Private_Vault}
   wantPriv -->|No| stayOss([stay_freeware_or_OC])
   wantPriv -->|Yes_key_4| handoff[4_clone_vault_local]
@@ -38,11 +37,10 @@ flowchart TD
 
 - **New_laptop / OSS_only_or_Private:** Choose public freeware (skills + demo) vs an operator path that needs GitHub access to the private vault. OSS never creates an affiliate runtime.
 - **mkdir_MYMERITAPP:** Create the OSS bench root (default `C:\MyMeritApp`). Hub first run (or menu **M**) can also set User env `MYMERITAPP`.
-- **Hub_2_clone_skills:** Merit-Hub **2** (alias **J**) clones this public repo at a release tag (`skills-v*`) into the bench. Internals: `_oss.ps1` inside that clone ó not a second script.
-- **Install_OSS_demo_quiet_smoke:** Seed `merit-demo`, then validate (`closeout` + quiet `smoke`). Local freeware OSS is done here. Old D+G live inside this step.
-- **3_Try_it_local:** Open `merit-demo\play\index.html`. Not hosted yet.
+- **Hub_2_clone_skills:** Merit-Hub **2** (alias **J**) clones this public repo at a release tag (`skills-v*`) into the bench. Internals: `_oss.ps1` inside that clone (not a second script). Does **not** seed merit-demo.
+- **Hub_3_demo_play:** Clone public [`Mr-PI-Bala/merit-demo`](https://github.com/Mr-PI-Bala/merit-demo) (no GitHub login) under `%MYMERITAPP%`, then open `play\index.html`. Not hosted yet.
 - **OC_OSS_in_the_Cloud:** Publish play+cfg + `portal/` as `/play/site` to merit-prod; store activate **must** succeed. here.now is a platform-key upgrade (laptop never sees the key).
-- **Multi-creator dogfood (one PC):** Process-only `MYMERITAPP` benches under `C:\MyMeritApps\benches\<name>` sharing one `MYMERITTOOLS`. Wrapper: `Merit-Hub/oc-bench.ps1 -Name creator-01 -All`. Do **not** copy Tools 5◊. Subscribers are not benches.
+- **Multi-creator dogfood (one PC):** Process-only `MYMERITAPP` benches under `C:\MyMeritApps\benches\<name>` sharing one `MYMERITTOOLS`. Wrapper: `Merit-Hub/oc-bench.ps1 -Name creator-01 -All`. Do **not** copy Tools 5ù. Subscribers are not benches.
 - **Want_Private_Vault:** Stay on OSS/OC, or continue with key **4**.
 - **4_clone_vault_local:** Clones the private vault at the pinned release tag (needs credentials / GCM). Still local.
 - **VC_Venture_Capable:** Operator/tenant grade vs freeware OC. Vault BootStrap on this laptop.
@@ -63,22 +61,22 @@ Do **not** create `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd
 
 `C:\Tools\merit-venv` is **not** assumed pre-installed. Hub **1** / PHASE 1 prereqs create it (same path Private-Vault uses). Public root `merit.ps1` remains PowerShell-first; Tools Python helps **merit-demo / Flask** and later vault `scripts/merit.ps1`.
 
-## After first clone ó use merit.ps1 (not raw git)
+## After first clone ù use merit.ps1 (not raw git)
 
 Cold start may use `git clone` **once**. After that:
 
-- OSS consumer work: `.\merit.ps1` (`verify` / `closeout` / `init` / Ö)
+- OSS consumer work: `.\merit.ps1` (`verify` / `closeout` / `init` / ù)
 - Operator closing this skills repo or the vault: vault `scripts/merit.ps1` ? **`mXin`** / **`mXout`** / **`git verify`** / **`runtime out`**
 
-Do not agent-closeout with raw `git commit`/`tag`/`push`. See vault ß7c.7.
+Do not agent-closeout with raw `git commit`/`tag`/`push`. See vault ù7c.7.
 
 **Merit Surface:** run `.\merit.ps1 where` (B present) or `Merit-Hub.ps1 -Surface` / menu **W** (B missing). See [docs/merit_surface_matrix.md](merit_surface_matrix.md).
 
-**Merit law:** run `.\merit.ps1 law closeout` ó OSS L1 excerpt from `merit.blob`. See [docs/merit_law_pack.md](merit_law_pack.md).
+**Merit law:** run `.\merit.ps1 law closeout` ù OSS L1 excerpt from `merit.blob`. See [docs/merit_law_pack.md](merit_law_pack.md).
 
 ## Related
 
-- [BootStrap/README.md](../BootStrap/README.md) ó how to run
-- [docs/bootstrap.design.md](bootstrap.design.md) ó design / L1ñL3 / agent host registry / merit.ps1 law
-- [`cfg/agent_hosts.json`](../cfg/agent_hosts.json) ó host install + detectHints
-- Root [README.md](../README.md) Start-here ó OSS BootStrap row
+- [BootStrap/README.md](../BootStrap/README.md) ù how to run
+- [docs/bootstrap.design.md](bootstrap.design.md) ù design / L1ùL3 / agent host registry / merit.ps1 law
+- [`cfg/agent_hosts.json`](../cfg/agent_hosts.json) ù host install + detectHints
+- Root [README.md](../README.md) Start-here ù OSS BootStrap row

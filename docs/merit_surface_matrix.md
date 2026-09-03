@@ -16,13 +16,13 @@ Three install planes are **independent**. Merit-Hub and `merit.ps1 where` discov
 |-----|------|--------------|
 | **H** | `Merit-Hub.ps1` at `%MYMERITTOOLS%` | Cold start when B missing |
 | **D** | `merit-demo` under `%MYMERITAPP%` | Hub **3**, **OC** (not validate alone) |
-| **T** | `%MYMERITTOOLS%\merit-venv` | Flask demo; vault Python later |
+| **T** | `%MYMERITTOOLS%\merit-venv` or `merit-python` shim | Flask demo; vault Python later |
 
 ## 8 combinations
 
 | # | A | B | C | Edition | Public CLI | Operator CLI | Recovery |
 |---|---|---|---|---------|------------|--------------|----------|
-| 0 | — | — | — | `none` | N/A | N/A | Hub **1→2** |
+| 0 | — | — | — | `none` | N/A | N/A | Hub **1→2→3** |
 | 1 | ✓ | — | — | `ide-only` | Not on disk | N/A | Hub **2** or clone B |
 | 2 | — | ✓ | — | `oss` | `B\merit.ps1` | N/A | `merit.ps1 where` |
 | 3 | ✓ | ✓ | — | `oss+ide` | `B\merit.ps1` | N/A | Re-run Hub **I** |

@@ -4,7 +4,7 @@
 
 `%MYMERITTOOLS%` (e.g. `C:\Tools` or `C:\DevTools`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.59` · `vault-v0.5.56` — see [CompatSet](#compatset--pins).
+**Embedded pins (current release):** `skills-v0.5.60` · `vault-v0.5.56` — see [CompatSet](#compatset--pins).
 
 **Raw download:** `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
 
@@ -14,7 +14,7 @@
 
 | If you want to… | Then |
 |-----------------|------|
-| **Cold-start MERIT on a new laptop** | Download Raw `Merit-Hub.ps1` → `%MYMERITTOOLS%\` → run full `-File` line → **1** → **2** → **3** |
+| **Cold-start MERIT on a new laptop** | Download Raw `Merit-Hub.ps1` → `C:\Tools\` (any folder; `MYMERITTOOLS` need not exist yet) → run full `-File` line → **1** → **2** (skills) → **3** (demo) |
 | **Publish a creator app in the cloud (no vault)** | After **2** → **OC** → **6** Join |
 | **Work as vault operator (AgentDraven / partner)** | After **2** → **4** → **VC** → `runtime out` + `runtime verify` → **6** |
 | **Clone and deploy a catalog repo (m4fi, …)** | After **2** → **5** → **RC** |
@@ -34,8 +34,11 @@
 ### New laptop (first time)
 
 ```text
-Download Hub → pwsh -NoProfile -ExecutionPolicy Bypass -File %MYMERITTOOLS%\Merit-Hub.ps1
-→ 1 Setup → 2 Install OSS → 3 Try it → (OC | 4 | 5) → 6 Join
+Download Hub to C:\Tools (MYMERITTOOLS need not exist yet)
+→ cd C:\Tools
+→ pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1
+→ 1 Setup → 2 Install OSS (skills pin) → 3 Try it (public merit-demo) → (OC | 4 | 5) → 6 Join
+→ type 0 at Select when done (Hub stays open until 0)
 ```
 
 ### Messy laptop (sprawl from testing MYMERIT* names)
@@ -81,6 +84,7 @@ flowchart TB
 
   HUB -->|"1"| VENV
   HUB -->|"2 / J"| SKILLS
+  HUB -->|"3"| DEMO
   HUB -->|"4"| VAULT
   HUB -->|"5 / R"| CATALOG
   HUB -->|"G A P"| BACK
@@ -94,33 +98,35 @@ flowchart TB
 
 <a id="cold-start-sequence"></a>
 
-1. Open [`Merit-Hub.ps1`](Merit-Hub.ps1) on GitHub → **Raw** → Save As `%MYMERITTOOLS%\Merit-Hub.ps1` (browser **Keep**).
-2. Run this entire line (do **not** double-click):
+1. Open [`Merit-Hub.ps1`](Merit-Hub.ps1) on GitHub → **Raw** → Save As `C:\Tools\Merit-Hub.ps1` (browser **Keep**). `%MYMERITTOOLS%` need not exist yet; menu **1** persists it.
+2. From that folder, run this entire line (do **not** double-click):
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1
+cd C:\Tools
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1
 ```
 
-3. First run: **Enter** for `MYMERITTOOLS` / `MYMERITAPP` defaults.
-4. **1** Setup laptop — git / gh / pwsh + `merit-venv`.
-5. **2** (alias **J**) Install OSS — clone skills pin + merit-demo + quiet smoke.
-6. **3** Try it — open `merit-demo\play\index.html`.
+3. First run: **Enter** for `MYMERITTOOLS` / `MYMERITAPP` defaults (or pick your own paths).
+4. **1** Setup laptop — git / gh / pwsh + Python (**V**env under tools, **G**lobal shim, or **S**kip).
+5. **2** (alias **J**) Install OSS — clone skills pin only (no merit-demo).
+6. **3** Try it — clone public [`Mr-PI-Bala/merit-demo`](https://github.com/Mr-PI-Bala/merit-demo) (no GitHub login) and open `play\index.html`.
 7. Branch: **OC** · **4** (vault) · **5** (catalog).
 8. **6** Join MERIT — after **OC** or after **4**.
+9. Type **0** at **Select** when done. Hub stays open after steps; do not rely on closing the window.
 
 ---
 
 ## Full menu reference
 
-Do **1** then **2** first unless you are only running cleanup keys (**G A P S**).
+Do **1** then **2** then **3** first unless you are only running cleanup keys (**G A P S**).
 
 ### Numbered keys (cold start)
 
 | Key | CLI flags | Action |
 |-----|-----------|--------|
-| **1** | `-Prereqs` | Setup laptop — git, gh, pwsh, `MYMERITTOOLS` Python venv |
-| **2** | `-Jumpstart Oss`, `-InstallOss`, `-OssPhase`, **J** | Install OSS — skills pin + merit-demo + quiet smoke |
-| **3** | `-TryIt` | Open local `merit-demo\play\index.html` |
+| **1** | `-Prereqs` | Setup laptop — git, gh, pwsh, persist `MYMERIT*`, Python (**V**env / **G**lobal shim / **S**kip) |
+| **2** | `-Jumpstart Oss`, `-InstallOss`, `-OssPhase`, **J** | Install OSS — skills pin only (no merit-demo) |
+| **3** | `-TryIt` | Clone public `Mr-PI-Bala/merit-demo` + open `play\index.html` |
 | **OC** | `-Oc`, `-NewOc` | OSS in the Cloud — DualRail play + store activate |
 | **4** | `-Jumpstart Vault` | Clone private vault (local working copy) |
 | **VC** | `-Vc` | Venture Capable — operator BootStrap + gates (after **4**) |
@@ -205,7 +211,7 @@ Hub **P** does not delete `%USERPROFILE%\.cursor\` wholesale; use **I** for skil
 
 | Pin | Repo | Role |
 |-----|------|------|
-| `skills-v0.5.59` | merit-agent-skills | OSS cold-start clone |
+| `skills-v0.5.60` | merit-agent-skills | OSS cold-start clone |
 | `vault-v0.5.56` | merit-private-vault | Operator cold-start clone |
 
 **Active CompatSet:** `2026.08.3` (vault `cfg/compat/`).
@@ -245,9 +251,11 @@ See [`oc-bench.ps1`](oc-bench.ps1). Each bench gets its own `MYMERITAPP` + `oss-
 | Path | When |
 |------|------|
 | `%MYMERITTOOLS%\backups\` | **A**, **P**, **S** |
-| `%MYMERITTOOLS%\merit-venv\` | **1** |
+| `%MYMERITTOOLS%\merit-venv\` | **1** (if you choose Venv) |
+| `%MYMERITTOOLS%\merit-python.cmd` | **1** (venv or global shim) |
 | `%MYMERITAPP%\merit-agent-skills\` | **2** |
 | `%MYMERITAPP%\oss-bench.json` | **2** |
+| `%MYMERITAPP%\merit-demo\` | **3** |
 | `~/dev/{persona}/{repo}` | **4**, **5** |
 | `~/.cursor/skills\` (etc.) | **I** |
 

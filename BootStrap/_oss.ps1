@@ -224,27 +224,33 @@ function Invoke-OssEnsureDemo {
     $gitDir = Join-Path $dest '.git'
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
         Write-Fail 'git not on PATH. Hub menu 1 first.'
-        return
+        return $false
     }
     if (Test-Path -LiteralPath $gitDir) {
         Write-Ok ('Already cloned: ' + $dest)
         Write-Info 'Pulling latest...'
         & git -C $dest pull --ff-only 2>&1 | Out-Host
+        if ($LASTEXITCODE -ne 0) {
+            Write-Fail ('git pull --ff-only failed (exit ' + $LASTEXITCODE + '). Public repo: ' + $url + ' (no GitHub login).')
+            return $false
+        }
     }
     elseif (Test-Path -LiteralPath $dest) {
-        Write-Fail ($dest + ' exists but is not a git clone. Move it aside and retry Install OSS.')
-        return
+        Write-Fail ($dest + ' exists but is not a git clone. Move it aside and retry Hub 3 (Try it).')
+        return $false
     }
     else {
         Write-Info ('Cloning ' + $url + ' ...')
+        Write-Info 'Public showcase (Mr-PI-Bala/merit-demo) — no GitHub login required.'
         & git clone $url $dest
         if ($LASTEXITCODE -ne 0) {
-            Write-Fail ('git clone failed (exit ' + $LASTEXITCODE + ').')
-            return
+            Write-Fail ('git clone failed (exit ' + $LASTEXITCODE + '). Expected public URL: ' + $url + ' (no GitHub login).')
+            return $false
         }
         Write-Ok ('Cloned ' + $dest)
     }
     Save-OssState $state
+    return $true
 }
 
 function Invoke-OssValidate {
@@ -494,9 +500,13 @@ function Invoke-OssPhaseMenu {
 }
 
 function Invoke-OssChainThenMenu {
-    Write-OssPhaseHeader 'Install OSS'
-    Write-Note 'Skills clone is done. Next: demo, then quiet validate - same script.'
-    Invoke-OssEnsureDemo
+    Write-OssPhaseHeader 'Seed demo + quiet validate'
+    Write-Note 'Optional BootStrap chain (not Hub 2). Hub 2 is skills pin only; Hub 3 seeds merit-demo.'
+    $seeded = Invoke-OssEnsureDemo
+    if (-not $seeded) {
+        Write-Fail 'merit-demo seed failed. Public URL: https://github.com/Mr-PI-Bala/merit-demo.git (no GitHub login).'
+        return
+    }
     Invoke-OssValidate
-    Write-Ok 'Install OSS finished (demo + quiet smoke). Hub map is next (3 Try it, OC, 4 Vault).'
+    Write-Ok 'Demo seed + quiet smoke done. Open play with Hub 3; OC / 4 are next.'
 }
