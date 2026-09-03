@@ -101,7 +101,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.58",
+  "skillsPin": "skills-v0.5.59",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -2703,22 +2703,43 @@ function Invoke-HubInstallOss {
     Write-HubReceipt '2'
 }
 
+function Ensure-HubDemoPlay {
+    if (Test-HubDemoReady) { return $true }
+    Write-Warn 'merit-demo play missing — seeding now (same work Hub 2 does for the demo).'
+    $bench = Get-MyMeritAppRoot
+    $skillsDest = Join-Path $bench 'merit-agent-skills'
+    if (-not (Test-Path -LiteralPath (Join-Path $skillsDest 'merit.ps1'))) {
+        Write-Note 'Skills clone missing — running Install OSS (2) first, then retrying Try it.'
+        Invoke-HubInstallOss -SkipPrereqs
+    }
+    elseif (-not (Ensure-HubOssHelpers)) {
+        Write-Fail 'OSS helpers unavailable after skills check.'
+        return $false
+    }
+    else {
+        Invoke-OssEnsureDemo
+    }
+    if (-not (Test-HubDemoReady)) {
+        Write-Fail 'merit-demo still missing after seed. Check network / re-run 2 Install OSS.'
+        return $false
+    }
+    Write-Ok 'merit-demo seeded under MYMERITAPP.'
+    return $true
+}
+
 function Invoke-HubTryIt {
     Write-Header '3 Try it'
     Write-HubMap -Here '3'
     Write-HubDrillIn '3'
-    if (-not (Ensure-HubOssHelpers)) { return }
-    if (-not (Test-HubDemoReady)) {
-        Write-Fail 'merit-demo play missing (D). Run 2 Install OSS first.'
-        Write-Note 'Hub 2 seeds merit-demo under MYMERITAPP.'
+    if (-not (Ensure-HubDemoPlay)) {
         Write-HubReceipt '3'
         return
     }
+    if (-not (Ensure-HubOssHelpers)) { return }
     $state = Get-OssState
     $play = Join-Path ([string]$state.demoFolder) 'play\index.html'
     if (-not (Test-Path -LiteralPath $play)) {
         Write-Fail "Local play missing: $play"
-        Write-Note 'Run 2 Install OSS first.'
         Write-HubReceipt '3'
         return
     }
@@ -2731,13 +2752,11 @@ function Invoke-HubOc {
     Write-Header 'OC  OSS in the Cloud'
     Write-HubMap -Here 'OC'
     Write-HubDrillIn 'OC'
-    if (-not (Ensure-HubOssHelpers)) { return }
-    if (-not (Test-HubDemoReady)) {
-        Write-Fail 'merit-demo play missing (D). Run 2 Install OSS first.'
-        Write-Note 'Hub 2 seeds merit-demo under MYMERITAPP.'
+    if (-not (Ensure-HubDemoPlay)) {
         Write-HubReceipt 'OC'
         return
     }
+    if (-not (Ensure-HubOssHelpers)) { return }
     $state = Get-OssState
     $cli = Join-Path ([string]$state.skillsFolder) 'merit.ps1'
     $demo = [string]$state.demoFolder

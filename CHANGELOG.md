@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.59] - 2026-09-02
+
+### Changed
+- Hub **3** / **OC** auto-seed `merit-demo` when play is missing (forgiving; same seed as Hub **2**).
+
 ## [0.5.58] - 2026-09-02
 
 ### Changed
