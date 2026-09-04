@@ -108,7 +108,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.60",
+  "skillsPin": "skills-v0.5.61",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -2061,8 +2061,96 @@ function Get-HubOssInternalScript {
 function Import-HubOssHelpers {
     $oss = Get-HubOssInternalScript
     if (-not (Test-Path -LiteralPath $oss)) { return $false }
-    . $oss
-    return [bool](Get-Command Get-OssState -ErrorAction SilentlyContinue)
+    try {
+        . $oss
+    }
+    catch {
+        Write-Fail ("Failed to load OSS helpers from $oss : " + $_.Exception.Message)
+        return $false
+    }
+    $haveState = [bool](Get-Command Get-OssState -ErrorAction SilentlyContinue)
+    $haveDemo = [bool](Get-Command Invoke-OssEnsureDemo -ErrorAction SilentlyContinue)
+    if (-not $haveState -or -not $haveDemo) {
+        Write-Fail "OSS helpers incomplete after dotsource: $oss (Get-OssState=$haveState Invoke-OssEnsureDemo=$haveDemo)"
+        return $false
+    }
+    return $true
+}
+
+function Import-HubOssHelpersFromSkills {
+    param([string]$SkillsRoot)
+    if ([string]::IsNullOrWhiteSpace($SkillsRoot)) { return $false }
+    $oss = Join-Path $SkillsRoot 'BootStrap\_oss.ps1'
+    if (-not (Test-Path -LiteralPath $oss)) {
+        Write-Fail "OSS helpers missing: $oss"
+        return $false
+    }
+    try {
+        . $oss
+    }
+    catch {
+        Write-Fail ("Failed to load $oss : " + $_.Exception.Message)
+        return $false
+    }
+    if (-not (Get-Command Invoke-OssEnsureDemo -ErrorAction SilentlyContinue)) {
+        Write-Fail "Invoke-OssEnsureDemo still missing after loading $oss"
+        return $false
+    }
+    return $true
+}
+
+function Invoke-HubEnsureDemoFallback {
+    $cfg = Get-HubConfig
+    $url = [string]$cfg.showcaseUrl
+    if ([string]::IsNullOrWhiteSpace($url)) { $url = 'https://github.com/Mr-PI-Bala/merit-demo.git' }
+    $bench = Get-MyMeritAppRoot
+    $dest = Join-Path $bench 'merit-demo'
+    Write-Header 'Seed merit-demo (Hub fallback)'
+    Write-Info "Clone target: $dest"
+    Write-Info "Remote (public, no login): $url"
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Fail 'git not on PATH. Hub menu 1 first.'
+        return $false
+    }
+    $prevNative = $null
+    if ($null -ne (Get-Variable -Name PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue)) {
+        $prevNative = $PSNativeCommandUseErrorActionPreference
+        $PSNativeCommandUseErrorActionPreference = $false
+    }
+    try {
+        New-Item -ItemType Directory -Force -Path $bench | Out-Null
+        $gitDir = Join-Path $dest '.git'
+        if (Test-Path -LiteralPath $gitDir) {
+            Write-Ok "Already cloned: $dest"
+            & git -C $dest pull --ff-only 2>&1 | Out-Host
+        }
+        elseif (Test-Path -LiteralPath $dest) {
+            Write-Fail "$dest exists but is not a git clone. Move it aside and retry 3."
+            return $false
+        }
+        else {
+            Write-Info "Cloning $url ..."
+            & git clone $url $dest 2>&1 | Out-Host
+            if ($LASTEXITCODE -ne 0) {
+                Write-Fail "git clone failed (exit $LASTEXITCODE). Public URL: $url"
+                return $false
+            }
+            Write-Ok "Cloned $dest"
+        }
+        $play = Join-Path $dest 'play\index.html'
+        if (-not (Test-Path -LiteralPath $play)) {
+            Write-Fail "Clone ok but play missing: $play"
+            return $false
+        }
+        return $true
+    }
+    catch {
+        Write-Fail ("Hub demo fallback error: " + $_.Exception.Message)
+        return $false
+    }
+    finally {
+        if ($null -ne $prevNative) { $PSNativeCommandUseErrorActionPreference = $prevNative }
+    }
 }
 
 function Ensure-SkillsRepo {
@@ -2543,28 +2631,38 @@ function Invoke-GitClonePin {
         return $false
     }
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Dest) | Out-Null
-    $gitDir = Join-Path $Dest '.git'
-    if (Test-Path -LiteralPath $gitDir) {
-        Write-Ok "$Label already cloned: $Dest"
-        Write-Info "Fetching / checking out $Pin ..."
-        & git -C $Dest fetch --tags origin 2>&1 | Out-Host
-        & git -C $Dest checkout --detach "refs/tags/$Pin" 2>&1 | Out-Host
-        if ($Dest -match '[\\/]merit-agent-skills$') { [void](Import-HubOssHelpers) }
-        return ($LASTEXITCODE -eq 0)
+    $prevNative = $null
+    if ($null -ne (Get-Variable -Name PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue)) {
+        $prevNative = $PSNativeCommandUseErrorActionPreference
+        $PSNativeCommandUseErrorActionPreference = $false
     }
-    if (Test-Path -LiteralPath $Dest) {
-        Write-Fail "$Dest exists but is not a git clone - move aside and retry."
-        return $false
+    try {
+        $gitDir = Join-Path $Dest '.git'
+        if (Test-Path -LiteralPath $gitDir) {
+            Write-Ok "$Label already cloned: $Dest"
+            Write-Info "Fetching / checking out $Pin ..."
+            & git -C $Dest fetch --tags origin 2>&1 | Out-Host
+            & git -C $Dest checkout --detach "refs/tags/$Pin" 2>&1 | Out-Host
+            if ($Dest -match '[\\/]merit-agent-skills$') { [void](Import-HubOssHelpers) }
+            return ($LASTEXITCODE -eq 0)
+        }
+        if (Test-Path -LiteralPath $Dest) {
+            Write-Fail "$Dest exists but is not a git clone - move aside and retry."
+            return $false
+        }
+        Write-Info "Cloning $Url @ $Pin -> $Dest"
+        & git clone --branch $Pin $Url $Dest
+        if ($LASTEXITCODE -ne 0) {
+            Write-Fail "git clone failed (exit $LASTEXITCODE)"
+            return $false
+        }
+        Write-Ok "Cloned $Label @ $Pin"
+            if ($Dest -match '[\\/]merit-agent-skills$') { [void](Import-HubOssHelpers) }
+        return $true
     }
-    Write-Info "Cloning $Url @ $Pin -> $Dest"
-    & git clone --branch $Pin $Url $Dest
-    if ($LASTEXITCODE -ne 0) {
-        Write-Fail "git clone failed (exit $LASTEXITCODE)"
-        return $false
+    finally {
+        if ($null -ne $prevNative) { $PSNativeCommandUseErrorActionPreference = $prevNative }
     }
-    Write-Ok "Cloned $Label @ $Pin"
-    if ($Dest -match '[\\/]merit-agent-skills$') { [void](Import-HubOssHelpers) }
-    return $true
 }
 
 function Write-HubLegend {
@@ -2729,12 +2827,20 @@ function Write-HubReceipt {
 function Ensure-HubOssHelpers {
     $oss = Get-HubOssInternalScript
     if (-not (Test-Path -LiteralPath $oss)) {
+        # Prefer bench skills even if Resolve-MeritSkillsRepoRoot pointed elsewhere (IDE marker).
+        $benchOss = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\BootStrap\_oss.ps1'
+        if (Test-Path -LiteralPath $benchOss) {
+            Write-Warn "Primary OSS path missing ($oss) - loading bench copy: $benchOss"
+            return (Import-HubOssHelpersFromSkills -SkillsRoot (Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills'))
+        }
         Write-Fail "Install OSS internals missing: $oss"
         Write-Note 'Run Hub 2 first so merit-agent-skills is cloned under MYMERITAPP.'
         return $false
     }
     if (-not (Import-HubOssHelpers)) {
-        Write-Fail "OSS helpers did not load Get-OssState from $oss"
+        $benchSkills = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills'
+        if (Import-HubOssHelpersFromSkills -SkillsRoot $benchSkills) { return $true }
+        Write-Fail "OSS helpers did not load Invoke-OssEnsureDemo from $oss"
         return $false
     }
     return $true
@@ -2793,33 +2899,61 @@ function Invoke-HubInstallOss {
 
 function Ensure-HubDemoPlay {
     if (Test-HubDemoReady) { return $true }
-    Write-Warn 'merit-demo play missing — cloning public showcase now (Hub 3 work; not Hub 2).'
+    Write-Warn 'merit-demo play missing - cloning public showcase now (Hub 3 work; not Hub 2).'
     $cfg = Get-HubConfig
     $bench = Get-MyMeritAppRoot
     $skillsDest = Join-Path $bench 'merit-agent-skills'
+    $ossPath = Join-Path $skillsDest 'BootStrap\_oss.ps1'
     if (-not (Test-Path -LiteralPath (Join-Path $skillsDest 'merit.ps1'))) {
-        Write-Note 'Skills clone missing — cloning skills pin first (still not seeding demo via 2).'
+        Write-Note 'Skills clone missing - cloning skills pin first (still not seeding demo via 2).'
         $okSkills = Invoke-GitClonePin -Url ([string]$cfg.skillsUrl) -Pin ([string]$cfg.skillsPin) -Dest $skillsDest -Label 'merit-agent-skills'
         if (-not $okSkills) {
             Write-Fail 'Cannot seed demo without merit-agent-skills. Fix git/network and retry 2 or 3.'
             return $false
         }
     }
-    if (-not (Ensure-HubOssHelpers)) {
-        Write-Fail 'OSS helpers unavailable after skills check.'
-        return $false
+    # Always prefer the bench skills BootStrap (authoritative for Invoke-OssEnsureDemo).
+    $helpersOk = Import-HubOssHelpersFromSkills -SkillsRoot $skillsDest
+    if (-not $helpersOk) {
+        $helpersOk = Ensure-HubOssHelpers
+    }
+    # Re-check after Ensure; if still missing, force absolute re-dot-source.
+    if (-not (Get-Command Invoke-OssEnsureDemo -ErrorAction SilentlyContinue)) {
+        if (Test-Path -LiteralPath $ossPath) {
+            Write-Warn "Invoke-OssEnsureDemo missing after Ensure-HubOssHelpers - re-dot-sourcing $ossPath"
+            try {
+                . $ossPath
+            }
+            catch {
+                Write-Fail ("Re-dot-source failed for $ossPath : " + $_.Exception.Message)
+            }
+            $helpersOk = [bool](Get-Command Invoke-OssEnsureDemo -ErrorAction SilentlyContinue)
+            if (-not $helpersOk) {
+                Write-Fail "Invoke-OssEnsureDemo still missing after dotsource: $ossPath"
+            }
+        }
+        else {
+            Write-Fail "Bench OSS helpers path missing: $ossPath"
+            $helpersOk = $false
+        }
     }
     $seeded = $false
-    try {
-        $seeded = [bool](Invoke-OssEnsureDemo)
+    if ($helpersOk -and (Get-Command Invoke-OssEnsureDemo -ErrorAction SilentlyContinue)) {
+        try {
+            $seeded = [bool](Invoke-OssEnsureDemo)
+        }
+        catch {
+            Write-Fail ("merit-demo seed threw: " + $_.Exception.Message)
+            Write-Warn 'Falling back to Hub-local git clone...'
+            $seeded = [bool](Invoke-HubEnsureDemoFallback)
+        }
     }
-    catch {
-        Write-Fail ("merit-demo seed threw: " + $_.Exception.Message)
-        Write-Fail 'Expected public clone: https://github.com/Mr-PI-Bala/merit-demo.git (no GitHub login).'
-        return $false
+    else {
+        Write-Warn 'OSS EnsureDemo helper unavailable - using Hub-local git clone fallback.'
+        $seeded = [bool](Invoke-HubEnsureDemoFallback)
     }
     if (-not $seeded) {
-        Write-Fail 'merit-demo seed returned failure. Check network / git. Repo is public under Mr-PI-Bala (not AgentDraven).'
+        Write-Fail 'merit-demo seed failed. Public clone: https://github.com/Mr-PI-Bala/merit-demo.git (no GitHub login).'
         return $false
     }
     if (-not (Test-HubDemoReady)) {
@@ -2875,7 +3009,7 @@ function Invoke-HubOc {
         return
     }
     if (-not (Test-Path -LiteralPath (Join-Path $demo 'play\index.html'))) {
-        Write-Fail "Demo play missing under $demo - run 2 then 3."
+        Write-Fail "Demo play missing under $demo - run 3."
         return
     }
     $cid = ''
@@ -3332,7 +3466,7 @@ function Show-MeritHubHelp {
     Write-Host '  W) Where / Surface   A+B+C+D+H diagnostic map'
     Write-Host '  H) Help'
     Write-Host ''
-    Write-Note 'Cold start: 1 → 2 (skills) → 3 (demo). Cleanup: G then A then P. After a step, Enter=menu; Hub stays open until 0.'
+    Write-Note 'A/P/S return to menu (only 0 exits). Cold start: 1 → 2 (skills) → 3 (demo). Cleanup: G then A then P. After a step, Enter=menu; Hub stays open until 0.'
     if ($AgentLaw) {
         Write-HubAgentCloseoutHint -Compact
     }
@@ -3361,9 +3495,21 @@ function Show-InteractiveMenu {
         $pending = ''
         try {
             switch -Regex ($c) {
-                '^(P|p|Pristine)$' { Invoke-Mode -Mode Pristine; return }
-                '^(S|s|Soft)$' { Invoke-Mode -Mode Soft; return }
-                '^(A|a|B|b|BackupOnly|PrePristine|Archive)$' { Invoke-Mode -Mode PrePristine; return }
+                '^(P|p|Pristine)$' {
+                    Invoke-Mode -Mode Pristine
+                    Write-Note 'A/P/S finished - Hub stays open. Enter=menu; continue with 1 then 2 then 3, or 0 to exit.'
+                    $pending = Read-HubContinue
+                }
+                '^(S|s|Soft)$' {
+                    Invoke-Mode -Mode Soft
+                    Write-Note 'A/P/S finished - Hub stays open. Enter=menu; continue with 1 then 2 then 3, or 0 to exit.'
+                    $pending = Read-HubContinue
+                }
+                '^(A|a|B|b|BackupOnly|PrePristine|Archive)$' {
+                    Invoke-Mode -Mode PrePristine
+                    Write-Note 'A/P/S finished - Hub stays open. Enter=menu; continue with 1 then 2 then 3, or 0 to exit.'
+                    $pending = Read-HubContinue
+                }
                 '^1$' { Invoke-HubSetupLaptop; $pending = Read-HubContinue }
                 '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss; $pending = Read-HubContinue }
                 '^3$' { Invoke-HubTryIt; $pending = Read-HubContinue }

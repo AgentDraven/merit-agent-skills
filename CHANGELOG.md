@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [0.5.61] - 2026-09-03
+
+### Fixed
+- Hub OSS load: Import verifies `Invoke-OssEnsureDemo`; re-dot-source bench `BootStrap\_oss.ps1`; Hub-local `Invoke-HubEnsureDemoFallback` clone so menu **3** works if `_oss` fails.
+- Interactive menu **A/P/S** stay open (`Read-HubContinue`); only **0** exits. CLI `-Pristine`/`-Soft`/`-PrePristine` still exit after mode.
+- OC message: demo missing -> run **3** (not 2 then 3). `Invoke-GitClonePin` sets `PSNativeCommandUseErrorActionPreference=false` locally.
+
 ## [0.5.60] - 2026-09-03
 
 ### Changed
