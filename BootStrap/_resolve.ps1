@@ -5,6 +5,10 @@
 if (-not (Get-Variable -Name MeritResolveLoaded -Scope Script -ErrorAction SilentlyContinue) -or -not $Script:MeritResolveLoaded) {
     $Script:MeritResolveLoaded = $true
 }
+# StrictMode: declare before -not/-and tests when dot-sourced without Hub
+if (-not (Get-Variable -Name MeritResolveRepoRoot -Scope Script -ErrorAction SilentlyContinue)) { $Script:MeritResolveRepoRoot = $null }
+if (-not (Get-Variable -Name MeritResolveHubScript -Scope Script -ErrorAction SilentlyContinue)) { $Script:MeritResolveHubScript = $null }
+if (-not (Get-Variable -Name MeritResolveHubPin -Scope Script -ErrorAction SilentlyContinue)) { $Script:MeritResolveHubPin = $null }
 
 function Expand-MeritPath {
     param([string]$Path)
@@ -333,7 +337,8 @@ function Get-MeritSurface {
     if ($skillsRoot -and -not $NoWrite) {
         $bench = Get-MeritEnvScoped -Name 'MYMERITAPP'
         if (-not $bench) { $bench = Split-Path -Parent $skillsRoot }
-        Initialize-OssBenchJson -SkillsFolder $skillsRoot -BenchFolder $bench
+        # Must discard return path — otherwise Get-MeritSurface becomes Object[] and StrictMode fails on .edition
+        [void](Initialize-OssBenchJson -SkillsFolder $skillsRoot -BenchFolder $bench)
     }
 
     $vault = Resolve-MeritVaultRoot
@@ -408,35 +413,67 @@ function Write-MeritSurfaceReport {
         $Surface,
         [switch]$AsJson
     )
+    # Unwrap pipeline pollution (e.g. path string + surface object)
+    if ($Surface -is [System.Array]) {
+        $picked = @($Surface | Where-Object {
+                $null -ne $_ -and $_.PSObject -and $_.PSObject.Properties['edition']
+            } | Select-Object -Last 1)
+        if ($picked.Count -gt 0) { $Surface = $picked[0] }
+        else { $Surface = @($Surface)[-1] }
+    }
+    if ($null -eq $Surface) {
+        Write-Host '  MERIT SURFACE: (null)' -ForegroundColor Yellow
+        return
+    }
+    $get = {
+        param($Obj, [string]$Name, $Default = $null)
+        $p = $Obj.PSObject.Properties[$Name]
+        if ($p) { return $p.Value }
+        return $Default
+    }
     if ($AsJson) {
         $Surface | ConvertTo-Json -Depth 5
         return
     }
+    $edition = & $get $Surface 'edition' '(unknown)'
+    $ideHosts = @(& $get $Surface 'ideHosts' @())
+    $skillsRoot = & $get $Surface 'skillsRepoRoot' $null
+    $vaultRoot = & $get $Surface 'vaultRoot' $null
+    $demoFolder = & $get $Surface 'demoFolder' $null
+    $hubScript = & $get $Surface 'hubScript' $null
+    $publicCli = & $get $Surface 'publicMeritCli' $null
+    $operatorCli = & $get $Surface 'operatorMeritCli' $null
+    $pinMismatch = [bool](& $get $Surface 'pinMismatch' $false)
+    $hubPin = & $get $Surface 'hubPin' ''
+    $skillsVersion = & $get $Surface 'skillsVersion' ''
+    $staleIde = [bool](& $get $Surface 'staleIdeMarker' $false)
+    $hints = @(& $get $Surface 'recoveryHints' @())
+
     Write-Host ''
     Write-Host '  MERIT SURFACE' -ForegroundColor Cyan
-    Write-Host ('  edition:       {0}' -f $Surface.edition)
-    Write-Host ('  A IDE skills:  {0}' -f $(if ($Surface.ideHosts.Count) { $Surface.ideHosts -join ', ' } else { '(none)' }))
-    Write-Host ('  B OSS bench:   {0}' -f $(if ($Surface.skillsRepoRoot) { $Surface.skillsRepoRoot } else { '(missing)' }))
-    Write-Host ('  C vault:       {0}' -f $(if ($Surface.vaultRoot) { $Surface.vaultRoot } else { '(missing)' }))
-    Write-Host ('  D merit-demo:  {0}' -f $(if ($Surface.demoFolder -and (Test-Path -LiteralPath $Surface.demoFolder)) { $Surface.demoFolder } else { '(missing)' }))
-    Write-Host ('  H Hub:         {0}' -f $(if ($Surface.hubScript) { $Surface.hubScript } else { '(missing)' }))
-    if ($Surface.publicMeritCli) {
-        Write-Host ('  merit.ps1:     {0}' -f $Surface.publicMeritCli) -ForegroundColor Green
-        Write-Host ('  run:           pwsh -NoProfile -File "{0}" where' -f $Surface.publicMeritCli) -ForegroundColor DarkGray
-        Write-Host ('  closeout:      pwsh -NoProfile -File "{0}" law closeout' -f $Surface.publicMeritCli) -ForegroundColor DarkGray
+    Write-Host ('  edition:       {0}' -f $edition)
+    Write-Host ('  A IDE skills:  {0}' -f $(if ($ideHosts.Count) { $ideHosts -join ', ' } else { '(none)' }))
+    Write-Host ('  B OSS bench:   {0}' -f $(if ($skillsRoot) { $skillsRoot } else { '(missing)' }))
+    Write-Host ('  C vault:       {0}' -f $(if ($vaultRoot) { $vaultRoot } else { '(missing)' }))
+    Write-Host ('  D merit-demo:  {0}' -f $(if ($demoFolder -and (Test-Path -LiteralPath $demoFolder)) { $demoFolder } else { '(missing)' }))
+    Write-Host ('  H Hub:         {0}' -f $(if ($hubScript) { $hubScript } else { '(missing)' }))
+    if ($publicCli) {
+        Write-Host ('  merit.ps1:     {0}' -f $publicCli) -ForegroundColor Green
+        Write-Host ('  run:           pwsh -NoProfile -File "{0}" where' -f $publicCli) -ForegroundColor DarkGray
+        Write-Host ('  closeout:      pwsh -NoProfile -File "{0}" law closeout' -f $publicCli) -ForegroundColor DarkGray
     }
-    if ($Surface.operatorMeritCli) {
-        Write-Host ('  vault CLI:     {0}' -f $Surface.operatorMeritCli)
+    if ($operatorCli) {
+        Write-Host ('  vault CLI:     {0}' -f $operatorCli)
     }
-    if ($Surface.pinMismatch) {
-        Write-Host ('  WARN pin:      Hub {0} != B VERSION {1}' -f $Surface.hubPin, $Surface.skillsVersion) -ForegroundColor Yellow
+    if ($pinMismatch) {
+        Write-Host ('  WARN pin:      Hub {0} != B VERSION {1}' -f $hubPin, $skillsVersion) -ForegroundColor Yellow
     }
-    if ($Surface.staleIdeMarker) {
+    if ($staleIde) {
         Write-Host '  WARN:          stale IDE .merit-surface.json (B path gone) — Hub 2 to re-clone' -ForegroundColor Yellow
     }
-    if ($Surface.recoveryHints.Count -gt 0) {
+    if ($hints.Count -gt 0) {
         Write-Host '  recovery:' -ForegroundColor DarkYellow
-        foreach ($h in $Surface.recoveryHints) { Write-Host "    - $h" }
+        foreach ($h in $hints) { Write-Host "    - $h" }
     }
     Write-Host ''
 }

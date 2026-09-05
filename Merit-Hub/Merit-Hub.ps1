@@ -95,6 +95,10 @@ $Script:BackupRoot = $null
 $Script:HistoryLog = $null
 $Script:TranscriptStarted = $false
 $Script:HubStepFailed = $false
+$Script:HubLastCatalogRow = $null
+$Script:MeritResolveRepoRoot = $null
+$Script:MeritResolveHubScript = $null
+$Script:MeritResolveHubPin = $null
 $Script:HubOnWindows = (
     ($PSVersionTable.ContainsKey('PSPlatform') -and $PSVersionTable.PSPlatform -eq 'Win32NT') -or
     ($env:OS -match 'Windows')
@@ -108,7 +112,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.63",
+  "skillsPin": "skills-v0.5.64",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -791,11 +795,16 @@ function Import-HubMeritResolve {
             . $resolve
             Promote-HubDotsourcedFunctions -BeforeNames $before
             if (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue) { return $true }
+            Write-Warn "Resolve loaded but Get-MeritSurface missing: $resolve"
         }
-        catch { }
+        catch {
+            Write-Warn ("Resolve import failed ($resolve): " + $_.Exception.Message)
+        }
     }
     Initialize-HubMeritSurfaceEmbed
-    return [bool](Get-Command Get-MeritSurface -ErrorAction SilentlyContinue)
+    $ok = [bool](Get-Command Get-MeritSurface -ErrorAction SilentlyContinue)
+    if (-not $ok) { Write-Warn 'Surface resolver unavailable (embed + _resolve both failed).' }
+    return $ok
 }
 
 function Initialize-HubMeritSurfaceEmbed {
@@ -956,29 +965,58 @@ function Initialize-HubMeritSurfaceEmbed {
     }
     function Write-MeritSurfaceReport {
         param($Surface, [switch]$AsJson)
+        if ($Surface -is [System.Array]) {
+            $picked = @($Surface | Where-Object {
+                    $null -ne $_ -and $_.PSObject -and $_.PSObject.Properties['edition']
+                } | Select-Object -Last 1)
+            if ($picked.Count -gt 0) { $Surface = $picked[0] }
+            else { $Surface = @($Surface)[-1] }
+        }
+        if ($null -eq $Surface) {
+            Write-Host '  MERIT SURFACE: (null)' -ForegroundColor Yellow
+            return
+        }
+        $get = {
+            param($Obj, [string]$Name, $Default = $null)
+            $p = $Obj.PSObject.Properties[$Name]
+            if ($p) { return $p.Value }
+            return $Default
+        }
         if ($AsJson) { $Surface | ConvertTo-Json -Depth 5; return }
+        $edition = & $get $Surface 'edition' '(unknown)'
+        $ideHosts = @(& $get $Surface 'ideHosts' @())
+        $skillsRoot = & $get $Surface 'skillsRepoRoot' $null
+        $vaultRoot = & $get $Surface 'vaultRoot' $null
+        $demoFolder = & $get $Surface 'demoFolder' $null
+        $hubScript = & $get $Surface 'hubScript' $null
+        $publicCli = & $get $Surface 'publicMeritCli' $null
+        $pinMismatch = [bool](& $get $Surface 'pinMismatch' $false)
+        $hubPin = & $get $Surface 'hubPin' ''
+        $skillsVersion = & $get $Surface 'skillsVersion' ''
+        $staleIde = [bool](& $get $Surface 'staleIdeMarker' $false)
+        $hints = @(& $get $Surface 'recoveryHints' @())
         Write-Host ''
         Write-Host '  MERIT SURFACE (Hub embed — run Hub 2 for full resolver)' -ForegroundColor Cyan
-        Write-Host ('  edition:       {0}' -f $Surface.edition)
-        Write-Host ('  A IDE skills:  {0}' -f $(if ($Surface.ideHosts.Count) { $Surface.ideHosts -join ', ' } else { '(none)' }))
-        Write-Host ('  B OSS bench:   {0}' -f $(if ($Surface.skillsRepoRoot) { $Surface.skillsRepoRoot } else { '(missing)' }))
-        Write-Host ('  C vault:       {0}' -f $(if ($Surface.vaultRoot) { $Surface.vaultRoot } else { '(missing)' }))
-        Write-Host ('  D merit-demo:  {0}' -f $(if ($Surface.demoFolder -and (Test-Path -LiteralPath $Surface.demoFolder)) { $Surface.demoFolder } else { '(missing)' }))
-        Write-Host ('  H Hub:         {0}' -f $(if ($Surface.hubScript) { $Surface.hubScript } else { '(missing)' }))
-        if ($Surface.publicMeritCli) {
-            Write-Host ('  merit.ps1:     {0}' -f $Surface.publicMeritCli) -ForegroundColor Green
-            Write-Host ('  run:           pwsh -NoProfile -File "{0}" where' -f $Surface.publicMeritCli) -ForegroundColor DarkGray
-            Write-Host ('  closeout:      pwsh -NoProfile -File "{0}" law closeout' -f $Surface.publicMeritCli) -ForegroundColor DarkGray
+        Write-Host ('  edition:       {0}' -f $edition)
+        Write-Host ('  A IDE skills:  {0}' -f $(if ($ideHosts.Count) { $ideHosts -join ', ' } else { '(none)' }))
+        Write-Host ('  B OSS bench:   {0}' -f $(if ($skillsRoot) { $skillsRoot } else { '(missing)' }))
+        Write-Host ('  C vault:       {0}' -f $(if ($vaultRoot) { $vaultRoot } else { '(missing)' }))
+        Write-Host ('  D merit-demo:  {0}' -f $(if ($demoFolder -and (Test-Path -LiteralPath $demoFolder)) { $demoFolder } else { '(missing)' }))
+        Write-Host ('  H Hub:         {0}' -f $(if ($hubScript) { $hubScript } else { '(missing)' }))
+        if ($publicCli) {
+            Write-Host ('  merit.ps1:     {0}' -f $publicCli) -ForegroundColor Green
+            Write-Host ('  run:           pwsh -NoProfile -File "{0}" where' -f $publicCli) -ForegroundColor DarkGray
+            Write-Host ('  closeout:      pwsh -NoProfile -File "{0}" law closeout' -f $publicCli) -ForegroundColor DarkGray
         }
-        if ($Surface.pinMismatch) {
-            Write-Host ('  WARN pin:      Hub {0} != B VERSION {1}' -f $Surface.hubPin, $Surface.skillsVersion) -ForegroundColor Yellow
+        if ($pinMismatch) {
+            Write-Host ('  WARN pin:      Hub {0} != B VERSION {1}' -f $hubPin, $skillsVersion) -ForegroundColor Yellow
         }
-        if ($Surface.staleIdeMarker) {
+        if ($staleIde) {
             Write-Host '  WARN:          stale IDE .merit-surface.json (B path gone) — Hub 2 to re-clone' -ForegroundColor Yellow
         }
-        if ($Surface.recoveryHints.Count -gt 0) {
+        if ($hints.Count -gt 0) {
             Write-Host '  recovery:' -ForegroundColor DarkYellow
-            foreach ($h in $Surface.recoveryHints) { Write-Host "    - $h" }
+            foreach ($h in $hints) { Write-Host "    - $h" }
         }
         Write-Host ''
     }
@@ -992,11 +1030,14 @@ function Write-MeritSurfaceReceipt {
         return
     }
     $cfg = Get-HubConfig
-    $surf = Get-MeritSurface -HubPin ([string]$cfg.skillsPin) -HubScript $Script:HubScriptPath
+    # -NoWrite: menu/diagnostic must not rewrite oss-bench (also avoids Initialize return pollution)
+    $raw = @(Get-MeritSurface -NoWrite -HubPin ([string]$cfg.skillsPin) -HubScript $Script:HubScriptPath)
+    $surf = @($raw | Where-Object { $null -ne $_ -and $_.PSObject -and $_.PSObject.Properties['edition'] } | Select-Object -Last 1)
+    if ($surf.Count -gt 0) { $surf = $surf[0] } else { $surf = @($raw)[-1] }
     if (Get-Command Write-MeritSurfaceReport -ErrorAction SilentlyContinue) {
         Write-MeritSurfaceReport -Surface $surf
     }
-    if ($surf.publicMeritCli -and $IncludeAgentLaw) {
+    if ($surf -and $surf.PSObject.Properties['publicMeritCli'] -and $surf.publicMeritCli -and $IncludeAgentLaw) {
         Write-HubAgentCloseoutHint
     }
 }
@@ -2189,6 +2230,10 @@ function Invoke-HubEnsureDemoFallback {
         if (Test-Path -LiteralPath $gitDir) {
             Write-Ok "Already cloned: $dest"
             & git -C $dest pull --ff-only 2>&1 | Out-Host
+            if ($LASTEXITCODE -ne 0) {
+                Write-Fail "git pull failed (exit $LASTEXITCODE)"
+                return $false
+            }
         }
         elseif (Test-Path -LiteralPath $dest) {
             Write-Fail "$dest exists but is not a git clone. Move it aside and retry 3."
@@ -2230,7 +2275,9 @@ function Ensure-SkillsRepo {
     if (-not (Invoke-GitClonePin -Url ([string]$cfg.skillsUrl) -Pin ([string]$cfg.skillsPin) -Dest $dest -Label 'merit-agent-skills')) {
         return $null
     }
-    [void](Import-HubOssHelpers)
+    if (-not (Import-HubOssHelpers)) {
+        Write-Warn 'Skills cloned but OSS helpers failed to load — Hub 3 may use fallback clone.'
+    }
     return $dest
 }
 
@@ -2283,14 +2330,25 @@ function Invoke-InstallMeritSkills {
     Write-Header "Install MERIT skills -> $destRoot"
     New-Item -ItemType Directory -Force -Path $destRoot | Out-Null
     $count = 0
+    $fail = 0
     Get-ChildItem -LiteralPath $skillsSrc -Directory | ForEach-Object {
         $destSkill = Join-Path $destRoot $_.Name
-        if (Test-Path -LiteralPath $destSkill) {
-            Remove-Item -LiteralPath $destSkill -Recurse -Force
+        try {
+            if (Test-Path -LiteralPath $destSkill) {
+                Remove-Item -LiteralPath $destSkill -Recurse -Force
+            }
+            Copy-Item -LiteralPath $_.FullName -Destination $destSkill -Recurse -Force
+            Write-Ok "install $($_.Name)"
+            $count++
         }
-        Write-Ok "install $($_.Name)"
-        Copy-Item -LiteralPath $_.FullName -Destination $destSkill -Recurse -Force
-        $count++
+        catch {
+            Write-Fail ("install $($_.Name) failed: " + $_.Exception.Message)
+            $fail++
+        }
+    }
+    if ($fail -gt 0) {
+        Write-Fail "Installed $count skills; $fail failed (Target=$Target)"
+        return $false
     }
     Write-Ok "Installed $count skills (Target=$Target)"
     $pin = ''
@@ -3609,7 +3667,13 @@ function Set-MyMeritToolsPrompt {
 }
 
 function Show-InteractiveMenu {
-    Ensure-MeritHubEnvAtStart
+    try {
+        Ensure-MeritHubEnvAtStart
+    }
+    catch {
+        Write-Fail ("Env setup: " + $_.Exception.Message)
+        Write-Note 'Continuing to menu anyway.'
+    }
     try { Remove-RetiredOssLiveBootStrap } catch { Write-Warn ("Retired BootStrap cleanup: " + $_.Exception.Message) }
     try { Write-MeritSurfaceReceipt } catch { Write-Fail ("Surface map: " + $_.Exception.Message); Write-Note 'Continuing to menu anyway.' }
     $pending = ''

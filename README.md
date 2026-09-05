@@ -59,7 +59,7 @@ Menu **2** / **J** clones pinned OSS for you — no full repo clone required fir
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.5.63 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.64 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\install.ps1 -Target Cursor
 # omit -Target to print usage (no default host)
@@ -72,7 +72,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.5.63 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.64 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./install.sh -Target Cursor
 ```
