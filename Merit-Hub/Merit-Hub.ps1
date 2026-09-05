@@ -112,7 +112,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.65",
+  "skillsPin": "skills-v0.5.66",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -1546,9 +1546,10 @@ function Copy-IfExists {
 }
 
 function New-MeritBackup {
+    param([switch]$BeforeWipe)
     [void](Initialize-HubBackupRoot)
     [void](Install-HubToToolsRoot)
-    Write-HubFoolproofGate
+    Write-HubFoolproofGate -BeforeWipe:$BeforeWipe
     $cfg = Get-HubConfig
     $tools = Get-MyMeritToolsRoot
     $oss = Get-MyMeritAppRoot
@@ -2034,10 +2035,7 @@ function Invoke-Mode {
             Write-Header 'Mode: PRISTINE v2 (brand-new laptop)'
             Write-Info 'First archives (pre-pristine), then wipes every known MYMERITAPP bench, MYMERITTOOLS merit-venv/shims, ~/dev, MYMERIT* env.'
             Write-Info "Keeps tools Hub: $(Join-Path (Get-MyMeritToolsRoot) 'Merit-Hub.ps1')"
-            [void](Initialize-HubBackupRoot)
-            [void](Install-HubToToolsRoot)
-            Write-HubFoolproofGate -BeforeWipe
-            $backup = New-MeritBackup
+            $backup = New-MeritBackup -BeforeWipe
             Invoke-MeritCleanup -BackupDir $backup -ModeName $Mode -ConfirmWord 'PRISTINE' `
                 -DoWipeOss $true -DoWipeDevTree $true -DoWipeToolsArtifacts $true
         }

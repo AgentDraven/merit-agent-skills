@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.66] - 2026-09-05
+
+### Fixed
+- Hub Pristine: Foolproof gate once (via New-MeritBackup -BeforeWipe), not twice.
+
 ## [0.5.65] - 2026-09-05
 
 ### Fixed
