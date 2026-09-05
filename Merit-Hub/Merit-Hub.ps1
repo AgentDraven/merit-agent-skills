@@ -112,7 +112,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.64",
+  "skillsPin": "skills-v0.5.65",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -1353,7 +1353,13 @@ function Set-UserEnvVar {
     Write-Ok "SET User env $Name = $Value (was $(if ($existing) { $existing } else { 'empty' }))"
     Write-Note 'Open a NEW terminal to see User env in other windows. This process already has it.'
     if ($Name -eq 'MYMERITAPP') {
-        [void](Import-HubOssHelpers)
+        # Hub 1 may set MYMERITAPP before Hub 2 clones skills — never abort setup on missing OSS helpers.
+        try {
+            [void](Import-HubOssHelpers)
+        }
+        catch {
+            Write-Warn ("OSS helpers not loaded yet (normal before Hub 2): " + $_.Exception.Message)
+        }
     }
 }
 
@@ -2134,15 +2140,25 @@ function Install-MeritToolsPwshPortable {
 function Get-SkillsRepoRoot {
     [void](Import-HubMeritResolve)
     if (Get-Command Resolve-MeritSkillsRepoRoot -ErrorAction SilentlyContinue) {
-        $resolved = Resolve-MeritSkillsRepoRoot -AllowIdeMarker
-        if ($resolved.Root) { return $resolved.Root }
+        try {
+            $resolved = Resolve-MeritSkillsRepoRoot -AllowIdeMarker
+            if ($resolved -and -not [string]::IsNullOrWhiteSpace([string]$resolved.Root)) {
+                return [string]$resolved.Root
+            }
+        }
+        catch {
+            Write-Warn ("Skills root resolve failed (will use bench path): " + $_.Exception.Message)
+        }
     }
     $bench = Get-MyMeritAppRoot
+    if ([string]::IsNullOrWhiteSpace($bench)) { return $null }
     return Join-Path $bench 'merit-agent-skills'
 }
 
 function Get-HubOssInternalScript {
-    return Join-Path (Get-SkillsRepoRoot) 'BootStrap\_oss.ps1'
+    $root = Get-SkillsRepoRoot
+    if ([string]::IsNullOrWhiteSpace($root)) { return $null }
+    return Join-Path $root 'BootStrap\_oss.ps1'
 }
 
 function Promote-HubDotsourcedFunctions {
@@ -2158,8 +2174,9 @@ function Promote-HubDotsourcedFunctions {
 }
 
 function Import-HubOssHelpers {
-    $oss = Get-HubOssInternalScript
-    if (-not (Test-Path -LiteralPath $oss)) { return $false }
+    $oss = $null
+    try { $oss = Get-HubOssInternalScript } catch { return $false }
+    if ([string]::IsNullOrWhiteSpace($oss) -or -not (Test-Path -LiteralPath $oss)) { return $false }
     try {
         $before = @(Get-ChildItem function: -ErrorAction SilentlyContinue | ForEach-Object { $_.Name })
         . $oss

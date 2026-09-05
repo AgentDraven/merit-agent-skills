@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.65] - 2026-09-05
+
+### Fixed
+- Hub: tolerate missing OSS helpers on Hub 1 (`Import-HubOssHelpers` / `Get-SkillsRepoRoot` Join-Path null guards) so setup does not abort before Hub 2 clones skills.
+- Hub: pin `skills-v0.5.65`.
+
 ## [0.5.61] - 2026-09-03
 
 ### Fixed

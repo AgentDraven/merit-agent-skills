@@ -4,7 +4,7 @@
 
 `%MYMERITTOOLS%` (e.g. `C:\Tools` or `C:\DevTools`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.64` · `vault-v0.5.56` — see [CompatSet](#compatset--pins).
+**Embedded pins (current release):** `skills-v0.5.65` · `vault-v0.5.56` — see [CompatSet](#compatset--pins).
 
 **Raw download:** `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
 
@@ -211,7 +211,7 @@ Hub **P** does not delete `%USERPROFILE%\.cursor\` wholesale; use **I** for skil
 
 | Pin | Repo | Role |
 |-----|------|------|
-| `skills-v0.5.64` | merit-agent-skills | OSS cold-start clone |
+| `skills-v0.5.65` | merit-agent-skills | OSS cold-start clone |
 | `vault-v0.5.56` | merit-private-vault | Operator cold-start clone |
 
 **Active CompatSet:** `2026.08.3` (vault `cfg/compat/`).
