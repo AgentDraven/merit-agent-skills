@@ -108,7 +108,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.61",
+  "skillsPin": "skills-v0.5.62",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -615,13 +615,57 @@ function Write-HubWrongPrompt {
     Write-Host ''
 }
 
+function Write-HubConfirmPrompt {
+    param(
+        [string]$Got,
+        [string]$Question
+    )
+    Write-Host ''
+    Write-Host ('!' * 72) -ForegroundColor Red
+    Write-Host "  CONFIRM: you typed '$Got' (a Hub menu key)." -ForegroundColor Red
+    Write-Host "  $Question" -ForegroundColor Red
+    Write-Host ('!' * 72) -ForegroundColor Red
+    Write-Host ''
+}
+
+function Get-HubMenuActionLabel {
+    param([string]$Key)
+    switch ($Key) {
+        '1' { return '1 Setup laptop' }
+        '2' { return '2 Install OSS' }
+        '3' { return '3 Try it' }
+        'OC' { return 'OC OSS in the Cloud' }
+        '4' { return '4 Vault (local)' }
+        'VC' { return 'VC Venture Capable' }
+        '5' { return '5 catalog clone (R)' }
+        'RC' { return 'RC repo in Cloud' }
+        '6' { return '6 Join MERIT' }
+        'G' { return 'G Sprawl scan' }
+        'A' { return 'A Pre-Pristine archive' }
+        'P' { return 'P Pristine wipe' }
+        'S' { return 'S Soft cleanup' }
+        'I' { return 'I Install skills' }
+        'M' { return 'M set MYMERITAPP' }
+        'T' { return 'T set MYMERITTOOLS' }
+        'W' { return 'W Where / Surface' }
+        'H' { return 'H Help' }
+        '0' { return '0 Stop / exit Hub' }
+        default { return $Key }
+    }
+}
+
 function Read-HubContinue {
     $ans = (Read-Host 'Next (Enter=menu; or a menu key like 3/OC; 0 later at Select to exit)').Trim()
     if ([string]::IsNullOrWhiteSpace($ans)) { return '' }
     $key = Test-HubMenuChoice $ans
     if ($key) {
-        Write-HubWrongPrompt -Got $ans -Needed 'Enter to return to the menu — or a menu key if you meant the next step' -WillDo "Running '$key' now (not discarded)."
-        return $key
+        Write-Host ''
+        Write-Host ('!' * 72) -ForegroundColor Red
+        Write-Host ("  CONFIRM: You typed '{0}'. Run menu action {1} now? [y/N]" -f $ans, $key) -ForegroundColor Red
+        Write-Host ('!' * 72) -ForegroundColor Red
+        $yes = (Read-Host).Trim()
+        if ($yes -match '^[Yy]') { return $key }
+        return ''
     }
     Write-HubWrongPrompt -Got $ans -Needed 'Enter (menu) or a Hub key (1-6, G, A, P, …)' -WillDo 'Ignored. Back to Select.'
     return ''
@@ -743,8 +787,10 @@ function Import-HubMeritResolve {
             $Script:MeritResolveHubScript = $Script:HubScriptPath
             $cfg = Get-HubConfig
             $Script:MeritResolveHubPin = [string]$cfg.skillsPin
+            $before = @(Get-ChildItem function: | ForEach-Object { $_.Name })
             . $resolve
-            return $true
+            Promote-HubDotsourcedFunctions -BeforeNames $before
+            if (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue) { return $true }
         }
         catch { }
     }
@@ -784,7 +830,7 @@ function Initialize-HubMeritSurfaceEmbed {
         if (-not $full) { return $false }
         return (Test-Path -LiteralPath (Join-Path $full 'scripts\merit.ps1'))
     }
-    function Get-MeritSurface {
+    function script:Get-MeritSurface {
         param([switch]$NoWrite, [string]$HubPin = '', [string]$HubScript = '')
         if ($HubScript) { $Script:MeritResolveHubScript = $HubScript }
         $skillsSearch = [System.Collections.Generic.List[string]]::new()
@@ -2058,11 +2104,25 @@ function Get-HubOssInternalScript {
     return Join-Path (Get-SkillsRepoRoot) 'BootStrap\_oss.ps1'
 }
 
+function Promote-HubDotsourcedFunctions {
+    param([string[]]$BeforeNames)
+    $after = @(Get-ChildItem function: -ErrorAction SilentlyContinue | ForEach-Object { $_.Name })
+    foreach ($n in $after) {
+        if ($BeforeNames -contains $n) { continue }
+        $cmd = Get-Command $n -CommandType Function -ErrorAction SilentlyContinue
+        if ($cmd) {
+            Set-Item -Path ("function:script:{0}" -f $n) -Value $cmd.ScriptBlock -Force
+        }
+    }
+}
+
 function Import-HubOssHelpers {
     $oss = Get-HubOssInternalScript
     if (-not (Test-Path -LiteralPath $oss)) { return $false }
     try {
+        $before = @(Get-ChildItem function: -ErrorAction SilentlyContinue | ForEach-Object { $_.Name })
         . $oss
+        Promote-HubDotsourcedFunctions -BeforeNames $before
     }
     catch {
         Write-Fail ("Failed to load OSS helpers from $oss : " + $_.Exception.Message)
@@ -2086,7 +2146,9 @@ function Import-HubOssHelpersFromSkills {
         return $false
     }
     try {
+        $before = @(Get-ChildItem function: -ErrorAction SilentlyContinue | ForEach-Object { $_.Name })
         . $oss
+        Promote-HubDotsourcedFunctions -BeforeNames $before
     }
     catch {
         Write-Fail ("Failed to load $oss : " + $_.Exception.Message)
@@ -2094,6 +2156,10 @@ function Import-HubOssHelpersFromSkills {
     }
     if (-not (Get-Command Invoke-OssEnsureDemo -ErrorAction SilentlyContinue)) {
         Write-Fail "Invoke-OssEnsureDemo still missing after loading $oss"
+        return $false
+    }
+    if (-not (Get-Command Get-OssState -ErrorAction SilentlyContinue)) {
+        Write-Fail "Get-OssState still missing after loading $oss"
         return $false
     }
     return $true
@@ -2406,10 +2472,31 @@ function Invoke-MeritPrereqs {
     Write-Info '--- Environment (not the same as git/gh/pwsh) ---'
     Write-Ok "MYMERITTOOLS resolved = $tools"
     Write-Ok "MYMERITAPP    resolved = $app"
-    if ($needPersistTools) { Write-Warn "MYMERITTOOLS User env - not persisted (will SET to $tools)" }
+    if ($needPersistTools) { Write-Warn "MYMERITTOOLS User env - not persisted yet" }
     else { Write-Ok "MYMERITTOOLS User env already set = $toolsUser" }
-    if ($needPersistApp) { Write-Warn "MYMERITAPP User env - not persisted (will SET to $app)" }
+    if ($needPersistApp) { Write-Warn "MYMERITAPP User env - not persisted yet" }
     else { Write-Ok "MYMERITAPP User env already set = $appUser" }
+
+    # Ask path choices before assuming defaults (unless -Force).
+    $pyChoice = 'V'  # V=venv G=global S=skip
+    if (-not $Force) {
+        if ($needPersistTools) {
+            Write-Host ''
+            Write-Note "Choose MYMERITTOOLS (laptop tools root). Enter keeps default."
+            $ansTools = Read-Host "MYMERITTOOLS path [$tools]"
+            if (-not [string]::IsNullOrWhiteSpace($ansTools)) {
+                $tools = Expand-HomePath $ansTools
+            }
+        }
+        if ($needPersistApp) {
+            Write-Host ''
+            Write-Note "Choose MYMERITAPP (OSS bench). Enter keeps default."
+            $ansApp = Read-Host "MYMERITAPP path [$app]"
+            if (-not [string]::IsNullOrWhiteSpace($ansApp)) {
+                $app = Expand-HomePath $ansApp
+            }
+        }
+    }
 
     Write-Host ''
     Write-Info '--- Tools ---'
@@ -2448,28 +2535,39 @@ function Invoke-MeritPrereqs {
         Show-PwshInstallGuide
     }
 
-    $venvPy = Get-MeritVenvPython
+    $venvPy = if ($Script:HubOnWindows) { Join-Path $tools 'merit-venv\Scripts\python.exe' } else { Join-Path $tools 'merit-venv/bin/python3' }
     $needPy = -not (Test-Path -LiteralPath $venvPy)
     $basePy = Resolve-BasePythonExe
     $toolsShim = if ($Script:HubOnWindows) { Join-Path $tools 'merit-python.cmd' } else { Join-Path $tools 'merit-python' }
     $pythonReady = (-not $needPy) -or (Test-Path -LiteralPath $toolsShim)
     if (-not $needPy) {
         Write-Ok "MERIT Python venv - $venvPy"
+        $needPy = $false
+        $pyChoice = 'V'
     }
     elseif ($pythonReady) {
         Write-Ok "MERIT Python shim present - $toolsShim (venv optional)"
         $needPy = $false
+        $pyChoice = 'G'
     }
     else {
         Write-Warn "MERIT Python venv - MISSING at $venvPy"
         if ($basePy) {
             Write-Note "System Python found ($basePy)."
-            Write-Info '  Venv (recommended): isolated packages under MYMERITTOOLS; does not change your global Python.'
-            Write-Info '  Global: point merit-python.cmd at system Python (no venv). Fine for light use; less isolated.'
-            Write-Info '  Skip: leave unset; some MERIT recipes that call merit-python may fail until you choose V or G later.'
+            Write-Info '  Venv (recommended/default): isolated under MYMERITTOOLS; does not change global Python.'
+            Write-Info '  Global: point merit-python.cmd at system Python (no venv).'
+            Write-Info '  Skip: leave unset for now.'
+            if (-not $Force) {
+                $pyAns = Read-Host 'Python for MERIT: [V]env (recommended) / [G]lobal shim / [S]kip [V/G/S] (Enter=V)'
+                if ([string]::IsNullOrWhiteSpace($pyAns)) { $pyChoice = 'V' }
+                elseif ($pyAns -match '^[Gg]') { $pyChoice = 'G' }
+                elseif ($pyAns -match '^[Ss]') { $pyChoice = 'S'; $needPy = $false }
+                else { $pyChoice = 'V' }
+            }
         }
         else {
-            Write-Note 'Base Python is also missing. Choosing V later will install Python 3.12 then create the venv.'
+            Write-Note 'Base Python is also missing. Default V will install Python 3.12 then create the venv.'
+            $pyChoice = 'V'
         }
     }
 
@@ -2477,7 +2575,10 @@ function Invoke-MeritPrereqs {
     if ($needGit) { $missingTools.Add('Git') }
     if ($needPwsh) { $missingTools.Add('pwsh (PowerShell 7+)') }
     if ($needGh) { $missingTools.Add('GitHub CLI (gh) - optional') }
-    if ($needPy) { $missingTools.Add("MERIT Python (venv under MYMERITTOOLS, or global shim)") }
+    if ($needPy) {
+        if ($pyChoice -eq 'G') { $missingTools.Add("MERIT Python global shim -> $basePy") }
+        else { $missingTools.Add("MERIT Python venv ($venvPy)") }
+    }
     $needAnyTool = $needGit -or $needPwsh -or $needGh -or $needPy
     $needAnyEnv = $needPersistTools -or $needPersistApp
 
@@ -2548,20 +2649,13 @@ function Invoke-MeritPrereqs {
     }
     if ($needGh) { [void](Install-WingetPkg -Id 'GitHub.cli' -Name 'GitHub CLI') }
     if ($needPy) {
-        if ($basePy) {
-            Write-Host ''
-            Write-Note 'Python: isolated venv vs your already-installed system Python.'
-            $pyHow = Read-Host 'Python: [V]env under MYMERITTOOLS (recommended) / [G]lobal shim / [S]kip [V/G/S]'
-            switch -Regex ($pyHow) {
-                '^[Gg]' {
-                    if (Set-MeritPythonShim -PythonExe $basePy) {
-                        Write-Ok "Using global Python for MERIT via merit-python shim ($basePy)."
-                        Write-Note 'No merit-venv created. Re-run 1 and choose V later if you want isolation.'
-                    }
-                }
-                '^[Ss]' { Write-Warn 'Python skipped — merit-python shim not set.' }
-                default { [void](Install-MeritToolsPython) }
+        if ($pyChoice -eq 'G' -and $basePy) {
+            if (Set-MeritPythonShim -PythonExe $basePy) {
+                Write-Ok "Using global Python for MERIT via merit-python shim ($basePy)."
             }
+        }
+        elseif ($pyChoice -eq 'S') {
+            Write-Warn 'Python skipped — merit-python shim not set.'
         }
         else {
             [void](Install-MeritToolsPython)
@@ -2883,16 +2977,40 @@ function Invoke-HubInstallOss {
         }
     }
 
-    if (Ensure-HubOssHelpers) {
+    $benchSaved = $false
+    if (Import-HubOssHelpersFromSkills -SkillsRoot $skillsDest) {
         try {
             $st = Get-OssState
             Save-OssState $st
+            $benchSaved = $true
+            Write-Ok "oss-bench.json refreshed under $bench"
         }
         catch {
-            Write-Warn ("Could not refresh oss-bench.json: " + $_.Exception.Message)
+            Write-Fail ("Could not refresh oss-bench.json: " + $_.Exception.Message)
+            Write-Note 'Skills clone is OK; status file update failed. Re-run 2 or W after fixing helpers.'
         }
     }
-    Write-Ok 'Install OSS complete (skills pin). merit-demo is not part of step 2 — use 3 Try it.'
+    elseif (Ensure-HubOssHelpers) {
+        try {
+            $st = Get-OssState
+            Save-OssState $st
+            $benchSaved = $true
+            Write-Ok "oss-bench.json refreshed under $bench"
+        }
+        catch {
+            Write-Fail ("Could not refresh oss-bench.json: " + $_.Exception.Message)
+        }
+    }
+    else {
+        Write-Fail 'OSS helpers did not load (Get-OssState). Skills may still be cloned; oss-bench.json not updated.'
+    }
+    if ($benchSaved) {
+        Write-Ok 'Install OSS complete (skills pin). merit-demo is not part of step 2 — use 3 Try it.'
+    }
+    else {
+        Write-Fail 'Install OSS incomplete: skills pin may be cloned, but Get-OssState/Save failed after Import — do not treat as OK complete.'
+        $Script:HubStepFailed = $true
+    }
     Write-HubReceipt '2'
     Write-HubNextSteps '2'
 }
@@ -2922,7 +3040,9 @@ function Ensure-HubDemoPlay {
         if (Test-Path -LiteralPath $ossPath) {
             Write-Warn "Invoke-OssEnsureDemo missing after Ensure-HubOssHelpers - re-dot-sourcing $ossPath"
             try {
+                $before = @(Get-ChildItem function: -ErrorAction SilentlyContinue | ForEach-Object { $_.Name })
                 . $ossPath
+                Promote-HubDotsourcedFunctions -BeforeNames $before
             }
             catch {
                 Write-Fail ("Re-dot-source failed for $ossPath : " + $_.Exception.Message)
@@ -2973,13 +3093,21 @@ function Invoke-HubTryIt {
         Write-HubNextSteps '3'
         return
     }
-    if (-not (Ensure-HubOssHelpers)) {
-        Write-HubReceipt '3'
-        Write-HubNextSteps '3'
-        return
+    $play = $null
+    if (Ensure-HubOssHelpers -and (Get-Command Get-OssState -ErrorAction SilentlyContinue)) {
+        try {
+            $state = Get-OssState
+            if ($state -and $state.demoFolder) {
+                $play = Join-Path ([string]$state.demoFolder) 'play\index.html'
+            }
+        }
+        catch {
+            Write-Warn ("Get-OssState failed after Ensure-HubDemoPlay: " + $_.Exception.Message)
+        }
     }
-    $state = Get-OssState
-    $play = Join-Path ([string]$state.demoFolder) 'play\index.html'
+    if (-not $play -or -not (Test-Path -LiteralPath $play)) {
+        $play = Join-Path (Get-MyMeritAppRoot) 'merit-demo\play\index.html'
+    }
     if (-not (Test-Path -LiteralPath $play)) {
         Write-Fail "Local play missing: $play"
         Write-HubReceipt '3'
