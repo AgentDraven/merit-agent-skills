@@ -108,7 +108,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "skillsPin": "skills-v0.5.62",
+  "skillsPin": "skills-v0.5.63",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
@@ -873,7 +873,7 @@ function Initialize-HubMeritSurfaceEmbed {
         foreach ($pair in @(
                 @{ id = 'cursor'; dest = (Join-Path $homeRoot '.cursor\skills') },
                 @{ id = 'claude'; dest = (Join-Path $homeRoot '.claude\skills') },
-                @{ id = 'codex'; dest = (Join-Path (if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $homeRoot '.codex' }) 'skills') },
+                @{ id = 'codex'; dest = (Join-Path $(if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $homeRoot '.codex' }) 'skills') },
                 @{ id = 'vscode'; dest = (Join-Path $homeRoot '.agents\skills') }
             )) {
             if (-not (Test-Path -LiteralPath $pair.dest)) { continue }
@@ -3610,8 +3610,8 @@ function Set-MyMeritToolsPrompt {
 
 function Show-InteractiveMenu {
     Ensure-MeritHubEnvAtStart
-    Remove-RetiredOssLiveBootStrap
-    Write-MeritSurfaceReceipt
+    try { Remove-RetiredOssLiveBootStrap } catch { Write-Warn ("Retired BootStrap cleanup: " + $_.Exception.Message) }
+    try { Write-MeritSurfaceReceipt } catch { Write-Fail ("Surface map: " + $_.Exception.Message); Write-Note 'Continuing to menu anyway.' }
     $pending = ''
     while ($true) {
         if (-not $pending) {

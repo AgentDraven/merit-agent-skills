@@ -2,7 +2,7 @@
 # Dot-source from merit.ps1, _oss.ps1, or Merit-Hub.ps1 (when B exists).
 #Requires -Version 5.1
 
-if (-not $Script:MeritResolveLoaded) {
+if (-not (Get-Variable -Name MeritResolveLoaded -Scope Script -ErrorAction SilentlyContinue) -or -not $Script:MeritResolveLoaded) {
     $Script:MeritResolveLoaded = $true
 }
 
