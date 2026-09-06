@@ -547,3 +547,6 @@
 # 0.5.71
 
 - Make inferred GitHub access status explicit when GitHub returns an empty 204 response.
+# 0.5.72
+
+- Forward consumer admin commands through the merit-demo wrapper and surface GitHub permission errors.
