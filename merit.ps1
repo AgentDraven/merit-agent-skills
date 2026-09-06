@@ -1045,6 +1045,11 @@ function Invoke-Closeout {
         Write-Host 'closeout: validate only. Use .\merit.ps1 closeout --path . --release for full release closeout.'
         Write-Host 'closeout: webpage-shell AP-MA-13. Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md'
         Write-Host 'closeout tiers: (1) validate = this command; (2) OSS ship = .\merit.ps1 ship; (3) operator = vault mXin; (4) agent response = chat 3-3'
+        Write-Host ''
+        Write-Host '3-3' -ForegroundColor Cyan
+        Write-Host 'Done: validation-only closeout checks completed; no commit or push performed.'
+        Write-Host "State: current commit $head; release remains pending."
+        Write-Host 'Next: run plain closeout for release, or remediate any failed validation.'
     } finally {
         Pop-Location
     }
@@ -1070,6 +1075,11 @@ function Invoke-ReleaseCloseout {
         if ((Test-Path (Join-Path $TargetRoot 'skills')) -and (Test-Path (Join-Path $TargetRoot 'VERSION'))) {
             Write-Host 'skills repo detected: run .\merit.ps1 ship -Message "..." to create the skills-v tag.' -ForegroundColor Yellow
         }
+        Write-Host ''
+        Write-Host '3-3' -ForegroundColor Cyan
+        Write-Host "Done: release closeout validated, committed, and pushed $branch."
+        Write-Host "State: commit $((git rev-parse --short HEAD).Trim()); remote origin; release tag handled by skills release policy."
+        Write-Host 'Next: review the remote commit; continue with the next scoped task or run validation-only for diagnostics.'
     } finally { Pop-Location }
 }
 

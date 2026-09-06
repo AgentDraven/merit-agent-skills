@@ -559,3 +559,6 @@
 # 0.5.75
 
 - Ensure lifecycle hooks use validation-only closeout and never publish implicitly.
+# 0.5.76
+
+- Emit a CLI 3-3 report at the end of release and validation-only closeout.
