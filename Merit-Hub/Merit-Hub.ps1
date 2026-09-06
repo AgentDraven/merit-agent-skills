@@ -1284,7 +1284,8 @@ function Ensure-HubElevated {
         Write-Ok 'Running elevated (Administrator)'
         return
     }
-    $exe = (Get-Process -Id $PID).Path
+    $exe = Resolve-MeritPwshExe
+    if (-not $exe) { $exe = (Get-Process -Id $PID).Path }
     $argList = if ($Action) {
         $list = [System.Collections.Generic.List[string]]::new()
         foreach ($item in @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $Script:HubScriptPath, "-$Action")) { [void]$list.Add($item) }
@@ -2156,8 +2157,20 @@ function Install-MeritToolsPwshPortable {
     }
     $shim = Join-Path $tools 'pwsh.cmd'
     Set-Content -LiteralPath $shim -Value "@echo off`r`n`"$pwshExe`" %*`r`n" -Encoding ASCII
+    # Persist both the executable directory and shim directory for new shells,
+    # and refresh this process so UAC/elevated child launches can resolve pwsh.
+    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+    $pathParts = @($userPath -split ';' | Where-Object { $_ -and $_.Trim() })
+    foreach ($pathEntry in @((Split-Path -Parent $pwshExe), $tools)) {
+        if ($pathParts -notcontains $pathEntry) { $pathParts += $pathEntry }
+    }
+    [Environment]::SetEnvironmentVariable('Path', ($pathParts -join ';'), 'User')
+    $machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+    $env:Path = (($machinePath, ($pathParts -join ';')) -join ';')
+    $env:MERIT_PWSH_EXE = $pwshExe
     Write-Ok "Portable pwsh: $pwshExe"
-    Write-Ok "Shim: $shim (prepend MYMERITTOOLS to PATH or open new terminal)"
+    Write-Ok "PATH updated: $(Split-Path -Parent $pwshExe) and $tools"
+    Write-Ok "Shim: $shim"
     return $true
 }
 

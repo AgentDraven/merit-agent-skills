@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## [0.5.93] - 2026-09-06
+## [0.5.94] - 2026-09-06
+### Fixed
+- Portable PowerShell bootstrap now persists the pwsh/shim directories in User PATH, refreshes the current session, and uses the absolute pwsh executable for elevated Hub launches.
 ### Changed
 - Reworked the dinner tutorial into linked three-step flows and removed raw clone/install burden from the beginner path.
 - Normalized mojibake text so GitHub renders punctuation correctly.
