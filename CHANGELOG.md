@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## [0.5.82] - 2026-09-06
+## [0.5.83] - 2026-09-06
+
+### Added
+- Added `admin github auth login` for browser-based authentication of another GitHub account.
 
 ### Added
 - Added `admin github access switch` as an alias for account switching.
