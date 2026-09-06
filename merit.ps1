@@ -1242,7 +1242,9 @@ function Invoke-AdminGithubAuth {
         }
         'login' {
             Write-Host 'Opening GitHub authentication. Complete the browser/device flow for the repository-owner account.' -ForegroundColor Cyan
-            & gh auth login --hostname github.com --git-protocol ssh --web
+            # HTTPS avoids the post-login SSH-key upload prompt and works even when
+            # the selected account already has this laptop's public key registered.
+            & gh auth login --hostname github.com --git-protocol https --web
             if ($LASTEXITCODE -ne 0) { throw "GitHub auth login failed (exit $LASTEXITCODE)" }
             Write-Host 'GitHub authentication completed. Run admin github auth status, then admin github auth switch if needed.' -ForegroundColor Green
         }

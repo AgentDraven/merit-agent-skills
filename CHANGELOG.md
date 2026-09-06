@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## [0.5.83] - 2026-09-06
+## [0.5.84] - 2026-09-06
+
+### Fixed
+- GitHub auth login now defaults to HTTPS, avoiding duplicate SSH-key upload failures after successful browser authentication.
 
 ### Added
 - Added `admin github auth login` for browser-based authentication of another GitHub account.
