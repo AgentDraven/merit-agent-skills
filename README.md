@@ -228,3 +228,19 @@ Apache-2.0 adoption on skills; monetization via meritstore — not license royal
 ## Sync from vault
 
 Exported from `merit-private-vault/templates/skills/` at release time.
+# Developer repository access
+
+Public cloning does not require write access. To let a developer account push to a repository, the repository owner or an administrator must run:
+
+```powershell
+gh api --method PUT repos/Mr-PI-Bala/merit-demo/collaborators/AgentDraven `
+  --field permission=push
+```
+
+Replace the owner, repository, and account as needed. The command must be run by an account with repository administration rights; a token's `repo` scope alone does not grant collaborator access. Verify the effective permission with:
+
+```powershell
+gh api repos/Mr-PI-Bala/merit-demo --jq '.permissions'
+```
+
+The result must include `"push": true`. If the owner cannot grant access, fork the repository and point `origin` at the writable fork instead.
