@@ -1,32 +1,47 @@
 # CHANGELOG
 
+## [0.5.88] - 2026-09-06
+### Fixed
+- Restored explicit entries for every 0.5.78–0.5.87 release instead of grouping them under one heading.
+
 ## [0.5.87] - 2026-09-06
 
 ### Changed
 - Finalized Hub and OSS bench pins at skills-v0.5.86 for new-device baseline testing.
 
+## [0.5.86] - 2026-09-06
 ### Fixed
 - Release closeout now handles a clean working tree without attempting an empty commit.
 
+## [0.5.85] - 2026-09-06
 ### Changed
 - Aligned Hub and OSS bench skills pins with the current released skills baseline.
 
+## [0.5.84] - 2026-09-06
 ### Fixed
 - GitHub auth login now defaults to HTTPS, avoiding duplicate SSH-key upload failures after successful browser authentication.
 
+## [0.5.83] - 2026-09-06
 ### Added
 - Added `admin github auth login` for browser-based authentication of another GitHub account.
 
+## [0.5.82] - 2026-09-06
 ### Added
 - Added `admin github access switch` as an alias for account switching.
 
+## [0.5.81] - 2026-09-06
 ### Fixed
 - Replaced raw GitHub collaborator JSON/error dumps with concise user-facing access guidance.
 
+## [0.5.80] - 2026-09-06
 ### Changed
 - Updated Hub and OSS bench pins to skills-v0.5.79 and documented vault-first authority resolution.
 
+## [0.5.79] - 2026-09-06
 ### Added
+- Added the dependency hierarchy IAR and corrected stale CLI version handling.
+
+## [0.5.78] - 2026-09-06
 - Added `admin github auth status|switch` so account selection stays behind the MERIT CLI.
 
 ## [0.5.77] - 2026-09-06
