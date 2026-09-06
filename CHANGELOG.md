@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.78] - 2026-09-06
+
+### Added
+- Added `admin github auth status|switch` so account selection stays behind the MERIT CLI.
+
 ## [0.5.77] - 2026-09-06
 
 ### Changed

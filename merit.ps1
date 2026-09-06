@@ -54,6 +54,8 @@ Commands:
   admin github access status [--repo <owner/name>] [--user <login>]
   admin github access add [--repo <owner/name>] [--user <login>] [--permission <pull|triage|push|maintain|admin>] [--yes]
   admin github access remove [--repo <owner/name>] [--user <login>] [--yes]
+  admin github auth status                     Show the active GitHub account
+  admin github auth switch [--user <login>]   Switch the active GitHub account
   app scaffold             Print merit-demo clone guidance
   create --path <repo>     AutoMagic fullstack-consumer (default = platform URL on merit-prod)
                            [--profile fullstack-consumer] [--deploy]
@@ -1199,6 +1201,27 @@ function Invoke-AdminGithubAccess {
             Write-Host "GitHub access removed: $user from $repo" -ForegroundColor Green
         }
         default { throw 'use admin github access status|add|remove' }
+    }
+}
+
+function Invoke-AdminGithubAuth {
+    param([string[]]$ArgList)
+    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { throw 'admin github auth requires GitHub CLI (gh) on PATH' }
+    $action = if ($ArgList.Count -gt 2) { "$($ArgList[2])".ToLowerInvariant() } else { 'status' }
+    switch ($action) {
+        'status' {
+            & gh auth status
+            if ($LASTEXITCODE -ne 0) { throw "GitHub auth status failed (exit $LASTEXITCODE)" }
+        }
+        'switch' {
+            $user = Get-ArgValue -ArgList $ArgList -Name '--user'
+            if ([string]::IsNullOrWhiteSpace($user)) { $user = Read-Host 'GitHub account to activate (login)' }
+            if ([string]::IsNullOrWhiteSpace($user)) { throw 'GitHub account login is required' }
+            & gh auth switch --user $user
+            if ($LASTEXITCODE -ne 0) { throw "GitHub auth switch failed (exit $LASTEXITCODE)" }
+            Write-Host "GitHub account active: $user" -ForegroundColor Green
+        }
+        default { throw 'use admin github auth status|switch [--user <login>]' }
     }
 }
 
@@ -2580,6 +2603,10 @@ switch -Regex ($Command) {
         }
         if ($Rest.Count -ge 3 -and $Rest[0] -eq 'github' -and $Rest[1] -eq 'access') {
             try { Invoke-AdminGithubAccess -ArgList $Rest; exit 0 }
+            catch { Write-Host $_.Exception.Message; exit 1 }
+        }
+        if ($Rest.Count -ge 3 -and $Rest[0] -eq 'github' -and $Rest[1] -eq 'auth') {
+            try { Invoke-AdminGithubAuth -ArgList $Rest; exit 0 }
             catch { Write-Host $_.Exception.Message; exit 1 }
         }
         Write-MeritHelp
