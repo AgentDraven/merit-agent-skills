@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## [0.5.92] - 2026-09-06
+## [0.5.93] - 2026-09-06
+### Changed
+- Reworked the dinner tutorial into linked three-step flows and removed raw clone/install burden from the beginner path.
+- Normalized mojibake text so GitHub renders punctuation correctly.
 ### Changed
 - Reworked README onboarding into persona-based flows with Mermaid navigation and progressive disclosure.
 ### Changed

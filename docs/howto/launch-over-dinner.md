@@ -1,24 +1,36 @@
-﻿# HowToLaunch-Over-Dinner-Tutorial
+# HowToLaunch-Over-Dinner-Tutorial
 
 **Introductory tutorial for new Content Creators**  
 **Tagline:** Build your app over dinner; let MERIT publicize and promote you overnight.
 
 | | |
 |---|---|
-| **Audience** | Non-technical creators Ã¢â‚¬â€ no prior MERIT, GitHub, or cloud setup |
+| **Audience** | Non-technical creators — no prior MERIT, GitHub, or cloud setup |
 | **You need tonight** | A laptop, internet, this repo + [merit-demo](https://github.com/Mr-PI-Bala/merit-demo) |
 | **You do not need tonight** | GitHub login, Vercel, Supabase, Square, here.now |
-| **Advanced docs** | [docs/usage.md](../usage.md) · [merit-demo OPERATOR_PROVISION](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md) |
+| **Advanced docs** | [docs/usage.md](../usage.md) ? [merit-demo OPERATOR_PROVISION](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md) |
 
 ---
 
 ## Introduction
 
-MERIT gives you a **ready-made app** (Journal, AMA, subscriber pages) plus **free tools** in this repo. You personalize in one evening. MERITÃ¢â‚¬â„¢s discovery platform finds your audience overnight.
+MERIT gives you a **ready-made app** (Journal, AMA, subscriber pages) plus **free tools** in this repo. You personalize in one evening. MERIT’s discovery platform finds your audience overnight.
 
 This document is the **only** guide you need for night one. Technical permutations are in the [Advanced section](#advanced-optional) at the end.
 
 ### The idea in three steps
+
+```mermaid
+flowchart TD
+    S1[1. Get ready] --> A[Open PowerShell]
+    A --> B[Run .\Merit-Hub.ps1]
+    B --> C[Choose Hub 2 then 3]
+    C --> S2[2. Make it yours]
+    S2 --> D[Edit your name, story, and topics]
+    D --> E[Run merit.ps1 quickstart or serve]
+    E --> S3[3. Share it]
+    S3 --> F[Register, choose a free surface, and share]
+```
 
 | Step | What you do | Accounts |
 |------|-------------|----------|
@@ -28,66 +40,39 @@ This document is the **only** guide you need for night one. Technical permutatio
 
 ---
 
-## Step 1 Ã¢â‚¬â€ Download the toolkit and the app
+## Step 1 — Get ready
 
 Use any folder (example: `C:\MyMeritApp`). You are **not** connecting this laptop to any existing MERIT operator setup.
 
-### 1A Ã¢â‚¬â€ merit-agent-skills
+### 1A — Start the Hub
 
-Tools, `merit` CLI, and optional Cursor agent skills.
+The Hub downloads the correct toolkit and app for you. You do not need to type `git clone` or choose a release tag.
 
 ```powershell
-mkdir C:\MyMeritApp
-cd C:\MyMeritApp
-git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
+cd C:\Tools
+.\Merit-Hub.ps1
 ```
 
 Linux/macOS:
 
 ```bash
-mkdir -p ~/MyMeritApp
-cd ~/MyMeritApp
-git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
+cd ~/Tools
+./Merit-Hub.sh
 ```
 
-Optional laptop hub (prereqs, demo seed, PHASE 2 validate, PHASE 3 vault):
+Choose Hub **2** to install the pinned OSS toolkit, then **3** to seed the demo. The Hub records paths and release pins for you.
 
-```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
-```
+### 1B — merit-demo
 
-See [Merit-Hub/README.md](Merit-Hub/README.md) and [BootStrap/README.md](BootStrap/README.md). Do not copy BootStrap to `%MYMERITAPP%\BootStrap\`. `git clone` must run **from** the bench folder so the repo lands at `C:\MyMeritApp\merit-agent-skills`.
-
-### 1B Ã¢â‚¬â€ merit-demo
-
-Pre-scaffolded application: Journal, AMA, portal pages, legal templates, subscriber funnel cfg.
-
-```powershell
-cd C:\MyMeritApp
-git clone https://github.com/Mr-PI-Bala/merit-demo.git
-```
+Pre-scaffolded application: Journal, AMA, portal pages, legal templates, subscriber funnel cfg. Hub **3** seeds it for you.
 
 ### GitHub account?
 
-**Not required.** Public `git clone` works without logging in. You only need a GitHub account later if you **fork** or **push** your own copy.
+**Not required.** The Hub and public demo work without logging in. You only need a GitHub account later if you **fork** or **push** your own copy.
 
-### Optional Ã¢â‚¬â€ AI IDE skills
+### Optional — AI IDE skills
 
-Install into your host (`Cursor`, `ClaudeCode`, `Codex`, or `VSCode`; aliases `Claude` / `Agents`):
-
-```powershell
-cd C:\MyMeritApp\merit-agent-skills
-.\install.ps1 -Target Cursor
-# also: -Target ClaudeCode | Codex | VSCode
-```
-
-Linux/macOS:
-
-```bash
-cd ~/MyMeritApp/merit-agent-skills
-./install.sh -Target Cursor
-# also: -Target ClaudeCode | Codex | VSCode
-```
+Run Hub menu **I** and select your host (`Cursor`, `ClaudeCode`, `Codex`, or `VSCode`).
 
 Open the `merit-demo` folder in your AI IDE and ask it to help edit branding or portal text.
 
@@ -95,11 +80,11 @@ Open the `merit-demo` folder in your AI IDE and ask it to help edit branding or 
 
 ---
 
-## Step 2 Ã¢â‚¬â€ Make it yours over dinner
+## Step 2 — Make it yours over dinner
 
 Customize what visitors will see. You are **not** putting the app on the internet yet.
 
-### 2A Ã¢â‚¬â€ Product name
+### 2A — Product name
 
 File: `merit-demo\cfg\branding.json`  
 Change `"product_name"`:
@@ -108,7 +93,7 @@ Change `"product_name"`:
 "product_name": "Sunset Reflections"
 ```
 
-### 2B Ã¢â‚¬â€ Welcome story
+### 2B — Welcome story
 
 Folder: `merit-demo\portal\`  
 Edit `index.html` (and optionally `portal/journal/`, `portal/ama/`) with your headline and one short paragraph.
@@ -117,9 +102,9 @@ If you use Cursor:
 
 > Update my main portal page for a journal about mindful parenting. Keep the MERIT layout.
 
-### 2C Ã¢â‚¬â€ Topics of Interest (ToI)
+### 2C — Topics of Interest (ToI)
 
-Create `merit-demo\MyTopics.txt` Ã¢â‚¬â€ one topic per line, 3Ã¢â‚¬â€œ5 lines:
+Create `merit-demo\MyTopics.txt` — one topic per line, 3–5 lines:
 
 ```text
 Mindful parenting
@@ -131,13 +116,13 @@ Each line can become **one ToI pack** in Step 3. Night one uses **one pack only*
 
 | Term | Meaning |
 |------|---------|
-| **ToI** | Topics of Interest Ã¢â‚¬â€ what you want to be known for |
+| **ToI** | Topics of Interest — what you want to be known for |
 | **ToI pack** | One topic written up for MERIT discovery (who you help, tone, promise) |
 
-### 2D Ã¢â‚¬â€ Preview locally
+### 2D — Preview locally
 
 Double-click `merit-demo\play\index.html` in your browser.  
-Widgets load from MERITÃ¢â‚¬â„¢s public package CDN Ã¢â‚¬â€ no account.
+Widgets load from MERIT’s public package CDN — no account.
 
 Optional (Node.js installed):
 
@@ -159,7 +144,7 @@ npm run verify
 
 ---
 
-## Step 3 Ã¢â‚¬â€ Register; MERIT promotes you overnight
+## Step 3 — Register; MERIT promotes you overnight
 
 Join as **Content Creator (CC)** on the MERIT platform. Submit **one ToI pack** from your list. Choose **one free surface** (Journal or AMA). MERIT runs discovery while you sleep.
 
@@ -167,23 +152,23 @@ Join as **Content Creator (CC)** on the MERIT platform. Submit **one ToI pack** 
 
 ```text
 Free CC registration
-  Ã¢â€ â€™ you enter one ToI pack (one interest area)
-  Ã¢â€ â€™ Chain of Content (CoC) runs overnight
-  Ã¢â€ â€™ DIRT matches your topic to readers
-  Ã¢â€ â€™ guests land on your Journal or AMA (merit-demo shell)
-  Ã¢â€ â€™ free followers first; paid Plus only when you opt in later
+  → you enter one ToI pack (one interest area)
+  → Chain of Content (CoC) runs overnight
+  → DIRT matches your topic to readers
+  → guests land on your Journal or AMA (merit-demo shell)
+  → free followers first; paid Plus only when you opt in later
 ```
 
 | Term | Meaning |
 |------|---------|
-| **CC** | Content Creator Ã¢â‚¬â€ you |
-| **CoC** | Chain of Content Ã¢â‚¬â€ Topics Ã¢â€ â€™ Areas Ã¢â€ â€™ Content Ã¢â€ â€™ Queue Ã¢â€ â€™ publish |
-| **DIRT** | MERIT discovery engine Ã¢â‚¬â€ finds audience for your ToI |
+| **CC** | Content Creator — you |
+| **CoC** | Chain of Content — Topics → Areas → Content → Queue → publish |
+| **DIRT** | MERIT discovery engine — finds audience for your ToI |
 
-### 3A Ã¢â‚¬â€ Free registration
+### 3A — Free registration
 
 1. Open the creator registration URL for your assigned **consumer id** (MERIT operator provides this after onboarding).
-2. Sign up with email Ã¢â‚¬â€ **Content Creator** tier (free).
+2. Sign up with email — **Content Creator** tier (free).
 3. No Square, Supabase, or Vercel for this step.
 
 **Pattern example** (canonical demo, not your app):
@@ -194,15 +179,15 @@ Free CC registration
 
 `https://merit-prod.vercel.app/store/YOUR_ID/register`
 
-### 3B Ã¢â‚¬â€ Submit one ToI pack
+### 3B — Submit one ToI pack
 
 1. Choose **one** line from `MyTopics.txt`.
 2. Complete the short prompts: what you teach, who you help, your voice.
-3. Submit as **one ToI pack** Ã¢â€ â€™ one **interest area** on the platform.
+3. Submit as **one ToI pack** → one **interest area** on the platform.
 
-More packs can be added later. Night one: **one pack Ã¢â€ â€™ one platform surface**.
+More packs can be added later. Night one: **one pack → one platform surface**.
 
-### 3C Ã¢â‚¬â€ Pick one free surface
+### 3C — Pick one free surface
 
 | Surface | Visitor experience |
 |---------|-------------------|
@@ -211,7 +196,7 @@ More packs can be added later. Night one: **one pack Ã¢â€ â€™ one pla
 
 Both are already in merit-demo. Most creators start with **Journal** or **AMA**.
 
-### 3D Ã¢â‚¬â€ Morning
+### 3D — Morning
 
 - DIRT routes interested readers to your topic.
 - merit-demo is the **face** they see.
@@ -257,13 +242,13 @@ Cloning OSS does **not** open a bank account. Revenue from existing demos (e.g. 
 
 ---
 
-## Accounts Ã¢â‚¬â€ quick reference
+## Accounts — quick reference
 
-| Service | Required for Steps 1Ã¢â‚¬â€œ3? |
+| Service | Required for Steps 1–3? |
 |---------|-------------------------|
 | Git CLI | Yes (install only) |
 | GitHub login | **No** (unless fork/push) |
-| PAR CDN | **No** Ã¢â‚¬â€ public |
+| PAR CDN | **No** — public |
 | Vercel | **No** until live deploy |
 | here.now | **No** until marketing publish |
 | Supabase | **No** until cloud journal/AMA |
@@ -277,13 +262,13 @@ Cloning OSS does **not** open a bank account. Revenue from existing demos (e.g. 
 Yes for preview. Keep merit-agent-skills for the `merit` helper and Cursor skills when you personalize or deploy.
 
 **Do I need all of here.now, Vercel, and Supabase?**  
-No. Each unlocks a different surface. Steps 1Ã¢â‚¬â€œ3 need none of them.
+No. Each unlocks a different surface. Steps 1–3 need none of them.
 
 **Does MERIT run Supabase and Square for me in the background?**  
-PAR and platform registration are hosted by MERIT. Supabase is **your** database when you go live. Square is for **checkout and payout** when you enable Plus Ã¢â‚¬â€ not on night one.
+PAR and platform registration are hosted by MERIT. Supabase is **your** database when you go live. Square is for **checkout and payout** when you enable Plus — not on night one.
 
 **When do I get paid?**  
-After meritstore tenant provision and payment-provider onboarding for your consumer id Ã¢â‚¬â€ not from cloning alone.
+After meritstore tenant provision and payment-provider onboarding for your consumer id — not from cloning alone.
 
 ---
 
@@ -297,7 +282,7 @@ After meritstore tenant provision and payment-provider onboarding for your consu
 | **CC** | Content Creator |
 | **ToI** | Topics of Interest |
 | **ToI pack** | One topic lane for discovery |
-| **CoC** | Chain of Content Ã¢â‚¬â€ overnight publish pipeline |
+| **CoC** | Chain of Content — overnight publish pipeline |
 | **DIRT** | Discovery and content intelligence platform |
 | **consumer id** | Your MERIT creator key (e.g. `merit-demo`) |
 | **PAR** | Shared UI packages from MERIT CDN |
@@ -312,15 +297,15 @@ Read only after the three steps.
 |----------|---------|
 | [docs/usage.md](docs/usage.md) | Tiers, BYOK, commerce |
 | [merit-demo OPERATOR_PROVISION](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md) | Vercel + Supabase + meritstore tenant |
-| [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) | Angle 1Ã¢â‚¬â€œ4 bundles |
+| [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) | Angle 1–4 bundles |
 | [DIRT user guide](https://github.com/AgentDraven/dirt/blob/main/DIRT%20docs/dirt_usage.md) | Full discovery dashboard |
 
 ---
 
 ## Checklist
 
-- [ ] Step 1 Ã¢â‚¬â€ Cloned merit-agent-skills @ `skills-v0.5.0` under C:\MyMeritApp (or ~/MyMeritApp) and merit-demo
-- [ ] Step 2 Ã¢â‚¬â€ Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
-- [ ] Step 3 Ã¢â‚¬â€ Registered as CC, one ToI pack, Journal or AMA selected
+- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.5.0` under C:\MyMeritApp (or ~/MyMeritApp) and merit-demo
+- [ ] Step 2 — Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
+- [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed
 
