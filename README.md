@@ -2,39 +2,23 @@
 
 Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for **Cursor**, **Claude Code**, **Codex**, **VS Code / Open Agents**, **Hermes**, **OpenClaw**, **Grok Bot**, **Devin**, and more agent harnesses (see [Collaboration](#collaboration--suggest-a-host)).
 
-## Start here — choose your persona
+## Start here — pick your adventure
 
-```mermaid
-flowchart TB
-    classDef start fill:#7c3aed,color:#fff,stroke:#5b21b6,stroke-width:2px
-    classDef one fill:#dbeafe,color:#172554,stroke:#2563eb,stroke-width:2px
-    classDef two fill:#dcfce7,color:#14532d,stroke:#16a34a,stroke-width:2px
-    classDef three fill:#fef3c7,color:#78350f,stroke:#d97706,stroke-width:2px
-    A[🌟 Start here]:::start
-    subgraph R1[① Get ready]
-      direction LR
-      R1a[🧰 Open PowerShell]:::one --> R1b[▶️ Run Merit-Hub]:::one --> R1c[📦 Choose Hub 2 + 3]:::one
-    end
-    subgraph R2[② Build your idea]
-      direction LR
-      R2a[🎨 Choose a name]:::two --> R2b[✍️ Tell your story]:::two --> R2c[🧪 Preview merit-demo]:::two
-    end
-    subgraph R3[③ Share it]
-      direction LR
-      R3a[📝 Register]:::three --> R3b[📚 Pick a free surface]:::three --> R3c[🚀 Share your app]:::three
-    end
-    A --> R1a
-    R1c --> R2a
-    R2c --> R3a
-    R1c -. optional .-> I[🧠 Install IDE skills]
-    click R1a "#i-want-to-try-merit"
-    click R2a "#build-your-app-over-dinner"
-    click I "#i-want-skills-in-my-ide"
-```
+| Path | 1. Start | 2. Make progress | 3. Finish |
+|---|---|---|---|
+| 🚀 [I want to try MERIT](#i-want-to-try-merit) | Open PowerShell | Run the Hub | Choose the demo |
+| 🍽️ [I want to build over dinner](docs/howto/launch-over-dinner.md) | Start the Hub | Personalize `merit-demo` | Preview and share |
+| 🧠 [I want skills in my IDE](#i-want-skills-in-my-ide) | Pick your host | Run Hub **I** | Verify the skills |
+
+> IDE skills are an optional helper for the first two paths, not an orphaned fourth step.
 
 ### I want to try MERIT
 
 Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1), open PowerShell, change to its folder, and run ` .\Merit-Hub.ps1`.
+
+### I want to build my own app over dinner
+
+Follow the [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md) walkthrough.
 
 ### I want a hello-world app
 

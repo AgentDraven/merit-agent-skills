@@ -18,28 +18,15 @@ MERIT gives you a **ready-made app** (Journal, AMA, subscriber pages) plus **fre
 
 This document is the **only** guide you need for night one. Technical permutations are in the [Advanced section](#advanced-optional) at the end.
 
-### The idea in three steps
+### The idea in three rows
 
-```mermaid
-flowchart TB
-    classDef one fill:#dbeafe,color:#172554,stroke:#2563eb,stroke-width:2px
-    classDef two fill:#dcfce7,color:#14532d,stroke:#16a34a,stroke-width:2px
-    classDef three fill:#fef3c7,color:#78350f,stroke:#d97706,stroke-width:2px
-    subgraph STEP1[① Get ready]
-      direction LR
-      A1[🧰 Open PowerShell]:::one --> A2[▶️ Run .\Merit-Hub.ps1]:::one --> A3[📦 Hub 2 + 3]:::one
-    end
-    subgraph STEP2[② Make it yours]
-      direction LR
-      B1[🎨 Pick a name]:::two --> B2[✍️ Add your story]:::two --> B3[🧪 Preview with quickstart]:::two
-    end
-    subgraph STEP3[③ Share it]
-      direction LR
-      C1[📝 Register]:::three --> C2[📚 Choose Journal or AMA]:::three --> C3[🚀 Share your idea]:::three
-    end
-    A3 --> B1
-    B3 --> C1
-```
+| Row | 1. Start | 2. Next | 3. Finish |
+|---|---|---|---|
+| 🧰 **Get ready** | [Open PowerShell](#1a--start-the-hub) | [Run the Hub](#1a--start-the-hub) | [Choose Hub 2 + 3](#1b--merit-demo) |
+| 🎨 **Make it yours** | [Pick a name](#step-2--make-it-yours) | [Add your story](#step-2--make-it-yours) | [Preview](#step-2--make-it-yours) |
+| 🚀 **Share it** | [Register](#step-3--share-it) | [Choose Journal or AMA](#step-3--share-it) | [Share your idea](#step-3--share-it) |
+
+The rows are sequential. [IDE skills](../../README.md#i-want-skills-in-my-ide) are optional.
 
 | Step | What you do | Accounts |
 |------|-------------|----------|
