@@ -1,10 +1,15 @@
 # CHANGELOG
 
+## [0.5.97] - 2026-09-06
+### Changed
+- Removed the obsolete root dinner-tutorial stub; Git history remains the archive and `docs/howto/launch-over-dinner.md` is canonical.
+
 ## [0.5.96] - 2026-09-06
 ### Changed
 - Finalized the persona-first 3x3 documentation navigation and canonical dinner tutorial links.
 ### Fixed
 - Removed interactive Mermaid navigation that could render as a blank GitHub view.
+- Removed the obsolete root dinner-tutorial stub; the `docs/howto/launch-over-dinner.md` page is the sole canonical tutorial.
 
 ## [0.5.95] - 2026-09-06
 ### Changed
