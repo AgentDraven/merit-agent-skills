@@ -36,7 +36,7 @@ Commands:
   deploy --path <repo>     Apply launch file, link Vercel if needed, deploy production
   portal --path <repo>     Apply launch file, then publish here.now portal targets
   all --path <repo>        Apply, deploy Vercel, then publish portal targets
-  closeout [--path <repo>] Full release closeout by default: validate, commit, push
+  closeout [--path <repo>] Full release closeout: validate, CHANGELOG, commit, push
                            Use --validate-only to skip commit/push
   release [--path <repo>]  Alias for default release closeout
   law [list|closeout|edition|<section>]  OSS L1 excerpt from merit.blob (in-memory unpack)
@@ -1068,6 +1068,14 @@ function Invoke-ReleaseCloseout {
         if (-not (Get-Command git -ErrorAction SilentlyContinue)) { throw 'release blocked: git not available' }
         $branch = (git -c "safe.directory=$TargetRoot" branch --show-current).Trim()
         if ([string]::IsNullOrWhiteSpace($branch)) { throw 'release blocked: detached HEAD; checkout a branch first' }
+        $versionFile = Join-Path $TargetRoot 'VERSION'
+        $changelogFile = Join-Path $TargetRoot 'CHANGELOG.md'
+        if (Test-Path -LiteralPath $versionFile) {
+            if (-not (Test-Path -LiteralPath $changelogFile)) { throw 'release blocked: CHANGELOG.md is required when VERSION exists' }
+            $version = ((Get-Content -LiteralPath $versionFile -Raw) -split '\r?\n')[0].Trim()
+            $changelog = Get-Content -LiteralPath $changelogFile -Raw
+            if ($changelog -notmatch [regex]::Escape($version)) { throw "release blocked: CHANGELOG.md has no entry for VERSION $version" }
+        }
         git -c "safe.directory=$TargetRoot" add -A
         $message = if ($ArgList -contains '-Message') { Get-ArgValue -ArgList $ArgList -Name '-Message' } else { 'chore: MERIT release closeout' }
         if ([string]::IsNullOrWhiteSpace($message)) { $message = 'chore: MERIT release closeout' }

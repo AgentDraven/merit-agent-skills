@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## [0.5.88] - 2026-09-06
+## [0.5.89] - 2026-09-06
+### Added
+- Made VERSION/CHANGELOG coverage an explicit release closeout gate.
 ### Fixed
 - Restored explicit entries for every 0.5.78–0.5.87 release instead of grouping them under one heading.
 
