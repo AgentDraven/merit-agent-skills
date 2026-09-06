@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## [0.5.91] - 2026-09-06
+## [0.5.92] - 2026-09-06
+### Changed
+- Reworked README onboarding into persona-based flows with Mermaid navigation and progressive disclosure.
 ### Changed
 - Simplified README cold start to `cd <tools-folder>; .\Merit-Hub.ps1` from any Windows PowerShell version.
 ### Fixed

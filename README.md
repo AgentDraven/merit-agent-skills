@@ -2,7 +2,35 @@
 
 Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for **Cursor**, **Claude Code**, **Codex**, **VS Code / Open Agents**, **Hermes**, **OpenClaw**, **Grok Bot**, **Devin**, and more agent harnesses (see [Collaboration](#collaboration--suggest-a-host)).
 
-## Start here
+## Start here — choose your persona
+
+```mermaid
+flowchart LR
+    A[What do you want?] --> B[Try MERIT]
+    A --> C[Build an app]
+    A --> D[Install IDE skills]
+    B --> B1[Run Merit-Hub]
+    C --> C1[Open merit-demo]
+    D --> D1[Hub menu I]
+```
+
+### I want to try MERIT
+
+Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1), open PowerShell, change to its folder, and run ` .\Merit-Hub.ps1`.
+
+### I want a hello-world app
+
+Open [merit-demo](https://github.com/Mr-PI-Bala/merit-demo) and run ` .\merit.ps1 quickstart`.
+
+### I want skills in my IDE
+
+Run Hub and choose **I**. It installs skills into the correct host location.
+
+### For additional options
+
+Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](docs/usage.md), [deployment guide](docs/deploy.md), [try bundles](docs/TRY_BUNDLES.md), or [IAR architecture map](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md).
+
+<details><summary>Reference map and advanced options</summary>
 
 | Goal | Path |
 |------|------|
@@ -20,6 +48,8 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 | **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** — gap analysis → FR/AGENT_REQ (no vault) |
 | **Referral / design partner** | [`skills/merit-referral`](skills/merit-referral/SKILL.md) — free attribution + portal recipes (no billing) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha …` |
+
+</details>
 
 **Production MERIT base (skills default):** `https://merit-prod.vercel.app` (**v00** in [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json)). Operator **v01** hosts exist but are not the skills default until vault `publish_gate` promotes them. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
 
