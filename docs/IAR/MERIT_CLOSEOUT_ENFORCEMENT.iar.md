@@ -4,6 +4,8 @@
 **Contract:** `cfg/merit_closeout_contract.json` (schema v2)  
 **Law:** `merit.ps1 law closeout` -> `merit.ps1 closeout --path <repo>` -> release; 3-3 is `Done / State / Next`.
 
+**Execution boundary:** plain `closeout` is the user-approved release closeout. Hooks use `closeout --validate-only` and never commit or push automatically. This prevents a stop event from publishing without an explicit release action.
+
 **Validation checklist:** [MERIT_CLOSEOUT_ENFORCEMENT_CHECKLIST.md](MERIT_CLOSEOUT_ENFORCEMENT_CHECKLIST.md). This is the required worksheet for evidence, status changes, and promotion to `HARD-ENFORCED`.
 
 **IAR navigation and consolidation policy:** [README.md](README.md). This policy and its checklist are the only active closeout-enforcement authority; historical packets remain evidence only.

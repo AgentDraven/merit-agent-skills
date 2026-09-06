@@ -13,7 +13,7 @@ if [ ! -f "$cli" ]; then
 fi
 if command -v pwsh >/dev/null 2>&1; then
   pwsh -NoProfile -File "$cli" law closeout >/dev/null 2>&1 || true
-  pwsh -NoProfile -File "$cli" closeout --path "$repo" >/dev/null 2>&1
+  pwsh -NoProfile -File "$cli" closeout --path "$repo" --validate-only >/dev/null 2>&1
   code=$?
 else
   printf '%s\n' '{"continue":true,"systemMessage":"MERIT closeout hook requires pwsh; run merit.ps1 manually."}'

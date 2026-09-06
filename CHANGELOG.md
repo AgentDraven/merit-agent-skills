@@ -556,3 +556,6 @@
 # 0.5.74
 
 - Make plain `merit.ps1 closeout` perform release closeout by default; retain `--validate-only` as the explicit exception.
+# 0.5.75
+
+- Ensure lifecycle hooks use validation-only closeout and never publish implicitly.
