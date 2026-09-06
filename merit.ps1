@@ -34,7 +34,8 @@ Commands:
   deploy --path <repo>     Apply launch file, link Vercel if needed, deploy production
   portal --path <repo>     Apply launch file, then publish here.now portal targets
   all --path <repo>        Apply, deploy Vercel, then publish portal targets
-  closeout --path <repo>   Validate only (verify + git diff --check) ? NOT full MERIT closeout
+  closeout --path <repo>   Validate only by default; add --release for validate + commit + push
+  release --path <repo>    Full release closeout: validate, commit, push (skills repo also tags)
   law [list|closeout|edition|<section>]  OSS L1 excerpt from merit.blob (in-memory unpack)
                            law --section VIII.F | law --for-skill merit-portal
   where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
@@ -980,7 +981,7 @@ function Invoke-PortalPublish {
     return $published
 }
 function Invoke-Closeout {
-    param([string]$TargetRoot)
+    param([string]$TargetRoot, [switch]$Release)
     if (-not (Invoke-Verify -TargetRoot $TargetRoot)) { throw 'closeout blocked: verify FAILED' }
     $contractPath = Join-Path $Root 'cfg\merit_closeout_contract.json'
     if (-not (Test-Path -LiteralPath $contractPath)) { throw "closeout blocked: missing law contract $contractPath" }
@@ -1037,12 +1038,35 @@ function Invoke-Closeout {
         $receiptPath = Join-Path $evidenceDir 'closeout-validation.json'
         $receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $receiptPath -Encoding UTF8
         Write-Host "closeout receipt: $receiptPath" -ForegroundColor Green
-        Write-Host 'closeout: validate only. Full MERIT closeout: .\merit.ps1 law closeout then ship or vault mXin'
+        Write-Host 'closeout: validate only. Use .\merit.ps1 closeout --path . --release for full release closeout.'
         Write-Host 'closeout: webpage-shell AP-MA-13. Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md'
         Write-Host 'closeout tiers: (1) validate = this command; (2) OSS ship = .\merit.ps1 ship; (3) operator = vault mXin; (4) agent response = chat 3-3'
     } finally {
         Pop-Location
     }
+}
+
+function Invoke-ReleaseCloseout {
+    param([string]$TargetRoot, [string[]]$ArgList)
+    if (-not (Invoke-Verify -TargetRoot $TargetRoot)) { throw 'release blocked: verify FAILED' }
+    Invoke-Closeout -TargetRoot $TargetRoot
+    Push-Location $TargetRoot
+    try {
+        if (-not (Get-Command git -ErrorAction SilentlyContinue)) { throw 'release blocked: git not available' }
+        $branch = (git -c "safe.directory=$TargetRoot" branch --show-current).Trim()
+        if ([string]::IsNullOrWhiteSpace($branch)) { throw 'release blocked: detached HEAD; checkout a branch first' }
+        git -c "safe.directory=$TargetRoot" add -A
+        $message = if ($ArgList -contains '-Message') { Get-ArgValue -ArgList $ArgList -Name '-Message' } else { 'chore: MERIT release closeout' }
+        if ([string]::IsNullOrWhiteSpace($message)) { $message = 'chore: MERIT release closeout' }
+        git -c "safe.directory=$TargetRoot" commit -m $message
+        if ($LASTEXITCODE -ne 0) { throw "release blocked: git commit failed (exit $LASTEXITCODE)" }
+        git -c "safe.directory=$TargetRoot" push origin $branch
+        if ($LASTEXITCODE -ne 0) { throw "release blocked: git push failed (exit $LASTEXITCODE)" }
+        Write-Host "release closeout OK: pushed $branch" -ForegroundColor Green
+        if ((Test-Path (Join-Path $TargetRoot 'skills')) -and (Test-Path (Join-Path $TargetRoot 'VERSION'))) {
+            Write-Host 'skills repo detected: run .\merit.ps1 ship -Message "..." to create the skills-v tag.' -ForegroundColor Yellow
+        }
+    } finally { Pop-Location }
 }
 
 function Test-MeritWindowsAdmin {
@@ -2442,7 +2466,13 @@ switch -Regex ($Command) {
     '^vercel$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^portal$' { try { Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^all$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
-    '^closeout$' { try { Invoke-Closeout -TargetRoot $target; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^closeout$' {
+        try {
+            if (Test-ArgFlag -ArgList $Rest -Name '--release') { Invoke-ReleaseCloseout -TargetRoot $target -ArgList $Rest } else { Invoke-Closeout -TargetRoot $target }
+            exit 0
+        } catch { Write-Host $_.Exception.Message; exit 1 }
+    }
+    '^release$' { try { Invoke-ReleaseCloseout -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^law$' { try { Invoke-MeritLaw -ArgList $Rest -RepoRoot $Root; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^(where|surface)$' { Invoke-MeritWhere -ArgList $Rest }
     '^ship$' { try { Invoke-MeritShip -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }

@@ -17,13 +17,14 @@ cd %MYMERITAPP%\merit-agent-skills
 git checkout main                 # ship refuses detached HEAD
 .\merit.ps1 closeout --path .    # validate only
 .\merit.ps1 ship -Message "..."   # OSS git release → skills-v*
+.\merit.ps1 closeout --path . --release  # release closeout: validate + commit + push
 ```
 
 When plane **C** (vault) exists: prefer `& <operatorMeritCli> mXin` — resolve via `.\merit.ps1 where`.
 
 ## Do not
 
-- Stop after `closeout --path` (validate only)
+- Stop after `closeout --path` (validate only) when release was requested
 - Raw `git commit` / `tag` / `push`
 - Skip chat **3-3**
 
