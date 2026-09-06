@@ -535,3 +535,6 @@
 
 - Add cross-harness closeout enforcement contract, runners, adapters, IAR policy, and validation checklist.
 - Add safe ownership/evidence handling and explicit host enforcement classifications.
+# 0.5.68
+
+- Make explicit release closeout validate, commit, and push before completion.
