@@ -29,6 +29,8 @@ Commands:
   init --path <repo>       Create .merit_launch.md and gitignore it
   apply --path <repo>      Read .merit_launch.md and generate config + .env.local
   verify --path <repo>     Verify local MERIT scaffold
+  e2e --path <repo>        Run consumer static smoke E2E (npm run e2e)
+  e2e:playwright --path <repo>  Run consumer browser E2E (npm run e2e:playwright)
   deploy --path <repo>     Apply launch file, link Vercel if needed, deploy production
   portal --path <repo>     Apply launch file, then publish here.now portal targets
   all --path <repo>        Apply, deploy Vercel, then publish portal targets
@@ -45,6 +47,9 @@ Commands:
   livealpha --path <repo>  Elevate consumer toward live alpha (Research + Baseline scaffold)
   baseline --path <repo>   Alias for livealpha
   admin gate demo-init     Advanced: create local demo operator-gate placeholders
+  admin ownership repair --path <repo>  Repair Windows repo owner/Modify ACL (confirmation required)
+  admin ownership status --path <repo>  Inspect owner, ACL, and write access
+                           (legacy alias: admin repair-ownership)
   app scaffold             Print merit-demo clone guidance
   create --path <repo>     AutoMagic fullstack-consumer (default = platform URL on merit-prod)
                            [--profile fullstack-consumer] [--deploy]
@@ -977,22 +982,167 @@ function Invoke-PortalPublish {
 function Invoke-Closeout {
     param([string]$TargetRoot)
     if (-not (Invoke-Verify -TargetRoot $TargetRoot)) { throw 'closeout blocked: verify FAILED' }
+    $contractPath = Join-Path $Root 'cfg\merit_closeout_contract.json'
+    if (-not (Test-Path -LiteralPath $contractPath)) { throw "closeout blocked: missing law contract $contractPath" }
+    $contract = Read-JsonFile -Path $contractPath
+    if (-not $contract.chatThreeThreeRequired) { throw 'closeout blocked: law contract does not require chat 3-3' }
+    Write-Host ''
+    Write-Host 'closeout: displaying binding MERIT law before validation' -ForegroundColor Cyan
+    Invoke-MeritLaw -ArgList @('closeout') -RepoRoot $Root
+    $head = ''
+    $status = @()
     Push-Location $TargetRoot
     try {
         if (Get-Command git -ErrorAction SilentlyContinue) {
-            git diff --check
+            git -c "safe.directory=$TargetRoot" diff --check
             if ($LASTEXITCODE -ne 0) { throw "git diff --check failed (exit $LASTEXITCODE)" }
-            git status --short
-            git rev-parse --short HEAD
+            $status = @(git -c "safe.directory=$TargetRoot" status --short)
+            $head = (git -c "safe.directory=$TargetRoot" rev-parse --short HEAD 2>$null).Trim()
         } else {
             Write-Host 'closeout WARN: git not available on PATH'
         }
+        $evidenceDir = $null
+        foreach ($candidate in @(
+                (Join-Path $TargetRoot 'merit-demo docs\IAR\evidence'),
+                (Join-Path $TargetRoot 'docs\IAR\evidence'),
+                (Join-Path $TargetRoot '.merit\evidence')
+            )) {
+            if (Test-Path -LiteralPath $candidate -PathType Container) {
+                try { New-Item -ItemType Directory -Force -Path $candidate -ErrorAction Stop | Out-Null; $evidenceDir = $candidate; break } catch { }
+            }
+        }
+        if (-not $evidenceDir) {
+            $pathHash = [Security.Cryptography.SHA256]::Create()
+            $key = ([BitConverter]::ToString($pathHash.ComputeHash([Text.Encoding]::UTF8.GetBytes($TargetRoot.ToLowerInvariant())))).Replace('-', '')
+            $evidenceDir = Join-Path ([IO.Path]::GetTempPath()) "merit-closeout\$key"
+            New-Item -ItemType Directory -Force -Path $evidenceDir | Out-Null
+            Write-Host "closeout note: target evidence directory is not writable; using $evidenceDir" -ForegroundColor Yellow
+        }
+        $receipt = [ordered]@{
+            schemaVersion = 1
+            status = 'validated'
+            target = $TargetRoot
+            validatedAt = (Get-Date).ToString('o')
+            gitHead = $head
+            gitStatus = @($status)
+            lawContractId = [string]$contract.contractId
+            lawContractVersion = [int]$contract.schemaVersion
+            lawCommand = [string]$contract.lawCommand
+            validationCommand = [string]$contract.validationCommand
+            releaseCommand = [string]$contract.ossReleaseCommand
+            operatorReleaseCommand = [string]$contract.operatorReleaseCommand
+            chatThreeThreeRequired = [bool]$contract.chatThreeThreeRequired
+            releaseNotPerformed = $true
+        }
+        $receiptPath = Join-Path $evidenceDir 'closeout-validation.json'
+        $receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $receiptPath -Encoding UTF8
+        Write-Host "closeout receipt: $receiptPath" -ForegroundColor Green
         Write-Host 'closeout: validate only. Full MERIT closeout: .\merit.ps1 law closeout then ship or vault mXin'
         Write-Host 'closeout: webpage-shell AP-MA-13. Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md'
-        Write-Host 'closeout tiers: (1) validate = this command; (2) OSS ship = .\merit.ps1 ship; (3) operator = vault mXin'
+        Write-Host 'closeout tiers: (1) validate = this command; (2) OSS ship = .\merit.ps1 ship; (3) operator = vault mXin; (4) agent response = chat 3-3'
     } finally {
         Pop-Location
     }
+}
+
+function Test-MeritWindowsAdmin {
+    if ($env:OS -notmatch 'Windows') { return $false }
+    try {
+        return ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+            [Security.Principal.WindowsBuiltInRole]::Administrator)
+    } catch { return $false }
+}
+
+function Invoke-AdminRepairOwnership {
+    param([string]$TargetRoot, [string[]]$ArgList)
+    if (-not ($env:OS -match 'Windows')) { throw 'admin repair-ownership is currently supported on Windows only' }
+    if (-not (Test-Path -LiteralPath $TargetRoot -PathType Container)) { throw "admin repair-ownership: repo directory not found: $TargetRoot" }
+    $resolved = (Resolve-Path -LiteralPath $TargetRoot).Path.TrimEnd('\', '/')
+    $root = [IO.Path]::GetPathRoot($resolved).TrimEnd('\', '/')
+    if ($resolved -eq $root) { throw 'admin repair-ownership refuses a filesystem root; pass an exact repository path' }
+    if (-not (Test-Path -LiteralPath (Join-Path $resolved '.git'))) {
+        throw "admin repair-ownership: target is not a Git worktree (.git missing): $resolved"
+    }
+    $yes = (Test-ArgFlag -ArgList $ArgList -Name '--yes') -or (Test-ArgFlag -ArgList $ArgList -Name '-Force')
+    if (-not $yes) {
+        Write-Host "This will take ownership and grant Modify to the current user recursively under:`n  $resolved" -ForegroundColor Yellow
+        $answer = Read-Host 'Continue? [y/N]'
+        if ($answer -notmatch '^[Yy]$') { Write-Host 'admin repair-ownership: cancelled'; return }
+    }
+    if (-not (Test-MeritWindowsAdmin)) {
+        $hostExe = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+        $scriptPath = $PSCommandPath
+        $argText = '-NoProfile -ExecutionPolicy Bypass -File "' + $scriptPath + '" admin repair-ownership --path "' + $resolved + '" --yes'
+        Write-Host 'Administrator permission is required. Requesting UAC elevation...' -ForegroundColor Yellow
+        $proc = Start-Process -FilePath $hostExe -Verb RunAs -ArgumentList $argText -Wait -PassThru
+        if ($proc.ExitCode -ne 0) { throw "admin repair-ownership elevated process failed (exit $($proc.ExitCode))" }
+        return
+    }
+    $takeown = Join-Path $env:SystemRoot 'System32\takeown.exe'
+    $icacls = Join-Path $env:SystemRoot 'System32\icacls.exe'
+    $principal = if ($env:USERDOMAIN) { "$env:USERDOMAIN\$env:USERNAME" } else { $env:USERNAME }
+    Write-Host "admin repair-ownership: takeown $resolved" -ForegroundColor Cyan
+    & $takeown /F $resolved /R /D Y
+    if ($LASTEXITCODE -ne 0) { throw "takeown failed (exit $LASTEXITCODE)" }
+    Write-Host "admin repair-ownership: grant Modify to $principal" -ForegroundColor Cyan
+    & $icacls $resolved /grant "${principal}:(OI)(CI)M" /T /C
+    if ($LASTEXITCODE -ne 0) { throw "icacls failed (exit $LASTEXITCODE)" }
+    $probe = Join-Path $resolved '.merit-write-probe.tmp'
+    try {
+        Set-Content -LiteralPath $probe -Value 'write probe' -Encoding ASCII
+        Remove-Item -LiteralPath $probe -Force
+    } catch { throw "ownership repair completed but write probe failed: $($_.Exception.Message)" }
+    $owner = (Get-Acl -LiteralPath $resolved).Owner
+    Write-Host "admin repair-ownership OK: owner=$owner writable=yes target=$resolved" -ForegroundColor Green
+}
+
+function Invoke-AdminOwnershipStatus {
+    param([string]$TargetRoot)
+    if (-not ($env:OS -match 'Windows')) { throw 'admin ownership status is currently supported on Windows only' }
+    if (-not (Test-Path -LiteralPath $TargetRoot -PathType Container)) { throw "admin ownership status: repo directory not found: $TargetRoot" }
+    $resolved = (Resolve-Path -LiteralPath $TargetRoot).Path.TrimEnd('\', '/')
+    if (-not (Test-Path -LiteralPath (Join-Path $resolved '.git'))) { throw "admin ownership status: .git missing under $resolved" }
+    $acl = Get-Acl -LiteralPath $resolved
+    Write-Host "owner: $($acl.Owner)"
+    Write-Host 'relevant ACL entries:'
+    $acl.Access | Where-Object { $_.IdentityReference -match 'Administrators|Users|Authenticated Users|Draven|Codex' } |
+        Select-Object IdentityReference, FileSystemRights, AccessControlType, IsInherited |
+        Format-Table -AutoSize | Out-Host
+    $probe = Join-Path $resolved '.merit-ownership-status.tmp'
+    try {
+        Set-Content -LiteralPath $probe -Value 'write probe' -Encoding ASCII -ErrorAction Stop
+        Remove-Item -LiteralPath $probe -Force -ErrorAction Stop
+        Write-Host 'write probe: PASS' -ForegroundColor Green
+    } catch {
+        Write-Host "write probe: FAIL - $($_.Exception.Message)" -ForegroundColor Red
+    }
+    $safe = git -c "safe.directory=$resolved" -C $resolved status --porcelain 2>&1
+    if ($LASTEXITCODE -eq 0) { Write-Host 'git safe-directory probe: PASS' -ForegroundColor Green }
+    else { Write-Host "git safe-directory probe: FAIL - $($safe -join ' ')" -ForegroundColor Red }
+}
+
+function Invoke-ConsumerE2E {
+    param([string]$TargetRoot, [ValidateSet('e2e','e2e:playwright')][string]$Mode)
+    $packagePath = Join-Path $TargetRoot 'package.json'
+    if (-not (Test-Path -LiteralPath $packagePath)) {
+        throw "$Mode requires package.json under $TargetRoot"
+    }
+    $package = Read-JsonFile -Path $packagePath
+    $scriptName = $Mode
+    if (-not $package.scripts -or -not $package.scripts.PSObject.Properties.Name.Contains($scriptName)) {
+        throw "$Mode requires package.json script '$scriptName' under $TargetRoot"
+    }
+    Push-Location $TargetRoot
+    try {
+        Write-Host "consumer ${Mode}: npm run $scriptName"
+        & npm run $scriptName
+        if ($LASTEXITCODE -ne 0) {
+            throw "consumer $Mode failed (exit $LASTEXITCODE)"
+        }
+    } finally {
+        Pop-Location
+    }
+    Write-Host "consumer $Mode OK: $TargetRoot"
 }
 
 function Test-MeritSkillsShipRepo {
@@ -1044,6 +1194,29 @@ function Invoke-MeritShip {
     $tag = "$prefix$version"
 
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) { throw 'ship: git not on PATH' }
+
+    $receiptCandidates = @(
+        (Join-Path $repoRoot 'docs\IAR\evidence\closeout-validation.json'),
+        (Join-Path $repoRoot '.merit\evidence\closeout-validation.json')
+    )
+    $pathHash = [Security.Cryptography.SHA256]::Create()
+    $repoKey = ([BitConverter]::ToString($pathHash.ComputeHash([Text.Encoding]::UTF8.GetBytes($repoRoot.ToLowerInvariant())))).Replace('-', '')
+    $receiptCandidates += (Join-Path ([IO.Path]::GetTempPath()) "merit-closeout\$repoKey\closeout-validation.json")
+    $receiptPath = $receiptCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+    if (-not $receiptPath) {
+        throw 'ship blocked: run .\merit.ps1 law closeout then .\merit.ps1 closeout --path . first'
+    }
+    try { $receipt = Read-JsonFile -Path $receiptPath } catch { throw "ship blocked: invalid closeout receipt $receiptPath" }
+    if ([string]$receipt.status -ne 'validated' -or -not $receipt.chatThreeThreeRequired) {
+        throw "ship blocked: closeout receipt is not a valid MERIT validation receipt ($receiptPath)"
+    }
+    if ($receipt.validatedAt) {
+        try {
+            if (((Get-Date) - [DateTime]::Parse([string]$receipt.validatedAt)).TotalHours -gt 24) {
+                throw 'closeout receipt is older than 24 hours; rerun closeout'
+            }
+        } catch { throw "ship blocked: $($_.Exception.Message)" }
+    }
 
     Push-Location $repoRoot
     try {
@@ -2257,6 +2430,14 @@ switch -Regex ($Command) {
         if (-not (Invoke-Verify -TargetRoot $target)) { exit 1 }
         exit 0
     }
+    '^e2e$' {
+        try { Invoke-ConsumerE2E -TargetRoot $target -Mode 'e2e'; exit 0 }
+        catch { Write-Host $_.Exception.Message; exit 1 }
+    }
+    '^e2e:playwright$' {
+        try { Invoke-ConsumerE2E -TargetRoot $target -Mode 'e2e:playwright'; exit 0 }
+        catch { Write-Host $_.Exception.Message; exit 1 }
+    }
     '^deploy$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^vercel$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^portal$' { try { Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
@@ -2373,9 +2554,24 @@ switch -Regex ($Command) {
         exit 0
     }
     '^admin$' {
-        if ($Rest.Count -lt 2 -or $Rest[0] -ne 'gate' -or $Rest[1] -ne 'demo-init') { Write-MeritHelp; exit 1 }
-        Invoke-AdminGateDemoInit -TargetRoot $target
-        exit 0
+        if ($Rest.Count -ge 2 -and $Rest[0] -eq 'gate' -and $Rest[1] -eq 'demo-init') {
+            Invoke-AdminGateDemoInit -TargetRoot $target
+            exit 0
+        }
+        if ($Rest.Count -ge 2 -and $Rest[0] -eq 'ownership' -and $Rest[1] -eq 'status') {
+            try { Invoke-AdminOwnershipStatus -TargetRoot $target; exit 0 }
+            catch { Write-Host $_.Exception.Message; exit 1 }
+        }
+        if ($Rest.Count -ge 2 -and $Rest[0] -eq 'ownership' -and $Rest[1] -eq 'repair') {
+            try { Invoke-AdminRepairOwnership -TargetRoot $target -ArgList $Rest; exit 0 }
+            catch { Write-Host $_.Exception.Message; exit 1 }
+        }
+        if ($Rest.Count -ge 1 -and $Rest[0] -eq 'repair-ownership') {
+            try { Invoke-AdminRepairOwnership -TargetRoot $target -ArgList $Rest; exit 0 }
+            catch { Write-Host $_.Exception.Message; exit 1 }
+        }
+        Write-MeritHelp
+        exit 1
     }
     '^app$' {
         Write-Host "app scaffold: clone the reference consumer:"

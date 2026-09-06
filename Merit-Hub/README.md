@@ -230,7 +230,39 @@ Windows treats internet downloads as unsigned scripts. `-ExecutionPolicy Bypass`
 
 ## PowerShell 7 (pwsh)
 
-Merit-Hub requires **PowerShell 7+**. Menu **1** can install portable `pwsh` under `%MYMERITTOOLS%\pwsh\`.
+Merit-Hub prefers **PowerShell 7+**, but a fresh device does not need pwsh preinstalled.
+
+- Windows PowerShell 5.1 can parse the standalone Hub, explain the requirement, ask for confirmation, install a laptop-local portable `pwsh` under `%MYMERITTOOLS%\pwsh\`, and relaunch the Hub.
+- `Merit-Hub.sh` is the Linux/macOS launcher. If `pwsh` is missing it asks for confirmation, downloads the pinned portable PowerShell release under `$MYMERITTOOLS/pwsh`, and relaunches the same `Merit-Hub.ps1`.
+- Set `MERIT_HUB_AUTO_INSTALL_PWSH=1` only when unattended bootstrap is explicitly intended. A declined install exits with a clear remediation command.
+- The standalone PowerShell source is ASCII-safe so Windows PowerShell 5.1 does not misparse UTF-8 punctuation from a browser download.
+
+Windows direct invocation remains:
+
+```powershell
+.\Merit-Hub.ps1
+```
+
+POSIX invocation is:
+
+```bash
+./Merit-Hub.sh
+```
+
+## Repository ownership recovery
+
+Hub does not run the normal clone/install workflow elevated. Elevation is reserved for destructive cleanup modes. This keeps Git clones owned by the interactive user instead of `BUILTIN\\Administrators`.
+
+If an older Hub run or an externally elevated clone left a repository unwritable, inspect and repair the exact worktree through the public CLI:
+
+```powershell
+.\merit.ps1 admin ownership status --path <repo>
+
+Hook enforcement status is recorded in `.merit-hook-install.json`; unsupported hosts receive `.merit-hook-warning.json`. See `docs/IAR/MERIT_CLOSEOUT_ENFORCEMENT.iar.md`.
+.\merit.ps1 admin ownership repair --path <repo>
+```
+
+The repair command confirms the target, requests UAC, runs `takeown`, grants the current user Modify recursively, and performs a write probe. It refuses filesystem roots and non-Git paths.
 
 ---
 

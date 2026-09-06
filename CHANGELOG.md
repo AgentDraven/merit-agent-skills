@@ -531,3 +531,7 @@
 ### Added
 
 - Webpage-shell AP-MA-13: `merit.ps1 verify` / closeout FAIL DIY `merit-ux-brand` without `createAppShell`/`createBrandShell`. Play template carries `data-webpage-shell="createAppShell"`. Smoke asserts marker. Checklist: merit-prod `docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md`.
+# 0.5.67
+
+- Add cross-harness closeout enforcement contract, runners, adapters, IAR policy, and validation checklist.
+- Add safe ownership/evidence handling and explicit host enforcement classifications.

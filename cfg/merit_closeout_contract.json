@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contractId": "MERIT-CLOSEOUT-1",
+  "lawCommand": "merit.ps1 law closeout",
+  "validationCommand": "merit.ps1 closeout --path <repo>",
+  "ossReleaseCommand": "merit.ps1 ship -Message \"<summary>\"",
+  "operatorReleaseCommand": "vault scripts/merit.ps1 mXin",
+  "verificationCommand": "vault scripts/merit.ps1 git verify",
+  "chatThreeThreeRequired": true,
+  "chatThreeThreeShape": ["Done", "State", "Next"],
+  "alwaysOnPolicy": {
+    "schemaVersion": 2,
+    "hookEvent": "Stop",
+    "hostStatus": {
+      "Cursor": "SUPPORTED-BUT-VERIFY",
+      "VSCode": "SUPPORTED-BUT-VERIFY",
+      "CodexInteractive": "SUPPORTED-BUT-VERIFY",
+      "CodexExec": "GUIDANCE-ONLY",
+      "ClaudeCode": "SUPPORTED-BUT-VERIFY",
+      "Hermes": "GUIDANCE-ONLY",
+      "OpenClaw": "GUIDANCE-ONLY",
+      "GrokBot": "GUIDANCE-ONLY",
+      "Devin": "GUIDANCE-ONLY",
+      "Project": "GUIDANCE-ONLY"
+    },
+    "unsupportedHosts": ["Hermes", "OpenClaw", "GrokBot", "Devin", "Project"],
+    "unsupportedWarning": "This host has no MERIT post-turn hook installed. The agent must follow the closeout law and 3-3 response protocol; release remains gated by a valid closeout receipt.",
+    "exceptions": ["WIP", "local-only", "no-commit"],
+    "threeThreeValidatedBy": ["agent", "hook", "operator", "unverified"]
+  },
+  "installReceipt": ".merit-closeout.json",
+  "releasePolicy": "Installation and validation never commit, tag, push, deploy, or publish."
+}

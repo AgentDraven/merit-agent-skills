@@ -7,6 +7,8 @@ description: MERIT git closeout — run merit.ps1 law closeout, validate, ship (
 
 **Binding law:** `.\merit.ps1 law closeout` (from plane **B**). No `MERIT.instructions` file in this repo — law is in `merit.blob`.
 
+The machine-readable contract is `cfg/merit_closeout_contract.json`. Skill installation emits `.merit-closeout.json`; validation emits `closeout-validation.json`. A release must not proceed without a recent valid validation receipt.
+
 ## Sequence
 
 ```powershell
@@ -26,3 +28,7 @@ When plane **C** (vault) exists: prefer `& <operatorMeritCli> mXin` — resolve 
 - Skip chat **3-3**
 
 Exception: user said **WIP** / **no commit** / **local-only**.
+
+## Host enforcement boundary
+
+Read `docs/IAR/MERIT_CLOSEOUT_ENFORCEMENT.iar.md` and `.merit-hook-install.json` before claiming hook enforcement. `SUPPORTED-BUT-VERIFY` is not hard enforcement. Codex interactive and `codex exec` are separate modes. Hooks cannot semantically validate final 3-3 text.

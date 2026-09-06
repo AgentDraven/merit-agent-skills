@@ -93,7 +93,7 @@ flowchart TD
 | `aliases` | e.g. `Claude` â†’ `ClaudeCode`, `Agents` â†’ `VSCode` |
 | `installHint` | CLI one-liner when not yet in `install.ps1` |
 
-**Supported today (`install.ps1`):** Cursor, ClaudeCode, Codex, VSCode/Agents, Project.  
+**Supported today (`install.ps1`):** Cursor, ClaudeCode, Codex, VSCode/Agents, Project. Hook enforcement status is maintained in [MERIT_CLOSEOUT_ENFORCEMENT.iar.md](IAR/MERIT_CLOSEOUT_ENFORCEMENT.iar.md); installed skills do not imply hard lifecycle enforcement.
 **Planned:** Hermes, OpenClaw.  
 **Research (add paths before promoting):** Paperclip, GrokBot, Devin â€” plus any future host (same JSON row pattern).
 

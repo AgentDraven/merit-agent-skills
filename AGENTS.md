@@ -27,9 +27,13 @@ Work is **not done** until **validate + git ship + 3-3**.
 
 The CLI verb **`closeout`** = validate only — not MERIT closeout.
 
+The machine-readable contract is `cfg/merit_closeout_contract.json`. Skill installation must emit `.merit-closeout.json` beside the installed surface marker. A successful `closeout` must emit `closeout-validation.json`; `ship` refuses to release without a recent valid receipt. Installation and validation never commit, tag, push, deploy, or publish.
+
 Before `ship`: checkout a branch (`main`).
 
 Exception only if the user said **WIP** / **no commit** / **local-only**.
+
+Cross-harness enforcement is documented in `docs/IAR/MERIT_CLOSEOUT_ENFORCEMENT.iar.md`. HARD-ENFORCED requires live host/mode evidence; otherwise use SUPPORTED-BUT-VERIFY or GUIDANCE-ONLY. Never generalize interactive hook results to headless mode.
 
 ## Path resolution (agents)
 
@@ -38,6 +42,17 @@ Do **not** assume `~/dev` or Cursor workspace paths.
 1. `MYMERITAPP` / `MYMERITTOOLS` env vars
 2. `%MYMERITAPP%\oss-bench.json`
 3. `.\merit.ps1 where` or `Merit-Hub.ps1 -Surface`
+
+If a Windows checkout is owned by `BUILTIN\Administrators` and the current user cannot write evidence, use the scoped admin repair task (exact Git worktree only):
+
+```powershell
+.\merit.ps1 admin ownership status --path <repo>
+.\merit.ps1 admin ownership repair --path <repo>
+```
+
+`admin repair-ownership --path <repo>` remains a compatibility alias.
+
+The command confirms the target, requests UAC elevation when needed, runs `takeown` and grants the current user Modify recursively, then performs a write probe. It refuses filesystem roots and non-Git paths.
 
 See skill **merit-surface** for the A×B×C matrix.
 

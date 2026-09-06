@@ -4,7 +4,7 @@
   Merit-Hub - laptop cleanup (Pristine v2), jumpstart OSS/vault, shared tools (MYMERITTOOLS).
 
 .DESCRIPTION
-  Standalone script. Suggested download folder: C:\Tools (any folder is fine — MYMERITTOOLS need not exist yet).
+  Standalone script. Suggested download folder: C:\Tools (any folder is fine - MYMERITTOOLS need not exist yet).
   After download, from that folder (do not double-click; use Bypass -File):
     cd C:\Tools
     pwsh -NoProfile -ExecutionPolicy Bypass -File .\Merit-Hub.ps1
@@ -115,7 +115,7 @@ $Script:EmbeddedHubConfigJson = @'
   "skillsPin": "skills-v0.5.66",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
-  "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout → closeout --path . → ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
+  "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout --path . -> ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path = validate only. Exception: WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",
@@ -358,7 +358,7 @@ function Get-HubVestigialCandidates {
             [void]$rows.Add([pscustomobject]@{
                     Path     = "env:$name"
                     Kind     = 'env-mismatch'
-                    Detail   = "User=$user  Process=$proc (Hub syncs User→Process on start)"
+                    Detail   = "User=$user  Process=$proc (Hub syncs User->Process on start)"
                     Severity = 'info'
                 })
         }
@@ -447,7 +447,7 @@ function Write-HubVestigialReport {
         Write-Ok 'No vestigial folders/files detected outside canonical MYMERIT* roots.'
     }
     else {
-        Write-Warn ("Found $($actionable.Count) vestigial path(s) — review before Pristine:")
+        Write-Warn ("Found $($actionable.Count) vestigial path(s) - review before Pristine:")
         $i = 1
         foreach ($row in $actionable) {
             Write-Host ("  {0,2}) [{1}] {2}" -f $i, $row.Kind, $row.Path) -ForegroundColor Yellow
@@ -671,7 +671,7 @@ function Read-HubContinue {
         if ($yes -match '^[Yy]') { return $key }
         return ''
     }
-    Write-HubWrongPrompt -Got $ans -Needed 'Enter (menu) or a Hub key (1-6, G, A, P, …)' -WillDo 'Ignored. Back to Select.'
+    Write-HubWrongPrompt -Got $ans -Needed 'Enter (menu) or a Hub key (1-6, G, A, P, ...)' -WillDo 'Ignored. Back to Select.'
     return ''
 }
 
@@ -684,13 +684,13 @@ function Write-HubNextSteps {
             Write-Note 'Next: 2 Install OSS (skills pin only). Enter returns to menu; 0 exits at Select.'
         }
         '2' {
-            Write-Note 'Next: 3 Try it — clones public merit-demo (Mr-PI-Bala) and opens play.'
+             Write-Note 'Next: 3 Try it - clones public merit-demo (Mr-PI-Bala) and opens play.'
             Write-Info 'Docs: merit-agent-skills\docs\howto\launch-over-dinner.md'
             Write-Info 'Demo: https://github.com/Mr-PI-Bala/merit-demo  (public; no GitHub login to clone)'
         }
         '3' {
             Write-Note 'Showcase skills via the open play page; then OC (cloud) or I (install skills to Cursor).'
-            Write-Info 'Docs: docs\howto\launch-over-dinner.md · TRY_BUNDLES.md'
+             Write-Info 'Docs: docs\howto\launch-over-dinner.md * TRY_BUNDLES.md'
             Write-Note 'Enter = menu to continue. Prefer 0 at Select when you are done (do not rely on window close).'
         }
         'OC' { Write-Note 'Next: 6 Join, or keep exploring from the menu (Enter).' }
@@ -704,7 +704,7 @@ function Read-HubEnterToClose {
     try { $ans = (Read-Host 'Press Enter to close (menu keys do not run here)').Trim() } catch { return }
     $key = Test-HubMenuChoice $ans
     if ($key) {
-        Write-HubWrongPrompt -Got $ans -Needed 'Enter only — this window is closing' -WillDo "Did NOT run '$key'. Open Hub again and type $key at Select."
+         Write-HubWrongPrompt -Got $ans -Needed 'Enter only - this window is closing' -WillDo "Did NOT run '$key'. Open Hub again and type $key at Select."
     }
     elseif ($ans) {
         Write-HubWrongPrompt -Got $ans -Needed 'Enter only' -WillDo 'Closing anyway.'
@@ -761,7 +761,7 @@ function Write-HubAgentCloseoutHint {
         return
     }
     Write-Host ''
-    Write-Host '  AGENT CLOSEOUT (MERIT binding — not validate-only closeout)' -ForegroundColor DarkYellow
+     Write-Host '  AGENT CLOSEOUT (MERIT binding - not validate-only closeout)' -ForegroundColor DarkYellow
     Write-Host "  $text"
     $skills = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\merit.ps1'
     if (Test-Path -LiteralPath $skills) {
@@ -941,7 +941,7 @@ function Initialize-HubMeritSurfaceEmbed {
             'none' { [void]$hints.Add('Download Merit-Hub.ps1 Raw to C:\Tools (MYMERITTOOLS need not exist yet)'); [void]$hints.Add('Run Hub 1 then 2 then 3') }
             'ide-only' {
                 [void]$hints.Add('Hub 2 clones merit-agent-skills to %MYMERITAPP%')
-                if ($staleIdeMarker) { [void]$hints.Add('IDE .merit-surface.json is stale — re-run Hub 2 after Pristine') }
+                 if ($staleIdeMarker) { [void]$hints.Add('IDE .merit-surface.json is stale - re-run Hub 2 after Pristine') }
             }
             default { [void]$hints.Add('Run Hub 2 when B missing; merit.ps1 where when B present') }
         }
@@ -996,7 +996,7 @@ function Initialize-HubMeritSurfaceEmbed {
         $staleIde = [bool](& $get $Surface 'staleIdeMarker' $false)
         $hints = @(& $get $Surface 'recoveryHints' @())
         Write-Host ''
-        Write-Host '  MERIT SURFACE (Hub embed — run Hub 2 for full resolver)' -ForegroundColor Cyan
+             Write-Host '  MERIT SURFACE (Hub embed - run Hub 2 for full resolver)' -ForegroundColor Cyan
         Write-Host ('  edition:       {0}' -f $edition)
         Write-Host ('  A IDE skills:  {0}' -f $(if ($ideHosts.Count) { $ideHosts -join ', ' } else { '(none)' }))
         Write-Host ('  B OSS bench:   {0}' -f $(if ($skillsRoot) { $skillsRoot } else { '(missing)' }))
@@ -1012,7 +1012,7 @@ function Initialize-HubMeritSurfaceEmbed {
             Write-Host ('  WARN pin:      Hub {0} != B VERSION {1}' -f $hubPin, $skillsVersion) -ForegroundColor Yellow
         }
         if ($staleIde) {
-            Write-Host '  WARN:          stale IDE .merit-surface.json (B path gone) — Hub 2 to re-clone' -ForegroundColor Yellow
+             Write-Host '  WARN:          stale IDE .merit-surface.json (B path gone) - Hub 2 to re-clone' -ForegroundColor Yellow
         }
         if ($hints.Count -gt 0) {
             Write-Host '  recovery:' -ForegroundColor DarkYellow
@@ -1184,7 +1184,7 @@ function Sync-HubMeritEnvFromUser {
         }
         elseif (-not [string]::IsNullOrWhiteSpace($proc)) {
             Remove-Item "Env:$name" -ErrorAction SilentlyContinue
-            Write-Note "Dropped stale Process $name ($proc) — User is empty"
+             Write-Note "Dropped stale Process $name ($proc) - User is empty"
         }
     }
 }
@@ -1275,6 +1275,7 @@ function Complete-HubSession {
 }
 
 function Ensure-HubElevated {
+    param([string]$Action = '')
     if (-not $Script:HubOnWindows) { return }
     if ($Help) { return }
     if ($VestigialScan) { return }
@@ -1284,7 +1285,11 @@ function Ensure-HubElevated {
         return
     }
     $exe = (Get-Process -Id $PID).Path
-    $argList = Get-HubRelaunchArgumentList
+    $argList = if ($Action) {
+        $list = [System.Collections.Generic.List[string]]::new()
+        foreach ($item in @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $Script:HubScriptPath, "-$Action")) { [void]$list.Add($item) }
+        $list.ToArray()
+    } else { Get-HubRelaunchArgumentList }
     Write-Note 'Not elevated. Opening an Administrator window (UAC).'
     Write-Info ("{0} {1}" -f $exe, ($argList -join ' '))
     New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
@@ -1329,7 +1334,27 @@ function Ensure-HubPwshHost {
 
     Write-Warn 'pwsh is not installed (or not on PATH).'
     Show-PwshInstallGuide
-    Write-Note 'Continuing in Windows PowerShell 5.1 so menu 1 can install pwsh. After that, run the command above.'
+    if ($Script:HubOnWindows -and $env:MERIT_HUB_NO_PWSH_PROMPT -ne '1') {
+        $installNow = Read-Host 'Install a laptop-local PowerShell 7 now (no admin required)? [Y/n]'
+        if ([string]::IsNullOrWhiteSpace($installNow) -or $installNow -match '^[Yy]') {
+            if (Install-MeritToolsPwshPortable) {
+                $pwshExe = Resolve-MeritPwshExe
+                if ($pwshExe) {
+                    Write-Ok "pwsh installed: $pwshExe"
+                    $argList = Get-HubRelaunchArgumentList
+                    & $pwshExe @argList
+                    exit $LASTEXITCODE
+                }
+            }
+            Write-Warn 'Portable pwsh installation did not complete; continuing in Windows PowerShell 5.1.'
+        }
+        else {
+            Write-Note 'Skipped pwsh install. Continuing in Windows PowerShell 5.1; menu 1 can retry later.'
+        }
+    }
+    else {
+        Write-Note 'Continuing in Windows PowerShell 5.1 so menu 1 can install pwsh. After that, run the command above.'
+    }
 }
 
 function Test-HubProcessBenchMode {
@@ -1353,7 +1378,7 @@ function Set-UserEnvVar {
     Write-Ok "SET User env $Name = $Value (was $(if ($existing) { $existing } else { 'empty' }))"
     Write-Note 'Open a NEW terminal to see User env in other windows. This process already has it.'
     if ($Name -eq 'MYMERITAPP') {
-        # Hub 1 may set MYMERITAPP before Hub 2 clones skills — never abort setup on missing OSS helpers.
+         # Hub 1 may set MYMERITAPP before Hub 2 clones skills - never abort setup on missing OSS helpers.
         try {
             [void](Import-HubOssHelpers)
         }
@@ -1654,18 +1679,18 @@ function New-MeritBackup {
 Pins in this Hub copy: skills={2} vault={3}
 
 ## What is here
-- env-snapshot.json — MYMERIT* scopes, benches, path existence
-- vestigial-scan.json + vestigial-archived/ — leftover MERIT folders archived before wipe
-- hub/Merit-Hub.ps1 (+ Merit-Hub.ps1.archived) — Hub script at archive time
-- oss-bench.*.json — live bench status copies (if present)
-- WARNING.txt — wipe scope for this machine
+ - env-snapshot.json - MYMERIT* scopes, benches, path existence
+ - vestigial-scan.json + vestigial-archived/ - leftover MERIT folders archived before wipe
+ - hub/Merit-Hub.ps1 (+ Merit-Hub.ps1.archived) - Hub script at archive time
+ - oss-bench.*.json - live bench status copies (if present)
+ - WARNING.txt - wipe scope for this machine
 
 ## Survives Pristine?
-- %MYMERITTOOLS%\Merit-Hub.ps1 — YES (kept; Pre-Pristine also refreshes this copy)
-- %MYMERITTOOLS%\backups\ — YES (archive root is forced here so APP wipe cannot eat it)
-- MYMERITAPP benches below — NO (wiped)
-- ~/dev clones — NO on full Pristine
-- GitHub remotes — YES; Hub 2 / 4 re-clone from pins
+ - %MYMERITTOOLS%\Merit-Hub.ps1 - YES (kept; Pre-Pristine also refreshes this copy)
+ - %MYMERITTOOLS%\backups\ - YES (archive root is forced here so APP wipe cannot eat it)
+ - MYMERITAPP benches below - NO (wiped)
+ - ~/dev clones - NO on full Pristine
+ - GitHub remotes - YES; Hub 2 / 4 re-clone from pins
 
 ## MYMERITAPP benches Pristine will wipe
 {4}
@@ -1680,14 +1705,14 @@ Pins in this Hub copy: skills={2} vault={3}
 
 # Cold start (fresh device)
 {1}
-# Menu: 1 → 2 → 3
+ # Menu: 1 -> 2 -> 3
 ```
 '@ -f $stamp, $runHint, [string]$cfg.skillsPin, [string]$cfg.vaultPin, $benchWipe
     Set-Content -LiteralPath (Join-Path $dir 'README.md') -Value $readme -Encoding UTF8
     Write-Ok 'README.md'
 
     $warning = @"
-WARNING — Pristine wipe scope ($stamp)
+ WARNING - Pristine wipe scope ($stamp)
 
 Hub script : $Script:HubScriptPath
 Tools Hub  : $(Join-Path $tools 'Merit-Hub.ps1')
@@ -1710,7 +1735,7 @@ Do not double-click. Do not run Hub from a path under MYMERITAPP after Pre-Prist
     Set-Content -LiteralPath (Join-Path $dir 'WARNING.txt') -Value $warning -Encoding UTF8
     Write-Ok 'WARNING.txt'
     Write-Note "Archive ready: $dir"
-    Write-Info 'Next: confirm -Help pin, then -Pristine, then menu 1 → 2 → 3.'
+     Write-Info 'Next: confirm -Help pin, then -Pristine, then menu 1 -> 2 -> 3.'
     Write-Host ("  $runHint") -ForegroundColor Cyan
     return $dir
 }
@@ -2030,6 +2055,7 @@ function Invoke-MeritCleanup {
 
 function Invoke-Mode {
     param([ValidateSet('Pristine', 'Soft', 'BackupOnly', 'PrePristine')]$Mode)
+    Ensure-HubElevated -Action $Mode
     switch ($Mode) {
         'Pristine' {
             Write-Header 'Mode: PRISTINE v2 (brand-new laptop)'
@@ -2291,7 +2317,7 @@ function Ensure-SkillsRepo {
         return $null
     }
     if (-not (Import-HubOssHelpers)) {
-        Write-Warn 'Skills cloned but OSS helpers failed to load — Hub 3 may use fallback clone.'
+             Write-Warn 'Skills cloned but OSS helpers failed to load - Hub 3 may use fallback clone.'
     }
     return $dest
 }
@@ -2315,6 +2341,13 @@ function Invoke-InstallMeritSkills {
         Write-Fail "skills/ missing under $repoRoot"
         return $false
     }
+    $closeoutContractPath = Join-Path $repoRoot 'cfg\merit_closeout_contract.json'
+    if (-not (Test-Path -LiteralPath $closeoutContractPath)) {
+        Write-Fail "Missing closeout law contract: $closeoutContractPath"
+        return $false
+    }
+    try { $closeoutContract = Get-Content -LiteralPath $closeoutContractPath -Raw -Encoding UTF8 | ConvertFrom-Json }
+    catch { Write-Fail "Invalid closeout law contract: $closeoutContractPath"; return $false }
     $homeRoot = if ($env:USERPROFILE) { $env:USERPROFILE } else { $env:HOME }
     $resolved = switch ($Target) {
         'Claude' { 'ClaudeCode' }
@@ -2381,6 +2414,44 @@ function Invoke-InstallMeritSkills {
     } | ConvertTo-Json -Depth 3
     Set-Content -LiteralPath (Join-Path $destRoot '.merit-surface.json') -Value $marker -Encoding UTF8
     Write-Ok "Surface marker -> $(Join-Path $destRoot '.merit-surface.json')"
+    $lawReceipt = @{
+        schemaVersion = 1
+        contractId = [string]$closeoutContract.contractId
+        contractVersion = [int]$closeoutContract.schemaVersion
+        lawCommand = [string]$closeoutContract.lawCommand
+        validationCommand = [string]$closeoutContract.validationCommand
+        releaseCommand = if ($resolved -eq 'Project') { '' } else { [string]$closeoutContract.ossReleaseCommand }
+        chatThreeThreeRequired = [bool]$closeoutContract.chatThreeThreeRequired
+        installedAt = (Get-Date).ToString('o')
+        skillsPin = $pin
+        sourceContractSha256 = (Get-FileHash -LiteralPath $closeoutContractPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        installTarget = $resolved
+    } | ConvertTo-Json -Depth 4
+    Set-Content -LiteralPath (Join-Path $destRoot '.merit-closeout.json') -Value $lawReceipt -Encoding UTF8
+    Write-Ok "Closeout law receipt -> $(Join-Path $destRoot '.merit-closeout.json')"
+    if ($resolved -eq 'Cursor') {
+        $hooksDir = Join-Path $homeRoot '.cursor\hooks'
+        New-Item -ItemType Directory -Force -Path $hooksDir | Out-Null
+        $hookSource = Join-Path $repoRoot 'hooks\merit-closeout-stop.ps1'
+        if (Test-Path -LiteralPath $hookSource) { Copy-Item -LiteralPath $hookSource -Destination (Join-Path $hooksDir 'merit-closeout-stop.ps1') -Force }
+        $hooksPath = Join-Path $homeRoot '.cursor\hooks.json'
+        $hooks = [ordered]@{ version = 1; hooks = [ordered]@{} }
+        if (Test-Path -LiteralPath $hooksPath) {
+            try {
+                $existing = Get-Content -LiteralPath $hooksPath -Raw -Encoding UTF8 | ConvertFrom-Json
+                if ($existing) { $hooks.version = if ($existing.version) { $existing.version } else { 1 }; foreach ($p in $existing.hooks.psobject.Properties) { $hooks.hooks[$p.Name] = @($p.Value) } }
+            } catch { Write-Warning "Existing hooks.json is invalid; MERIT hook not merged and file preserved: $hooksPath"; $hooks = $null }
+        }
+        if ($hooks) {
+            $stop = @($hooks.hooks['stop'])
+            if (-not ($stop | Where-Object { $_.command -eq './hooks/merit-closeout-stop.ps1' })) { $stop += [ordered]@{ type = 'command'; command = './hooks/merit-closeout-stop.ps1'; timeout = 10 } }
+            $hooks.hooks['stop'] = $stop
+            $hooks | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $hooksPath -Encoding UTF8
+            Write-Ok "Cursor stop hook installed -> $hooksPath"
+        }
+    } else {
+        Write-Warning "No post-turn MERIT hook is supported for $resolved; law + 3-3 guidance and release receipt gate remain active."
+    }
     if ($resolved -eq 'OpenClaw') {
         Write-Note 'Tip: openclaw skills install ./skills/<skill> for CLI single-skill installs.'
     }
@@ -2728,7 +2799,7 @@ function Invoke-MeritPrereqs {
             }
         }
         elseif ($pyChoice -eq 'S') {
-            Write-Warn 'Python skipped — merit-python shim not set.'
+             Write-Warn 'Python skipped - merit-python shim not set.'
         }
         else {
             [void](Install-MeritToolsPython)
@@ -3078,10 +3149,10 @@ function Invoke-HubInstallOss {
         Write-Fail 'OSS helpers did not load (Get-OssState). Skills may still be cloned; oss-bench.json not updated.'
     }
     if ($benchSaved) {
-        Write-Ok 'Install OSS complete (skills pin). merit-demo is not part of step 2 — use 3 Try it.'
+         Write-Ok 'Install OSS complete (skills pin). merit-demo is not part of step 2 - use 3 Try it.'
     }
     else {
-        Write-Fail 'Install OSS incomplete: skills pin may be cloned, but Get-OssState/Save failed after Import — do not treat as OK complete.'
+         Write-Fail 'Install OSS incomplete: skills pin may be cloned, but Get-OssState/Save failed after Import - do not treat as OK complete.'
         $Script:HubStepFailed = $true
     }
     Write-HubReceipt '2'
@@ -3667,7 +3738,7 @@ function Show-MeritHubHelp {
     Write-Host '  W) Where / Surface   A+B+C+D+H diagnostic map'
     Write-Host '  H) Help'
     Write-Host ''
-    Write-Note 'A/P/S return to menu (only 0 exits). Cold start: 1 → 2 (skills) → 3 (demo). Cleanup: G then A then P. After a step, Enter=menu; Hub stays open until 0.'
+     Write-Note 'A/P/S return to menu (only 0 exits). Cold start: 1 -> 2 (skills) -> 3 (demo). Cleanup: G then A then P. After a step, Enter=menu; Hub stays open until 0.'
     if ($AgentLaw) {
         Write-HubAgentCloseoutHint -Compact
     }
@@ -3695,7 +3766,7 @@ function Show-InteractiveMenu {
     while ($true) {
         if (-not $pending) {
             Show-MeritHubHelp
-            Write-Host '  Recommended:  1 then 2 then 3  ·  cleanup: G then A then P' -ForegroundColor Yellow
+             Write-Host '  Recommended:  1 then 2 then 3  *  cleanup: G then A then P' -ForegroundColor Yellow
             Write-Host ''
         }
         $c = if ($pending) { $pending } else { (Read-Host 'Select').Trim() }
@@ -3753,7 +3824,6 @@ if ($Help) {
     return
 }
 [void](Initialize-HubBackupRoot)
-Ensure-HubElevated
 Sync-HubMeritEnvFromUser
 [void](Import-HubMeritResolve)
 [void](Import-HubOssHelpers)

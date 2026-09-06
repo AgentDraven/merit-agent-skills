@@ -28,6 +28,24 @@ Assert-Test 'cfg/merit_law.json exists' {
     if (-not (Test-Path (Join-Path $Root 'cfg\merit_law.json'))) { throw 'missing manifest' }
 }
 
+Assert-Test 'closeout contract exists and requires 3-3' {
+    $path = Join-Path $Root 'cfg\merit_closeout_contract.json'
+    if (-not (Test-Path $path)) { throw 'missing closeout contract' }
+    $contract = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($contract.contractId -ne 'MERIT-CLOSEOUT-1') { throw 'unexpected closeout contract id' }
+    if ($contract.chatThreeThreeRequired -ne $true) { throw 'chat 3-3 is not required' }
+    foreach ($name in @('lawCommand', 'validationCommand', 'ossReleaseCommand', 'operatorReleaseCommand')) {
+        if ([string]::IsNullOrWhiteSpace([string]$contract.$name)) { throw "missing contract field $name" }
+    }
+}
+
+Assert-Test 'merit-closeout skill requires law, release, and 3-3' {
+    $skill = Get-Content -LiteralPath (Join-Path $Root 'skills\merit-closeout\SKILL.md') -Raw
+    foreach ($needle in @('law closeout', 'ship', 'mXin', '3-3')) {
+        if ($skill -notmatch [regex]::Escape($needle)) { throw "skill missing $needle" }
+    }
+}
+
 . (Join-Path $Root 'BootStrap\_law.ps1')
 $Script:MeritResolveRepoRoot = $Root
 

@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .github/hooks/merit-closeout.ps1",
+        "windows": "powershell -NoProfile -ExecutionPolicy Bypass -File .github/hooks/merit-closeout.ps1",
+        "linux": "bash .github/hooks/merit-closeout.sh",
+        "osx": "bash .github/hooks/merit-closeout.sh",
+        "timeout": 30
+      }
+    ]
+  }
+}

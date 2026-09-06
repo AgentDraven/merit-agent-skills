@@ -65,6 +65,11 @@ $skillsSrc = Join-Path $repoRoot 'skills'
 if (-not (Test-Path $skillsSrc)) {
     Write-Error "skills/ folder not found under $repoRoot"
 }
+$closeoutContractPath = Join-Path $repoRoot 'cfg\merit_closeout_contract.json'
+if (-not (Test-Path -LiteralPath $closeoutContractPath)) {
+    Write-Error "Missing closeout law contract: $closeoutContractPath"
+}
+$closeoutContract = Get-Content -LiteralPath $closeoutContractPath -Raw -Encoding UTF8 | ConvertFrom-Json
 
 $homeRoot = if ($env:USERPROFILE) { $env:USERPROFILE } else { $env:HOME }
 if (-not $homeRoot) {
@@ -142,6 +147,64 @@ $marker = @{
 } | ConvertTo-Json -Depth 3
 Set-Content -LiteralPath (Join-Path $destRoot '.merit-surface.json') -Value $marker -Encoding UTF8
 Write-Host "Wrote surface marker -> $(Join-Path $destRoot '.merit-surface.json')"
+$lawReceipt = @{
+    schemaVersion = 1
+    contractId = [string]$closeoutContract.contractId
+    contractVersion = [int]$closeoutContract.schemaVersion
+    lawCommand = [string]$closeoutContract.lawCommand
+    validationCommand = [string]$closeoutContract.validationCommand
+    releaseCommand = if ($resolved -eq 'Project') { '' } else { [string]$closeoutContract.ossReleaseCommand }
+    chatThreeThreeRequired = [bool]$closeoutContract.chatThreeThreeRequired
+    installedAt = (Get-Date).ToString('o')
+    skillsPin = $pin
+    sourceContractSha256 = (Get-FileHash -LiteralPath $closeoutContractPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    installTarget = $resolved
+} | ConvertTo-Json -Depth 4
+Set-Content -LiteralPath (Join-Path $destRoot '.merit-closeout.json') -Value $lawReceipt -Encoding UTF8
+Write-Host "Wrote closeout law receipt -> $(Join-Path $destRoot '.merit-closeout.json')"
+$hookStatus = if ($closeoutContract.alwaysOnPolicy.hostStatus.$resolved) { [string]$closeoutContract.alwaysOnPolicy.hostStatus.$resolved } else { 'GUIDANCE-ONLY' }
+$hookReceipt = [ordered]@{ schemaVersion = 1; host = $resolved; mode = if ($resolved -eq 'Codex') { 'interactive-unknown' } else { 'default' }; adapter = if ($resolved -eq 'Cursor') { 'cursor-stop' } elseif ($resolved -eq 'VSCode') { 'vscode-stop-template' } else { 'guidance-only' }; event = 'Stop'; configPath = ''; installed = $false; verification = 'pending'; enforcement = $hookStatus; requirements = @(); warning = ''; remediation = 'Run the host-specific live verification procedure in docs/IAR/MERIT_CLOSEOUT_ENFORCEMENT.iar.md'; installedAt = (Get-Date).ToString('o') }
+if ($resolved -eq 'Cursor') {
+    $hooksDir = Join-Path $homeRoot '.cursor\hooks'
+    New-Item -ItemType Directory -Force -Path $hooksDir | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'hooks\merit-closeout-stop.ps1') -Destination (Join-Path $hooksDir 'merit-closeout-stop.ps1') -Force
+    $hooksPath = Join-Path $homeRoot '.cursor\hooks.json'
+    $hooks = [ordered]@{ version = 1; hooks = [ordered]@{} }
+    if (Test-Path -LiteralPath $hooksPath) {
+        try { $existing = Get-Content -LiteralPath $hooksPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { Write-Warning "Existing hooks.json is invalid; MERIT hook not installed and file preserved: $hooksPath"; $existing = $null; $hooks = $null }
+        if ($existing) {
+            $hooks.version = if ($existing.version) { $existing.version } else { 1 }
+            foreach ($p in $existing.hooks.psobject.Properties) { $hooks.hooks[$p.Name] = @($p.Value) }
+        }
+    }
+    if ($hooks) {
+        $stop = @($hooks.hooks['stop'])
+        if (-not ($stop | Where-Object { $_.command -eq './hooks/merit-closeout-stop.ps1' })) { $stop += [ordered]@{ type = 'command'; command = './hooks/merit-closeout-stop.ps1'; timeout = 10 } }
+        $hooks.hooks['stop'] = $stop
+        $hooks | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $hooksPath -Encoding UTF8
+        Write-Host "Installed Cursor stop hook -> $hooksPath"
+        $hookReceipt.configPath = $hooksPath
+        $hookReceipt.installed = $true
+        $hookReceipt.warning = 'SUPPORTED-BUT-VERIFY: prove live hook execution and blocking before claiming hard enforcement.'
+    }
+} elseif ($resolved -eq 'Project') {
+        $projectRoot = Split-Path -Parent (Split-Path -Parent $destRoot)
+        $githubHooks = Join-Path $projectRoot '.github\hooks'
+        New-Item -ItemType Directory -Force -Path $githubHooks | Out-Null
+        Copy-Item -LiteralPath (Join-Path $repoRoot 'hooks\merit-closeout.vscode.ps1') -Destination (Join-Path $githubHooks 'merit-closeout.ps1') -Force
+        Copy-Item -LiteralPath (Join-Path $repoRoot 'hooks\merit-closeout.sh') -Destination (Join-Path $githubHooks 'merit-closeout.sh') -Force
+        Copy-Item -LiteralPath (Join-Path $repoRoot 'hooks\vscode-merit-closeout.json') -Destination (Join-Path $githubHooks 'merit-closeout.json') -Force
+        $hookReceipt.configPath = (Join-Path $githubHooks 'merit-closeout.json')
+        $hookReceipt.installed = $true
+        $hookReceipt.warning = 'SUPPORTED-BUT-VERIFY: VS Code Agent hooks are preview and require live verification.'
+} else {
+    $warning = [ordered]@{ schemaVersion = 1; host = $resolved; hookInstalled = $false; warning = [string]$closeoutContract.alwaysOnPolicy.unsupportedWarning; required = @('merit.ps1 law closeout','merit.ps1 closeout --path <repo>','3-3: Done, State, Next'); exceptions = @('WIP','local-only','no-commit'); installedAt = (Get-Date).ToString('o') } | ConvertTo-Json -Depth 5
+    Set-Content -LiteralPath (Join-Path $destRoot '.merit-hook-warning.json') -Value $warning -Encoding UTF8
+    Write-Warning "No post-turn MERIT hook is supported for $resolved. Law/3-3 guidance and release receipt gate remain active. See .merit-hook-warning.json"
+    $hookReceipt.warning = [string]$closeoutContract.alwaysOnPolicy.unsupportedWarning
+}
+Set-Content -LiteralPath (Join-Path $destRoot '.merit-hook-install.json') -Value ($hookReceipt | ConvertTo-Json -Depth 6) -Encoding UTF8
+Write-Host "Wrote hook classification receipt -> $(Join-Path $destRoot '.merit-hook-install.json')"
 if ($resolved -eq 'OpenClaw') {
     Write-Host 'Tip: openclaw skills install ./skills/<skill-name> for CLI-managed single-skill installs.'
 }
