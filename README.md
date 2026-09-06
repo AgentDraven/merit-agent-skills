@@ -5,13 +5,31 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 ## Start here — choose your persona
 
 ```mermaid
-flowchart LR
-    A[What do you want?] --> B[Try MERIT]
-    A --> C[Build an app]
-    A --> D[Install IDE skills]
-    B --> B1[Run Merit-Hub]
-    C --> C1[Open merit-demo]
-    D --> D1[Hub menu I]
+flowchart TB
+    classDef start fill:#7c3aed,color:#fff,stroke:#5b21b6,stroke-width:2px
+    classDef one fill:#dbeafe,color:#172554,stroke:#2563eb,stroke-width:2px
+    classDef two fill:#dcfce7,color:#14532d,stroke:#16a34a,stroke-width:2px
+    classDef three fill:#fef3c7,color:#78350f,stroke:#d97706,stroke-width:2px
+    A[🌟 Start here]:::start
+    subgraph R1[① Get ready]
+      direction LR
+      R1a[🧰 Open PowerShell]:::one --> R1b[▶️ Run Merit-Hub]:::one --> R1c[📦 Choose Hub 2 + 3]:::one
+    end
+    subgraph R2[② Build your idea]
+      direction LR
+      R2a[🎨 Choose a name]:::two --> R2b[✍️ Tell your story]:::two --> R2c[🧪 Preview merit-demo]:::two
+    end
+    subgraph R3[③ Share it]
+      direction LR
+      R3a[📝 Register]:::three --> R3b[📚 Pick a free surface]:::three --> R3c[🚀 Share your app]:::three
+    end
+    A --> R1a
+    R1c --> R2a
+    R2c --> R3a
+    R1c -. optional .-> I[🧠 Install IDE skills]
+    click R1a "#i-want-to-try-merit"
+    click R2a "#build-your-app-over-dinner"
+    click I "#i-want-skills-in-my-ide"
 ```
 
 ### I want to try MERIT
@@ -82,6 +100,10 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 cd C:\Tools
 .\Merit-Hub.ps1
 ```
+
+### Build Your App Over Dinner
+
+Follow [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md). It turns the three rows above into three tiny actions each.
 
 The ` .\` prefix matters: PowerShell does not execute a script from the current directory when you type only its filename. The Hub handles the PowerShell-version check and offers to install/launch PowerShell 7 when only Windows PowerShell is available. Menu **2** / **J** clones the pinned OSS release for you — no full repo clone is required first. Cleanup keys (**G** sprawl scan, **A** archive, **P** pristine): [Merit-Hub/README.md](Merit-Hub/README.md).
 

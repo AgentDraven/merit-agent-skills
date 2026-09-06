@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## [0.5.94] - 2026-09-06
+## [0.5.95] - 2026-09-06
+### Changed
+- Reworked the README and dinner tutorial diagrams into colorful three-row, three-column learning flows with linked persona sections.
 ### Fixed
 - Portable PowerShell bootstrap now persists the pwsh/shim directories in User PATH, refreshes the current session, and uses the absolute pwsh executable for elevated Hub launches.
 ### Changed

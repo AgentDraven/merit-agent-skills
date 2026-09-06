@@ -21,15 +21,24 @@ This document is the **only** guide you need for night one. Technical permutatio
 ### The idea in three steps
 
 ```mermaid
-flowchart TD
-    S1[1. Get ready] --> A[Open PowerShell]
-    A --> B[Run .\Merit-Hub.ps1]
-    B --> C[Choose Hub 2 then 3]
-    C --> S2[2. Make it yours]
-    S2 --> D[Edit your name, story, and topics]
-    D --> E[Run merit.ps1 quickstart or serve]
-    E --> S3[3. Share it]
-    S3 --> F[Register, choose a free surface, and share]
+flowchart TB
+    classDef one fill:#dbeafe,color:#172554,stroke:#2563eb,stroke-width:2px
+    classDef two fill:#dcfce7,color:#14532d,stroke:#16a34a,stroke-width:2px
+    classDef three fill:#fef3c7,color:#78350f,stroke:#d97706,stroke-width:2px
+    subgraph STEP1[① Get ready]
+      direction LR
+      A1[🧰 Open PowerShell]:::one --> A2[▶️ Run .\Merit-Hub.ps1]:::one --> A3[📦 Hub 2 + 3]:::one
+    end
+    subgraph STEP2[② Make it yours]
+      direction LR
+      B1[🎨 Pick a name]:::two --> B2[✍️ Add your story]:::two --> B3[🧪 Preview with quickstart]:::two
+    end
+    subgraph STEP3[③ Share it]
+      direction LR
+      C1[📝 Register]:::three --> C2[📚 Choose Journal or AMA]:::three --> C3[🚀 Share your idea]:::three
+    end
+    A3 --> B1
+    B3 --> C1
 ```
 
 | Step | What you do | Accounts |
