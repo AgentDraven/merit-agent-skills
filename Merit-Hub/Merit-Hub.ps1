@@ -115,7 +115,7 @@ $Script:EmbeddedHubConfigJson = @'
   "skillsPin": "skills-v0.5.66",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
-  "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout --path . --release (validate + commit + push) -> ship (OSS skills-v*) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --path without --release = validation only. Exception: WIP / no commit / local-only.",
+  "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
   "skillsUrl": "https://github.com/AgentDraven/merit-agent-skills.git",
   "vaultUrl": "https://github.com/AgentDraven/merit-private-vault.git",
   "vaultOwner": "AgentDraven",

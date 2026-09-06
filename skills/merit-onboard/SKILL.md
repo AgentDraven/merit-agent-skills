@@ -30,7 +30,7 @@ Install IDE skills: Hub **I** or `.\install.ps1 -Target Cursor`.
 ```powershell
 .\merit.ps1 law closeout
 .\merit.ps1 closeout --path .
-.\merit.ps1 ship -Message "..."
+.\merit.ps1 closeout
 ```
 
 ## Operator (plane C only)

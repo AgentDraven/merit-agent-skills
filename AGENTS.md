@@ -17,19 +17,19 @@ Skills are **index cards** pointing at `merit.ps1 law`. See skill **merit-law**.
 
 ## Closeout (binding — never skip)
 
-Work is **not done** until **validate + git ship + 3-3**.
+Work is **not done** until **release closeout + 3-3**.
 
 | Step | OSS laptop (no vault) | Operator (vault on disk) |
 |------|------------------------|---------------------------|
 | Law | `.\merit.ps1 law closeout` | same |
 | Validate | `.\merit.ps1 closeout --path .` | same |
-| Git release | `.\merit.ps1 ship -Message "..."` | vault `scripts\merit.ps1` **`mXin`** + **`git verify`** |
+| Git release | `.\merit.ps1 closeout` | vault `scripts\merit.ps1` **`mXin`** + **`git verify`** |
 
-The CLI verb **`closeout`** is release closeout by default: `.\merit.ps1 closeout` resolves the current repo, validates, commits, and pushes. Use `.\merit.ps1 closeout --validate-only` only when release is intentionally deferred. Skills releases additionally run `ship` for the skills-v tag.
+The CLI verb **`closeout`** is release closeout by default: `.\merit.ps1 closeout` resolves the current repo, validates, commits, pushes, and creates/pushes the applicable skills version tag. Use `.\merit.ps1 closeout --validate-only` only when release is intentionally deferred.
 
-The machine-readable contract is `cfg/merit_closeout_contract.json`. Skill installation must emit `.merit-closeout.json` beside the installed surface marker. A successful `closeout` must emit `closeout-validation.json`; `ship` refuses to release without a recent valid receipt. Installation and validation never commit, tag, push, deploy, or publish.
+The machine-readable contract is `cfg/merit_closeout_contract.json`. Skill installation must emit `.merit-closeout.json` beside the installed surface marker. A successful `closeout` must emit `closeout-validation.json`; release closeout refuses to publish without a recent valid receipt. Installation and validation never commit, tag, push, deploy, or publish.
 
-Before `ship`: checkout a branch (`main`).
+Before release closeout: checkout a branch (`main`).
 
 Exception only if the user said **WIP** / **no commit** / **local-only**.
 

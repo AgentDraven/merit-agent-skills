@@ -129,7 +129,7 @@ function Write-MeritLawSectionText {
 function Invoke-MeritLawEdition {
     param([string]$RepoRoot = '')
     $tier = 'oss'
-    $closeout = '.\merit.ps1 closeout --path .`n.\merit.ps1 ship -Message "..."'
+    $closeout = '.\merit.ps1 closeout'
     if (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue) {
         $surf = Get-MeritSurface -NoWrite
         Write-Host ("edition: {0}" -f $surf.edition)
@@ -145,10 +145,10 @@ function Invoke-MeritLawEdition {
     Write-Host 'Closeout tier for this machine:' -ForegroundColor Yellow
     if ($tier -eq 'operator') {
         Write-Host '  Operator (plane C): vault mXin + git verify (preferred when vault on disk)'
-        Write-Host "  OSS override: MERIT_SHIP_OSS=1 then .\merit.ps1 ship"
+        Write-Host "  OSS: .\merit.ps1 closeout"
     }
     else {
-        Write-Host '  OSS: .\merit.ps1 closeout --path . then .\merit.ps1 ship -Message "..."'
+        Write-Host '  OSS: .\merit.ps1 closeout'
     }
     Write-Host ''
     $sec = Get-MeritLawSection -SectionId 'VIII.F' -RepoRoot $RepoRoot
@@ -178,7 +178,7 @@ function Invoke-MeritLaw {
     if ($sub -eq 'closeout') {
         $secs = @('VIII.F', 'H', 'CLI')
         $pack = Read-MeritLawPack -RepoRoot $RepoRoot
-        Write-Host 'MERIT closeout law (from merit.blob — validate + ship/mXin + 3-3)' -ForegroundColor Cyan
+        Write-Host 'MERIT closeout law (from merit.blob — release closeout/mXin + 3-3)' -ForegroundColor Cyan
         foreach ($sid in $secs) {
             foreach ($s in @($pack.sections)) {
                 if ([string]$s.id -eq $sid) { Write-MeritLawSectionText -Section $s }

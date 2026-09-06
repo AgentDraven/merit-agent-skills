@@ -4,7 +4,7 @@
   "lawCommand": "merit.ps1 law closeout",
   "validationCommand": "merit.ps1 closeout --path <repo> --validate-only",
   "releaseCloseoutCommand": "merit.ps1 closeout [--path <repo>]",
-  "ossReleaseCommand": "merit.ps1 ship -Message \"<summary>\"",
+  "ossReleaseCommand": "merit.ps1 closeout",
   "operatorReleaseCommand": "vault scripts/merit.ps1 mXin",
   "verificationCommand": "vault scripts/merit.ps1 git verify",
   "chatThreeThreeRequired": true,
@@ -30,5 +30,5 @@
     "threeThreeValidatedBy": ["agent", "hook", "operator", "unverified"]
   },
   "installReceipt": ".merit-closeout.json",
-  "releasePolicy": "Installation and validation never commit, tag, push, deploy, or publish. Release closeout explicitly validates, commits, and pushes; skills release additionally requires ship for the skills-v tag."
+  "releasePolicy": "Installation and validation never commit, tag, push, deploy, or publish. Plain release closeout validates, commits, pushes, and creates/pushes the skills version tag when applicable."
 }

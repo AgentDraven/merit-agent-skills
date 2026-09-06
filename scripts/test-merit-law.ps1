@@ -41,7 +41,7 @@ Assert-Test 'closeout contract exists and requires 3-3' {
 
 Assert-Test 'merit-closeout skill requires law, release, and 3-3' {
     $skill = Get-Content -LiteralPath (Join-Path $Root 'skills\merit-closeout\SKILL.md') -Raw
-    foreach ($needle in @('law closeout', 'ship', 'mXin', '3-3')) {
+    foreach ($needle in @('law closeout', 'closeout', 'mXin', '3-3')) {
         if ($skill -notmatch [regex]::Escape($needle)) { throw "skill missing $needle" }
     }
 }

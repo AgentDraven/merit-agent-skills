@@ -115,7 +115,7 @@ OSS BootStrap does **not** deploy vault L1. It may later offer â€œinstall sk
 | Device menus | `C:\Tools\Merit-Hub.ps1` (PHASE 1/2). Legacy `BootStrap\MERIT_BootStrap.cmd` forwards to Hub. |
 | Consumer app validate | `.\merit.ps1 verify` / `.\merit.ps1 closeout --path <repo>` (validate only) |
 | OSS law (binding) | `.\merit.ps1 law closeout` — unpacks `merit.blob` in memory |
-| Closeout of **this** skills repo | OSS: `.\merit.ps1 ship -Message "..."` · Operator (plane C): vault `scripts/merit.ps1 mXin` + `git verify` |
+| Closeout of **this** skills repo | OSS: `.\merit.ps1 closeout` · Operator (plane C): vault `scripts/merit.ps1 mXin` + `git verify` |
 | Day-to-day vault / private repos | Always vault `merit.ps1` â€” never raw git closeout |
 
 Details: [merit_law_pack.md](merit_law_pack.md) · skill `merit-closeout` · vault `docs/vault_usage.md` §7c.7.

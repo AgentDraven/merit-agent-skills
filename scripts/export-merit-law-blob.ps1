@@ -32,12 +32,12 @@ Agents on merit-agent-skills follow public OSS law via merit.ps1 law (merit.blob
             body  = @'
 | CLI | Path | Use |
 |-----|------|-----|
-| Public OSS | B\merit.ps1 | init, apply, verify, closeout, ship, law, where, create, oc |
+| Public OSS | B\merit.ps1 | init, apply, verify, closeout, law, where, create, oc |
 | Operator | C\scripts\merit.ps1 | mXin, mXout, git verify, runtime, cert, deploy vercel |
 | Hub | H\Merit-Hub.ps1 | cold start 1→2, menu W surface, I install skills |
 
 merit.ps1 closeout --path = VALIDATE ONLY (verify + git diff --check).
-Full MERIT closeout = merit.ps1 law closeout then ship (OSS) or vault mXin (operator).
+Full MERIT closeout = merit.ps1 law closeout then plain merit.ps1 closeout (OSS) or vault mXin (operator).
 '@
         }
         @{
@@ -59,11 +59,11 @@ MERIT closeout sequence (binding):
 2. Validate — merit.ps1 closeout --path <repo> (or consumer verify).
 3. VERSION + CHANGELOG — PATCH bump for skills release.
 4. Git release:
-   OSS (no vault / MERIT_SHIP_OSS): merit.ps1 ship -Message "..." from skills repo root.
+   OSS (no vault): merit.ps1 closeout from skills repo root; it commits, pushes, and creates/pushes the skills-v* tag.
    Operator (plane C): & <vault>\scripts\merit.ps1 mXin -Message "..." then git verify.
 5. Chat 3-3: Done · State (VERSION/tag) · Next (≤3 bullets).
 
-ship requires branch (not detached HEAD unless -AllowDetached). Reads VERSION + TAG_PREFIX → skills-v*.
+Release closeout requires a branch and reads VERSION + TAG_PREFIX to create the skills-v* tag.
 '@
         }
         @{

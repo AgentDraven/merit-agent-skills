@@ -20,6 +20,6 @@ Law unpacks **in memory only** from `merit.blob` beside `merit.ps1`. Full L1 SSO
 |------|---------|
 | Validate | `.\merit.ps1 closeout --path .` |
 | Law | `.\merit.ps1 law closeout` |
-| Release | `.\merit.ps1 ship -Message "..."` or vault `mXin` when plane **C** |
+| Release | `.\merit.ps1 closeout` or vault `mXin` when plane **C** |
 
 See **merit-closeout** for the closeout entry card.

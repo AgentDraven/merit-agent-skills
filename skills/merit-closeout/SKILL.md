@@ -1,6 +1,6 @@
 ---
 name: merit-closeout
-description: MERIT git closeout — run merit.ps1 law closeout, validate, ship (OSS) or vault mXin.
+description: MERIT git closeout — run merit.ps1 law closeout, validate, release closeout (OSS) or vault mXin.
 ---
 
 # merit-closeout
@@ -14,9 +14,9 @@ The machine-readable contract is `cfg/merit_closeout_contract.json`. Skill insta
 ```powershell
 cd %MYMERITAPP%\merit-agent-skills
 .\merit.ps1 law closeout          # print full law for this machine
-git checkout main                 # ship refuses detached HEAD
+git checkout main                 # release closeout refuses detached HEAD
 .\merit.ps1 closeout             # release closeout: current repo, validate + commit + push
-.\merit.ps1 ship -Message "..."   # OSS git release → skills-v*
+.\merit.ps1 closeout               # OSS git release → branch + skills-v* tag
 .\merit.ps1 closeout --path . --validate-only  # validation-only exception
 ```
 

@@ -30,6 +30,6 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File %MYMERITTOOLS%\Merit-Hub.ps1 -Surf
 
 1. `.\merit.ps1 law closeout`
 2. Validate: `.\merit.ps1 closeout --path .`
-3. OSS: `.\merit.ps1 ship` · Operator (C): `& <operatorMeritCli> mXin`
+3. OSS: `.\merit.ps1 closeout` · Operator (C): `& <operatorMeritCli> mXin`
 
 Never assume `~/dev`. Resolve paths via `where` first.

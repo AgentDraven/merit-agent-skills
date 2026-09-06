@@ -41,7 +41,6 @@ Commands:
                            law --section VIII.F | law --for-skill merit-portal
   where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
   surface                  Alias for where
-  ship -Message <msg>      OSS release: commit + skills-v tag + push (skills repo only)
   par scaffold             Advanced: create play shell + cfg/par_pins.json
   branding scaffold        Advanced: create cfg/branding.json
   subs scaffold            Advanced: create meritsubs/meritstore cfg
@@ -1042,9 +1041,9 @@ function Invoke-Closeout {
         $receiptPath = Join-Path $evidenceDir 'closeout-validation.json'
         $receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $receiptPath -Encoding UTF8
         Write-Host "closeout receipt: $receiptPath" -ForegroundColor Green
-        Write-Host 'closeout: validate only. Use .\merit.ps1 closeout --path . --release for full release closeout.'
+        Write-Host 'closeout: validate only. Run plain .\merit.ps1 closeout for full release closeout.'
         Write-Host 'closeout: webpage-shell AP-MA-13. Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md'
-        Write-Host 'closeout tiers: (1) validate = this command; (2) OSS ship = .\merit.ps1 ship; (3) operator = vault mXin; (4) agent response = chat 3-3'
+        Write-Host 'closeout tiers: (1) validate-only = this command; (2) release = plain closeout; (3) operator vault policy; (4) agent response = chat 3-3'
         Write-Host ''
         Write-Host '3-3' -ForegroundColor Cyan
         Write-Host 'Done: validation-only closeout checks completed; no commit or push performed.'
@@ -1073,7 +1072,13 @@ function Invoke-ReleaseCloseout {
         if ($LASTEXITCODE -ne 0) { throw "release blocked: git push failed (exit $LASTEXITCODE)" }
         Write-Host "release closeout OK: pushed $branch" -ForegroundColor Green
         if ((Test-Path (Join-Path $TargetRoot 'skills')) -and (Test-Path (Join-Path $TargetRoot 'VERSION'))) {
-            Write-Host 'skills repo detected: run .\merit.ps1 ship -Message "..." to create the skills-v tag.' -ForegroundColor Yellow
+            $version = ((Get-Content (Join-Path $TargetRoot 'VERSION') -Raw) -split '\r?\n')[0].Trim()
+            $prefix = if (Test-Path (Join-Path $TargetRoot 'TAG_PREFIX')) { ((Get-Content (Join-Path $TargetRoot 'TAG_PREFIX') -Raw) -split '\r?\n')[0].Trim() } else { 'skills-v' }
+            $tag = "$prefix$version"
+            if (-not (git tag --points-at HEAD | Where-Object { $_ -eq $tag })) { git tag -a $tag -m "${tag}: MERIT release closeout"; if ($LASTEXITCODE -ne 0) { throw "release blocked: tag creation failed (exit $LASTEXITCODE)" } }
+            git push origin $tag
+            if ($LASTEXITCODE -ne 0) { throw "release blocked: tag push failed (exit $LASTEXITCODE)" }
+            Write-Host "release closeout OK: pushed tag $tag" -ForegroundColor Green
         }
         Write-Host ''
         Write-Host '3-3' -ForegroundColor Cyan
@@ -1256,97 +1261,6 @@ function Write-MeritAccessContext {
     if ($AsJson) { Write-Host (($ctx | ConvertTo-Json -Depth 5 -Compress)); return }
     Write-Host 'MERIT access context:' -ForegroundColor Cyan
     foreach ($p in $ctx.GetEnumerator()) { if ($p.Value) { Write-Host ("  {0}: {1}" -f $p.Key, $p.Value) } }
-}
-
-function Invoke-MeritShip {
-    param([string[]]$ArgList)
-    $msg = Get-ArgValue -ArgList $ArgList -Name '-Message'
-    if (-not $msg) { $msg = Get-ArgValue -ArgList $ArgList -Name '-m' }
-    if ([string]::IsNullOrWhiteSpace($msg)) { throw 'ship requires -Message <summary>' }
-
-    $repoRoot = $Root
-    if (-not (Test-MeritSkillsShipRepo -RepoRoot $repoRoot)) {
-        throw 'ship: run from merit-agent-skills repo root (needs VERSION, TAG_PREFIX, skills/)'
-    }
-
-    if (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue) {
-        $surf = Get-MeritSurface -NoWrite
-        if ($surf.operatorMeritCli -and $env:MERIT_SHIP_OSS -ne '1') {
-            Write-Host "ship: vault operator CLI found at $($surf.operatorMeritCli)"
-            Write-Host 'ship: use vault scripts\merit.ps1 mXin for operator release, or set MERIT_SHIP_OSS=1 to force OSS ship'
-            exit 2
-        }
-    }
-
-    $version = ((Get-Content -LiteralPath (Join-Path $repoRoot 'VERSION') -Raw) -split '\r?\n')[0].Trim()
-    $prefix = ((Get-Content -LiteralPath (Join-Path $repoRoot 'TAG_PREFIX') -Raw) -split '\r?\n')[0].Trim()
-    $tag = "$prefix$version"
-
-    if (-not (Get-Command git -ErrorAction SilentlyContinue)) { throw 'ship: git not on PATH' }
-
-    $receiptCandidates = @(
-        (Join-Path $repoRoot 'docs\IAR\evidence\closeout-validation.json'),
-        (Join-Path $repoRoot '.merit\evidence\closeout-validation.json')
-    )
-    $pathHash = [Security.Cryptography.SHA256]::Create()
-    $repoKey = ([BitConverter]::ToString($pathHash.ComputeHash([Text.Encoding]::UTF8.GetBytes($repoRoot.ToLowerInvariant())))).Replace('-', '')
-    $receiptCandidates += (Join-Path ([IO.Path]::GetTempPath()) "merit-closeout\$repoKey\closeout-validation.json")
-    $receiptPath = $receiptCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-    if (-not $receiptPath) {
-        throw 'ship blocked: run .\merit.ps1 law closeout then .\merit.ps1 closeout --path . first'
-    }
-    try { $receipt = Read-JsonFile -Path $receiptPath } catch { throw "ship blocked: invalid closeout receipt $receiptPath" }
-    if ([string]$receipt.status -ne 'validated' -or -not $receipt.chatThreeThreeRequired) {
-        throw "ship blocked: closeout receipt is not a valid MERIT validation receipt ($receiptPath)"
-    }
-    if ($receipt.validatedAt) {
-        try {
-            if (((Get-Date) - [DateTime]::Parse([string]$receipt.validatedAt)).TotalHours -gt 24) {
-                throw 'closeout receipt is older than 24 hours; rerun closeout'
-            }
-        } catch { throw "ship blocked: $($_.Exception.Message)" }
-    }
-
-    Push-Location $repoRoot
-    try {
-        $branch = (& git rev-parse --abbrev-ref HEAD 2>$null).Trim()
-        if ($branch -eq 'HEAD') {
-            if (-not (Test-ArgFlag -ArgList $ArgList -Name '-AllowDetached')) {
-                throw 'ship: detached HEAD ? checkout a branch or pass -AllowDetached'
-            }
-        }
-
-        & git add -A
-        $status = (& git status --porcelain 2>$null)
-        if ($status) {
-            & git commit -m $msg
-            if ($LASTEXITCODE -ne 0) { throw "ship: git commit failed (exit $LASTEXITCODE)" }
-        }
-
-        $cfg = Get-MeritSurfaceConfig
-        $defaultBranch = if ($cfg -and $cfg.defaultShipBranch) { [string]$cfg.defaultShipBranch } else { 'main' }
-
-        if ($branch -ne 'HEAD' -and $branch -ne $defaultBranch) {
-            & git push origin "${branch}:${branch}"
-        }
-        else {
-            & git push origin "HEAD:${defaultBranch}"
-        }
-        if ($LASTEXITCODE -ne 0) { throw "ship: git push branch failed (exit $LASTEXITCODE)" }
-
-        $existing = (& git tag --points-at HEAD 2>$null) | Where-Object { $_ -eq $tag }
-        if (-not $existing) {
-            & git tag -a $tag -m "${tag}: $msg"
-            if ($LASTEXITCODE -ne 0) { throw "ship: git tag failed (exit $LASTEXITCODE)" }
-        }
-        & git push origin $tag
-        if ($LASTEXITCODE -ne 0) { throw "ship: git push tag failed (exit $LASTEXITCODE)" }
-
-        Write-Host "ship OK: $tag on $(git rev-parse --short HEAD)"
-    }
-    finally {
-        Pop-Location
-    }
 }
 
 function Ensure-CreateLaunchDefaults {
@@ -2540,7 +2454,6 @@ switch -Regex ($Command) {
     '^release$' { try { Invoke-ReleaseCloseout -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^law$' { try { Invoke-MeritLaw -ArgList $Rest -RepoRoot $Root; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^(where|surface)$' { Invoke-MeritWhere -ArgList $Rest }
-    '^ship$' { try { Invoke-MeritShip -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^apps$' {
         if (-not $Rest -or $Rest.Count -lt 1) { Write-MeritHelp; exit 1 }
         $sub = "$($Rest[0])".ToLowerInvariant()

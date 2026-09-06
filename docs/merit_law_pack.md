@@ -34,7 +34,7 @@ From vault when L1 changes (operator):
 & <vault>\scripts\merit.ps1 law export-blob -Source instructions/MERIT.instructions -Out <skills-repo>\merit.blob
 ```
 
-Then bump `VERSION`, `CHANGELOG`, and `ship`.
+Then bump `VERSION`, `CHANGELOG`, and run `.\merit.ps1 closeout`.
 
 ## IP model
 

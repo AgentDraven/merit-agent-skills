@@ -57,14 +57,14 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1 -Surface
 | `MYMERITTOOLS` | Hub + merit-venv |
 | `MERIT_SKILLS_ROOT` | Optional override for B |
 | `MERIT_VAULT_ROOT` | Optional override for C |
-| `MERIT_SHIP_OSS` | Allow `ship` when C also present |
+| `MERIT_SHIP_OSS` | Legacy setting; no public `ship` command remains |
 
 ## Closeout tiers
 
 | Goal | Command |
 |------|---------|
 | Validate OSS | `.\merit.ps1 closeout --path .` |
-| Ship `skills-v*` (no vault) | `.\merit.ps1 ship -Message "..."` |
+| Release `skills-v*` (no vault) | `.\merit.ps1 closeout` |
 | Operator release | `& <vault>\scripts\merit.ps1 mXin ...` |
 | Diagnostic | `.\merit.ps1 where` or `Merit-Hub.ps1 -Surface` |
 
