@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## [0.5.89] - 2026-09-06
+## [0.5.90] - 2026-09-06
+### Fixed
+- Added an explicit historical release index for older tags that lacked individual changelog sections.
 ### Added
 - Made VERSION/CHANGELOG coverage an explicit release closeout gate.
 ### Fixed
@@ -613,3 +615,15 @@
 # 0.5.76
 
 - Emit a CLI 3-3 report at the end of release and validation-only closeout.
+
+## Historical release index
+
+The repository contains older tagged releases whose original changelog sections were not preserved in the file. Their immutable tag history remains authoritative; this index makes the missing coverage explicit.
+
+- `skills-v0.1.0`, `skills-v0.2.0`, and `skills-v0.3.0`–`skills-v0.3.58`: early OSS/Hub/consumer evolution releases.
+- `skills-v0.5.0`–`skills-v0.5.34`: initial skills, installer, law-pack, and Hub iterations.
+- `skills-v0.5.36`: post-0.5.34 maintenance release.
+- `skills-v0.5.37`–`skills-v0.5.61`: skills, Hub, surface, closeout, and enforcement iterations.
+- `skills-v0.5.62`–`skills-v0.5.76`: closeout, access, ownership, and release-policy iterations.
+
+For exact historical details, use `git show skills-vX.Y.Z` and the tag annotation. New releases must use a dedicated `## [X.Y.Z]` section and are rejected by closeout when `VERSION` lacks changelog coverage.
