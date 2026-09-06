@@ -1071,8 +1071,11 @@ function Invoke-ReleaseCloseout {
         git -c "safe.directory=$TargetRoot" add -A
         $message = if ($ArgList -contains '-Message') { Get-ArgValue -ArgList $ArgList -Name '-Message' } else { 'chore: MERIT release closeout' }
         if ([string]::IsNullOrWhiteSpace($message)) { $message = 'chore: MERIT release closeout' }
-        git -c "safe.directory=$TargetRoot" commit -m $message
-        if ($LASTEXITCODE -ne 0) { throw "release blocked: git commit failed (exit $LASTEXITCODE)" }
+        $pending = @(git -c "safe.directory=$TargetRoot" status --porcelain)
+        if ($pending.Count -gt 0) {
+            git -c "safe.directory=$TargetRoot" commit -m $message
+            if ($LASTEXITCODE -ne 0) { throw "release blocked: git commit failed (exit $LASTEXITCODE)" }
+        } else { Write-Host 'release closeout: no local changes; continuing with remote push/tag verification.' }
         git -c "safe.directory=$TargetRoot" push origin $branch
         if ($LASTEXITCODE -ne 0) { throw "release blocked: git push failed (exit $LASTEXITCODE)" }
         Write-Host "release closeout OK: pushed $branch" -ForegroundColor Green

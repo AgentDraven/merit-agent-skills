@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## [0.5.85] - 2026-09-06
+## [0.5.86] - 2026-09-06
+
+### Fixed
+- Release closeout now handles a clean working tree without attempting an empty commit.
 
 ### Changed
 - Aligned Hub and OSS bench skills pins with the current released skills baseline.
