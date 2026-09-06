@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## [0.5.86] - 2026-09-06
+## [0.5.87] - 2026-09-06
+
+### Changed
+- Finalized Hub and OSS bench pins at skills-v0.5.86 for new-device baseline testing.
 
 ### Fixed
 - Release closeout now handles a clean working tree without attempting an empty commit.
