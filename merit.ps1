@@ -1161,8 +1161,11 @@ function Invoke-AdminGithubAccess {
     $endpoint = "repos/$repo/collaborators/$user"
     switch ($sub) {
         'status' {
-            & gh api $endpoint --jq '{user: .login, permissions: .permissions}'
-            if ($LASTEXITCODE -ne 0) { throw "GitHub access status failed (exit $LASTEXITCODE)" }
+            $response = (& gh api $endpoint --jq '{user: .login, permissions: .permissions}' 2>&1 | Out-String).Trim()
+            if ($LASTEXITCODE -ne 0) { throw "GitHub access status failed (exit $LASTEXITCODE): $response" }
+            if ([string]::IsNullOrWhiteSpace($response)) {
+                Write-Host "GitHub access status: $user on $repo -> collaborator access present (HTTP 204; no permission body returned)." -ForegroundColor Green
+            } else { Write-Host $response }
         }
         'add' {
             $permission = Get-ArgValue -ArgList $ArgList -Name '--permission'; if ([string]::IsNullOrWhiteSpace($permission)) { $permission = Read-Host 'Permission [pull/triage/push/maintain/admin] (default push)'; if ([string]::IsNullOrWhiteSpace($permission)) { $permission = 'push' } }
