@@ -34,8 +34,9 @@ Commands:
   deploy --path <repo>     Apply launch file, link Vercel if needed, deploy production
   portal --path <repo>     Apply launch file, then publish here.now portal targets
   all --path <repo>        Apply, deploy Vercel, then publish portal targets
-  closeout --path <repo>   Validate only by default; add --release for validate + commit + push
-  release --path <repo>    Full release closeout: validate, commit, push (skills repo also tags)
+  closeout [--path <repo>] Full release closeout by default: validate, commit, push
+                           Use --validate-only to skip commit/push
+  release [--path <repo>]  Alias for default release closeout
   law [list|closeout|edition|<section>]  OSS L1 excerpt from merit.blob (in-memory unpack)
                            law --section VIII.F | law --for-skill merit-portal
   where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
@@ -2522,7 +2523,7 @@ switch -Regex ($Command) {
     '^all$' { try { Invoke-Deploy -TargetRoot $target -ArgList $Rest; Invoke-PortalPublish -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^closeout$' {
         try {
-            if (Test-ArgFlag -ArgList $Rest -Name '--release') { Invoke-ReleaseCloseout -TargetRoot $target -ArgList $Rest } else { Invoke-Closeout -TargetRoot $target }
+            if (Test-ArgFlag -ArgList $Rest -Name '--validate-only') { Invoke-Closeout -TargetRoot $target } else { Invoke-ReleaseCloseout -TargetRoot $target -ArgList $Rest }
             exit 0
         } catch { Write-Host $_.Exception.Message; exit 1 }
     }

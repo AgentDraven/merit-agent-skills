@@ -25,7 +25,7 @@ Work is **not done** until **validate + git ship + 3-3**.
 | Validate | `.\merit.ps1 closeout --path .` | same |
 | Git release | `.\merit.ps1 ship -Message "..."` | vault `scripts\merit.ps1` **`mXin`** + **`git verify`** |
 
-The CLI verb **`closeout`** validates by default. **Release closeout** is explicit: `.\merit.ps1 closeout --path . --release` (or `.\merit.ps1 release --path .`); it validates, commits, and pushes. Skills releases additionally run `ship` for the skills-v tag.
+The CLI verb **`closeout`** is release closeout by default: `.\merit.ps1 closeout` resolves the current repo, validates, commits, and pushes. Use `.\merit.ps1 closeout --validate-only` only when release is intentionally deferred. Skills releases additionally run `ship` for the skills-v tag.
 
 The machine-readable contract is `cfg/merit_closeout_contract.json`. Skill installation must emit `.merit-closeout.json` beside the installed surface marker. A successful `closeout` must emit `closeout-validation.json`; `ship` refuses to release without a recent valid receipt. Installation and validation never commit, tag, push, deploy, or publish.
 

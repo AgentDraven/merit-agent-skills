@@ -15,16 +15,16 @@ The machine-readable contract is `cfg/merit_closeout_contract.json`. Skill insta
 cd %MYMERITAPP%\merit-agent-skills
 .\merit.ps1 law closeout          # print full law for this machine
 git checkout main                 # ship refuses detached HEAD
-.\merit.ps1 closeout --path .    # validate only
+.\merit.ps1 closeout             # release closeout: current repo, validate + commit + push
 .\merit.ps1 ship -Message "..."   # OSS git release → skills-v*
-.\merit.ps1 closeout --path . --release  # release closeout: validate + commit + push
+.\merit.ps1 closeout --path . --validate-only  # validation-only exception
 ```
 
 When plane **C** (vault) exists: prefer `& <operatorMeritCli> mXin` — resolve via `.\merit.ps1 where`.
 
 ## Do not
 
-- Stop after `closeout --path` (validate only) when release was requested
+- Stop after `closeout --validate-only` when release was requested
 - Raw `git commit` / `tag` / `push`
 - Skip chat **3-3**
 

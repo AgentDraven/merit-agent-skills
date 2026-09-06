@@ -553,3 +553,6 @@
 # 0.5.73
 
 - Add shared MERIT access context to `where`, `surface`, and admin GitHub status.
+# 0.5.74
+
+- Make plain `merit.ps1 closeout` perform release closeout by default; retain `--validate-only` as the explicit exception.
