@@ -7,6 +7,7 @@ This directory is an evidence and architecture surface, not a dumping ground. Ke
 | `MERIT_CLOSEOUT_ENFORCEMENT.iar.md` | Controlling policy, host matrix, gotchas, and promotion rules | Skills-plane authority |
 | `MERIT_CLOSEOUT_ENFORCEMENT_CHECKLIST.md` | Executable validation worksheet and evidence index | Operational annex to the policy |
 | `MERIT_AGENT_SKILLS_LLD_MAP.md` | Stable architecture and dependency map | Design reference |
+| `MERIT_SIMPLIFICATION_AND_CLI_PLAN.iar.md` | Consolidated review baseline for CLI, Hub, Bootstrap, law payload, and vault precedence | Current implementation plan |
 | `MAS-IAR-HUB-PP-*.md` | Historical Hub proof packets | Evidence only; do not duplicate policy |
 | `merit_demo_cloud_recovery.iar.md` | Historical recovery handoff | Evidence only; link to current policy |
 
