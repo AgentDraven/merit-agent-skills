@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## [0.5.81] - 2026-09-06
+## [0.5.82] - 2026-09-06
+
+### Added
+- Added `admin github access switch` as an alias for account switching.
 
 ### Fixed
 - Replaced raw GitHub collaborator JSON/error dumps with concise user-facing access guidance.

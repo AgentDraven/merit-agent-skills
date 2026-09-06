@@ -1172,6 +1172,12 @@ function Invoke-AdminGithubAccess {
     param([string[]]$ArgList)
     if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { throw 'admin github access requires GitHub CLI (gh) on PATH' }
     $sub = if ($ArgList.Count -gt 2) { "$($ArgList[2])".ToLowerInvariant() } else { 'status' }
+    if ($sub -eq 'switch') {
+        $switchArgs = @('github','auth','switch')
+        if ($ArgList.Count -gt 3) { $switchArgs += @($ArgList[3..($ArgList.Count - 1)]) }
+        Invoke-AdminGithubAuth -ArgList $switchArgs
+        return
+    }
     $repo = Get-ArgValue -ArgList $ArgList -Name '--repo'
     if ([string]::IsNullOrWhiteSpace($repo)) { $remote = (& git remote get-url origin 2>$null).Trim(); if ($remote -match 'github\.com[:/]([^/]+)/([^/]+?)(?:\.git)?$') { $repo = "$($Matches[1])/$($Matches[2])" } }
     if ([string]::IsNullOrWhiteSpace($repo) -or $repo -notmatch '^[^/\s]+/[^/\s]+$') { throw 'Could not infer GitHub repo from origin; pass --repo <owner/name>' }
