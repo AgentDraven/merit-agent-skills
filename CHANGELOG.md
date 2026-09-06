@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.96] - 2026-09-06
+### Changed
+- Finalized the persona-first 3x3 documentation navigation and canonical dinner tutorial links.
+### Fixed
+- Removed interactive Mermaid navigation that could render as a blank GitHub view.
+
 ## [0.5.95] - 2026-09-06
 ### Changed
 - Reworked the README and dinner tutorial diagrams into colorful three-row, three-column learning flows with linked persona sections.
