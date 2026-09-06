@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## [0.5.84] - 2026-09-06
+## [0.5.85] - 2026-09-06
+
+### Changed
+- Aligned Hub and OSS bench skills pins with the current released skills baseline.
 
 ### Fixed
 - GitHub auth login now defaults to HTTPS, avoiding duplicate SSH-key upload failures after successful browser authentication.
