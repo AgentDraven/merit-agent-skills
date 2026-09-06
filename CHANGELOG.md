@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.101] - 2026-09-06
+### Added
+- Added `merit.ps1 skills list`, `skills status`, and `skills install --target <Host>` as the unified IDE installation entrypoint.
+
 ## [0.5.100] - 2026-09-06
 ### Changed
 - Extracted shared argument and JSON/file primitives into `merit/modules/Merit.Core.ps1` while preserving public CLI behavior.

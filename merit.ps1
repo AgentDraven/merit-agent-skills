@@ -10,6 +10,7 @@ $MERIT_VERSION = if (Test-Path (Join-Path $Root 'VERSION')) {
 
 $Script:MeritResolveRepoRoot = $Root
 try { . (Join-Path $Root 'merit\modules\Merit.Core.ps1') } catch { throw "MERIT core module failed to load: $($_.Exception.Message)" }
+try { . (Join-Path $Root 'merit\modules\Merit.Skills.ps1') } catch { throw "MERIT skills module failed to load: $($_.Exception.Message)" }
 try {
     . (Join-Path $Root 'BootStrap\_resolve.ps1')
 }
@@ -44,6 +45,7 @@ Commands:
                            law --section VIII.F | law --for-skill merit-portal
   where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
   surface                  Alias for where
+  skills list|status|install|remove      Install and inspect IDE skills
   par scaffold             Advanced: create play shell + cfg/par_pins.json
   branding scaffold        Advanced: create cfg/branding.json
   subs scaffold            Advanced: create meritsubs/meritstore cfg
@@ -2498,6 +2500,7 @@ switch -Regex ($Command) {
     }
     '^release$' { try { Invoke-ReleaseCloseout -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^law$' { try { Invoke-MeritLaw -ArgList $Rest -RepoRoot $Root; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^skills$' { try { Invoke-MeritSkillsCommand -ArgList $Rest -RepoRoot $Root; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^(where|surface)$' { Invoke-MeritWhere -ArgList $Rest }
     '^apps$' {
         if (-not $Rest -or $Rest.Count -lt 1) { Write-MeritHelp; exit 1 }
