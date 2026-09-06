@@ -3,8 +3,10 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$MERIT_VERSION = '0.5.66'
 $Root = $PSScriptRoot
+$MERIT_VERSION = if (Test-Path (Join-Path $Root 'VERSION')) {
+    ((Get-Content (Join-Path $Root 'VERSION') -Raw) -split '\r?\n')[0].Trim()
+} else { '0.0.0-dev' }
 
 $Script:MeritResolveRepoRoot = $Root
 try {
