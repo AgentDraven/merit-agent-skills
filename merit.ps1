@@ -51,6 +51,9 @@ Commands:
   admin ownership repair --path <repo>  Repair Windows repo owner/Modify ACL (confirmation required)
   admin ownership status --path <repo>  Inspect owner, ACL, and write access
                            (legacy alias: admin repair-ownership)
+  admin github access status --repo <owner/name> --user <login>
+  admin github access add --repo <owner/name> --user <login> --permission <pull|triage|push|maintain|admin> --yes
+  admin github access remove --repo <owner/name> --user <login> --yes
   app scaffold             Print merit-demo clone guidance
   create --path <repo>     AutoMagic fullstack-consumer (default = platform URL on merit-prod)
                            [--profile fullstack-consumer] [--deploy]
@@ -1143,6 +1146,38 @@ function Invoke-AdminOwnershipStatus {
     $safe = git -c "safe.directory=$resolved" -C $resolved status --porcelain 2>&1
     if ($LASTEXITCODE -eq 0) { Write-Host 'git safe-directory probe: PASS' -ForegroundColor Green }
     else { Write-Host "git safe-directory probe: FAIL - $($safe -join ' ')" -ForegroundColor Red }
+}
+
+function Invoke-AdminGithubAccess {
+    param([string[]]$ArgList)
+    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { throw 'admin github access requires GitHub CLI (gh) on PATH' }
+    $sub = if ($ArgList.Count -gt 2) { "$($ArgList[2])".ToLowerInvariant() } else { 'status' }
+    $repo = Get-ArgValue -ArgList $ArgList -Name '--repo'
+    $user = Get-ArgValue -ArgList $ArgList -Name '--user'
+    if ([string]::IsNullOrWhiteSpace($repo) -or $repo -notmatch '^[^/\s]+/[^/\s]+$') { throw 'admin github access requires --repo <owner/name>' }
+    if ([string]::IsNullOrWhiteSpace($user) -or $user -notmatch '^[A-Za-z0-9-]+$') { throw 'admin github access requires --user <login>' }
+    $endpoint = "repos/$repo/collaborators/$user"
+    switch ($sub) {
+        'status' {
+            & gh api $endpoint --jq '{user: .login, permissions: .permissions}'
+            if ($LASTEXITCODE -ne 0) { throw "GitHub access status failed (exit $LASTEXITCODE)" }
+        }
+        'add' {
+            $permission = Get-ArgValue -ArgList $ArgList -Name '--permission'
+            if ($permission -notin @('pull','triage','push','maintain','admin')) { throw 'permission must be pull, triage, push, maintain, or admin' }
+            if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) { throw 'access changes require --yes confirmation' }
+            & gh api --method PUT $endpoint --field permission=$permission
+            if ($LASTEXITCODE -ne 0) { throw "GitHub collaborator add failed (exit $LASTEXITCODE)" }
+            Write-Host "GitHub access granted: $user -> $repo ($permission)" -ForegroundColor Green
+        }
+        'remove' {
+            if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) { throw 'access changes require --yes confirmation' }
+            & gh api --method DELETE $endpoint
+            if ($LASTEXITCODE -ne 0) { throw "GitHub collaborator removal failed (exit $LASTEXITCODE)" }
+            Write-Host "GitHub access removed: $user from $repo" -ForegroundColor Green
+        }
+        default { throw 'use admin github access status|add|remove' }
+    }
 }
 
 function Invoke-ConsumerE2E {
@@ -2598,6 +2633,10 @@ switch -Regex ($Command) {
         }
         if ($Rest.Count -ge 1 -and $Rest[0] -eq 'repair-ownership') {
             try { Invoke-AdminRepairOwnership -TargetRoot $target -ArgList $Rest; exit 0 }
+            catch { Write-Host $_.Exception.Message; exit 1 }
+        }
+        if ($Rest.Count -ge 3 -and $Rest[0] -eq 'github' -and $Rest[1] -eq 'access') {
+            try { Invoke-AdminGithubAccess -ArgList $Rest; exit 0 }
             catch { Write-Host $_.Exception.Message; exit 1 }
         }
         Write-MeritHelp

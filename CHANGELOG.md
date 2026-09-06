@@ -538,3 +538,6 @@
 # 0.5.68
 
 - Make explicit release closeout validate, commit, and push before completion.
+# 0.5.69
+
+- Add `admin github access status|add|remove` for explicit collaborator permissions.
