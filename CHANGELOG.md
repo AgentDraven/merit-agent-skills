@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.100] - 2026-09-06
+### Changed
+- Extracted shared argument and JSON/file primitives into `merit/modules/Merit.Core.ps1` while preserving public CLI behavior.
+
 ## [0.5.99] - 2026-09-06
 ### Added
 - Added the root `Merit-Hub.ps1` launcher so first-time users can start Hub from the repository root.

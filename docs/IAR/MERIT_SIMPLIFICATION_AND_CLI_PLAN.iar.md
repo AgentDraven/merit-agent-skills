@@ -156,8 +156,8 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 | Phase | Status | Evidence |
 |---|---|---|
 | 1. IAR and inventory | PASS | This plan, IAR navigation link, dependency-hierarchy link; release `skills-v0.5.98` |
-| 2. Root Hub launcher | PASS | Root `Merit-Hub.ps1 -Help` smoke test; implementation remains under `Merit-Hub/`; release closeout pending |
-| 3. CLI extraction | OPEN | Not started |
+| 2. Root Hub launcher | PASS | Root `Merit-Hub.ps1 -Help` smoke test; implementation remains under `Merit-Hub/`; release `skills-v0.5.99` |
+| 3. CLI extraction | IN PROGRESS | `merit/modules/Merit.Core.ps1` owns argument and JSON primitives; `merit.ps1 help` and `verify` parity pass |
 | 4. Unified IDE installer | OPEN | Not started |
 | 5. Bootstrap migration | OPEN | Not started |
 | 6. Law relocation | OPEN | Not started |

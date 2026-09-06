@@ -9,6 +9,7 @@ $MERIT_VERSION = if (Test-Path (Join-Path $Root 'VERSION')) {
 } else { '0.0.0-dev' }
 
 $Script:MeritResolveRepoRoot = $Root
+try { . (Join-Path $Root 'merit\modules\Merit.Core.ps1') } catch { throw "MERIT core module failed to load: $($_.Exception.Message)" }
 try {
     . (Join-Path $Root 'BootStrap\_resolve.ps1')
 }
@@ -103,19 +104,6 @@ Redo a single phase anytime - phase map is printed below on help, and again in R
     Write-CreatePhaseGuide -TargetRoot '..\<app>'
 }
 
-function Get-ArgValue {
-    param([string[]]$ArgList, [string]$Name)
-    for ($i = 0; $i -lt $ArgList.Count; $i++) {
-        if ($ArgList[$i] -eq $Name -and ($i + 1) -lt $ArgList.Count) { return $ArgList[$i + 1] }
-    }
-    return $null
-}
-
-function Test-ArgFlag {
-    param([string[]]$ArgList, [string]$Name)
-    return $ArgList -contains $Name
-}
-
 function Resolve-TargetRoot {
     param([string[]]$ArgList)
     $p = Get-ArgValue -ArgList $ArgList -Name '--path'
@@ -124,18 +112,6 @@ function Resolve-TargetRoot {
         return (Resolve-Path $p).Path
     }
     return (Get-Location).Path
-}
-
-function Read-JsonFile {
-    param([string]$Path)
-    return Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
-}
-
-function Write-JsonFile {
-    param([string]$Path, [object]$Object)
-    $dir = Split-Path -Parent $Path
-    if ($dir -and -not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
-    $Object | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $Path -Encoding UTF8
 }
 
 function Add-GitIgnoreLine {
