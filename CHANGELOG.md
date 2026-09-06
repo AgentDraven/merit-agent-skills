@@ -550,3 +550,6 @@
 # 0.5.72
 
 - Forward consumer admin commands through the merit-demo wrapper and surface GitHub permission errors.
+# 0.5.73
+
+- Add shared MERIT access context to `where`, `surface`, and admin GitHub status.

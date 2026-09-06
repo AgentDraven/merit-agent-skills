@@ -1159,6 +1159,7 @@ function Invoke-AdminGithubAccess {
     if ([string]::IsNullOrWhiteSpace($user)) { $user = (& gh api user --jq .login 2>$null).Trim() }
     if ([string]::IsNullOrWhiteSpace($user) -or $user -notmatch '^[A-Za-z0-9-]+$') { throw 'Could not infer GitHub user; pass --user <login>' }
     $endpoint = "repos/$repo/collaborators/$user"
+    if ($sub -eq 'status') { Write-Host "MERIT access context: repo=$repo user=$user cwd=$((Get-Location).Path) origin=$((& git remote get-url origin 2>$null).Trim())" -ForegroundColor Cyan }
     switch ($sub) {
         'status' {
             $response = (& gh api $endpoint --jq '{user: .login, permissions: .permissions}' 2>&1 | Out-String).Trim()
@@ -1229,8 +1230,21 @@ function Invoke-MeritWhere {
         exit 1
     }
     $surf = Get-MeritSurface -NoWrite:$noWrite
+    Write-MeritAccessContext -Surface $surf -AsJson:$asJson
     Write-MeritSurfaceReport -Surface $surf -AsJson:$asJson
     exit 0
+}
+
+function Write-MeritAccessContext {
+    param($Surface, [switch]$AsJson)
+    $cwd = (Get-Location).Path
+    $origin = (& git remote get-url origin 2>$null).Trim()
+    $repo = if ($origin -match 'github\.com[:/]([^/]+)/([^/]+?)(?:\.git)?$') { "$($Matches[1])/$($Matches[2])" } else { '' }
+    $ghUser = if (Get-Command gh -ErrorAction SilentlyContinue) { (& gh api user --jq .login 2>$null).Trim() } else { '' }
+    $ctx = [ordered]@{ cwd = $cwd; origin = $origin; githubRepo = $repo; githubUser = $ghUser; MYMERITAPP = $env:MYMERITAPP; MYMERITTOOLS = $env:MYMERITTOOLS; skillsRoot = $Surface.skillsRoot; demoFolder = $Surface.demoFolder; authStatus = if ($ghUser) { 'authenticated' } else { 'unknown-or-not-installed' } }
+    if ($AsJson) { Write-Host (($ctx | ConvertTo-Json -Depth 5 -Compress)); return }
+    Write-Host 'MERIT access context:' -ForegroundColor Cyan
+    foreach ($p in $ctx.GetEnumerator()) { if ($p.Value) { Write-Host ("  {0}: {1}" -f $p.Key, $p.Value) } }
 }
 
 function Invoke-MeritShip {
