@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## [0.5.80] - 2026-09-06
+## [0.5.81] - 2026-09-06
+
+### Fixed
+- Replaced raw GitHub collaborator JSON/error dumps with concise user-facing access guidance.
 
 ### Changed
 - Updated Hub and OSS bench pins to skills-v0.5.79 and documented vault-first authority resolution.

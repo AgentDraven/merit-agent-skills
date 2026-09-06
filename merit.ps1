@@ -1183,23 +1183,41 @@ function Invoke-AdminGithubAccess {
     switch ($sub) {
         'status' {
             $response = (& gh api $endpoint --jq '{user: .login, permissions: .permissions}' 2>&1 | Out-String).Trim()
-            if ($LASTEXITCODE -ne 0) { throw "GitHub access status failed (exit $LASTEXITCODE): $response" }
+            if ($LASTEXITCODE -ne 0) {
+                if ($response -match 'Must have push access|HTTP 403') { throw "GitHub access status unavailable: the active account ($user) cannot view collaborator permissions for $repo. Ask a repository administrator to run the access check." }
+                if ($response -match 'Not Found|HTTP 404') { throw "GitHub access status unavailable: $repo was not found or the active account cannot administer it." }
+                throw "GitHub access status failed: $response"
+            }
             if ([string]::IsNullOrWhiteSpace($response)) {
                 Write-Host "GitHub access status: $user on $repo -> collaborator access present (HTTP 204; no permission body returned)." -ForegroundColor Green
-            } else { Write-Host $response }
+            } else {
+                try {
+                    $obj = $response | ConvertFrom-Json
+                    $perms = $obj.permissions
+                    Write-Host "GitHub access status: $user on $repo" -ForegroundColor Green
+                    Write-Host ("  admin={0} maintain={1} push={2} triage={3} pull={4}" -f $perms.admin,$perms.maintain,$perms.push,$perms.triage,$perms.pull)
+                } catch { Write-Host "GitHub access status: $user on $repo -> collaborator access present" -ForegroundColor Green }
+            }
         }
         'add' {
             $permission = Get-ArgValue -ArgList $ArgList -Name '--permission'; if ([string]::IsNullOrWhiteSpace($permission)) { $permission = Read-Host 'Permission [pull/triage/push/maintain/admin] (default push)'; if ([string]::IsNullOrWhiteSpace($permission)) { $permission = 'push' } }
             if ($permission -notin @('pull','triage','push','maintain','admin')) { throw 'permission must be pull, triage, push, maintain, or admin' }
             if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) { $answer = Read-Host "Grant $permission access to $user on $repo? [y/N]"; if ($answer -notmatch '^[Yy]$') { Write-Host 'GitHub access add: cancelled'; return } }
-            & gh api --method PUT $endpoint --field permission=$permission
-            if ($LASTEXITCODE -ne 0) { throw "GitHub collaborator add failed (exit $LASTEXITCODE)" }
+            $response = (& gh api --method PUT $endpoint --field permission=$permission 2>&1 | Out-String).Trim()
+            if ($LASTEXITCODE -ne 0) {
+                if ($response -match 'Not Found|HTTP 404') { throw "GitHub access grant failed: the active account cannot administer $repo, or the repository does not exist. Switch to the repository owner/admin account, then retry." }
+                if ($response -match 'HTTP 403|Forbidden') { throw "GitHub access grant failed: the active account is not allowed to manage collaborators for $repo." }
+                throw "GitHub access grant failed: $response"
+            }
             Write-Host "GitHub access granted: $user -> $repo ($permission)" -ForegroundColor Green
         }
         'remove' {
             if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) { $answer = Read-Host "Remove access for $user from $repo? [y/N]"; if ($answer -notmatch '^[Yy]$') { Write-Host 'GitHub access remove: cancelled'; return } }
-            & gh api --method DELETE $endpoint
-            if ($LASTEXITCODE -ne 0) { throw "GitHub collaborator removal failed (exit $LASTEXITCODE)" }
+            $response = (& gh api --method DELETE $endpoint 2>&1 | Out-String).Trim()
+            if ($LASTEXITCODE -ne 0) {
+                if ($response -match 'Not Found|HTTP 404|HTTP 403') { throw "GitHub access removal failed: the active account cannot administer $repo, or the collaborator was not found." }
+                throw "GitHub access removal failed: $response"
+            }
             Write-Host "GitHub access removed: $user from $repo" -ForegroundColor Green
         }
         default { throw 'use admin github access status|add|remove' }
