@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [0.5.76] - 2026-09-06
+## [0.5.77] - 2026-09-06
 
 ### Changed
 - Removed the public `ship` command and dead implementation. Plain `merit.ps1 closeout` is the single OSS release operation and handles validation, commit, branch push, and applicable skills version tag push.
