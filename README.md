@@ -7,7 +7,7 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 | Goal | Path |
 |------|------|
 | **Live ecosystems (bolt-on targets)** | [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json) � default **v00** until vault publishes **v01** as `live_public`. Hobby is never listed. |
-| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)** to `%MYMERITTOOLS%`. **Required:** `pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1`. Then **1** → **2** → **3** (optional **OC**). Vault **4**; catalog **5**/**RC**; **6** Join after **OC** or **4**. Full menu + personas: [Merit-Hub/README.md](Merit-Hub/README.md). |
+| **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)**, open Windows PowerShell or PowerShell 7, change to its folder, and run ` .\Merit-Hub.ps1`. The ` .\` prefix is required by PowerShell for a script in the current folder. The Hub detects Windows PowerShell 5.1, installs/launches `pwsh` when needed, and guides **1** → **2** → **3** (optional **OC**). Full menu + personas: [Merit-Hub/README.md](Merit-Hub/README.md). |
 | **Build over dinner (start here)** | **[docs/howto/launch-over-dinner.md](docs/howto/launch-over-dinner.md)** — 3 steps, no accounts night one |
 | **OSS internals** | Hub **2** dotsources `BootStrap/_oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
@@ -46,13 +46,14 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 
 ## Quick install
 
-**Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (**Raw**) to `%MYMERITTOOLS%`. **Required — use the full command.** Do not double-click the file or run `.\Merit-Hub.ps1`.
+**Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (**Raw**) to a tools folder such as `C:\Tools`, open Windows PowerShell or PowerShell 7, and run:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File $env:MYMERITTOOLS\Merit-Hub.ps1
+cd C:\Tools
+.\Merit-Hub.ps1
 ```
 
-Menu **2** / **J** clones pinned OSS for you — no full repo clone required first. Cleanup keys (**G** sprawl scan, **A** archive, **P** pristine): [Merit-Hub/README.md](Merit-Hub/README.md).
+The ` .\` prefix matters: PowerShell does not execute a script from the current directory when you type only its filename. The Hub handles the PowerShell-version check and offers to install/launch PowerShell 7 when only Windows PowerShell is available. Menu **2** / **J** clones the pinned OSS release for you — no full repo clone is required first. Cleanup keys (**G** sprawl scan, **A** archive, **P** pristine): [Merit-Hub/README.md](Merit-Hub/README.md).
 
 **Full repo install** (OSS bench = `%MYMERITAPP%`, default `C:\MyMeritApp`):
 

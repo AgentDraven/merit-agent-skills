@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## [0.5.90] - 2026-09-06
+## [0.5.91] - 2026-09-06
+### Changed
+- Simplified README cold start to `cd <tools-folder>; .\Merit-Hub.ps1` from any Windows PowerShell version.
 ### Fixed
 - Added an explicit historical release index for older tags that lacked individual changelog sections.
 ### Added
