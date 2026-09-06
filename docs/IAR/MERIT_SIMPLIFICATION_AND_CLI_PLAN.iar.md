@@ -150,3 +150,16 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 - `BootStrap/` is temporary migration infrastructure.
 - `merit/merit.blob` becomes the canonical public law location.
 - Vault delegation is explicit by command ownership.
+
+## Phase status
+
+| Phase | Status | Evidence |
+|---|---|---|
+| 1. IAR and inventory | PASS | This plan, IAR navigation link, dependency-hierarchy link; release `skills-v0.5.98` |
+| 2. Root Hub launcher | PASS | Root `Merit-Hub.ps1 -Help` smoke test; implementation remains under `Merit-Hub/`; release closeout pending |
+| 3. CLI extraction | OPEN | Not started |
+| 4. Unified IDE installer | OPEN | Not started |
+| 5. Bootstrap migration | OPEN | Not started |
+| 6. Law relocation | OPEN | Not started |
+| 7. Vault delegation | OPEN | Not started |
+| 8. Compatibility cleanup | OPEN | Not started |

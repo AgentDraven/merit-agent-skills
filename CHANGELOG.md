@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.99] - 2026-09-06
+### Added
+- Added the root `Merit-Hub.ps1` launcher so first-time users can start Hub from the repository root.
+
 ## [0.5.98] - 2026-09-06
 ### Added
 - Added the consolidated IAR plan for the unified CLI, root Hub launcher, Bootstrap migration, law payload, and vault precedence.
