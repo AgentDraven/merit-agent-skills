@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.98] - 2026-09-06
+### Added
+- Added the consolidated IAR plan for the unified CLI, root Hub launcher, Bootstrap migration, law payload, and vault precedence.
+
 ## [0.5.97] - 2026-09-06
 ### Changed
 - Removed the obsolete root dinner-tutorial stub; Git history remains the archive and `docs/howto/launch-over-dinner.md` is canonical.
