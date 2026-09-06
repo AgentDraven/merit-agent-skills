@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## [0.5.79] - 2026-09-06
+## [0.5.80] - 2026-09-06
+
+### Changed
+- Updated Hub and OSS bench pins to skills-v0.5.79 and documented vault-first authority resolution.
 
 ### Added
 - Added `admin github auth status|switch` so account selection stays behind the MERIT CLI.
