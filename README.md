@@ -245,10 +245,10 @@ gh api repos/Mr-PI-Bala/merit-demo --jq '.permissions'
 
 The result must include `"push": true`. If the owner cannot grant access, fork the repository and point `origin` at the writable fork instead.
 
-Equivalent MERIT admin commands:
+Equivalent MERIT admin commands (run from the target repository; repo/user/permission are prompted or inferred):
 
 ```powershell
-.\merit.ps1 admin github access add --repo Mr-PI-Bala/merit-demo --user AgentDraven --permission push --yes
-.\merit.ps1 admin github access status --repo Mr-PI-Bala/merit-demo --user AgentDraven
-.\merit.ps1 admin github access remove --repo Mr-PI-Bala/merit-demo --user AgentDraven --yes
+.\merit.ps1 admin github access add
+.\merit.ps1 admin github access status
+.\merit.ps1 admin github access remove
 ```

@@ -541,3 +541,6 @@
 # 0.5.69
 
 - Add `admin github access status|add|remove` for explicit collaborator permissions.
+# 0.5.70
+
+- Infer GitHub repository/user for admin access commands and prompt for permission/confirmation.

@@ -51,9 +51,9 @@ Commands:
   admin ownership repair --path <repo>  Repair Windows repo owner/Modify ACL (confirmation required)
   admin ownership status --path <repo>  Inspect owner, ACL, and write access
                            (legacy alias: admin repair-ownership)
-  admin github access status --repo <owner/name> --user <login>
-  admin github access add --repo <owner/name> --user <login> --permission <pull|triage|push|maintain|admin> --yes
-  admin github access remove --repo <owner/name> --user <login> --yes
+  admin github access status [--repo <owner/name>] [--user <login>]
+  admin github access add [--repo <owner/name>] [--user <login>] [--permission <pull|triage|push|maintain|admin>] [--yes]
+  admin github access remove [--repo <owner/name>] [--user <login>] [--yes]
   app scaffold             Print merit-demo clone guidance
   create --path <repo>     AutoMagic fullstack-consumer (default = platform URL on merit-prod)
                            [--profile fullstack-consumer] [--deploy]
@@ -1153,9 +1153,11 @@ function Invoke-AdminGithubAccess {
     if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { throw 'admin github access requires GitHub CLI (gh) on PATH' }
     $sub = if ($ArgList.Count -gt 2) { "$($ArgList[2])".ToLowerInvariant() } else { 'status' }
     $repo = Get-ArgValue -ArgList $ArgList -Name '--repo'
+    if ([string]::IsNullOrWhiteSpace($repo)) { $remote = (& git remote get-url origin 2>$null).Trim(); if ($remote -match 'github\.com[:/]([^/]+)/([^/]+?)(?:\.git)?$') { $repo = "$($Matches[1])/$($Matches[2])" } }
+    if ([string]::IsNullOrWhiteSpace($repo) -or $repo -notmatch '^[^/\s]+/[^/\s]+$') { throw 'Could not infer GitHub repo from origin; pass --repo <owner/name>' }
     $user = Get-ArgValue -ArgList $ArgList -Name '--user'
-    if ([string]::IsNullOrWhiteSpace($repo) -or $repo -notmatch '^[^/\s]+/[^/\s]+$') { throw 'admin github access requires --repo <owner/name>' }
-    if ([string]::IsNullOrWhiteSpace($user) -or $user -notmatch '^[A-Za-z0-9-]+$') { throw 'admin github access requires --user <login>' }
+    if ([string]::IsNullOrWhiteSpace($user)) { $user = (& gh api user --jq .login 2>$null).Trim() }
+    if ([string]::IsNullOrWhiteSpace($user) -or $user -notmatch '^[A-Za-z0-9-]+$') { throw 'Could not infer GitHub user; pass --user <login>' }
     $endpoint = "repos/$repo/collaborators/$user"
     switch ($sub) {
         'status' {
@@ -1163,15 +1165,15 @@ function Invoke-AdminGithubAccess {
             if ($LASTEXITCODE -ne 0) { throw "GitHub access status failed (exit $LASTEXITCODE)" }
         }
         'add' {
-            $permission = Get-ArgValue -ArgList $ArgList -Name '--permission'
+            $permission = Get-ArgValue -ArgList $ArgList -Name '--permission'; if ([string]::IsNullOrWhiteSpace($permission)) { $permission = Read-Host 'Permission [pull/triage/push/maintain/admin] (default push)'; if ([string]::IsNullOrWhiteSpace($permission)) { $permission = 'push' } }
             if ($permission -notin @('pull','triage','push','maintain','admin')) { throw 'permission must be pull, triage, push, maintain, or admin' }
-            if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) { throw 'access changes require --yes confirmation' }
+            if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) { $answer = Read-Host "Grant $permission access to $user on $repo? [y/N]"; if ($answer -notmatch '^[Yy]$') { Write-Host 'GitHub access add: cancelled'; return } }
             & gh api --method PUT $endpoint --field permission=$permission
             if ($LASTEXITCODE -ne 0) { throw "GitHub collaborator add failed (exit $LASTEXITCODE)" }
             Write-Host "GitHub access granted: $user -> $repo ($permission)" -ForegroundColor Green
         }
         'remove' {
-            if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) { throw 'access changes require --yes confirmation' }
+            if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) { $answer = Read-Host "Remove access for $user from $repo? [y/N]"; if ($answer -notmatch '^[Yy]$') { Write-Host 'GitHub access remove: cancelled'; return } }
             & gh api --method DELETE $endpoint
             if ($LASTEXITCODE -ne 0) { throw "GitHub collaborator removal failed (exit $LASTEXITCODE)" }
             Write-Host "GitHub access removed: $user from $repo" -ForegroundColor Green
