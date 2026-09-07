@@ -117,7 +117,7 @@ $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
   "hubVersion": "0.5.138",
-  "skillsPin": "skills-v0.5.176",
+  "skillsPin": "skills-v0.5.177",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -3887,8 +3887,7 @@ function Invoke-HubOcTutorial {
     if (Test-Path -LiteralPath $script) { Write-Info "OC tutorial helper found; refreshing latest copy from GitHub..." }
     else { Write-Warn "OC tutorial helper missing; downloading it from GitHub..." }
     try {
-        $cacheBust = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-        Invoke-WebRequest -Uri "$url?v=$cacheBust" -OutFile $script -UseBasicParsing -ErrorAction Stop
+        Invoke-WebRequest -Uri ([Uri]$url) -Headers @{ 'Cache-Control' = 'no-cache' } -OutFile $script -UseBasicParsing -ErrorAction Stop
         Write-Ok "OC tutorial helper ready: $script"
     } catch { Write-Fail "Could not download OC tutorial helper: $($_.Exception.Message)"; return }
     Write-Attention 'OCV: walking through the published play, registration, and marketing URLs from the OC receipt.'

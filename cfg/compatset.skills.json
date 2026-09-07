@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
-    { "pin": "skills-v0.5.176", "releasedAt": "2026-09-07", "status": "supported", "notes": "Defensive URL normalization for copied Markdown links" },
+    { "pin": "skills-v0.5.177", "releasedAt": "2026-09-07", "status": "supported", "notes": "PowerShell 5.1 URI compatibility for always-refresh downloads" },
     { "pin": "skills-v0.5.169", "releasedAt": "2026-09-07", "status": "supported", "notes": "Compact Hub legend, map, keys, and recommendations" },
     { "pin": "skills-v0.5.166", "releasedAt": "2026-09-07", "status": "supported", "notes": "Clear staged OC publish output and canonical receipt" }
   ]

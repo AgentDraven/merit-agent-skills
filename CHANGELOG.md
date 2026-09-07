@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.177] - 2026-09-07
+### Fixed
+- Bootstrap downloads now pass validated `System.Uri` values and no-cache headers, avoiding PowerShell 5.1 URI parsing failures.
+
 ## [0.5.176] - 2026-09-07
 ### Fixed
 - Root stub normalizes Markdown-wrapped GitHub URLs before invoking web requests.

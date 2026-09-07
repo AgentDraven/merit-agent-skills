@@ -15,9 +15,10 @@ try {
     } else {
         Write-Host "MERIT Hub implementation missing; downloading it from GitHub ..." -ForegroundColor Cyan
     }
-    $cacheBust = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-    Invoke-WebRequest -UseBasicParsing -Uri "$url?v=$cacheBust" -OutFile $implementation
-    $remoteVersion = ((Invoke-WebRequest -UseBasicParsing -Uri "$versionUrl?v=$cacheBust").Content).Trim()
+    $uri = [Uri]$url
+    $versionUri = [Uri]$versionUrl
+    Invoke-WebRequest -UseBasicParsing -Uri $uri -Headers @{ 'Cache-Control' = 'no-cache' } -OutFile $implementation
+    $remoteVersion = ((Invoke-WebRequest -UseBasicParsing -Uri $versionUri -Headers @{ 'Cache-Control' = 'no-cache' }).Content).Trim()
     Write-Host "MERIT Hub downloaded: skills-v$remoteVersion" -ForegroundColor Green
 }
 catch {
