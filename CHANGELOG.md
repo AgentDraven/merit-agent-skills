@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.103] - 2026-09-06
+### Changed
+- Extracted target-path, launch-path, and gitignore helpers into the shared CLI core module.
+
 ## [0.5.102] - 2026-09-06
 ### Changed
 - Routed Hub IDE skill installation through `merit.ps1 skills install` so the public CLI is the single installation entrypoint.

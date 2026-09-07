@@ -106,37 +106,6 @@ Redo a single phase anytime - phase map is printed below on help, and again in R
     Write-CreatePhaseGuide -TargetRoot '..\<app>'
 }
 
-function Resolve-TargetRoot {
-    param([string[]]$ArgList)
-    $p = Get-ArgValue -ArgList $ArgList -Name '--path'
-    if ($p) {
-        if (-not (Test-Path $p)) { New-Item -ItemType Directory -Force -Path $p | Out-Null }
-        return (Resolve-Path $p).Path
-    }
-    return (Get-Location).Path
-}
-
-function Add-GitIgnoreLine {
-    param([string]$TargetRoot, [string]$Line)
-    $path = Join-Path $TargetRoot '.gitignore'
-    if (Test-Path $path) {
-        $text = Get-Content -LiteralPath $path -Raw -Encoding UTF8
-        if ($text -match "(?m)^$([regex]::Escape($Line))$") { return }
-        $prefix = if ($text.EndsWith("`n")) { '' } else { "`n" }
-        [System.IO.File]::AppendAllText($path, "$prefix$Line`n", [System.Text.UTF8Encoding]::new($false))
-    } else {
-        [System.IO.File]::WriteAllText($path, "$Line`n", [System.Text.UTF8Encoding]::new($false))
-    }
-}
-
-function Get-LaunchPath {
-    param([string]$TargetRoot, [string[]]$ArgList)
-    $p = Get-ArgValue -ArgList $ArgList -Name '--launch'
-    if (-not $p) { $p = '.merit_launch.md' }
-    if ([System.IO.Path]::IsPathRooted($p)) { return $p }
-    return (Join-Path $TargetRoot $p)
-}
-
 function Get-LaunchSettings {
     param([string]$Path)
     if (-not (Test-Path $Path)) { throw "Launch file not found: $Path. Run merit init --path <repo> first." }
