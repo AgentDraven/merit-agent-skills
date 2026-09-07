@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.109] - 2026-09-06
+### Changed
+- Began law-payload migration: resolver prefers `merit/merit.blob` and warns on legacy root fallback.
+
 ## [0.5.108] - 2026-09-06
 ### Changed
 - Extracted the webpage-shell validator into the shared CLI core module.

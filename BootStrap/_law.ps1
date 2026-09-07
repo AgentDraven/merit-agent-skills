@@ -8,7 +8,14 @@ function Get-MeritLawBlobPath {
     if (-not $RepoRoot) {
         $RepoRoot = if ($Script:MeritResolveRepoRoot) { $Script:MeritResolveRepoRoot } else { $PSScriptRoot | Split-Path -Parent }
     }
-    return Join-Path $RepoRoot 'merit.blob'
+    $canonical = Join-Path $RepoRoot 'merit\merit.blob'
+    if (Test-Path -LiteralPath $canonical) { return $canonical }
+    $legacy = Join-Path $RepoRoot 'merit.blob'
+    if (Test-Path -LiteralPath $legacy) {
+        Write-Warning "MERIT law payload uses legacy path; migrate to merit\merit.blob: $legacy"
+        return $legacy
+    }
+    return $canonical
 }
 
 function Get-MeritLawManifestPath {

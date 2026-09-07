@@ -20,8 +20,10 @@ function Assert-Test {
     }
 }
 
-Assert-Test 'merit.blob exists' {
-    if (-not (Test-Path (Join-Path $Root 'merit.blob'))) { throw 'missing merit.blob' }
+Assert-Test 'merit law blob exists' {
+    $canonical = Join-Path $Root 'merit\merit.blob'
+    $legacy = Join-Path $Root 'merit.blob'
+    if (-not (Test-Path $canonical) -and -not (Test-Path $legacy)) { throw 'missing merit law blob' }
 }
 
 Assert-Test 'cfg/merit_law.json exists' {
