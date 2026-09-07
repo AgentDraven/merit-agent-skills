@@ -2,7 +2,9 @@
 
 Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for **Cursor**, **Claude Code**, **Codex**, **VS Code / Open Agents**, **Hermes**, **OpenClaw**, **Grok Bot**, **Devin**, and more agent harnesses (see [Collaboration](#collaboration--suggest-a-host)).
 
-## Start here — pick your adventure
+## 🧭 Start here — pick your adventure
+
+> **Choose one row, then read left to right.** Every path starts with the Hub; IDE skills are an optional helper, not a surprise extra step.
 
 | Path | 1. Start | 2. Make progress | 3. Finish |
 |---|---|---|---|
@@ -12,19 +14,27 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 
 > IDE skills are an optional helper for the first two paths, not an orphaned fourth step.
 
-### I want to try MERIT
+### 🚀 I want to try MERIT
+
+---
 
 Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1), open PowerShell, change to its folder, and run ` .\Merit-Hub.ps1`.
 
-### I want to build my own app over dinner
+### 🍽️ I want to build my own app over dinner
+
+---
 
 Follow the [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md) walkthrough.
 
-### I want a hello-world app
+### 👋 I want a hello-world app
+
+---
 
 Open [merit-demo](https://github.com/Mr-PI-Bala/merit-demo) and run ` .\merit.ps1 quickstart`.
 
-### I want skills in my IDE
+### 🧠 I want skills in my IDE
+
+---
 
 Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (use **Raw**), save it in a tools folder such as `C:\Tools`, open PowerShell, change to that folder, and run:
 
@@ -34,7 +44,9 @@ Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (use **Raw**), save it in a 
 
 When the Hub menu appears, choose **I — Install IDE skills**, then choose your host (Cursor, Codex, VS Code, or another supported host). The Hub installs the skills into that host's correct location.
 
-### For additional options
+### 🧰 For additional options
+
+---
 
 Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](docs/usage.md), [deployment guide](docs/deploy.md), [try bundles](docs/TRY_BUNDLES.md), or [IAR architecture map](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md).
 
@@ -61,7 +73,9 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 
 **Production MERIT base (skills default):** `https://merit-prod.vercel.app` (**v00** in [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json)). Operator **v01** hosts exist but are not the skills default until vault `publish_gate` promotes them. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
 
-## Public vs private SSOT
+## 🔐 Public vs private SSOT
+
+---
 
 | | Public (this repo + Portal) | Private (operators only) |
 |--|----------------------------|--------------------------|
@@ -82,7 +96,9 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 | Vault **`BootStrap/MERIT.json`** | Vault BootStrap template (edition `vault`) | Public OSS registry |
 | **`~/dev/MERIT.json`** | Live machine BootStrap state after first run | A committed repo file |
 
-## Quick install
+## ⚡ Quick install
+
+---
 
 **Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (**Raw**) to a tools folder such as `C:\Tools`, open Windows PowerShell or PowerShell 7, and run:
 
@@ -91,7 +107,9 @@ cd C:\Tools
 .\Merit-Hub.ps1
 ```
 
-### Build Your App Over Dinner
+### 🍽️ Build Your App Over Dinner
+
+---
 
 Follow [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md). It turns the three rows above into three tiny actions each.
 
@@ -120,7 +138,9 @@ cd merit-agent-skills
 ./merit.sh skills install --target Cursor
 ```
 
-## Multi-runtime install (same `skills/` tree)
+## 🧩 Multi-runtime install (same `skills/` tree)
+
+---
 
 | Runtime | Status | Install |
 |---------|--------|---------|
@@ -151,7 +171,9 @@ We add vetted hosts to [`cfg/agent_hosts.json`](cfg/agent_hosts.json) and promot
 
 **mmUpgrade** is public freeware (`merit-mm-upgrade`). Full **`merit-upgrade`** (IAR / hygiene / maturity / closeout) stays vault-only via `merit.ps1 runtime out` — not in this OSS tree.
 
-## 3 Steps Over Dinner cheatsheet
+## 🍽️ 3 Steps Over Dinner cheatsheet
+
+---
 
 Use this review order for human validation once code, docs, and E2E are complete:
 
@@ -170,7 +192,9 @@ Use this review order for human validation once code, docs, and E2E are complete
 
 Optional confidence pass: run **E2E Testing Using Playwright** in both `merit-demo` and `merit-test` after `npm install`; screenshots prove the local routes and responsive flows, while provider checks prove the hosted MERIT boundary and independent consumer identities.
 
-## One public CLI
+## 🛠️ One public CLI
+
+---
 
 ```powershell
 .\merit.ps1 init --path ..\my-app
@@ -199,7 +223,9 @@ Shell wrappers require `pwsh` or PowerShell.
 
 Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-freemium.sh`.
 
-## E2E Testing Using Playwright (optional)
+## 🧪 E2E Testing Using Playwright (optional)
+
+---
 
 The public quickstart does not require Node dependencies, but full visual validation does. In `merit-demo`, run:
 
@@ -217,7 +243,9 @@ npm install
 
 `npm install` installs the demo’s declared Node dev tooling, including `@playwright/test`; the repo postinstall attempts to install the Chromium browser used for screenshots. The MERIT wrapper then runs the route/provider checks and writes screenshots under `merit-demo docs/evidence/`. If dependencies are not installed, `verify` can still pass, but screenshot capture is skipped.
 
-## Skills
+## 🧠 Skills
+
+---
 
 | Skill | Purpose |
 |-------|---------|
