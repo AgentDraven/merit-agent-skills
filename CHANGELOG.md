@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.160] - 2026-09-07
+### Fixed
+- Step 2 receipts now use the shared legend and explicitly distinguish `3V` validation from optional `O/OCV` hosted steps.
+
 ## [0.5.159] - 2026-09-07
 ### Added
 - Applied the Peel-The-Onion three-step cards to the root beginner README, including the basic `1 → 2 → 3 → 3V → O → OCV` journey.

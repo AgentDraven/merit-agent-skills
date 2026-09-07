@@ -690,7 +690,7 @@ function Write-HubNextSteps {
             Write-Note 'Next: 2 Install OSS (skills pin only). Enter returns to menu; 0 exits at Select.'
         }
         '2' {
-             Write-Note 'Next: 3 Try it - clones public merit-demo (Mr-PI-Bala) and opens play.'
+             Write-Note 'Next: 3 Try it - clones public merit-demo (Mr-PI-Bala) and opens play; then run 3V to validate. O/OCV are optional hosted-cloud steps after 3.'
             Write-Info 'Docs: merit-agent-skills\docs\howto\launch-over-dinner.md'
             Write-Info 'Demo: https://github.com/Mr-PI-Bala/merit-demo  (public; no GitHub login to clone)'
         }
