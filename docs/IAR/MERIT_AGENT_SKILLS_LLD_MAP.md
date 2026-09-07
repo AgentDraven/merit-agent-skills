@@ -150,3 +150,37 @@ merit.ps1 skills install:
 | 1.0.4 | 2026-07-12 | v0.3.13 launch validation: closeout command and public design doc |
 | 1.0.5 | 2026-07-13 | v0.3.14 monotonic patch release: merit-demo Hello World and merit-test clean-clone proof |
 | 1.0.3 | 2026-07-12 | v0.3.12 cleanup: shim scripts removed; merit.ps1 is self-contained |
+
+---
+
+<a id="documentation-format-standard"></a>
+## 9. Documentation format standard
+
+This is the shared visual and editorial contract for MERIT documentation in both `merit-agent-skills` and `merit-demo`.
+
+### Major sections
+
+- Use one top-level Markdown heading per document.
+- Use a colored HTML table band for major sections (`##` level), with a short emoji marker and contrasting bold text.
+- Keep the band free of nested heading tags; this avoids GitHub's unwanted inner underline.
+- Use the blue band for the primary start/overview section, purple for public/private boundaries, and teal for other major sections.
+- Preserve explicit `<a id="...">` anchors before bands when a section is linked from a table of contents.
+
+### Content hierarchy
+
+- Use `###` headings for task/persona subsections; do not add decorative horizontal rules beneath them.
+- Use blockquotes for tips, warnings, and “read left to right” instructions.
+- Use tables for matrices, command comparisons, and three-step flows.
+- Use fenced code blocks for commands and inline code for paths, files, and flags.
+- Keep beginner actions in `merit.ps1` / `Merit-Hub.ps1`; raw Git or retired installer commands belong only in historical notes.
+
+### Accessibility and maintenance
+
+- Emoji are cues, not the only meaning; headings must remain understandable without them.
+- Keep links descriptive and relative where possible.
+- Avoid custom CSS, image-only headings, and deeply nested Mermaid diagrams for core navigation.
+- Apply this standard to README, usage, design, deployment, dinner, and IAR documents in both repositories.
+
+### README change record
+
+The README styling work added: a persona matrix, a first-class hello-world path, colored major-section bands, removal of duplicate thick separators, enlarged band text, callout guidance, and command-first beginner instructions.
