@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.142] - 2026-09-06
+### Added
+- Registered `skills-v0.5.141` as a second supported CompatSet choice in Hub.
+
 ## [0.5.141] - 2026-09-06
 ### Fixed
 - CompatSet registry and numeric selection released as the new supported Hub baseline.
