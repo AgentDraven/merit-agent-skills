@@ -75,6 +75,9 @@ param(
     [Alias('SprawlScan')]
     [switch]$VestigialScan,
     [switch]$Force,
+    # Internal flag used when an interactive cleanup action must relaunch elevated.
+    # The elevated child performs the action, then re-enters the menu instead of exiting.
+    [switch]$ReturnToMenu,
     [Alias('?')]
     [switch]$Help
 )
@@ -95,6 +98,7 @@ $Script:BackupRoot = $null
 $Script:HistoryLog = $null
 $Script:TranscriptStarted = $false
 $Script:HubStepFailed = $false
+$Script:HubInteractiveAction = $false
 $Script:HubLastCatalogRow = $null
 $Script:MeritResolveRepoRoot = $null
 $Script:MeritResolveHubScript = $null
@@ -1289,6 +1293,7 @@ function Ensure-HubElevated {
     $argList = if ($Action) {
         $list = [System.Collections.Generic.List[string]]::new()
         foreach ($item in @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $Script:HubScriptPath, "-$Action")) { [void]$list.Add($item) }
+        if ($Script:HubInteractiveAction) { [void]$list.Add('-ReturnToMenu') }
         $list.ToArray()
     } else { Get-HubRelaunchArgumentList }
     Write-Note 'Not elevated. Opening an Administrator window (UAC).'
@@ -3807,6 +3812,7 @@ function Set-MyMeritToolsPrompt {
 }
 
 function Show-InteractiveMenu {
+    $Script:HubInteractiveAction = $true
     try {
         Ensure-MeritHubEnvAtStart
     }
@@ -3883,9 +3889,9 @@ Sync-HubMeritEnvFromUser
 [void](Import-HubOssHelpers)
 Start-HubTranscript
 try {
-    if ($Pristine) { Invoke-Mode -Mode Pristine; return }
-    if ($Soft) { Invoke-Mode -Mode Soft; return }
-    if ($BackupOnly -or $PrePristine) { Invoke-Mode -Mode PrePristine; return }
+    if ($Pristine) { Invoke-Mode -Mode Pristine; if ($ReturnToMenu) { Show-InteractiveMenu }; return }
+    if ($Soft) { Invoke-Mode -Mode Soft; if ($ReturnToMenu) { Show-InteractiveMenu }; return }
+    if ($BackupOnly -or $PrePristine) { Invoke-Mode -Mode PrePristine; if ($ReturnToMenu) { Show-InteractiveMenu }; return }
     if ($Surface) { Invoke-HubSurface; return }
     if ($VestigialScan) { Invoke-HubSprawlScan; return }
     if ($Prereqs) { Invoke-HubSetupLaptop; return }
