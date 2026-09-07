@@ -72,6 +72,21 @@ Run Hub menu **I** and select your host (`Cursor`, `ClaudeCode`, `Codex`, or `VS
 
 Open the `merit-demo` folder in your AI IDE and ask it to help edit branding or portal text.
 
+### 1C — Confirm the fresh-device install
+
+After Hub **2** and **3** finish, run this short acceptance check from the seeded demo folder:
+
+```powershell
+cd $env:MYMERITAPP\merit-demo
+.\merit.ps1 where
+.\merit.ps1 verify
+.\merit.ps1 serve
+```
+
+You should see the resolved `MYMERITAPP`/demo surface, `verify OK`, and a local HTTP URL. Open that URL and choose `/play/`. The page should report **Hosted Ready**, show the mounted workbench, and show **Register free**. If the host is unavailable, the page must show a labeled fallback with retry—not an endless spinner.
+
+For the full release gate after editing, run `.\merit.ps1 closeout`; it runs verification, E2E, browser checks, and writes the release evidence.
+
 **Step 1 complete.** Two folders on disk. No cloud accounts.
 
 ---

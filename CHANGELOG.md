@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.132] - 2026-09-06
+### Added
+- Fresh-device Hub acceptance checklist for `where`, `verify`, `serve`, Hosted Ready, mount, and Register checks.
+
 ## [0.5.131] - 2026-09-06
 ### Changed
 - Final alpha documentation scrub: current docs use Hub-first setup and `merit.ps1 skills install`; retired pins and installer commands are confined to historical context.

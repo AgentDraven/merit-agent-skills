@@ -105,6 +105,8 @@ Follow [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md). I
 
 The ` .\` prefix matters: PowerShell does not execute a script from the current directory when you type only its filename. The Hub handles the PowerShell-version check and offers to install/launch PowerShell 7 when only Windows PowerShell is available. Menu **2** / **J** clones the pinned OSS release for you — no full repo clone is required first. Cleanup keys (**G** sprawl scan, **A** archive, **P** pristine): [Merit-Hub/README.md](Merit-Hub/README.md).
 
+**Fresh-device check:** after Hub **2 → 3**, open the seeded demo and run `.\merit.ps1 where`, `.\merit.ps1 verify`, then `.\merit.ps1 serve`. Open `/play/` and confirm **Hosted Ready**, the mounted workbench, and **Register free**. Use `.\merit.ps1 closeout` for the full release gate.
+
 **Advanced/manual clone** (most users should use Hub **1 → 2 → 3** above):
 
 ```powershell
