@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.171] - 2026-09-07
+### Added
+- Added colored journey panels and a beginner next-action prompt to the Hub interface.
+
 ## [0.5.170] - 2026-09-07
 ### Fixed
 - Promoted the current Hub/docs baseline as the default CompatSet and retained only the latest two backups.

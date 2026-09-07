@@ -117,7 +117,7 @@ $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
   "hubVersion": "0.5.138",
-  "skillsPin": "skills-v0.5.170",
+  "skillsPin": "skills-v0.5.171",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -3852,16 +3852,21 @@ function Show-MeritHubHelp {
     Write-Info "History log (append): $Script:HistoryLog"
     Write-HubMap
     Write-Host ''
-    Write-Host '  JOURNEY (follow left to right)' -ForegroundColor White
-    Write-Host '  1 Setup -> 2 Install OSS -> 3 Try -> 3V Validate -> OC Publish -> OCV Hosted check'
-    Write-Host '  4 Vault -> VC Validate     |  5 Repo -> 5R Status -> RC Cloud validation'
-    Write-Host '  6 Join (after OC or 4)     |  0 Stop (only exit)'
+    Write-Host '  ┌─ BEGINNER PATH ─────────────────────────────────────────────────────┐' -ForegroundColor Cyan
+    Write-Host '  │  1 Setup → 2 Install → 3 Try → 3V Validate → OC Publish → OCV Check │' -ForegroundColor Cyan
+    Write-Host '  └──────────────────────────────────────────────────────────────────────┘' -ForegroundColor Cyan
+    Write-Host '  NEXT FOR A NEW LAPTOP: choose 1, then 2, then 3.' -ForegroundColor Green
+    Write-Host '  LOCAL PROOF: 3V     CLOUD PROOF: OC → OCV     EXIT: 0' -ForegroundColor Magenta
     Write-Host ''
-    Write-Host '  ALSO (helpers)' -ForegroundColor White
-    Write-Host '  G scan | A archive | P pristine reset | S soft cleanup | I IDE skills'
-    Write-Host '  M app path | T tools path | W surface | K CompatSet | H help'
+    Write-Host '  ┌─ ADVANCED PATHS ─────────────────────────────────────────────────────┐' -ForegroundColor Yellow
+    Write-Host '  │  4 Vault → VC Validate     |  5 Repo → 5R Status → RC Cloud check    │' -ForegroundColor Yellow
+    Write-Host '  └──────────────────────────────────────────────────────────────────────┘' -ForegroundColor Yellow
+    Write-Host '  ┌─ HELPERS ────────────────────────────────────────────────────────────┐' -ForegroundColor DarkCyan
+    Write-Host '  │  G scan  A archive  P pristine  S soft  I IDE  M app  T tools        │' -ForegroundColor DarkCyan
+    Write-Host '  │  W surface  K CompatSet  H help                                      │' -ForegroundColor DarkCyan
+    Write-Host '  └──────────────────────────────────────────────────────────────────────┘' -ForegroundColor DarkCyan
     Write-Host ''
-     Write-Note 'Cold start: 1 -> 2 -> 3. Validate: 3V. Cloud: OC -> OCV. Every action returns to this menu; press 0 only when finished.'
+     Write-Note 'Every action returns to this menu. Colors reinforce the words; copied logs remain understandable.'
     if ($AgentLaw) {
         Write-HubAgentCloseoutHint -Compact
     }
