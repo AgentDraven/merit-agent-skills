@@ -18,5 +18,16 @@ if (-not (Test-Path -LiteralPath $implementation -PathType Leaf)) {
     }
 }
 
+# Windows PowerShell 5.1 can misread a UTF-8-without-BOM download (especially
+# box-drawing and arrow characters) and report false parser errors. Normalize
+# the fetched/current implementation to UTF-8 with BOM before invoking it.
+try {
+    $hubText = [IO.File]::ReadAllText($implementation)
+    [IO.File]::WriteAllText($implementation, $hubText, (New-Object Text.UTF8Encoding($true)))
+}
+catch {
+    throw "MERIT Hub implementation could not be normalized for Windows PowerShell: $implementation`n$($_.Exception.Message)"
+}
+
 & $implementation @args
 exit $LASTEXITCODE

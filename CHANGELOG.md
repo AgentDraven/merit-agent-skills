@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.172] - 2026-09-07
+### Fixed
+- Root Hub launcher normalizes the implementation to UTF-8 with BOM so Windows PowerShell 5.1 parses Unicode panels safely.
+
 ## [0.5.171] - 2026-09-07
 ### Added
 - Added colored journey panels and a beginner next-action prompt to the Hub interface.
