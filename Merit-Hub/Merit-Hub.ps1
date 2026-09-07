@@ -779,10 +779,11 @@ function Import-HubMeritResolve {
     $candidates = [System.Collections.Generic.List[string]]::new()
     $benchSkills = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\merit\modules\Merit.Surface.ps1'
     [void]$candidates.Add($benchSkills)
-    if ($env:MERIT_SKILLS_ROOT) {
+    if ($env:MERIT_SKILLS_ROOT -and (Test-HubConfiguredPathUsable -Path $env:MERIT_SKILLS_ROOT -Name 'MERIT_SKILLS_ROOT')) {
         [void]$candidates.Add((Join-Path $env:MERIT_SKILLS_ROOT 'merit\modules\Merit.Surface.ps1'))
     }
     foreach ($bench in @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP')) {
+        if (-not (Test-HubConfiguredPathUsable -Path $bench -Name 'MYMERITAPP')) { continue }
         [void]$candidates.Add((Join-Path $bench 'merit-agent-skills\merit\modules\Merit.Surface.ps1'))
     }
     foreach ($path in @('C:\DevApps\merit-agent-skills', 'C:\MyMeritApp\merit-agent-skills')) {

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.135] - 2026-09-06
+### Fixed
+- Filtered stale environment inventory before `Join-Path`, preventing unavailable-drive crashes during Hub startup.
+
 ## [0.5.134] - 2026-09-06
 ### Fixed
 - Hub ignores stale environment roots whose drive is unavailable, preventing `Join-Path` crashes during PowerShell relaunch.
