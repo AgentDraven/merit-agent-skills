@@ -3852,35 +3852,16 @@ function Show-MeritHubHelp {
     Write-Info "History log (append): $Script:HistoryLog"
     Write-HubMap
     Write-Host ''
-    Write-Host '  KEYS' -ForegroundColor White
-    Write-Host '  1) Setup laptop     prereqs + MYMERIT* + Python (venv or global shim)'
-    Write-Host '  2) Install OSS      skills pin only (no merit-demo)   (alias J)'
-    Write-Host '  3) Try it           clone public merit-demo + serve HTTP + open /play/'
-    Write-Host '       3V  Validate demo deployed by Step 3 (Try it)'
-    Write-Host '       OC  OSS in the Cloud — publish DualRail + register + marketing site'
-    Write-Host '          OCV Hosted OC Tutorial — open and review published URLs step-by-step'
-    Write-Host '          -NewOc creates a new oc-* id (advanced command-line switch)'
-    Write-Host '  4) Vault (local)    clone private vault (working clone kept)'
-    Write-Host '       VC  Validate the Vault deployed by Step 4 (Vault - Local) and Venture-Capable Status'
-    Write-Host '  5) Repo (local)     catalog clone; role consumer|provider'
-    Write-Host '       5R  Repo/Cloud Status'
-    Write-Host '       RC  Validation Repo in the Cloud'
-    Write-Host '  6) Join MERIT (sign up)  after OC or after 4; portal + register'
-    Write-Host '  0) Stop'
+    Write-Host '  JOURNEY (follow left to right)' -ForegroundColor White
+    Write-Host '  1 Setup -> 2 Install OSS -> 3 Try -> 3V Validate -> OC Publish -> OCV Hosted check'
+    Write-Host '  4 Vault -> VC Validate     |  5 Repo -> 5R Status -> RC Cloud validation'
+    Write-Host '  6 Join (after OC or 4)     |  0 Stop (only exit)'
     Write-Host ''
-    Write-Host '  ALSO' -ForegroundColor White
-    Write-Host '  G) Sprawl scan      find leftover MERIT folders (no archive)  (-SprawlScan)'
-    Write-Host '  A) Pre-Pristine     archive + sprawl review (no bench wipe)  (alias B / -PrePristine)'
-    Write-Host '  P) Pristine v2      sprawl review + archive, then full cold-start wipe'
-    Write-Host '  S) Soft             bench + status; keep ~/dev clones'
-    Write-Host '  I) Install skills   Cursor, Codex, Hermes, ...'
-    Write-Host '  M) Set MYMERITAPP bench path'
-    Write-Host '  T) Set MYMERITTOOLS root'
-    Write-Host '  W) Where / Surface   A+B+C+D+H diagnostic map'
-    Write-Host '  K) CompatSets        list/select approved skills pins (advanced)'
-    Write-Host '  H) Help'
+    Write-Host '  ALSO (helpers)' -ForegroundColor White
+    Write-Host '  G scan | A archive | P pristine reset | S soft cleanup | I IDE skills'
+    Write-Host '  M app path | T tools path | W surface | K CompatSet | H help'
     Write-Host ''
-     Write-Note 'A/P/S return to menu (only 0 exits). Cold start: 1 -> 2 (skills) -> 3 (demo). Cleanup: G then A then P. After a step, Enter=menu; Hub stays open until 0.'
+     Write-Note 'Cold start: 1 -> 2 -> 3. Validate: 3V. Cloud: OC -> OCV. Every action returns to this menu; press 0 only when finished.'
     if ($AgentLaw) {
         Write-HubAgentCloseoutHint -Compact
     }

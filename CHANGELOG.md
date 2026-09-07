@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.169] - 2026-09-07
+### Fixed
+- Consolidated Hub legend, map, keys, helper options, and recommendations into one compact beginner-friendly journey display.
+
 ## [0.5.168] - 2026-09-07
 ### Fixed
 - Rebuilt the Hub legend and map so `3V` is visibly under Try it and `OCV` is visibly under `OC`.
