@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.116] - 2026-09-06
+### Changed
+- Updated law documentation and the simplification IAR to reflect canonical payload paths and the remaining compatibility-shim boundary.
+
 ## [0.5.115] - 2026-09-06
 ### Changed
 - Added explicit, allow-listed `merit.ps1 vault` delegation for operator-only commands.

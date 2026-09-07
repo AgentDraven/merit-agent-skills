@@ -6,7 +6,7 @@ Public OSS distribution of **near-comprehensive L1 excerpt** without shipping pl
 
 | File | Role |
 |------|------|
-| `merit.blob` | Obfuscated gzip + XOR law pack (committed, not human-readable) |
+| `merit/merit.blob` | Obfuscated gzip + XOR law pack (committed, not human-readable) |
 | `cfg/merit_law.json` | Section index + skill→section map (metadata only, no law text) |
 | `BootStrap/_law.ps1` | Unpack + query (in-memory only) |
 | `scripts/export-merit-law-blob.ps1` | Regenerate blob (operators / release) |
@@ -31,7 +31,7 @@ pwsh -File scripts/export-merit-law-blob.ps1 -SkillsVersion <VERSION>
 From vault when L1 changes (operator):
 
 ```powershell
-& <vault>\scripts\merit.ps1 law export-blob -Source instructions/MERIT.instructions -Out <skills-repo>\merit.blob
+& <vault>\scripts\merit.ps1 law export-blob -Source instructions/MERIT.instructions -Out <skills-repo>\merit\merit.blob
 ```
 
 Then bump `VERSION`, `CHANGELOG`, and run `.\merit.ps1 closeout`.
