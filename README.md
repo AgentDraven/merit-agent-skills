@@ -65,7 +65,6 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 
 ## 🔐 Public vs private SSOT
 
----
 
 | | Public (this repo + Portal) | Private (operators only) |
 |--|----------------------------|--------------------------|
@@ -88,7 +87,6 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 
 ## ⚡ Quick install
 
----
 
 **Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (**Raw**) to a tools folder such as `C:\Tools`, open Windows PowerShell or PowerShell 7, and run:
 
@@ -99,7 +97,6 @@ cd C:\Tools
 
 ### 🍽️ Build Your App Over Dinner
 
----
 
 Follow [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md). It turns the three rows above into three tiny actions each.
 
@@ -130,7 +127,6 @@ cd merit-agent-skills
 
 ## 🧩 Multi-runtime install (same `skills/` tree)
 
----
 
 | Runtime | Status | Install |
 |---------|--------|---------|
@@ -163,7 +159,6 @@ We add vetted hosts to [`cfg/agent_hosts.json`](cfg/agent_hosts.json) and promot
 
 ## 🍽️ 3 Steps Over Dinner cheatsheet
 
----
 
 Use this review order for human validation once code, docs, and E2E are complete:
 
@@ -184,7 +179,6 @@ Optional confidence pass: run **E2E Testing Using Playwright** in both `merit-de
 
 ## 🛠️ One public CLI
 
----
 
 ```powershell
 .\merit.ps1 init --path ..\my-app
@@ -215,7 +209,6 @@ Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-fre
 
 ## 🧪 E2E Testing Using Playwright (optional)
 
----
 
 The public quickstart does not require Node dependencies, but full visual validation does. In `merit-demo`, run:
 
@@ -235,7 +228,6 @@ npm install
 
 ## 🧠 Skills
 
----
 
 | Skill | Purpose |
 |-------|---------|
