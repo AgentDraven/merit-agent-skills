@@ -3,7 +3,7 @@
 Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for **Cursor**, **Claude Code**, **Codex**, **VS Code / Open Agents**, **Hermes**, **OpenClaw**, **Grok Bot**, **Devin**, and more agent harnesses (see [Collaboration](#collaboration--suggest-a-host)).
 
 <a id="start-here--pick-your-adventure"></a>
-<table><tr><td bgcolor="#1f6feb"><h2>🧭 Start here — pick your adventure</h2></td></tr></table>
+<table><tr><td bgcolor="#1f6feb"><strong><big>🧭 Start here — pick your adventure</big></strong></td></tr></table>
 
 > **Choose one row, then read left to right.** Every path starts with the Hub; IDE skills are an optional helper, not a surprise extra step.
 
@@ -65,7 +65,7 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 **Production MERIT base (skills default):** `https://merit-prod.vercel.app` (**v00** in [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json)). Operator **v01** hosts exist but are not the skills default until vault `publish_gate` promotes them. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
 
 <a id="public-vs-private-ssot"></a>
-<table><tr><td bgcolor="#6f42c1"><h2>🔐 Public vs private SSOT</h2></td></tr></table>
+<table><tr><td bgcolor="#6f42c1"><strong><big>🔐 Public vs private SSOT</big></strong></td></tr></table>
 
 
 | | Public (this repo + Portal) | Private (operators only) |
@@ -87,7 +87,7 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 | Vault **`BootStrap/MERIT.json`** | Vault BootStrap template (edition `vault`) | Public OSS registry |
 | **`~/dev/MERIT.json`** | Live machine BootStrap state after first run | A committed repo file |
 
-## ⚡ Quick install
+<table><tr><td bgcolor="#0d9488"><strong><big>⚡ Quick install</big></strong></td></tr></table>
 
 
 **Recommended cold start:** [download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (**Raw**) to a tools folder such as `C:\Tools`, open Windows PowerShell or PowerShell 7, and run:
@@ -127,7 +127,7 @@ cd merit-agent-skills
 ./merit.sh skills install --target Cursor
 ```
 
-## 🧩 Multi-runtime install (same `skills/` tree)
+<table><tr><td bgcolor="#0d9488"><strong><big>🧩 Multi-runtime install (same `skills/` tree)</big></strong></td></tr></table>
 
 
 | Runtime | Status | Install |
@@ -145,7 +145,7 @@ cd merit-agent-skills
 
 Registry source of truth: [`cfg/agent_hosts.json`](cfg/agent_hosts.json).
 
-## Collaboration � suggest a host
+<table><tr><td bgcolor="#0d9488"><strong><big>🤝 Collaboration — suggest a host</big></strong></td></tr></table>
 
 MERIT aims to be the **one-stop** public path for builders on **any** AI IDE, agentic harness, or autonomous agent � not just the hosts above.
 
@@ -159,7 +159,7 @@ We add vetted hosts to [`cfg/agent_hosts.json`](cfg/agent_hosts.json) and promot
 
 **mmUpgrade** is public freeware (`merit-mm-upgrade`). Full **`merit-upgrade`** (IAR / hygiene / maturity / closeout) stays vault-only via `merit.ps1 runtime out` — not in this OSS tree.
 
-## 🍽️ 3 Steps Over Dinner cheatsheet
+<table><tr><td bgcolor="#0d9488"><strong><big>🍽️ 3 Steps Over Dinner cheatsheet</big></strong></td></tr></table>
 
 
 Use this review order for human validation once code, docs, and E2E are complete:
@@ -179,7 +179,7 @@ Use this review order for human validation once code, docs, and E2E are complete
 
 Optional confidence pass: run **E2E Testing Using Playwright** in both `merit-demo` and `merit-test` after `npm install`; screenshots prove the local routes and responsive flows, while provider checks prove the hosted MERIT boundary and independent consumer identities.
 
-## 🛠️ One public CLI
+<table><tr><td bgcolor="#0d9488"><strong><big>🛠️ One public CLI</big></strong></td></tr></table>
 
 
 ```powershell
@@ -209,7 +209,7 @@ Shell wrappers require `pwsh` or PowerShell.
 
 Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-freemium.sh`.
 
-## 🧪 E2E Testing Using Playwright (optional)
+<table><tr><td bgcolor="#0d9488"><strong><big>🧪 E2E Testing Using Playwright (optional)</big></strong></td></tr></table>
 
 
 The public quickstart does not require Node dependencies, but full visual validation does. In `merit-demo`, run:
@@ -228,7 +228,7 @@ npm install
 
 `npm install` installs the demo’s declared Node dev tooling, including `@playwright/test`; the repo postinstall attempts to install the Chromium browser used for screenshots. The MERIT wrapper then runs the route/provider checks and writes screenshots under `merit-demo docs/evidence/`. If dependencies are not installed, `verify` can still pass, but screenshot capture is skipped.
 
-## 🧠 Skills
+<table><tr><td bgcolor="#0d9488"><strong><big>🧠 Skills</big></strong></td></tr></table>
 
 
 | Skill | Purpose |
@@ -248,7 +248,7 @@ npm install
 
 All OSS user docs use **`.\merit.ps1`** / **`./merit.sh`**. There are no public shim scripts.
 
-## Freemium vs Plus
+<table><tr><td bgcolor="#0d9488"><strong><big>💎 Freemium vs Plus</big></strong></td></tr></table>
 
 | | Free (OSS) | Plus |
 |---|------------|------|
@@ -264,7 +264,7 @@ Plus: **$10.79/mo** ($2.49/wk round up); 20% off 6-month; 50% off annual.
 
 Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** SKU → meritsubs entitlements. See [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md).
 
-## Releases
+<table><tr><td bgcolor="#0d9488"><strong><big>🚀 Releases</big></strong></td></tr></table>
 
 | Policy | Detail |
 |--------|--------|
@@ -276,11 +276,11 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
 
-## Licensing (product fork)
+<table><tr><td bgcolor="#0d9488"><strong><big>📜 Licensing (product fork)</big></strong></td></tr></table>
 
 Apache-2.0 adoption on skills; monetization via meritstore — not license royalties. See **`LICENSING.md`**, **`THIRD_PARTY_NOTICES.md`**.
 
-## Sync from vault
+<table><tr><td bgcolor="#0d9488"><strong><big>🔄 Sync from vault</big></strong></td></tr></table>
 
 Exported from `merit-private-vault/templates/skills/` at release time.
 # Developer repository access
