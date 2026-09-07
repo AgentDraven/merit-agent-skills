@@ -159,10 +159,10 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 | 2. Root Hub launcher | PASS | Root `Merit-Hub.ps1 -Help` smoke test; implementation remains under `Merit-Hub/`; release `skills-v0.5.99` |
 | 3. CLI extraction | IN PROGRESS | `merit/modules/Merit.Core.ps1` owns shared primitives; `merit.ps1 help` and `verify` parity pass; remaining command families still being extracted |
 | 4. Unified IDE installer | PASS | Implementation moved to `merit/modules/Merit.SkillsInstall.ps1`; root wrappers removed; install/remove/reinstall acceptance passed; release `skills-v0.5.123` |
-| 5. Bootstrap migration | IN PROGRESS | `Merit.Surface.ps1` is authoritative for CLI and Hub surface loading; legacy `_resolve.ps1` remains fallback |
+| 5. Bootstrap migration | PASS | OSS/law/surface helpers moved into `merit/modules`; templates moved into `cfg`; Hub smoke, law, surface, and verify tests pass; `BootStrap/` removed |
 | 6. Law relocation | PASS | Canonical `merit/merit.blob` is authoritative; legacy root payload removed; law tests pass; release `skills-v0.5.110` |
 | 7. Vault delegation | PASS | Clean AgentDraven vault checkout at `C:\DApps\merit-private-vault`; allow-listed delegation and `mXin --help` live test pass; vault tree unchanged; surface now reports `oss+ide+vault`; release `skills-v0.5.120` |
-| 8. Compatibility cleanup | IN PROGRESS | Root installer wrappers removed and CLI install verified; Bootstrap remains because Hub still has active `_oss.ps1`/vault handoff callers; documentation references still require cleanup |
+| 8. Compatibility cleanup | IN PROGRESS | Root installer wrappers and `BootStrap/` removed; remaining documentation references require cleanup and final consumer review |
 
 Law migration note: the resolver now uses canonical `merit/merit.blob`; the legacy root blob has been removed after migration validation.
 

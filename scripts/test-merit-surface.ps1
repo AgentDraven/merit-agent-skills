@@ -4,7 +4,7 @@ param([switch]$Verbose)
 
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
-$resolve = Join-Path $Root 'BootStrap\_resolve.ps1'
+$resolve = Join-Path $Root 'merit\modules\Merit.Surface.ps1'
 if (-not (Test-Path -LiteralPath $resolve)) { throw "missing $resolve" }
 
 $Script:MeritResolveRepoRoot = $Root

@@ -1651,7 +1651,7 @@ function New-MeritBackup {
 
     foreach ($pair in @(
             @{ Src = (Join-Path $dev 'MERIT.json'); Sub = 'dev'; Name = 'MERIT.json' }
-            @{ Src = (Join-Path $oss 'BootStrap\MERIT.json'); Sub = 'oss-bootstrap'; Name = 'MERIT.json' }
+            @{ Src = (Join-Path $oss 'cfg\MERIT.template.json'); Sub = 'oss-bootstrap'; Name = 'MERIT.json' }
             @{ Src = $Script:HubScriptPath; Sub = 'hub'; Name = (Split-Path -Leaf $Script:HubScriptPath) }
         )) {
         if (Copy-IfExists -Source $pair.Src -DestDir (Join-Path $dir $pair.Sub) -DestName $pair.Name) {
@@ -2228,7 +2228,7 @@ function Get-SkillsRepoRoot {
 function Get-HubOssInternalScript {
     $root = Get-SkillsRepoRoot
     if ([string]::IsNullOrWhiteSpace($root)) { return $null }
-    return Join-Path $root 'BootStrap\_oss.ps1'
+    return Join-Path $root 'merit\modules\Merit.Oss.ps1'
 }
 
 function Promote-HubDotsourcedFunctions {
@@ -2268,7 +2268,7 @@ function Import-HubOssHelpers {
 function Import-HubOssHelpersFromSkills {
     param([string]$SkillsRoot)
     if ([string]::IsNullOrWhiteSpace($SkillsRoot)) { return $false }
-    $oss = Join-Path $SkillsRoot 'BootStrap\_oss.ps1'
+    $oss = Join-Path $SkillsRoot 'merit\modules\Merit.Oss.ps1'
     if (-not (Test-Path -LiteralPath $oss)) {
         Write-Fail "OSS helpers missing: $oss"
         return $false
@@ -3120,7 +3120,7 @@ function Ensure-HubOssHelpers {
     $oss = Get-HubOssInternalScript
     if (-not (Test-Path -LiteralPath $oss)) {
         # Prefer bench skills even if Resolve-MeritSkillsRepoRoot pointed elsewhere (IDE marker).
-        $benchOss = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\BootStrap\_oss.ps1'
+        $benchOss = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\merit\modules\Merit.Oss.ps1'
         if (Test-Path -LiteralPath $benchOss) {
             Write-Warn "Primary OSS path missing ($oss) - loading bench copy: $benchOss"
             return (Import-HubOssHelpersFromSkills -SkillsRoot (Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills'))
@@ -3219,7 +3219,7 @@ function Ensure-HubDemoPlay {
     $cfg = Get-HubConfig
     $bench = Get-MyMeritAppRoot
     $skillsDest = Join-Path $bench 'merit-agent-skills'
-    $ossPath = Join-Path $skillsDest 'BootStrap\_oss.ps1'
+    $ossPath = Join-Path $skillsDest 'merit\modules\Merit.Oss.ps1'
     if (-not (Test-Path -LiteralPath (Join-Path $skillsDest 'merit.ps1'))) {
         Write-Note 'Skills clone missing - cloning skills pin first (still not seeding demo via 2).'
         $okSkills = Invoke-GitClonePin -Url ([string]$cfg.skillsUrl) -Pin ([string]$cfg.skillsPin) -Dest $skillsDest -Label 'merit-agent-skills'
@@ -3912,4 +3912,3 @@ try {
 finally {
     Complete-HubSession
 }
-

@@ -168,8 +168,7 @@ function Get-OssState {
     }
     $bench = Get-OssBenchFolder
     foreach ($legacy in @(
-            (Join-Path $bench 'BootStrap\MERIT.json'),
-            (Join-Path $bench 'merit-agent-skills\BootStrap\MERIT.json')
+            (Join-Path $bench 'merit-agent-skills\cfg\MERIT.template.json')
         )) {
         if (Test-Path -LiteralPath $legacy) {
             $old = Get-Content -LiteralPath $legacy -Raw -Encoding UTF8 | ConvertFrom-Json

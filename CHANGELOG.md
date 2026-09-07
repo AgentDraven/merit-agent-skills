@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.127] - 2026-09-06
+### Changed
+- Migrated OSS, law, surface, and template helpers out of `BootStrap/` into `merit/modules` and `cfg`.
+- Removed the obsolete `BootStrap/` directory after Hub, law, surface, and verification smoke tests passed.
+
 ## [0.5.126] - 2026-09-06
 ### Changed
 - Added confirmed POSIX PowerShell bootstrap support using brew, apt-get, dnf, or yum with explicit user confirmation and re-exec under `pwsh`.
