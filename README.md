@@ -20,6 +20,68 @@ Every beginner pathway is explained in three layers: **Start**, **Make progress*
 
 > IDE skills are an optional helper for the try, dinner, and hello-world paths.
 
+### Peel-The-Onion cards: three steps, three checks each 🧅
+
+#### 🚀 I want to try MERIT
+
+1. **Start** — open PowerShell, run `\.\Merit-Hub.ps1`, then choose **1** and **2**.
+   - Hub checks prerequisites.
+   - Hub installs the approved CompatSet.
+   - Receipt shows the skills path and pin.
+2. **Make progress** — choose **3 Try it**.
+   - Hub reuses a clean local demo.
+   - HTTP server starts on the reusable port.
+   - Browser opens `/play/`.
+3. **Finish** — run **3V**, then optionally **O → OC**.
+   - Confirm Hosted Ready and workbench mounted.
+   - Check Register free and portal links.
+   - Receipt records URLs and validation status.
+
+#### 🍽️ I want to build over dinner
+
+1. **Start** — follow the [dinner walkthrough](docs/howto/launch-over-dinner.md).
+   - Run the Hub from PowerShell.
+   - Choose a demo and friendly product name.
+   - Keep accounts optional for the first night.
+2. **Make progress** — personalize the consumer.
+   - Edit branding and story fields.
+   - Preview through the local HTTP server.
+   - Run verification after each change.
+3. **Finish** — validate and share the idea.
+   - Run closeout and review the receipt.
+   - Choose a Journal or AMA surface.
+   - Publish only after hosted checks pass.
+
+#### 👋 I want a hello-world app
+
+1. **Start** — open `merit-demo` and run quickstart.
+   - The scaffold loads the pinned workbench.
+   - No vault or cloud account is required.
+   - The command prints the local URL.
+2. **Make progress** — explore `/play/`.
+   - Confirm “Hello, meritutils”.
+   - Confirm Hosted Ready and mounted workbench.
+   - Try guest controls and navigation.
+3. **Finish** — repeat with **3V** when ready.
+   - Validate routes one by one.
+   - Capture screenshots or receipt evidence.
+   - Stop with `0` when finished.
+
+#### 🧠 I want skills in my IDE
+
+1. **Start** — run `Merit-Hub.ps1` and choose **I**.
+   - Select your host.
+   - Hub checks the adapter and target.
+   - Unrelated settings are preserved.
+2. **Make progress** — use the installed skills.
+   - Ask the IDE to follow MERIT law.
+   - Use closeout and 3-3 at the end of work.
+   - Treat unsupported hosts as guidance-only.
+3. **Finish** — verify the installation.
+   - Re-run **I** if the pin changes.
+   - Check host status or warning receipt.
+   - Keep consumer code independent from IDE files.
+
 ### 🚀 I want to try MERIT
 
 Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1), open PowerShell, change to its folder, and run ` .\Merit-Hub.ps1`.

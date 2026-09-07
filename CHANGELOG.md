@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.159] - 2026-09-07
+### Added
+- Applied the Peel-The-Onion three-step cards to the root beginner README, including the basic `1 → 2 → 3 → 3V → O → OCV` journey.
+
 ## [0.5.158] - 2026-09-07
 ### Fixed
 - Surface pin mismatches now explain the consequence and the exact repair path.
