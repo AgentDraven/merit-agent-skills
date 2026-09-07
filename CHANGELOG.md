@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.163] - 2026-09-07
+### Fixed
+- Removed duplicate beginner shortcuts, updated stale manual pin examples, and added OCV to the Hub Mermaid pathway.
+
 ## [0.5.162] - 2026-09-07
 ### Fixed
 - Added one shared legend line to every Hub receipt so Step 2, Step 3, 3V, and OC terminology stays consistent.

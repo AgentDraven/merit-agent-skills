@@ -95,7 +95,7 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 | **Live ecosystems (bolt-on targets)** | [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json) � default **v00** until vault publishes **v01** as `live_public`. Hobby is never listed. |
 | **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)**, open Windows PowerShell or PowerShell 7, change to its folder, and run ` .\Merit-Hub.ps1`. The ` .\` prefix is required by PowerShell for a script in the current folder. The Hub detects Windows PowerShell 5.1, installs/launches `pwsh` when needed, and guides **1** → **2** → **3** (optional **OC**). Full menu + personas: [Merit-Hub/README.md](Merit-Hub/README.md). |
 | **Build over dinner (start here)** | **[docs/howto/launch-over-dinner.md](docs/howto/launch-over-dinner.md)** — 3 steps, no accounts night one |
-| **OSS internals** | Hub **2** dotsources `merit/modules/Merit.Oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
+| **OSS internals** | Hub **2** loads `merit/modules/Merit.Oss.ps1` in the skills clone. No separate Bootstrap product or live copy is used. |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
 | **Launch/deploy PoV** | [docs/deploy.md](docs/deploy.md) — one local `.merit_launch.md`, one `merit` command |
 | **LLD map (audit)** | [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md) |
@@ -131,8 +131,8 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 | This repo **`merit.ps1` / `merit.sh`** | Public OSS CLI (`create` / `apply` / `verify` / `portal` / consumer `closeout`) | Vault operator CLI |
 | Vault **`scripts/merit.ps1`** | Operator CLI (`mXin`, `runtime`, `env`, hygiene) | Public create/deploy CLI |
 | This repo **`cfg/oss-bench.template.json`** | Template field names for the laptop status file | Live laptop state (that is `%MYMERITAPP%\oss-bench.json`) |
-| Vault **`BootStrap/MERIT.json`** | Vault-only operator template (edition `vault`) | Public OSS registry |
-| **`~/dev/MERIT.json`** | Live machine BootStrap state after first run | A committed repo file |
+| Vault operator state | Vault-only operator template and runtime state | Public OSS registry |
+| **`oss-bench.json`** | Live machine bench state after first run | A committed repo file |
 
 <table><tr><td bgcolor="#0d9488"><strong><big><big>⚡ Quick install</big></big></strong></td></tr></table>
 
@@ -158,11 +158,11 @@ The ` .\` prefix matters: PowerShell does not execute a script from the current 
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\merit.ps1 skills install --target Cursor
 # omit -Target to print usage (no default host)
-# Do not run BootStrap as a second product. Use Merit-Hub (required full command):
+# Use Merit-Hub for device setup (required full command):
 # pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
 ```
 
@@ -171,7 +171,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./merit.sh skills install --target Cursor
 ```

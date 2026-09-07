@@ -13,7 +13,7 @@ Create a clean working directory and clone the two public repos:
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 .\merit.ps1 skills install --target Cursor
@@ -24,7 +24,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
 ./merit.sh skills install --target Cursor

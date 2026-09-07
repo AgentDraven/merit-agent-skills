@@ -35,7 +35,7 @@ Create an empty directory, clone the pinned skills release, clone `merit-demo`, 
 ```powershell
 mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
-git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\merit.ps1 skills install --target Cursor
 ```
@@ -95,7 +95,7 @@ There are two separate actions:
 
 | Action | When | Command |
 |--------|------|---------|
-| Clone/download repo | Advanced/manual path; beginners should use Hub 1 → 2 → 3 | `git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git` |
+| Clone/download repo | Advanced/manual path; beginners should use Hub 1 → 2 → 3 | `git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git` |
 | Install skills into an AI IDE host | Optional, only when you want the host to see skill instructions as installed skills | Windows `.\merit.ps1 skills install --target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./merit.sh skills install -Target …` (aliases: `Claude`, `Agents`; `Project` needs `-Path`) |
 
 You can run `merit.ps1` / `merit.sh` directly from the cloned repo without installing skills. Install is for agent authoring convenience, not for runtime deployment.
