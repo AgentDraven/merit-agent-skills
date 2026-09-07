@@ -2867,7 +2867,8 @@ function Invoke-MeritPrereqs {
 }
 
 function Ensure-MeritHubEnvAtStart {
-    if ($Force) { return }
+    param([switch]$Reconfigure)
+    if ($Force -and -not $Reconfigure) { return }
     Write-Header 'MYMERIT* environment'
     Write-HubEnvScopes
     if (Test-HubProcessBenchMode) {
@@ -2878,7 +2879,7 @@ function Ensure-MeritHubEnvAtStart {
     }
     $toolsUser = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'User')
     $toolsProc = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', 'Process')
-    if ([string]::IsNullOrWhiteSpace($toolsUser)) {
+    if ($Reconfigure -or [string]::IsNullOrWhiteSpace($toolsUser)) {
         $def = Get-DefaultMyMeritTools
         Write-Note 'MYMERITTOOLS User is empty (new laptop, or Pristine cleared it).'
         if ($toolsProc) { Write-Info "This process still has MYMERITTOOLS=$toolsProc (not persisted to User)." }
@@ -2889,7 +2890,7 @@ function Ensure-MeritHubEnvAtStart {
     }
     $appUser = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'User')
     $appProc = [Environment]::GetEnvironmentVariable('MYMERITAPP', 'Process')
-    if ([string]::IsNullOrWhiteSpace($appUser)) {
+    if ($Reconfigure -or [string]::IsNullOrWhiteSpace($appUser)) {
         $def = Get-DefaultMyMeritApp
         Write-Note 'MYMERITAPP User is empty (new laptop, or Pristine cleared it).'
         if ($appProc) { Write-Info "This process still has MYMERITAPP=$appProc (not persisted to User)." }
@@ -3151,6 +3152,9 @@ function Invoke-HubSetupLaptop {
     Write-Header '1 Setup laptop'
     Write-HubMap -Here '1'
     Write-HubDrillIn '1'
+    # Option 1 is the recovery/reset path as well as first-time setup: always
+    # let the user correct both roots instead of silently reusing stale values.
+    Ensure-MeritHubEnvAtStart -Reconfigure
     [void](Invoke-MeritPrereqs)
     Write-HubReceipt '1'
     Write-HubNextSteps '1'
@@ -3811,6 +3815,20 @@ function Set-MyMeritToolsPrompt {
     Set-UserEnvVar -Name 'MYMERITTOOLS' -Value (Expand-HomePath $path)
 }
 
+function Invoke-HubPathRecovery {
+    param([string]$Choice)
+    Write-Warn "The $Choice action could not use the configured MERIT folder."
+    Write-Note 'Choose corrected roots now, then retry the same menu option.'
+    try {
+        Ensure-MeritHubEnvAtStart -Reconfigure
+        Write-Ok 'MERIT paths refreshed. The menu remains open; retry the option.'
+    }
+    catch {
+        Write-Fail ("Path repair failed: " + $_.Exception.Message)
+        Write-Note 'Use M to change MYMERITAPP or T to change MYMERITTOOLS, then retry.'
+    }
+}
+
 function Show-InteractiveMenu {
     $Script:HubInteractiveAction = $true
     try {
@@ -3871,6 +3889,9 @@ function Show-InteractiveMenu {
         }
         catch {
             Write-Fail ("Step error: " + $_.Exception.Message)
+            if ($c -match '^(G|g|A|a|B|b|P|p|S|s|1|2|J|j)$') {
+                Invoke-HubPathRecovery -Choice $c
+            }
             Write-Note 'Menu stays open. Fix the issue and retry, or pick another key. Type 0 at Select to exit.'
             $pending = Read-HubContinue
         }

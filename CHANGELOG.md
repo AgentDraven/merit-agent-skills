@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.133] - 2026-09-06
+### Fixed
+- Hub option 1 now explicitly reconfigures `MYMERITTOOLS` and `MYMERITAPP` instead of silently reusing stale paths.
+- Path failures in cleanup/setup options offer recovery and keep the menu open.
+
 ## [0.5.132] - 2026-09-06
 ### Added
 - Fresh-device Hub acceptance checklist for `where`, `verify`, `serve`, Hosted Ready, mount, and Register checks.
