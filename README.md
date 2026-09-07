@@ -11,9 +11,10 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 |---|---|---|---|
 | 🚀 [I want to try MERIT](#i-want-to-try-merit) | Open PowerShell | Run the Hub | Choose the demo |
 | 🍽️ [I want to build over dinner](docs/howto/launch-over-dinner.md) | Start the Hub | Personalize `merit-demo` | Preview and share |
+| 👋 [I want a hello-world app](#i-want-a-hello-world-app) | Open `merit-demo` | Run `quickstart` | Open `/play/` |
 | 🧠 [I want skills in my IDE](#i-want-skills-in-my-ide) | Pick your host | Run Hub **I** | Verify the skills |
 
-> IDE skills are an optional helper for the first two paths, not an orphaned fourth step.
+> IDE skills are an optional helper for the try, dinner, and hello-world paths.
 
 ### 🚀 I want to try MERIT
 
