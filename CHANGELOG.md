@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.102] - 2026-09-06
+### Changed
+- Routed Hub IDE skill installation through `merit.ps1 skills install` so the public CLI is the single installation entrypoint.
+
 ## [0.5.101] - 2026-09-06
 ### Added
 - Added `merit.ps1 skills list`, `skills status`, and `skills install --target <Host>` as the unified IDE installation entrypoint.

@@ -16,7 +16,9 @@ function Invoke-MeritSkillsCommand {
         }
         'install' {
             if (-not $target) { throw 'Usage: .\merit.ps1 skills install --target <Host>' }
-            & $installer -Target $target
+            $path = Get-ArgValue -ArgList $ArgList -Name '--path'
+            if ($path) { & $installer -Target $target -Path $path }
+            else { & $installer -Target $target }
             if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "skills install failed (exit $LASTEXITCODE)" }
             return
         }

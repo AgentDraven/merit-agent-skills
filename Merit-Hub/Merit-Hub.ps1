@@ -2349,6 +2349,14 @@ function Invoke-InstallMeritSkills {
     [void](Invoke-MeritPrereqs)
     $repoRoot = Ensure-SkillsRepo
     if (-not $repoRoot) { return $false }
+    # Single installer authority: route Hub installs through the public OSS CLI.
+    $publicCli = Join-Path $repoRoot 'merit.ps1'
+    if (Test-Path -LiteralPath $publicCli) {
+        $cliArgs = @('skills', 'install', '--target', $Target)
+        if ($Target -eq 'Project' -and $ProjectPath) { $cliArgs += @('--path', $ProjectPath) }
+        & $publicCli @cliArgs
+        return ($LASTEXITCODE -eq 0)
+    }
     $skillsSrc = Join-Path $repoRoot 'skills'
     if (-not (Test-Path -LiteralPath $skillsSrc)) {
         Write-Fail "skills/ missing under $repoRoot"
