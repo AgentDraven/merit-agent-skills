@@ -117,17 +117,6 @@ function New-UsageOperatorPhrase {
     return "$a-$n-$pin"
 }
 
-function Get-Sha256Hex {
-    param([string]$Text)
-    $sha = [System.Security.Cryptography.SHA256]::Create()
-    try {
-        $bytes = [System.Text.Encoding]::UTF8.GetBytes($Text)
-        return -join ($sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') })
-    } finally {
-        $sha.Dispose()
-    }
-}
-
 function Ensure-UsageOperatorPhrase {
     param([string]$TargetRoot, [string]$ConsumerId)
     $envPath = Join-Path $TargetRoot '.env.local'
@@ -148,23 +137,6 @@ function Ensure-UsageOperatorPhrase {
     }
     $hash = Get-Sha256Hex -Text ("usage|" + $ConsumerId.ToLowerInvariant() + "|" + $existing.ToLowerInvariant())
     return $hash
-}
-
-function Set-EnvLocalValue {
-    param([string]$Path, [string]$Name, [string]$Value)
-    $lines = @()
-    if (Test-Path $Path) { $lines = @(Get-Content -LiteralPath $Path -Encoding UTF8) }
-    $found = $false
-    $out = foreach ($line in $lines) {
-        if ($line -match "^$([regex]::Escape($Name))=") {
-            $found = $true
-            "$Name=$Value"
-        } else {
-            $line
-        }
-    }
-    if (-not $found) { $out += "$Name=$Value" }
-    Set-Content -LiteralPath $Path -Value $out -Encoding UTF8
 }
 
 function Write-EnvLocal {

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.106] - 2026-09-06
+### Changed
+- Extracted usage hashing and environment-file update primitives into the shared CLI core module.
+
 ## [0.5.105] - 2026-09-06
 ### Changed
 - Extracted consumer slug and usage-environment helpers into the shared CLI core module.

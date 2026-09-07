@@ -108,3 +108,24 @@ function Get-UsagePassphraseEnvName {
     $slug = ($ConsumerId.ToUpperInvariant() -replace '[^A-Z0-9]+', '_')
     return "MERIT_${slug}_PASSPHRASE"
 }
+
+function Get-Sha256Hex {
+    param([string]$Text)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($Text)
+        return -join ($sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') })
+    } finally { $sha.Dispose() }
+}
+
+function Set-EnvLocalValue {
+    param([string]$Path, [string]$Name, [string]$Value)
+    $lines = @()
+    if (Test-Path $Path) { $lines = @(Get-Content -LiteralPath $Path -Encoding UTF8) }
+    $found = $false
+    $out = foreach ($line in $lines) {
+        if ($line -match "^$([regex]::Escape($Name))=") { $found = $true; "$Name=$Value" } else { $line }
+    }
+    if (-not $found) { $out += "$Name=$Value" }
+    Set-Content -LiteralPath $Path -Value $out -Encoding UTF8
+}
