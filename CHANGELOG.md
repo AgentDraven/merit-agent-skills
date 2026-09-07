@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.143] - 2026-09-06
+### Added
+- Registered `skills-v0.5.142` as a supported CompatSet choice.
+
 ## [0.5.142] - 2026-09-06
 ### Added
 - Registered `skills-v0.5.141` as a second supported CompatSet choice in Hub.

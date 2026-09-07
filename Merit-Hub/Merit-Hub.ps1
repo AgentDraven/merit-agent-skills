@@ -3358,13 +3358,17 @@ function Invoke-HubTryIt {
     $opened = $false
     if (Test-Path -LiteralPath $cli) {
         try {
+            Write-Attention 'Step 3 architecture: local HTML/portal shell + hosted merit_workbench runtime from merit-prod.'
+            Write-Note 'This is a thin consumer scaffold; it does not copy or mimic the cloud workbench locally.'
             $listener = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
             if ($listener) {
                 Write-Ok 'Reusing the existing merit-demo HTTP server on port 3000.'
             } else {
-                Start-Process -FilePath (Get-Command pwsh -ErrorAction Stop).Source -WorkingDirectory $demoRoot -ArgumentList @('-NoProfile','-File',$cli,'serve') | Out-Null
+                $log = Join-Path $demoRoot 'merit-demo docs\IAR\evidence\hub-serve.log'
+                New-Item -ItemType Directory -Force -Path (Split-Path $log) | Out-Null
+                Start-Process -FilePath (Get-Command pwsh -ErrorAction Stop).Source -WorkingDirectory $demoRoot -ArgumentList @('-NoProfile','-File',$cli,'serve') -RedirectStandardOutput $log -RedirectStandardError $log -WindowStyle Minimized | Out-Null
                 Start-Sleep -Seconds 2
-                Write-Ok 'Started the merit-demo HTTP server on port 3000.'
+                Write-Ok 'Started the merit-demo HTTP server on port 3000 (output -> IAR/evidence/hub-serve.log).'
             }
             Start-Process 'http://localhost:3000/play/'
             Write-Ok 'Serving merit-demo over HTTP and opening http://localhost:3000/play/.'

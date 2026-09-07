@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
+    { "pin": "skills-v0.5.142", "releasedAt": "2026-09-06", "status": "supported", "notes": "Step 3 architecture reporting and HTTP evidence" },
     { "pin": "skills-v0.5.141", "releasedAt": "2026-09-06", "status": "supported", "notes": "CompatSet registry + Hub selection baseline" },
     { "pin": "skills-v0.5.140", "releasedAt": "2026-09-06", "status": "supported", "notes": "Current OSS + IDE baseline" }
   ]
