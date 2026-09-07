@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.157] - 2026-09-07
+### Added
+- Promoted `skills-v0.5.156` to the supported CompatSet registry and made it the Hub default.
+- Added the repository IAR evidence directory so closeout receipts remain in-repo when writable.
+
 ## [0.5.156] - 2026-09-07
 ### Added
 - Standardized beginner pathway cards in the Hub README and encoded the three-step/three-sub-bullet rule in the exported OSS law blob.
