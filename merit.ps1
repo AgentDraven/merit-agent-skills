@@ -1115,6 +1115,17 @@ function Invoke-MeritWhere {
         exit 1
     }
     $surf = Get-MeritSurface -NoWrite:$noWrite
+    # Surface resolver may be loaded from a pinned legacy shim; ensure the
+    # explicit vault environment/sibling is reflected in the human report.
+    if (-not $surf.vaultRoot) {
+        $vaultRoot = Resolve-MeritVaultRoot -FromRoot $Root
+        if ($vaultRoot) {
+            if ($surf.PSObject.Properties.Name -contains 'vaultRoot') { $surf.vaultRoot = $vaultRoot } else { $surf | Add-Member -NotePropertyName vaultRoot -NotePropertyValue $vaultRoot }
+            $cliPath = Join-Path $vaultRoot 'scripts\merit.ps1'
+            if ($surf.PSObject.Properties.Name -contains 'operatorCli') { $surf.operatorCli = $cliPath } else { $surf | Add-Member -NotePropertyName operatorCli -NotePropertyValue $cliPath }
+            if ($surf.PSObject.Properties.Name -contains 'edition') { $surf.edition = 'oss+ide+vault' } else { $surf | Add-Member -NotePropertyName edition -NotePropertyValue 'oss+ide+vault' }
+        }
+    }
     Write-MeritAccessContext -Surface $surf -AsJson:$asJson
     Write-MeritSurfaceReport -Surface $surf -AsJson:$asJson
     exit 0

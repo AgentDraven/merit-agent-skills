@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.120] - 2026-09-06
+### Fixed
+- Surface reports now include an explicitly configured or standard sibling vault, including edition and operator CLI path.
+
 ## [0.5.119] - 2026-09-06
 ### Changed
 - Added the standard `MYMERITAPP\merit-private-vault` sibling to vault discovery candidates.
