@@ -209,25 +209,6 @@ function Invoke-Apply {
     Write-Host "apply OK: .merit_launch.md -> .env.local, cfg/flask_deploy.json, cfg/portals.json"
 }
 
-function Test-WebpageShellHtml {
-    param([string]$Path, [string]$Label)
-    $fail = @()
-    if (-not (Test-Path -LiteralPath $Path)) { return @("missing $Label") }
-    $html = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
-    $ux = ($html -match '\bcreateAppShell\b') -or ($html -match '\bcreateBrandShell\b')
-    $diy = $html -match '<header\b[^>]*class=["''][^"'']*merit-ux-brand'
-    if (-not $ux) {
-        $fail += "${Label}: Class B HTML must call createAppShell or createBrandShell (AP-MA-13). Checklist: merit-prod docs/IAR/plans/WEBPAGE_SHELL_COMPLIANCE.md"
-    }
-    if ($diy -and -not $ux) {
-        $fail += "${Label}: DIY merit-ux-brand header without package boot (AP-MA-13)"
-    }
-    if ($ux -and ($html -notmatch 'data-webpage-shell=')) {
-        $fail += "${Label}: missing data-webpage-shell=createAppShell or createBrandShell"
-    }
-    return $fail
-}
-
 function Invoke-Verify {
     param([string]$TargetRoot)
     $fail = @()

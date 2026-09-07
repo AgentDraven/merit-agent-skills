@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.108] - 2026-09-06
+### Changed
+- Extracted the webpage-shell validator into the shared CLI core module.
+
 ## [0.5.107] - 2026-09-06
 ### Changed
 - Extracted environment-file generation and branding update helpers into the shared CLI core module.
