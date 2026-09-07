@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.118] - 2026-09-06
+### Changed
+- Moved the IDE installer implementation into `merit/modules/Merit.SkillsInstall.ps1`.
+- Converted root `install.ps1` into a compatibility wrapper routed through `merit.ps1 skills install`.
+- Verified install, guarded remove, reinstall, and consumer verification paths.
+
 ## [0.5.117] - 2026-09-06
 ### Changed
 - Added guarded `merit.ps1 skills remove --target <Host> --yes` for removing MERIT skill folders without touching unrelated host content.

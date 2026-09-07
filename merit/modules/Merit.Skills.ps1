@@ -1,10 +1,10 @@
-# Unified IDE skill command adapter. The installer implementation remains
-# compatibility-owned by install.ps1 until the migration phase removes it.
+# Unified IDE skill command adapter. The implementation lives beside this
+# adapter; install.ps1 is only a compatibility wrapper.
 function Invoke-MeritSkillsCommand {
     param([string[]]$ArgList, [string]$RepoRoot)
     $sub = if ($ArgList.Count) { "$($ArgList[0])".ToLowerInvariant() } else { 'list' }
     $target = Get-ArgValue -ArgList $ArgList -Name '--target'
-    $installer = Join-Path $RepoRoot 'install.ps1'
+    $installer = Join-Path $RepoRoot 'merit\modules\Merit.SkillsInstall.ps1'
     if (-not (Test-Path -LiteralPath $installer)) { throw "Skill installer not found: $installer" }
     switch ($sub) {
         'list' { & $installer -Help; return }
