@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.168] - 2026-09-07
+### Fixed
+- Rebuilt the Hub legend and map so `3V` is visibly under Try it and `OCV` is visibly under `OC`.
+
 ## [0.5.167] - 2026-09-07
 ### Fixed
 - OCV now self-heals a missing `OC-Tutorial.ps1` by downloading the matching helper and reporting the action.

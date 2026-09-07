@@ -2996,11 +2996,10 @@ function Invoke-GitClonePin {
 
 function Write-HubLegend {
     Write-Host ''
-    Write-Host '  LEGEND  local letter = clone on this laptop; C suffix = that artifact hosted' -ForegroundColor White
-    Write-Host '          OC  OSS demo on merit-prod (freeware DualRail) - not a product repo'
-    Write-Host '          VC  operator/tenant grade after V (BootStrap / gates) - vault stays git+local, not merit-prod'
-    Write-Host '          RC  this catalog repo on ITS host (usually Vercel) - not OC'
-    Write-Host '          6   Join (sign up) - portal + register; after OC or after 4 (not OC-only)'
+    Write-Host '  LEGEND  Primary: 1 Setup -> 2 Install -> 3 Try -> 4 Vault -> 5 Repo' -ForegroundColor White
+    Write-Host '          Validation: 3V local demo | OCV hosted OC result' -ForegroundColor DarkGray
+    Write-Host '          Publish: OC OSS in Cloud | VC Venture Capable | RC Repo in Cloud' -ForegroundColor DarkGray
+    Write-Host '          0 is the only exit; subcommands are indented under their parent.' -ForegroundColor DarkGray
 }
 
 function Write-HubMap {
@@ -3018,9 +3017,15 @@ function Write-HubMap {
     Write-Host '         v'
     Write-Host ('  ' + (& $mark '2' '2 Install OSS  (J)'))
     Write-Host '         |'
-    Write-Host ('         +--> ' + (& $mark '3' '3 Try it') + ' --> ' + (& $mark 'OC' 'OC  OSS in the Cloud'))
-    Write-Host ('         +--> ' + (& $mark '4' '4 Vault (local)') + ' --> ' + (& $mark 'VC' 'VC  Venture Capable'))
-    Write-Host ('         +--> ' + (& $mark '5' '5 R (local, role C|P)') + ' --> ' + (& $mark 'RC' 'RC  repo in the Cloud'))
+    Write-Host ('         +--> ' + (& $mark '3' '3 Try it'))
+    Write-Host ('                |--> ' + (& $mark '3V' '3V Validate local demo'))
+    Write-Host ('                +--> ' + (& $mark 'OC' 'OC Publish OSS in Cloud'))
+    Write-Host ('                       +--> ' + (& $mark 'OCV' 'OCV Validate hosted OC'))
+    Write-Host ('         +--> ' + (& $mark '4' '4 Vault (local)'))
+    Write-Host ('                +--> ' + (& $mark 'VC' 'VC Validate Venture Capable'))
+    Write-Host ('         +--> ' + (& $mark '5' '5 Repo (local)'))
+    Write-Host ('                +--> ' + (& $mark '5R' '5R Repo/Cloud status'))
+    Write-Host ('                       +--> ' + (& $mark 'RC' 'RC Validate Repo in Cloud'))
     Write-Host ('         +--> ' + (& $mark '6' '6 Join MERIT (sign up)  after OC or 4'))
     Write-Host '         +--> 0 Stop'
 }
@@ -3851,9 +3856,9 @@ function Show-MeritHubHelp {
     Write-Host '  1) Setup laptop     prereqs + MYMERIT* + Python (venv or global shim)'
     Write-Host '  2) Install OSS      skills pin only (no merit-demo)   (alias J)'
     Write-Host '  3) Try it           clone public merit-demo + serve HTTP + open /play/'
-    Write-Host '       OC  OSS in the Cloud — publish DualRail + register + marketing site'
-    Write-Host '       OCV Hosted OC Tutorial — open and review published URLs step-by-step'
     Write-Host '       3V  Validate demo deployed by Step 3 (Try it)'
+    Write-Host '       OC  OSS in the Cloud — publish DualRail + register + marketing site'
+    Write-Host '          OCV Hosted OC Tutorial — open and review published URLs step-by-step'
     Write-Host '          -NewOc creates a new oc-* id (advanced command-line switch)'
     Write-Host '  4) Vault (local)    clone private vault (working clone kept)'
     Write-Host '       VC  Validate the Vault deployed by Step 4 (Vault - Local) and Venture-Capable Status'

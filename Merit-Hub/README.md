@@ -40,9 +40,9 @@ letter `O` cannot be confused with zero `0` (Stop).
 ```mermaid
 flowchart LR
   S["1 Setup"] --> I["2 Install OSS"] --> T["3 Try it"]
+  T --> V3["3V • Validate demo"]
   T --> OC["OC • OSS in Cloud"]
   OC --> OCV["OCV • Hosted validation"]
-  T --> V3["3V • Validate demo"]
   I --> VA["4 Vault"] --> VC["VC • Validate Vault"]
   I --> R["5 Repo"] --> R5["5R • Repo/Cloud"] --> RC["RC • Repo in Cloud"]
 ```
