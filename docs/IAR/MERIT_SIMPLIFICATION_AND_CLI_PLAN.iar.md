@@ -211,6 +211,21 @@ Closeout evidence receipts are currently written to the deterministic temporary 
 
 ## Document-sprawl guardrail
 
+## NextRel FR — README three-step explainability
+
+**FR-NEXTREL-README-3X3 (B; feeds L1 `MERIT.instructions` when the vault is
+available):** Every beginner-facing pathway in a README must use the same
+three-column pattern: **1. Start → 2. Make progress → 3. Finish**. Under each
+column, provide at least three concrete sub-bullets describing what the user,
+Hub, and hosted system do. The row/table, detailed bullets, and diagram must
+cross-link to one another. A one-line command summary alone is insufficient.
+
+Acceptance: a new user can follow any persona row without guessing the next
+action, and each step names its command, expected result, and evidence.
+
+**Porting note:** add this FR to vault L1 `MERIT.instructions` and regenerate
+the canonical `merit.blob` from the law-pack source during the vault merge.
+
 This IAR is the single controlling plan for CLI simplification, Hub/Bootstrap migration, law placement, installer ownership, vault precedence, implementation status, and acceptance results. New findings and future-release requirements must be added as sections or tables here unless the existing IAR index explicitly approves a separate artifact.
 
 The active IAR set is intentionally small:

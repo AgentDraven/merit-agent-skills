@@ -65,6 +65,70 @@ Advanced helpers: `I` install IDE skills, `M` change `MYMERITAPP`, `T` change
 `MYMERITTOOLS`, `W` show surfaces, `K` list/select approved CompatSets, and
 `G/A/P/S` provide sprawl and cleanup modes.
 
+## Three-step pathway cards 🧩
+
+Every pathway follows the same rhythm: **Start → Make progress → Finish**.
+
+### Try MERIT / local demo 🚀
+
+1. **Start**
+   - Download and run `Merit-Hub.ps1`.
+   - Choose `1` to set laptop paths and prerequisites.
+   - Choose `2` to install the pinned OSS skills.
+2. **Make progress**
+   - Choose `3`; Hub refreshes `merit-demo` and serves HTTP on port 3000.
+   - Open `/play/` and confirm Hosted Ready plus the mounted workbench.
+   - Run `3V` to repeat browser, verify, and E2E checks.
+3. **Finish**
+   - Confirm Register free opens the hosted route.
+   - Confirm the local marketing portal opens over HTTP.
+   - Keep the receipt/evidence before moving to `OC`.
+
+### Publish OSS in Cloud / OC ☁️
+
+1. **Start**
+   - Complete the local `3V` checks.
+   - Confirm `play/`, `portal/`, and `cfg/par_pins.json` exist.
+   - Choose `OC`; Hub begins the OC preflight.
+2. **Make progress**
+   - Preflight checks pins, SRI, artifacts, merit-prod health, and portal readiness.
+   - Hub publishes the play/config and activates the store route.
+   - Hub prints the hosted play, register, and marketing URLs.
+3. **Finish**
+   - Run `OCV` to open each hosted URL one at a time.
+   - Confirm Hosted Ready, registration, and marketing content.
+   - Save the OC receipt; fix and retry if any gate fails.
+
+### Vault / VC 🔐
+
+1. **Start**
+   - Complete `1` and `2` on the operator laptop.
+   - Choose `4` to clone the private vault.
+   - Confirm the private remote and operator identity.
+2. **Make progress**
+   - Choose `VC` to run vault/operator readiness checks.
+   - Validate runtime gates and private configuration.
+   - Keep vault files private and local/git-backed.
+3. **Finish**
+   - Confirm operator runtime verification passes.
+   - Record the vault evidence and access state.
+   - Use `6` only when the operator journey is ready.
+
+### Catalog repo / 5R → RC 📦
+
+1. **Start**
+   - Complete `1` and `2`.
+   - Choose `5` and identify the consumer/provider role.
+   - Confirm the selected repository and remote.
+2. **Make progress**
+   - Use `5R` for local repository and cloud-status checks.
+   - Run the repository’s own verify/build checks.
+   - Confirm its production host and deployment identity.
+3. **Finish**
+   - Choose `RC` to validate the repository in its cloud host.
+   - Record URLs, version, and health evidence.
+   - Keep this path separate from the shared OC demo.
+
 ## After each path: quick acceptance ✅
 
 **After `3` / `3V` (local demo):**

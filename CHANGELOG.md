@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.156] - 2026-09-07
+### Added
+- Standardized beginner pathway cards in the Hub README and encoded the three-step/three-sub-bullet rule in the exported OSS law blob.
+
 ## [0.5.155] - 2026-09-07
 ### Fixed
 - Promoted `skills-v0.5.154` as the default and retained only the latest two backup CompatSets in the curated registry.

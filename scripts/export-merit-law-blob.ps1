@@ -24,6 +24,7 @@ Agents on merit-agent-skills follow public OSS law via merit.ps1 law (merit.blob
 - Skills are index cards; binding law prints from merit.ps1 law closeout.
 - Consumer work: public merit.ps1 on plane B. Operator work: vault scripts\merit.ps1 when plane C exists.
 - Do not fork L1 into consumer repos. Do not raw git commit/tag/push as MERIT closeout.
+- Beginner README pathways use Start → Make progress → Finish, with at least three concrete sub-bullets under each step; keep the table and cards aligned.
 '@
         }
         @{

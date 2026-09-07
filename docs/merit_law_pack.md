@@ -52,3 +52,11 @@ flowchart LR
 ```
 
 L2/L3 are not published in merit-agent-skills. Operators use vault `runtime out`.
+# NextRel README standard
+
+Beginner README pathways use a consistent three-step explanation:
+**Start → Make progress → Finish**. Each step has at least three concrete
+sub-bullets covering user action, system behavior, and expected evidence. Keep
+the table, diagram, and detailed bullets cross-linked. This is a future L1
+requirement to port into `MERIT.instructions` and the generated `merit.blob`
+when `merit-private-vault` is merged.
