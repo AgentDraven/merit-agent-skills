@@ -1,6 +1,6 @@
 # merit-law
 
-OSS L1 law router — unpack merit.blob via public CLI (no plaintext MERIT.instructions in repo).
+OSS L1 law router — unpack merit/merit.blob via public CLI (no plaintext MERIT.instructions in repo).
 
 ## Always start here
 
@@ -12,7 +12,7 @@ cd %MYMERITAPP%\merit-agent-skills
 .\merit.ps1 law --for-skill merit-portal
 ```
 
-Law unpacks **in memory only** from `merit.blob` beside `merit.ps1`. Full L1 SSOT remains in vault `instructions/MERIT.instructions`.
+Law unpacks **in memory only** from `merit/merit.blob`. Full L1 SSOT remains in vault `instructions/MERIT.instructions`.
 
 ## Closeout reminder
 

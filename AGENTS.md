@@ -4,7 +4,7 @@
 
 ## Law authority (no plaintext L1 in repo)
 
-Full vault L1 (`MERIT.instructions`) is **not** shipped here. OSS law lives in **`merit.blob`** (obfuscated pack) unpacked only by **`merit.ps1 law`**.
+Full vault L1 (`MERIT.instructions`) is **not** shipped here. OSS law lives in **`merit/merit.blob`** (obfuscated pack) unpacked only by **`merit.ps1 law`**.
 
 | Need | Command |
 |------|---------|

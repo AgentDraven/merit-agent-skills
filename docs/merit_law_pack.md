@@ -1,4 +1,4 @@
-# Merit law pack (merit.blob)
+# Merit law pack (`merit/merit.blob`)
 
 Public OSS distribution of **near-comprehensive L1 excerpt** without shipping plaintext `MERIT.instructions`.
 

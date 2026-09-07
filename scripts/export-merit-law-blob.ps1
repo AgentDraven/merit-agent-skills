@@ -202,7 +202,9 @@ $manifest = [ordered]@{
     sectionIndex  = @($sections | ForEach-Object { $_.id })
 }
 
-$blobPath = Join-Path $RepoRoot 'merit.blob'
+$blobDir = Join-Path $RepoRoot 'merit'
+if (-not (Test-Path -LiteralPath $blobDir)) { New-Item -ItemType Directory -Force -Path $blobDir | Out-Null }
+$blobPath = Join-Path $blobDir 'merit.blob'
 $manifestPath = Join-Path $RepoRoot 'cfg\merit_law.json'
 
 Write-MeritLawBlob -PackObject $pack -OutPath $blobPath

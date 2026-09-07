@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.110] - 2026-09-06
+### Changed
+- Completed law-payload relocation to canonical `merit/merit.blob` and removed the legacy root payload.
+
 ## [0.5.109] - 2026-09-06
 ### Changed
 - Began law-payload migration: resolver prefers `merit/merit.blob` and warns on legacy root fallback.

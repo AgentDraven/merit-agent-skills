@@ -164,4 +164,4 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 | 7. Vault delegation | OPEN | Not started |
 | 8. Compatibility cleanup | OPEN | Not started |
 
-Law migration note: the resolver now prefers `merit/merit.blob` and warns while using the legacy root blob. The binary payload move remains pending because the compatibility release must carry the payload at the canonical path before the fallback is removed.
+Law migration note: the resolver now uses canonical `merit/merit.blob`; the legacy root blob has been removed after migration validation.

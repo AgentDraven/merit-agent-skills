@@ -6,6 +6,8 @@
 
 **Consolidated simplification plan:** [MERIT_SIMPLIFICATION_AND_CLI_PLAN.iar.md](MERIT_SIMPLIFICATION_AND_CLI_PLAN.iar.md)
 
+The canonical public law payload is now `merit/merit.blob`; the former root payload has been removed.
+
 ## Executive finding
 
 The repositories are not duplicate implementations in the strict sense, but the boundary is too implicit. `merit-demo/merit.ps1` is a consumer wrapper and forwards administrative, surface, and release operations to the sibling OSS CLI. It also contains consumer-specific verify/e2e/serve/deploy behavior, which is appropriate. It must not become another copy of the platform CLI.
