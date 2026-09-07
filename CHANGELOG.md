@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.140] - 2026-09-06
+### Added
+- Hub now highlights pinned skills and refreshed demo commits and lists supported pins with menu K.
+
 ## [0.5.139] - 2026-09-06
 ### Fixed
 - Aligned the OSS bench template and Hub documentation with `skills-v0.5.138`, the first supported pin containing `merit/modules/Merit.Oss.ps1`.
