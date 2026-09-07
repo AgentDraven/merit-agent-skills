@@ -276,6 +276,15 @@ real update warning: refresh the root launcher and rerun Hub 2. The regression
 suite continues to require launcher, Hub release, default payload, CompatSet,
 and bench-template alignment.
 
+### MAS-HUB-UX-01 — concise default, diagnostic opt-in (0.5.181)
+
+Hub's default output is limited to the current release, action outcome,
+failure/recovery notices, concise menu, and next action. `-Verbose` is the
+standard PowerShell diagnostic switch; `-v` is the equivalent Hub shortcut.
+Verbose output adds paths, environment scopes, full map, drill-ins, transcript
+metadata, and other details needed for support without making a first run feel
+like a log dump. Relaunch arguments preserve the requested level.
+
 ## NextRel FR — README three-step explainability (Peel-The-Onion)
 
 **Peel-The-Onion** is the MERIT teaching model: reveal the smallest useful action first, then progressively expose evidence and advanced detail. A beginner can pause after any layer with a clear success signal.

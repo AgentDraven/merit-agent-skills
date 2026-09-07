@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.181] - 2026-09-07
+### Changed
+- Hub now defaults to concise receipts, outcomes, and next actions. `-Verbose` or `-v` reveals the full journey map, environment scopes, paths, drill-ins, and diagnostic detail; this preference survives Hub relaunches.
+
 ## [0.5.180] - 2026-09-07
 ### Changed
 - Reduced everyday Hub versioning to one public label: `MERIT Skills 0.5.180`. The matching `skills-v0.5.180` Git tag is now documented as tag notation, not a separate track.

@@ -26,6 +26,7 @@ Assert-Test ($hubText -match ('"release"\s*:\s*"' + [regex]::Escape($release) + 
 Assert-Test ($hubText -match ('"skillsPin"\s*:\s*"skills-v' + [regex]::Escape($release) + '"')) 'Hub default payload matches VERSION'
 Assert-Test ($compat.sets[0].pin -eq "skills-v$release") 'first CompatSet is the release default'
 Assert-Test ($benchTemplate.skillsPin -eq "skills-v$release") 'new bench template uses the release default'
+Assert-Test ($hubText -match "\[Alias\('v', 'Details'\)\]") 'Hub accepts -v as a verbose alias'
 
 Copy-Item -LiteralPath $source -Destination $launcher
 if ($LiveDownload) {

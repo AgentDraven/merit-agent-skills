@@ -78,6 +78,10 @@ param(
     # Internal flag used when an interactive cleanup action must relaunch elevated.
     # The elevated child performs the action, then re-enters the menu instead of exiting.
     [switch]$ReturnToMenu,
+    # Default is a concise beginner view. -Verbose is the PowerShell common
+    # parameter; -v is the short Hub alias for the same diagnostic view.
+    [Alias('v', 'Details')]
+    [switch]$Detailed,
     [Alias('?')]
     [switch]$Help
 )
@@ -93,6 +97,7 @@ $Script:HubScriptPath = $PSCommandPath
 if (-not $Script:HubScriptPath) { $Script:HubScriptPath = $MyInvocation.MyCommand.Path }
 $Script:HubRoot = Split-Path -Parent $Script:HubScriptPath
 $Script:HubBoundParameters = [hashtable]$PSBoundParameters
+$Script:HubVerbose = [bool]($Detailed -or $PSBoundParameters.ContainsKey('Verbose'))
 # Prefer MYMERITTOOLS\backups so Pristine (which wipes MYMERITAPP) cannot delete the archive.
 $Script:BackupRoot = $null
 $Script:HistoryLog = $null
@@ -116,8 +121,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "release": "0.5.180",
-  "skillsPin": "skills-v0.5.180",
+  "release": "0.5.181",
+  "skillsPin": "skills-v0.5.181",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -571,7 +576,8 @@ function Write-Ok([string]$t) { Write-Host "  [OK]   $t" -ForegroundColor Green 
 function Write-Fail([string]$t) { Write-Host "  [FAIL] $t" -ForegroundColor Red }
 function Write-Warn([string]$t) { Write-Host "  [WARN] $t" -ForegroundColor Yellow }
 function Write-Note([string]$t) { Write-Host "  NOTE:  $t" -ForegroundColor DarkYellow }
-function Write-Info([string]$t) { Write-Host "  $t" }
+function Test-HubVerbose { return [bool]$Script:HubVerbose }
+function Write-Info([string]$t) { if (Test-HubVerbose) { Write-Host "  $t" } }
 function Write-Attention([string]$t) { Write-Host "  [MERIT] $t" -ForegroundColor Magenta }
 function Write-Header([string]$t) {
     Write-Host ''
@@ -1226,6 +1232,7 @@ function Test-HubAdmin {
 }
 
 function Write-HubEnvScopes {
+    if (-not (Test-HubVerbose)) { return }
     foreach ($name in @('MYMERITTOOLS', 'MYMERITAPP')) {
         $p = [Environment]::GetEnvironmentVariable($name, 'Process')
         $u = [Environment]::GetEnvironmentVariable($name, 'User')
@@ -1269,14 +1276,16 @@ function Start-HubTranscript {
         Write-Warn "Could not start transcript: $($_.Exception.Message)"
         $Script:TranscriptStarted = $false
     }
-    Write-Host ''
-    Write-Host ('=' * 72) -ForegroundColor DarkGray
-    Write-Host ("  Merit-Hub run  {0}" -f (Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))
-    Write-Host ("  user={0}  machine={1}  elevated={2}" -f $env:USERNAME, $env:COMPUTERNAME, (Test-HubAdmin))
-    Write-HubBuildIdentity
-    Write-Host ("  script={0}" -f $Script:HubScriptPath)
-    Write-Host ("  log (append)={0}" -f $Script:HistoryLog)
-    Write-Host ('=' * 72) -ForegroundColor DarkGray
+    if (Test-HubVerbose) {
+        Write-Host ''
+        Write-Host ('=' * 72) -ForegroundColor DarkGray
+        Write-Host ("  Merit-Hub run  {0}" -f (Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))
+        Write-Host ("  user={0}  machine={1}  elevated={2}" -f $env:USERNAME, $env:COMPUTERNAME, (Test-HubAdmin))
+        Write-HubBuildIdentity
+        Write-Host ("  script={0}" -f $Script:HubScriptPath)
+        Write-Host ("  log (append)={0}" -f $Script:HistoryLog)
+        Write-Host ('=' * 72) -ForegroundColor DarkGray
+    }
 }
 
 function Stop-HubTranscript {
@@ -3004,6 +3013,7 @@ function Write-HubLegend {
 
 function Write-HubMap {
     param([string]$Here = '')
+    if (-not (Test-HubVerbose)) { return }
     $mark = {
         param([string]$Step, [string]$Text)
         if ($Here -and $Step -eq $Here) { return "* $Text" }
@@ -3032,6 +3042,7 @@ function Write-HubMap {
 
 function Write-HubDrillIn {
     param([string]$Step)
+    if (-not (Test-HubVerbose)) { return }
     switch ($Step) {
         '1' { Write-Note 'Drill-in: git / gh / pwsh + MERIT Python (venv or global shim) under MYMERITTOOLS. Persist MYMERIT*. Not hosted.' }
         '2' { Write-Note 'Drill-in: clone merit-agent-skills pin only (no merit-demo). Optional host install via I. Not cloud.' }
@@ -3851,19 +3862,26 @@ function Show-MeritHubHelp {
     Write-Info "History log (append): $Script:HistoryLog"
     Write-HubMap
     Write-Host ''
-    Write-Host '  +-- BEGINNER PATH ----------------------------------------------------+' -ForegroundColor Cyan
-    Write-Host '  |  1 Setup -> 2 Install -> 3 Try -> 3V Validate -> OC Publish -> OCV |' -ForegroundColor Cyan
-    Write-Host '  +---------------------------------------------------------------------+' -ForegroundColor Cyan
-    Write-Host '  NEXT FOR A NEW LAPTOP: choose 1, then 2, then 3.' -ForegroundColor Green
-    Write-Host '  LOCAL PROOF: 3V     CLOUD PROOF: OC → OCV     EXIT: 0' -ForegroundColor Magenta
-    Write-Host ''
-    Write-Host '  +-- ADVANCED PATHS ---------------------------------------------------+' -ForegroundColor Yellow
-    Write-Host '  |  4 Vault -> VC Validate     5 Repo -> 5R Status -> RC Cloud check   |' -ForegroundColor Yellow
-    Write-Host '  +---------------------------------------------------------------------+' -ForegroundColor Yellow
-    Write-Host '  +-- HELPERS ----------------------------------------------------------+' -ForegroundColor DarkCyan
-    Write-Host '  |  G scan  A archive  P pristine  S soft  I IDE  M app  T tools       |' -ForegroundColor DarkCyan
-    Write-Host '  |  W surface  K CompatSet  H help                                     |' -ForegroundColor DarkCyan
-    Write-Host '  +---------------------------------------------------------------------+' -ForegroundColor DarkCyan
+    if (Test-HubVerbose) {
+        Write-Host '  +-- BEGINNER PATH ----------------------------------------------------+' -ForegroundColor Cyan
+        Write-Host '  |  1 Setup -> 2 Install -> 3 Try -> 3V Validate -> OC Publish -> OCV |' -ForegroundColor Cyan
+        Write-Host '  +---------------------------------------------------------------------+' -ForegroundColor Cyan
+        Write-Host '  NEXT FOR A NEW LAPTOP: choose 1, then 2, then 3.' -ForegroundColor Green
+        Write-Host '  LOCAL PROOF: 3V     CLOUD PROOF: OC → OCV     EXIT: 0' -ForegroundColor Magenta
+        Write-Host ''
+        Write-Host '  +-- ADVANCED PATHS ---------------------------------------------------+' -ForegroundColor Yellow
+        Write-Host '  |  4 Vault -> VC Validate     5 Repo -> 5R Status -> RC Cloud check   |' -ForegroundColor Yellow
+        Write-Host '  +---------------------------------------------------------------------+' -ForegroundColor Yellow
+        Write-Host '  +-- HELPERS ----------------------------------------------------------+' -ForegroundColor DarkCyan
+        Write-Host '  |  G scan  A archive  P pristine  S soft  I IDE  M app  T tools       |' -ForegroundColor DarkCyan
+        Write-Host '  |  W surface  K CompatSet  H help                                     |' -ForegroundColor DarkCyan
+        Write-Host '  +---------------------------------------------------------------------+' -ForegroundColor DarkCyan
+    } else {
+        Write-Host '  START:  1 Setup -> 2 Install -> 3 Try it' -ForegroundColor Green
+        Write-Host '  PROVE:  3V local -> OC publish -> OCV hosted' -ForegroundColor Cyan
+        Write-Host '  MORE:   4/VC Vault | 5/5R/RC Repo | I skills | K rollback | 0 exit' -ForegroundColor DarkCyan
+        Write-Note 'Use -Verbose (or -v) for the journey map, paths, environment, and diagnostic details.'
+    }
     Write-Host ''
      Write-Note 'Every action returns to this menu. Colors reinforce the words; copied logs remain understandable.'
     if ($AgentLaw) {
