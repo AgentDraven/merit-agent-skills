@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.141] - 2026-09-06
+### Fixed
+- CompatSet registry and numeric selection released as the new supported Hub baseline.
+
 ## [0.5.140] - 2026-09-06
 ### Added
 - Hub now highlights pinned skills and refreshed demo commits and lists supported pins with menu K.
