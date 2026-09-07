@@ -11,14 +11,8 @@ $MERIT_VERSION = if (Test-Path (Join-Path $Root 'VERSION')) {
 $Script:MeritResolveRepoRoot = $Root
 try { . (Join-Path $Root 'merit\modules\Merit.Core.ps1') } catch { throw "MERIT core module failed to load: $($_.Exception.Message)" }
 try { . (Join-Path $Root 'merit\modules\Merit.Skills.ps1') } catch { throw "MERIT skills module failed to load: $($_.Exception.Message)" }
-try {
-    . (Join-Path $Root 'BootStrap\_resolve.ps1')
-}
-catch { }
-try {
-    . (Join-Path $Root 'BootStrap\_law.ps1')
-}
-catch { }
+try { . (Join-Path $Root 'merit\modules\Merit.Surface.ps1') } catch { throw "MERIT surface module failed to load: $($_.Exception.Message)" }
+try { . (Join-Path $Root 'merit\modules\Merit.Law.ps1') } catch { throw "MERIT law module failed to load: $($_.Exception.Message)" }
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
 $Rest = if ($args.Count -gt 1) { @($args[1..($args.Count - 1)]) } else { @() }
