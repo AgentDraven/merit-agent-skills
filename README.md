@@ -2,7 +2,8 @@
 
 Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for **Cursor**, **Claude Code**, **Codex**, **VS Code / Open Agents**, **Hermes**, **OpenClaw**, **Grok Bot**, **Devin**, and more agent harnesses (see [Collaboration](#collaboration--suggest-a-host)).
 
-## 🧭 Start here — pick your adventure
+<a id="start-here--pick-your-adventure"></a>
+<table><tr><td bgcolor="#1f6feb"><h2>🧭 Start here — pick your adventure</h2></td></tr></table>
 
 > **Choose one row, then read left to right.** Every path starts with the Hub; IDE skills are an optional helper, not a surprise extra step.
 
@@ -63,7 +64,8 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 
 **Production MERIT base (skills default):** `https://merit-prod.vercel.app` (**v00** in [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json)). Operator **v01** hosts exist but are not the skills default until vault `publish_gate` promotes them. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
 
-## 🔐 Public vs private SSOT
+<a id="public-vs-private-ssot"></a>
+<table><tr><td bgcolor="#6f42c1"><h2>🔐 Public vs private SSOT</h2></td></tr></table>
 
 
 | | Public (this repo + Portal) | Private (operators only) |
