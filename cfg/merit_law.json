@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "blobVersion": "1.0.0",
-  "blobFile": "merit.blob",
+  "blobFile": "merit/merit.blob",
   "skillsVersion": "0.5.95",
   "skillMap": {
     "merit-closeout": [

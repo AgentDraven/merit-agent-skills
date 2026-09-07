@@ -773,16 +773,16 @@ function Write-HubAgentCloseoutHint {
 function Import-HubMeritResolve {
     if (Get-Command Get-MeritSurface -ErrorAction SilentlyContinue) { return $true }
     $candidates = [System.Collections.Generic.List[string]]::new()
-    $benchSkills = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\BootStrap\_resolve.ps1'
+    $benchSkills = Join-Path (Get-MyMeritAppRoot) 'merit-agent-skills\merit\modules\Merit.Surface.ps1'
     [void]$candidates.Add($benchSkills)
     if ($env:MERIT_SKILLS_ROOT) {
-        [void]$candidates.Add((Join-Path $env:MERIT_SKILLS_ROOT 'BootStrap\_resolve.ps1'))
+        [void]$candidates.Add((Join-Path $env:MERIT_SKILLS_ROOT 'merit\modules\Merit.Surface.ps1'))
     }
     foreach ($bench in @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP')) {
-        [void]$candidates.Add((Join-Path $bench 'merit-agent-skills\BootStrap\_resolve.ps1'))
+        [void]$candidates.Add((Join-Path $bench 'merit-agent-skills\merit\modules\Merit.Surface.ps1'))
     }
     foreach ($path in @('C:\DevApps\merit-agent-skills', 'C:\MyMeritApp\merit-agent-skills')) {
-        [void]$candidates.Add((Join-Path $path 'BootStrap\_resolve.ps1'))
+        [void]$candidates.Add((Join-Path $path 'merit\modules\Merit.Surface.ps1'))
     }
     foreach ($resolve in $candidates) {
         if (-not (Test-Path -LiteralPath $resolve)) { continue }

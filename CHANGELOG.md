@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.112] - 2026-09-06
+### Changed
+- Hub surface discovery now prefers the shared `merit/modules/Merit.Surface.ps1` module, with the legacy Bootstrap resolver retained as fallback.
+- Updated the law manifest to the canonical `merit/merit.blob` payload path.
+
 ## [0.5.111] - 2026-09-06
 ### Changed
 - Added compatibility modules for law and surface resolution so the public CLI can migrate away from direct Bootstrap imports without changing consumer commands.
