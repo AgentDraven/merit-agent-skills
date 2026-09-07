@@ -211,7 +211,9 @@ Closeout evidence receipts are currently written to the deterministic temporary 
 
 ## Document-sprawl guardrail
 
-## NextRel FR — README three-step explainability
+## NextRel FR — README three-step explainability (Peel-The-Onion)
+
+**Peel-The-Onion** is the MERIT teaching model: reveal the smallest useful action first, then progressively expose evidence and advanced detail. A beginner can pause after any layer with a clear success signal.
 
 **FR-NEXTREL-README-3X3 (B; feeds L1 `MERIT.instructions` when the vault is
 available):** Every beginner-facing pathway in a README must use the same

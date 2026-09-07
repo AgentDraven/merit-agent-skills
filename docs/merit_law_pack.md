@@ -52,7 +52,9 @@ flowchart LR
 ```
 
 L2/L3 are not published in merit-agent-skills. Operators use vault `runtime out`.
-# NextRel README standard
+# NextRel README standard — Peel-The-Onion
+
+Peel-The-Onion means bite-sized guidance: show the next action, its visible success signal, and only then the deeper command/evidence detail.
 
 Beginner README pathways use a consistent three-step explanation:
 **Start → Make progress → Finish**. Each step has at least three concrete

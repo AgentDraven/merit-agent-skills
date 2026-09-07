@@ -2,6 +2,10 @@
 
 Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for **Cursor**, **Claude Code**, **Codex**, **VS Code / Open Agents**, **Hermes**, **OpenClaw**, **Grok Bot**, **Devin**, and more agent harnesses (see [Collaboration](#collaboration--suggest-a-host)).
 
+### Peel-The-Onion beginner guide 🧅
+
+Every beginner pathway is explained in three layers: **Start**, **Make progress**, and **Finish**. Each layer includes at least three concrete sub-checks covering the action, what MERIT does, and the evidence to look for. This is the required README standard and a NextRel requirement for vault L1 `MERIT.instructions`.
+
 <a id="start-here--pick-your-adventure"></a>
 <table><tr><td bgcolor="#1f6feb"><strong><big><big>🧭 Start here — pick your adventure</big></big></strong></td></tr></table>
 
