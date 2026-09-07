@@ -232,6 +232,8 @@ function Resolve-MeritVaultRoot {
     $repo = if ($surf) { [string]$surf.vaultRepo } else { 'merit-private-vault' }
     $homeRoot = if ($env:USERPROFILE) { $env:USERPROFILE } else { $env:HOME }
     if ($homeRoot) { [void]$candidates.Add((Join-Path (Join-Path (Join-Path $homeRoot 'dev') $owner) $repo)) }
+    $benchRoot = Get-MeritEnvScoped -Name 'MYMERITAPP'
+    if ($benchRoot) { [void]$candidates.Add((Join-Path $benchRoot $repo)) }
     if ($surf) {
         foreach ($p in @($surf.vaultSearchPaths)) { [void]$candidates.Add([string]$p) }
     }

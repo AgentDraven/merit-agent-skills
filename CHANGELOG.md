@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.119] - 2026-09-06
+### Changed
+- Added the standard `MYMERITAPP\merit-private-vault` sibling to vault discovery candidates.
+- Cloned and verified the AgentDraven vault checkout as a clean, read-only validation dependency.
+
 ## [0.5.118] - 2026-09-06
 ### Changed
 - Moved the IDE installer implementation into `merit/modules/Merit.SkillsInstall.ps1`.
