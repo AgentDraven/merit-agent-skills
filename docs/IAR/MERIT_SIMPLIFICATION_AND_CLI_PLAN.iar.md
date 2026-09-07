@@ -59,7 +59,7 @@ merit-agent-skills/
 │       ├── Hub.Install.ps1
 │       ├── Hub.Cleanup.ps1
 │       └── Hub.Prerequisites.ps1
-├── BootStrap/                    # temporary migration area only
+├── BootStrap/                    # Hub compatibility internals; removal pending caller migration
 ├── cfg/
 ├── hooks/
 ├── skills/
@@ -86,9 +86,9 @@ Hub invokes:
 & "<skills-root>\merit.ps1" skills install --target <Host>
 ```
 
-## `install.ps1` transition
+## Installer transition
 
-For one compatibility release, root `install.ps1` and `install.sh` become forwarding shims that direct users to `merit.ps1 skills install`. They contain no separate implementation. In the following release they are removed, with Hub, docs, tests, and changelog updated.
+The root `install.ps1` and `install.sh` wrappers have now been removed. The canonical command is `merit.ps1 skills install`; implementation lives in `merit/modules/Merit.SkillsInstall.ps1`.
 
 ## Vault precedence
 
@@ -162,7 +162,7 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 | 5. Bootstrap migration | IN PROGRESS | `Merit.Surface.ps1` is authoritative for CLI and Hub surface loading; legacy `_resolve.ps1` remains fallback |
 | 6. Law relocation | PASS | Canonical `merit/merit.blob` is authoritative; legacy root payload removed; law tests pass; release `skills-v0.5.110` |
 | 7. Vault delegation | PASS | Clean AgentDraven vault checkout at `C:\DApps\merit-private-vault`; allow-listed delegation and `mXin --help` live test pass; vault tree unchanged; surface now reports `oss+ide+vault`; release `skills-v0.5.120` |
-| 8. Compatibility cleanup | IN PROGRESS | Canonical law references and Hub surface loading updated; installer and legacy Bootstrap shims remain until downstream callers are migrated and one compatibility release is complete |
+| 8. Compatibility cleanup | IN PROGRESS | Root installer wrappers removed and CLI install verified; Bootstrap remains because Hub still has active `_oss.ps1`/vault handoff callers; documentation references still require cleanup |
 
 Law migration note: the resolver now uses canonical `merit/merit.blob`; the legacy root blob has been removed after migration validation.
 

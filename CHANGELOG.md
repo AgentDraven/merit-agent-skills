@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.123] - 2026-09-06
+### Removed
+- Removed obsolete root `install.ps1` and `install.sh`; `merit.ps1 skills install` is now the only supported installer command.
+
 ## [0.5.122] - 2026-09-06
 ### Changed
 - Strengthened the IAR consolidation policy: current implementation and acceptance work must be added to the existing controlling documents, not split into new reports without written rationale.
