@@ -4,9 +4,31 @@
 
 `%MYMERITTOOLS%` (e.g. `C:\Tools` or `C:\DevTools`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.146` · `vault-v0.5.56` — see [CompatSet](#compatSet--pins).
+**Embedded pins (current release):** `skills-v0.5.148` · `vault-v0.5.56` — see [CompatSet](#compatSet--pins).
 
 **Raw download:** `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
+
+---
+
+## Quick index 🧭
+
+- [⭐ Recommended first journey](#recommended-first-journey)
+- [Beginner command map](#beginner-command-map-)
+- [After each path: acceptance](#after-each-path-quick-acceptance-)
+- [Persona pathways](#if-you-want-to-personas)
+- [Advanced options](#advanced-options)
+- [Cold-start details](#cold-start-sequence)
+
+## Recommended first journey ⭐
+
+For a new user, follow this evidence-gated path:
+
+```text
+1 Setup → 2 Install OSS → 3 Try it → 3V Validate → OC OSS in Cloud → 3V hosted validation → 6 Join
+```
+
+Each step can be repeated. Hub pauses safely on errors, explains what failed,
+and returns to the menu; `0` (zero) is the only exit.
 
 ---
 
@@ -35,6 +57,8 @@ flowchart LR
 | `5` / `5R` / `RC` | Clones and validates a catalog repo/cloud host | Catalog path |
 | `6` | Opens MERIT registration/join routes | After `OC` or `4` |
 | `0` | Stops Hub | Only exit command |
+
+## Advanced options 🛠️
 
 Advanced helpers: `I` install IDE skills, `M` change `MYMERITAPP`, `T` change
 `MYMERITTOOLS`, `W` show surfaces, `K` list/select approved CompatSets, and

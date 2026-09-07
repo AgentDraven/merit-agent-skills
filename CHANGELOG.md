@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.149] - 2026-09-06
+### Fixed
+- Aligned the Hub embedded skills pin and beginner README with the latest released baseline.
+
 ## [0.5.148] - 2026-09-06
 ### Added
 - Added post-path acceptance checklists for local demo, OC, Vault/VC, Repo/RC, and Join to the Hub README.
