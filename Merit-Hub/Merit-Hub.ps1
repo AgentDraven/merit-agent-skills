@@ -3915,9 +3915,17 @@ function Write-HubBuildIdentity {
     try { $cfg = Get-HubConfig } catch { }
     $version = if ($cfg -and $cfg.hubVersion) { [string]$cfg.hubVersion } else { 'unknown' }
     $pin = if ($cfg -and $cfg.skillsPin) { [string]$cfg.skillsPin } else { 'unknown' }
+    $tip = 'unknown'
+    try { $tip = ((Get-Content -LiteralPath (Join-Path $Script:HubRoot 'VERSION') -Raw) -split '\r?\n')[0].Trim() } catch { }
     $created = 'unknown'
     try { $created = (Get-Item -LiteralPath $Script:HubScriptPath).LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss') } catch { }
-    Write-Info ("script-version={0}  skills-pin={1}  file-created/updated={2}  host=pwsh {3}" -f $version, $pin, $created, $PSVersionTable.PSVersion.ToString())
+    Write-Attention ("Hub tip={0}  deployed skills pin={1}  (tip may advance independently; pin is the payload installed)" -f $tip, $pin)
+    try {
+        $reg = Join-Path $Script:HubRoot 'cfg\compatset.skills.json'
+        $approved = @((Get-Content $reg -Raw | ConvertFrom-Json).sets | Where-Object { $_.status -eq 'supported' -and $_.pin -eq $pin })
+        if (-not $approved) { Write-Warn "Embedded pin $pin is not present in the supported CompatSet registry." }
+    } catch { Write-Warn 'Supported CompatSet registry could not be checked.' }
+    Write-Info ("script-version={0}  file-created/updated={1}  host=pwsh {2}" -f $version, $created, $PSVersionTable.PSVersion.ToString())
 }
 
 function Invoke-HubPathRecovery {

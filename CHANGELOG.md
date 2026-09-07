@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.152] - 2026-09-06
+### Fixed
+- Hub now reports repository tip versus deployed CompatSet pin and warns when the default pin is not registry-approved.
+
 ## [0.5.151] - 2026-09-06
 ### Fixed
 - Made supported `skills-v0.5.149` the default embedded Hub pin for fresh installs.
