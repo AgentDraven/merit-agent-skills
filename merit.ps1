@@ -13,6 +13,7 @@ try { . (Join-Path $Root 'merit\modules\Merit.Core.ps1') } catch { throw "MERIT 
 try { . (Join-Path $Root 'merit\modules\Merit.Skills.ps1') } catch { throw "MERIT skills module failed to load: $($_.Exception.Message)" }
 try { . (Join-Path $Root 'merit\modules\Merit.Surface.ps1') } catch { throw "MERIT surface module failed to load: $($_.Exception.Message)" }
 try { . (Join-Path $Root 'merit\modules\Merit.Law.ps1') } catch { throw "MERIT law module failed to load: $($_.Exception.Message)" }
+try { . (Join-Path $Root 'merit\modules\Merit.Vault.ps1') } catch { throw "MERIT vault module failed to load: $($_.Exception.Message)" }
 
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
 $Rest = if ($args.Count -gt 1) { @($args[1..($args.Count - 1)]) } else { @() }
@@ -39,6 +40,7 @@ Commands:
                            law --section VIII.F | law --for-skill merit-portal
   where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
   surface                  Alias for where
+  vault <mXin|mXout|runtime|env|cert|git>  Delegate explicit operator commands when a vault is present
   skills list|status|install|remove      Install and inspect IDE skills
   par scaffold             Advanced: create play shell + cfg/par_pins.json
   branding scaffold        Advanced: create cfg/branding.json
@@ -2320,6 +2322,7 @@ switch -Regex ($Command) {
     }
     '^release$' { try { Invoke-ReleaseCloseout -TargetRoot $target -ArgList $Rest; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^law$' { try { Invoke-MeritLaw -ArgList $Rest -RepoRoot $Root; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
+    '^vault$' { try { Invoke-MeritVaultCommand -ArgList $Rest -FromRoot $Root; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^skills$' { try { Invoke-MeritSkillsCommand -ArgList $Rest -RepoRoot $Root; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^(where|surface)$' { Invoke-MeritWhere -ArgList $Rest }
     '^apps$' {

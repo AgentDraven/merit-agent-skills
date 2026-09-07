@@ -161,7 +161,7 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 | 4. Unified IDE installer | IN PROGRESS | `merit/modules/Merit.Skills.ps1` exposes `skills list/status/install`; Hub routes IDE installs through the public CLI; existing installer remains compatibility-owned |
 | 5. Bootstrap migration | IN PROGRESS | `Merit.Surface.ps1` is authoritative for CLI and Hub surface loading; legacy `_resolve.ps1` remains fallback |
 | 6. Law relocation | PASS | Canonical `merit/merit.blob` is authoritative; legacy root payload removed; law tests pass; release `skills-v0.5.110` |
-| 7. Vault delegation | OPEN | Not started |
+| 7. Vault delegation | IN PROGRESS | Added explicit allow-listed `merit.ps1 vault` delegation with clear no-vault failure; live vault integration test remains pending |
 | 8. Compatibility cleanup | OPEN | Not started |
 
 Law migration note: the resolver now uses canonical `merit/merit.blob`; the legacy root blob has been removed after migration validation.

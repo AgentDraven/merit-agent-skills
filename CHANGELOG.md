@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.115] - 2026-09-06
+### Changed
+- Added explicit, allow-listed `merit.ps1 vault` delegation for operator-only commands.
+- No-vault environments now return a clear remediation message instead of silently substituting OSS behavior.
+
 ## [0.5.114] - 2026-09-06
 ### Changed
 - Updated the simplification IAR with the actual phase status, canonical law relocation evidence, and Bootstrap migration progress.
