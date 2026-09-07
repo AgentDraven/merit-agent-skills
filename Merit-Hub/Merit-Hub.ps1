@@ -572,6 +572,7 @@ function Write-Fail([string]$t) { Write-Host "  [FAIL] $t" -ForegroundColor Red 
 function Write-Warn([string]$t) { Write-Host "  [WARN] $t" -ForegroundColor Yellow }
 function Write-Note([string]$t) { Write-Host "  NOTE:  $t" -ForegroundColor DarkYellow }
 function Write-Info([string]$t) { Write-Host "  $t" }
+function Write-Attention([string]$t) { Write-Host "  [MERIT] $t" -ForegroundColor Magenta }
 function Write-Header([string]$t) {
     Write-Host ''
     Write-Host ('=' * 72) -ForegroundColor Cyan
@@ -2342,12 +2343,16 @@ function Invoke-HubEnsureDemoFallback {
         New-Item -ItemType Directory -Force -Path $bench | Out-Null
         $gitDir = Join-Path $dest '.git'
         if (Test-Path -LiteralPath $gitDir) {
-            Write-Ok "Already cloned: $dest"
+            $before = (& git -C $dest rev-parse --short HEAD 2>$null)
+            Write-Attention "merit-demo: checking origin/main (local $before)"
             & git -C $dest pull --ff-only 2>&1 | Out-Host
             if ($LASTEXITCODE -ne 0) {
                 Write-Fail "git pull failed (exit $LASTEXITCODE)"
                 return $false
             }
+            $after = (& git -C $dest rev-parse --short HEAD 2>$null)
+            if ($before -eq $after) { Write-Attention "merit-demo: already current at $after" }
+            else { Write-Attention "merit-demo: refreshed origin/main $before -> $after" }
         }
         elseif (Test-Path -LiteralPath $dest) {
             Write-Fail "$dest exists but is not a git clone. Move it aside and retry 3."
@@ -2959,10 +2964,12 @@ function Invoke-GitClonePin {
     try {
         $gitDir = Join-Path $Dest '.git'
         if (Test-Path -LiteralPath $gitDir) {
-            Write-Ok "$Label already cloned: $Dest"
-            Write-Info "Fetching / checking out $Pin ..."
+            $beforeHead = (& git -C $Dest rev-parse --short HEAD 2>$null)
+            Write-Attention "${Label}: pinned refresh -> $Pin (local $beforeHead)"
+            Write-Info "Fetching / checking out exact supported tag $Pin ..."
             & git -C $Dest fetch --tags origin 2>&1 | Out-Host
             & git -C $Dest checkout --detach "refs/tags/$Pin" 2>&1 | Out-Host
+            if ($LASTEXITCODE -eq 0) { Write-Attention "${Label}: PIN APPLIED -> $Pin (no floating branch update)" }
             if ($Dest -match '[\\/]merit-agent-skills$') { [void](Import-HubOssHelpers) }
             return ($LASTEXITCODE -eq 0)
         }
@@ -3826,6 +3833,7 @@ function Show-MeritHubHelp {
     Write-Host '  2) Install OSS      skills pin only (no merit-demo)   (alias J)'
     Write-Host '  3) Try it           clone public merit-demo + serve HTTP + open /play/'
     Write-Host '  3V Validate demo    guided repeatable checks (browser + verify + e2e)'
+    Write-Host '  K  CompatSets       list supported skills pins (advanced)'
     Write-Host '  OC) OSS in the Cloud  DualRail play + register + your marketing site'
     Write-Host '      -NewOc with -Oc mints a new oc-* id (second creator on this bench)'
     Write-Host '  4) Vault (local)    clone private vault (working clone kept)'
@@ -3926,6 +3934,17 @@ function Repair-HubProcessEnvironment {
     }
 }
 
+function Invoke-HubListCompatSets {
+    Write-Header 'Advanced: supported skills CompatSets'
+    $cfg = Get-HubConfig
+    Write-Attention "Querying supported tags from $($cfg.skillsUrl)"
+    $rows = @(& git ls-remote --tags --refs ([string]$cfg.skillsUrl) 'skills-v*' 2>$null)
+    if (-not $rows) { Write-Fail 'Could not list supported CompatSets (git/network unavailable).'; return }
+    Write-Host 'Supported skills pins (select by editing the approved Hub CompatSet; arbitrary tags are not accepted):' -ForegroundColor Cyan
+    foreach ($row in $rows) { $parts=$row -split '\s+'; if($parts.Count -ge 2){ Write-Host ("  {0}" -f ($parts[1] -replace '^refs/tags/','')) } }
+    Write-Note 'The default pin remains the tested embedded release. Selection/change requires an explicit CompatSet update.'
+}
+
 function Show-InteractiveMenu {
     $Script:HubInteractiveAction = $true
     try {
@@ -3977,6 +3996,7 @@ function Show-InteractiveMenu {
                 { $_ -in @('M', 'm') } { Ensure-MyMeritAppPrompt | Out-Null; $pending = Read-HubContinue }
                 { $_ -in @('T', 't') } { Set-MyMeritToolsPrompt; $pending = Read-HubContinue }
                 { $_ -in @('W', 'w', 'Where', 'Surface') } { Invoke-HubSurface; $pending = Read-HubContinue }
+                { $_ -in @('K', 'k', 'CompatSet', 'Pins') } { Invoke-HubListCompatSets; $pending = Read-HubContinue }
                 { $_ -in @('G', 'g', 'Sprawl', 'Vestigial') } { Invoke-HubSprawlScan; $pending = Read-HubContinue }
                 '^(H|h|\?|Help)$' { continue }
                 '^(0|Q|q|Exit)$' { Write-Info 'Bye.'; return }

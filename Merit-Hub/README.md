@@ -209,6 +209,13 @@ Hub **P** does not delete `%USERPROFILE%\.cursor\` wholesale; use **I** for skil
 
 ## CompatSet & pins
 
+### What Hub reports
+
+Hub highlights synchronization decisions in magenta: skills are checked out at
+the exact embedded `skills-v*` pin, while `merit-demo` is fast-forward refreshed
+from `origin/main`. Local changes or divergent history stop safely; nothing is
+overwritten. Use menu **K** to list supported skills tags for advanced review.
+
 | Pin | Repo | Role |
 |-----|------|------|
 | `skills-v0.5.138` | merit-agent-skills | OSS cold-start clone |
