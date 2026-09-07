@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.146] - 2026-09-06
+### Fixed
+- Standardized second-tier Hub commands as OC, 3V, VC, 5R, and RC; clarified 0 as exit.
+
 ## [0.5.145] - 2026-09-06
 ### Fixed
 - Clarified Hub menu hierarchy so `O` (letter) is the only OC command; `0` remains exit.

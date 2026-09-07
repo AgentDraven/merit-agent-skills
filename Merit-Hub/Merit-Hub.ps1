@@ -3842,16 +3842,14 @@ function Show-MeritHubHelp {
     Write-Host '  1) Setup laptop     prereqs + MYMERIT* + Python (venv or global shim)'
     Write-Host '  2) Install OSS      skills pin only (no merit-demo)   (alias J)'
     Write-Host '  3) Try it           clone public merit-demo + serve HTTP + open /play/'
-    Write-Host '       O  OC (OSS in the Cloud) — publish DualRail + register + marketing site'
-    Write-Host '       3V Validate demo    guided repeatable checks (browser + verify + e2e)'
+    Write-Host '       OC  OSS in the Cloud — publish DualRail + register + marketing site'
+    Write-Host '       3V  Validate demo deployed by Step 3 (Try it)'
     Write-Host '          -NewOc creates a new oc-* id (advanced command-line switch)'
     Write-Host '  4) Vault (local)    clone private vault (working clone kept)'
-    Write-Host '       V  Venture-capable status'
-    Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC (not hosted vault)'
+    Write-Host '       VC  Validate the Vault deployed by Step 4 (Vault - Local) and Venture-Capable Status'
     Write-Host '  5) Repo (local)     catalog clone; role consumer|provider'
-    Write-Host '       R  Repo/cloud status'
-    Write-Host '  K  CompatSets       list/select approved skills pins (advanced)'
-    Write-Host '  RC) repo in Cloud   that repo on its host (Vercel) - not OC'
+    Write-Host '       5R  Repo/Cloud Status'
+    Write-Host '       RC  Validation Repo in the Cloud'
     Write-Host '  6) Join MERIT (sign up)  after OC or after 4; portal + register'
     Write-Host '  0) Stop'
     Write-Host ''
@@ -3864,6 +3862,7 @@ function Show-MeritHubHelp {
     Write-Host '  M) Set MYMERITAPP bench path'
     Write-Host '  T) Set MYMERITTOOLS root'
     Write-Host '  W) Where / Surface   A+B+C+D+H diagnostic map'
+    Write-Host '  K) CompatSets        list/select approved skills pins (advanced)'
     Write-Host '  H) Help'
     Write-Host ''
      Write-Note 'A/P/S return to menu (only 0 exits). Cold start: 1 -> 2 (skills) -> 3 (demo). Cleanup: G then A then P. After a step, Enter=menu; Hub stays open until 0.'
@@ -4004,10 +4003,10 @@ function Show-InteractiveMenu {
                 '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss; $pending = Read-HubContinue }
                 '^3$' { Invoke-HubTryIt; $pending = Read-HubContinue }
                 '^(3V|3v)$' { Invoke-HubTryItValidate; $pending = Read-HubContinue }
-                '^(O|o|OC|oc|Oc)$' { Invoke-HubOc; $pending = Read-HubContinue }
+                '^(OC|oc|Oc)$' { Invoke-HubOc; $pending = Read-HubContinue }
                 '^(4|Vault)$' { Invoke-JumpstartVault; $pending = Read-HubContinue }
-                '^(V|v|VC|vc|Vc)$' { Invoke-HubVc; $pending = Read-HubContinue }
-                '^(5|R)$' { Invoke-HubR; $pending = Read-HubContinue }
+                '^(VC|vc|Vc)$' { Invoke-HubVc; $pending = Read-HubContinue }
+                '^(5|5R|5r|R)$' { Invoke-HubR; $pending = Read-HubContinue }
                 '^(RC|rc|Rc)$' { Invoke-HubRc; $pending = Read-HubContinue }
                 '^6$' { Invoke-HubJoinMerit; $pending = Read-HubContinue }
                 { $_ -in @('I', 'i', 'Install', 'InstallSkills') } { Invoke-InstallSkillsMenu; $pending = Read-HubContinue }
