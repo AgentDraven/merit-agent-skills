@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.175] - 2026-09-07
+### Fixed
+- Hub and OCV now always refresh their downloaded scripts, report whether an existing copy was found, and print the fetched skills version.
+
 ## [0.5.174] - 2026-09-07
 ### Fixed
 - Completed release closeout with an in-repository IAR evidence receipt and promoted this release as the default CompatSet.

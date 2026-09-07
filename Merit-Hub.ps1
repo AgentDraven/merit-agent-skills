@@ -2,20 +2,26 @@
 # Keep this file small and stable: the implementation lives under Merit-Hub/.
 $ErrorActionPreference = 'Stop'
 $implementation = Join-Path $PSScriptRoot 'Merit-Hub\Merit-Hub.ps1'
+$url = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1'
+$versionUrl = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/VERSION'
+$folder = Split-Path -Parent $implementation
+try {
+    New-Item -ItemType Directory -Force -Path $folder | Out-Null
+    if (Test-Path -LiteralPath $implementation -PathType Leaf) {
+        Write-Host "MERIT Hub implementation found; refreshing it from GitHub ..." -ForegroundColor Yellow
+    } else {
+        Write-Host "MERIT Hub implementation missing; downloading it from GitHub ..." -ForegroundColor Cyan
+    }
+    $cacheBust = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+    Invoke-WebRequest -UseBasicParsing -Uri "$url?v=$cacheBust" -OutFile $implementation
+    $remoteVersion = ((Invoke-WebRequest -UseBasicParsing -Uri "$versionUrl?v=$cacheBust").Content).Trim()
+    Write-Host "MERIT Hub downloaded: skills-v$remoteVersion" -ForegroundColor Green
+}
+catch {
+    throw "MERIT Hub implementation download failed: $implementation`n$url`n$($_.Exception.Message)"
+}
 if (-not (Test-Path -LiteralPath $implementation -PathType Leaf)) {
-    $url = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1'
-    $folder = Split-Path -Parent $implementation
-    try {
-        New-Item -ItemType Directory -Force -Path $folder | Out-Null
-        Write-Host "MERIT Hub implementation missing; downloading $url ..." -ForegroundColor Cyan
-        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $implementation
-    }
-    catch {
-        throw "MERIT Hub implementation not found and download failed: $implementation`n$url`n$($_.Exception.Message)"
-    }
-    if (-not (Test-Path -LiteralPath $implementation -PathType Leaf)) {
-        throw "MERIT Hub implementation download did not produce: $implementation"
-    }
+    throw "MERIT Hub implementation download did not produce: $implementation"
 }
 
 # Windows PowerShell 5.1 can misread a UTF-8-without-BOM download (especially
