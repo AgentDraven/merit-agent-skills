@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.176] - 2026-09-07
+### Fixed
+- Root stub normalizes Markdown-wrapped GitHub URLs before invoking web requests.
+
 ## [0.5.175] - 2026-09-07
 ### Fixed
 - Hub and OCV now always refresh their downloaded scripts, report whether an existing copy was found, and print the fetched skills version.

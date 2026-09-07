@@ -4,6 +4,9 @@ $ErrorActionPreference = 'Stop'
 $implementation = Join-Path $PSScriptRoot 'Merit-Hub\Merit-Hub.ps1'
 $url = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1'
 $versionUrl = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/VERSION'
+# Defend against a URL copied from rendered Markdown: [https://...](https://...).
+$url = $url -replace '^\[([^\]]+)\]\([^\)]+\)$', '$1'
+$versionUrl = $versionUrl -replace '^\[([^\]]+)\]\([^\)]+\)$', '$1'
 $folder = Split-Path -Parent $implementation
 try {
     New-Item -ItemType Directory -Force -Path $folder | Out-Null
