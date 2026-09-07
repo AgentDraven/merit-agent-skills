@@ -117,7 +117,7 @@ $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
   "hubVersion": "0.5.138",
-  "skillsPin": "skills-v0.5.177",
+  "skillsPin": "skills-v0.5.178",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",

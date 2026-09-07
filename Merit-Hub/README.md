@@ -463,6 +463,21 @@ See [`oc-bench.ps1`](oc-bench.ps1). Each bench gets its own `MYMERITAPP` + `oss-
 
 ## Hub baseline
 
+### Launcher recovery: invalid URI
+
+1. **Recognize the issue**
+   - An error before the menu can come from an older root launcher.
+   - The old `$url?v` expression becomes an invalid URL in PowerShell.
+   - Renaming the file to `Merit-Hub-B.ps1` is fine; its contents determine behavior.
+2. **Refresh the launcher**
+   - Download the [root launcher](https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub.ps1) once into your tools folder.
+   - Run it from PowerShell; the corrected release prints `MERIT launcher 0.5.178` first.
+   - It refreshes the main Hub automatically, even if a cached file exists.
+3. **Check the result**
+   - Read the embedded skills pin and executable path printed after download.
+   - The launcher validates the file before starting the Hub menu.
+   - On network or parse failure it stops, preserves the old copy, and prints the cause; retry after addressing that cause.
+
 **Cold start:** `1 2 3 OC 4 VC 5 R RC 6` · **Cleanup:** `G A P S` · **Util:** `I M T W H`
 
 Freemium smoke: repo `scripts/smoke-freemium.ps1` (not a Hub menu key).

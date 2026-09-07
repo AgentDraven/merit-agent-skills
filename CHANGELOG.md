@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.178] - 2026-09-07
+### Fixed
+- Corrected the URI failure diagnosis: `$url?v` is parsed as a variable name in both PowerShell 5.1 and 7; the base URL and renamed launcher were not the cause. Direct URI requests replace that expression.
+- Launcher identifies itself before downloading and reads the skills pin from the downloaded file. Downloads are staged, decoded as UTF-8, parsed, then installed; failures preserve the old file without executing it.
+- Added executable launcher regressions for fresh installs, refreshes, argument forwarding, network/HTML/syntax failures and a live-download-only check under Windows PowerShell 5.1.
+
 ## [0.5.177] - 2026-09-07
 ### Fixed
 - Bootstrap downloads now pass validated `System.Uri` values and no-cache headers, avoiding PowerShell 5.1 URI parsing failures.

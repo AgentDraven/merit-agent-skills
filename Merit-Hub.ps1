@@ -1,13 +1,11 @@
 # MERIT root Hub launcher.
 # Keep this file small and stable: the implementation lives under Merit-Hub/.
 $ErrorActionPreference = 'Stop'
+Write-Host 'MERIT launcher 0.5.178 | direct URI downloads' -ForegroundColor Cyan
 $implementation = Join-Path $PSScriptRoot 'Merit-Hub\Merit-Hub.ps1'
 $url = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1'
-$versionUrl = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/VERSION'
-# Defend against a URL copied from rendered Markdown: [https://...](https://...).
-$url = $url -replace '^\[([^\]]+)\]\([^\)]+\)$', '$1'
-$versionUrl = $versionUrl -replace '^\[([^\]]+)\]\([^\)]+\)$', '$1'
 $folder = Split-Path -Parent $implementation
+$staged = Join-Path $folder ('Merit-Hub.' + [guid]::NewGuid().ToString('N') + '.download.ps1')
 try {
     New-Item -ItemType Directory -Force -Path $folder | Out-Null
     if (Test-Path -LiteralPath $implementation -PathType Leaf) {
@@ -16,27 +14,26 @@ try {
         Write-Host "MERIT Hub implementation missing; downloading it from GitHub ..." -ForegroundColor Cyan
     }
     $uri = [Uri]$url
-    $versionUri = [Uri]$versionUrl
-    Invoke-WebRequest -UseBasicParsing -Uri $uri -Headers @{ 'Cache-Control' = 'no-cache' } -OutFile $implementation
-    $remoteVersion = ((Invoke-WebRequest -UseBasicParsing -Uri $versionUri -Headers @{ 'Cache-Control' = 'no-cache' }).Content).Trim()
-    Write-Host "MERIT Hub downloaded: skills-v$remoteVersion" -ForegroundColor Green
+    Write-Host "Source: $uri" -ForegroundColor DarkGray
+    Invoke-WebRequest -UseBasicParsing -Uri $uri -Headers @{ 'Cache-Control' = 'no-cache' } -OutFile $staged -ErrorAction Stop
+    # Decode UTF-8 explicitly; Windows PowerShell 5.1 needs a BOM when parsing.
+    $hubText = [IO.File]::ReadAllText($staged, (New-Object Text.UTF8Encoding($false, $true)))
+    $pinMatch = [regex]::Match($hubText, '"skillsPin"\s*:\s*"(skills-v[0-9]+\.[0-9]+\.[0-9]+)"')
+    if (-not $pinMatch.Success) { throw 'Downloaded file has no MERIT skills pin; refusing to launch it.' }
+    [IO.File]::WriteAllText($staged, $hubText, (New-Object Text.UTF8Encoding($true)))
+    $tokens = $null
+    $parseErrors = $null
+    [System.Management.Automation.Language.Parser]::ParseFile($staged, [ref]$tokens, [ref]$parseErrors) | Out-Null
+    if ($parseErrors.Count) { throw "Downloaded Hub failed parsing: $($parseErrors[0].Message)" }
+    Move-Item -LiteralPath $staged -Destination $implementation -Force -ErrorAction Stop
+    Write-Host "MERIT Hub downloaded | embedded skills pin: $($pinMatch.Groups[1].Value)" -ForegroundColor Green
+    Write-Host "Starting: $implementation" -ForegroundColor Cyan
 }
 catch {
-    throw "MERIT Hub implementation download failed: $implementation`n$url`n$($_.Exception.Message)"
+    throw "MERIT Hub refresh failed; no cached implementation was started.`nTarget: $implementation`nSource: $url`n$($_.Exception.Message)"
 }
-if (-not (Test-Path -LiteralPath $implementation -PathType Leaf)) {
-    throw "MERIT Hub implementation download did not produce: $implementation"
-}
-
-# Windows PowerShell 5.1 can misread a UTF-8-without-BOM download (especially
-# box-drawing and arrow characters) and report false parser errors. Normalize
-# the fetched/current implementation to UTF-8 with BOM before invoking it.
-try {
-    $hubText = [IO.File]::ReadAllText($implementation)
-    [IO.File]::WriteAllText($implementation, $hubText, (New-Object Text.UTF8Encoding($true)))
-}
-catch {
-    throw "MERIT Hub implementation could not be normalized for Windows PowerShell: $implementation`n$($_.Exception.Message)"
+finally {
+    if (Test-Path -LiteralPath $staged) { Remove-Item -LiteralPath $staged -Force }
 }
 
 & $implementation @args

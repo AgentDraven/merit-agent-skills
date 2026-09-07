@@ -211,6 +211,35 @@ Closeout evidence receipts are currently written to the deterministic temporary 
 
 ## Document-sprawl guardrail
 
+### MAS-HUB-URI-01 — launcher diagnosis correction and regression proof (0.5.178)
+
+The reported `Invalid URI: The hostname could not be parsed` came from
+`"$url?v=$cacheBust"`: PowerShell parses `url?v` as the variable name. With an
+unset variable and nonce `123`, the expression evaluates to `=123`. Reproduced
+with AST variable inspection and evaluation on Windows PowerShell 5.1.26100.9168
+and PowerShell 7.6.5. The previous claims that plain URLs in the screenshot were
+Markdown-wrapped, that the filename `Merit-Hub-B.ps1` caused failure, or that
+PowerShell 5.1 cannot use query strings were incorrect. `${url}?v=123` is valid;
+the shipped downloader uses a direct URI and no-cache header instead.
+
+The root launcher now announces revision 0.5.178 before network activity,
+always refreshes, reads the skills pin from the actual downloaded script,
+stages and parses UTF-8-with-BOM before replacement, and stops on download or
+parse failure without executing a cached copy. The Hub's OCV downloader also
+uses a direct URI; there is no `$url?v` request expression in either launcher.
+
+Acceptance results: `scripts/test-hub-launcher.ps1` passed on both hosts for
+fresh download, refresh, preserved arguments, and network/HTML/syntax rejection
+with old-file preservation and no stale execution. `-LiveDownload` passed
+against GitHub on Windows PowerShell 5.1 (downloaded Hub 0.5.177 before release,
+UTF-8 BOM and parser verified). The fixture exercises child invocation; the live
+check intentionally does not start the interactive Hub or publish an OC app.
+
+Repeat with `powershell.exe -NoProfile -File scripts/test-hub-launcher.ps1`
+and add `-LiveDownload` for GitHub transport and parse verification. Replace the
+root launcher once on affected devices; deleting only its child folder leaves
+the faulty expression in the root launcher. Current CompatSet: 0.5.178.
+
 ## NextRel FR — README three-step explainability (Peel-The-Onion)
 
 **Peel-The-Onion** is the MERIT teaching model: reveal the smallest useful action first, then progressively expose evidence and advanced detail. A beginner can pause after any layer with a clear success signal.
