@@ -40,6 +40,35 @@ Advanced helpers: `I` install IDE skills, `M` change `MYMERITAPP`, `T` change
 `MYMERITTOOLS`, `W` show surfaces, `K` list/select approved CompatSets, and
 `G/A/P/S` provide sprawl and cleanup modes.
 
+## After each path: quick acceptance ✅
+
+**After `3` / `3V` (local demo):**
+
+- `/play/` opens over HTTP and reports Hosted Ready.
+- The workbench is mounted and `Register free` opens the hosted route.
+- `/portal/` opens locally; no `C:\` file path is treated as hosting proof.
+- `3V` checks can be repeated in any order. See the [consumer checklist](../merit-demo%20docs/IAR/MERIT_DEMO_TDD_CHECKLIST.md).
+
+**After `OC` (OSS in the Cloud):**
+
+- OC preflight passes local routes, pins/SRI, artifact reachability, merit-prod health, and portal readiness.
+- Hosted play, registration/store activation, and marketing portal URLs are printed and recorded.
+- A failed preflight blocks publication; fix the named item and retry `OC`.
+
+**After `4` / `VC` (Vault):**
+
+- Vault remains a private working clone; it is never published as the public OC runtime.
+- `VC` confirms operator/tenant readiness and points to the vault runtime checks.
+
+**After `5` / `5R` / `RC` (catalog repo):**
+
+- The selected repo is cloned locally, its role is recorded, and its own production host is validated.
+- `RC` is separate from OC: it validates that repo's cloud deployment, not merit-prod's shared demo.
+
+**After `6` (Join):** confirm the registration page opens, then record the resulting URL in the applicable receipt.
+
+For full evidence, use the linked consumer TDD checklist and the skills [IAR index](../docs/IAR/README.md). Hub never claims a branch is complete from a menu banner alone.
+
 ---
 
 ## If you want to… (personas)

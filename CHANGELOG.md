@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.148] - 2026-09-06
+### Added
+- Added post-path acceptance checklists for local demo, OC, Vault/VC, Repo/RC, and Join to the Hub README.
+
 ## [0.5.147] - 2026-09-06
 ### Added
 - Consolidated beginner Hub command map, hierarchy, emoji guidance, and Mermaid flow in `Merit-Hub/README.md`.
