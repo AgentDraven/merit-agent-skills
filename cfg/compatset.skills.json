@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
+  "sets": [
+    { "pin": "skills-v0.5.140", "releasedAt": "2026-09-06", "status": "supported", "notes": "Current OSS + IDE baseline" }
+  ]
+}

@@ -3832,13 +3832,16 @@ function Show-MeritHubHelp {
     Write-Host '  1) Setup laptop     prereqs + MYMERIT* + Python (venv or global shim)'
     Write-Host '  2) Install OSS      skills pin only (no merit-demo)   (alias J)'
     Write-Host '  3) Try it           clone public merit-demo + serve HTTP + open /play/'
-    Write-Host '  3V Validate demo    guided repeatable checks (browser + verify + e2e)'
-    Write-Host '  K  CompatSets       list supported skills pins (advanced)'
+    Write-Host '       O  OC cloud demo'
+    Write-Host '       3V Validate demo    guided repeatable checks (browser + verify + e2e)'
     Write-Host '  OC) OSS in the Cloud  DualRail play + register + your marketing site'
     Write-Host '      -NewOc with -Oc mints a new oc-* id (second creator on this bench)'
     Write-Host '  4) Vault (local)    clone private vault (working clone kept)'
+    Write-Host '       V  Venture-capable status'
     Write-Host '  VC) Venture Capable operator/tenant grade vs freeware OC (not hosted vault)'
-    Write-Host '  5) R (local)        catalog clone; role consumer|provider   (alias R)'
+    Write-Host '  5) Repo (local)     catalog clone; role consumer|provider'
+    Write-Host '       R  Repo/cloud status'
+    Write-Host '  K  CompatSets       list/select approved skills pins (advanced)'
     Write-Host '  RC) repo in Cloud   that repo on its host (Vercel) - not OC'
     Write-Host '  6) Join MERIT (sign up)  after OC or after 4; portal + register'
     Write-Host '  0) Stop'
@@ -3937,12 +3940,18 @@ function Repair-HubProcessEnvironment {
 function Invoke-HubListCompatSets {
     Write-Header 'Advanced: supported skills CompatSets'
     $cfg = Get-HubConfig
-    Write-Attention "Querying supported tags from $($cfg.skillsUrl)"
-    $rows = @(& git ls-remote --tags --refs ([string]$cfg.skillsUrl) 'skills-v*' 2>$null)
-    if (-not $rows) { Write-Fail 'Could not list supported CompatSets (git/network unavailable).'; return }
-    Write-Host 'Supported skills pins (select by editing the approved Hub CompatSet; arbitrary tags are not accepted):' -ForegroundColor Cyan
-    foreach ($row in $rows) { $parts=$row -split '\s+'; if($parts.Count -ge 2){ Write-Host ("  {0}" -f ($parts[1] -replace '^refs/tags/','')) } }
-    Write-Note 'The default pin remains the tested embedded release. Selection/change requires an explicit CompatSet update.'
+    $registry = Join-Path $Script:HubRoot 'cfg\compatset.skills.json'
+    if (-not (Test-Path -LiteralPath $registry)) { Write-Fail "Supported CompatSet registry missing: $registry"; return }
+    $sets = @((Get-Content $registry -Raw | ConvertFrom-Json).sets | Where-Object { $_.status -eq 'supported' } | Sort-Object { [version](($_.pin -replace '^skills-v','')) } -Descending)
+    if (-not $sets) { Write-Fail 'No supported skills CompatSets are registered.'; return }
+    Write-Host 'Supported skills CompatSets (curated registry):' -ForegroundColor Cyan
+    for ($i=0;$i -lt $sets.Count;$i++) { Write-Host ("  {0}) {1}  released {2}  [{3}]" -f ($i+1),$sets[$i].pin,$sets[$i].releasedAt,$sets[$i].notes) }
+    $pick = (Read-Host 'Choose a pin number, or Enter to keep the default').Trim()
+    if ($pick -match '^\d+$' -and [int]$pick -ge 1 -and [int]$pick -le $sets.Count) {
+        $selected = $sets[[int]$pick-1].pin
+        $Script:EmbeddedHubConfigJson = $Script:EmbeddedHubConfigJson -replace '"skillsPin"\s*:\s*"[^"]+"', ('"skillsPin": "' + $selected + '"')
+        Write-Attention "Selected approved CompatSet $selected for this Hub session."
+    } else { Write-Note 'Default CompatSet retained.' }
 }
 
 function Show-InteractiveMenu {
@@ -3986,9 +3995,9 @@ function Show-InteractiveMenu {
                 '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss; $pending = Read-HubContinue }
                 '^3$' { Invoke-HubTryIt; $pending = Read-HubContinue }
                 '^(3V|3v)$' { Invoke-HubTryItValidate; $pending = Read-HubContinue }
-                '^(OC|oc|Oc)$' { Invoke-HubOc; $pending = Read-HubContinue }
+                '^(O|o|OC|oc|Oc)$' { Invoke-HubOc; $pending = Read-HubContinue }
                 '^(4|Vault)$' { Invoke-JumpstartVault; $pending = Read-HubContinue }
-                '^(VC|vc|Vc)$' { Invoke-HubVc; $pending = Read-HubContinue }
+                '^(V|v|VC|vc|Vc)$' { Invoke-HubVc; $pending = Read-HubContinue }
                 '^(5|R)$' { Invoke-HubR; $pending = Read-HubContinue }
                 '^(RC|rc|Rc)$' { Invoke-HubRc; $pending = Read-HubContinue }
                 '^6$' { Invoke-HubJoinMerit; $pending = Read-HubContinue }
