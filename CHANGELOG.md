@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.136] - 2026-09-06
+### Fixed
+- Updated the embedded Hub skills pin to the current fixed release `skills-v0.5.135`.
+
 ## [0.5.135] - 2026-09-06
 ### Fixed
 - Filtered stale environment inventory before `Join-Path`, preventing unavailable-drive crashes during Hub startup.
