@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.114] - 2026-09-06
+### Changed
+- Updated the simplification IAR with the actual phase status, canonical law relocation evidence, and Bootstrap migration progress.
+
 ## [0.5.113] - 2026-09-06
 ### Changed
 - Law test and export utilities now load the shared law module, reducing direct Bootstrap coupling while preserving compatibility behavior.
