@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.111] - 2026-09-06
+### Changed
+- Added compatibility modules for law and surface resolution so the public CLI can migrate away from direct Bootstrap imports without changing consumer commands.
+- Kept legacy Bootstrap scripts as a compatibility fallback while migration continues.
+
 ## [0.5.110] - 2026-09-06
 ### Changed
 - Completed law-payload relocation to canonical `merit/merit.blob` and removed the legacy root payload.

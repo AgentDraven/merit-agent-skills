@@ -35,7 +35,7 @@ Commands:
   closeout [--path <repo>] Full release closeout: validate, CHANGELOG, commit, push
                            Use --validate-only to skip commit/push
   release [--path <repo>]  Alias for default release closeout
-  law [list|closeout|edition|<section>]  OSS L1 excerpt from merit.blob (in-memory unpack)
+  law [list|closeout|edition|<section>]  OSS L1 excerpt from merit/merit.blob (in-memory unpack)
                            law --section VIII.F | law --for-skill merit-portal
   where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
   surface                  Alias for where
