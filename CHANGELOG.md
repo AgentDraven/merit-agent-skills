@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.154] - 2026-09-07
+### Fixed
+- Added OCV to the beginner journey, command table, and post-OC acceptance guidance.
+
 ## [0.5.153] - 2026-09-07
 ### Added
 - Added receipt-driven `OC-Tutorial.ps1` and Hub `OCV` walkthrough for hosted OC validation.

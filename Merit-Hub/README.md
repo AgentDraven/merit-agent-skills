@@ -24,7 +24,7 @@
 For a new user, follow this evidence-gated path:
 
 ```text
-1 Setup → 2 Install OSS → 3 Try it → 3V Validate → OC OSS in Cloud → 3V hosted validation → 6 Join
+1 Setup → 2 Install OSS → 3 Try it → 3V Validate → OC OSS in Cloud → OCV hosted walkthrough → 6 Join
 ```
 
 Each step can be repeated. Hub pauses safely on errors, explains what failed,
@@ -53,6 +53,7 @@ flowchart LR
 | `3` | Refreshes demo, starts/reuses HTTP port 3000, opens `/play/` | Try the local consumer |
 | `OC` | Preflights and publishes the OSS demo to merit-prod | After `3` passes |
 | `3V` | Walks through browser, verify, and E2E checks | Repeatable validation |
+| `OCV` | Walks through the published OC play, register, and marketing URLs | After `OC` succeeds |
 | `4` / `VC` | Clones vault / validates Venture-Capable status | Operator path |
 | `5` / `5R` / `RC` | Clones and validates a catalog repo/cloud host | Catalog path |
 | `6` | Opens MERIT registration/join routes | After `OC` or `4` |
@@ -78,6 +79,7 @@ Advanced helpers: `I` install IDE skills, `M` change `MYMERITAPP`, `T` change
 - OC preflight passes local routes, pins/SRI, artifact reachability, merit-prod health, and portal readiness.
 - Hosted play, registration/store activation, and marketing portal URLs are printed and recorded.
 - A failed preflight blocks publication; fix the named item and retry `OC`.
+- Run `OCV` afterward to open and review each hosted URL step-by-step.
 
 **After `4` / `VC` (Vault):**
 
@@ -213,6 +215,7 @@ Do **1** then **2** then **3** first unless you are only running cleanup keys (*
 | **2** | `-Jumpstart Oss`, `-InstallOss`, `-OssPhase`, **J** | Install OSS — skills pin only (no merit-demo) |
 | **3** | `-TryIt` | Clone public `Mr-PI-Bala/merit-demo` + open `play\index.html` |
 | **OC** | `-Oc`, `-NewOc` | OSS in the Cloud — DualRail play + store activate |
+| **OCV** | Hub menu `OCV` | Hosted OC tutorial — review published URLs and evidence |
 | **4** | `-Jumpstart Vault` | Clone private vault (local working copy) |
 | **VC** | `-Vc` | Venture Capable — operator BootStrap + gates (after **4**) |
 | **5** | `-R` | Catalog clone — consumer or provider role |
