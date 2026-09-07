@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.126] - 2026-09-06
+### Changed
+- Added confirmed POSIX PowerShell bootstrap support using brew, apt-get, dnf, or yum with explicit user confirmation and re-exec under `pwsh`.
+
 ## [0.5.125] - 2026-09-06
 ### Changed
 - Root `Merit-Hub.ps1` now bootstraps the real Hub implementation when downloaded standalone, then delegates prerequisite checks and menu behavior to it.

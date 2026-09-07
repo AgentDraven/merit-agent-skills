@@ -1354,7 +1354,16 @@ function Ensure-HubPwshHost {
         }
     }
     else {
-        Write-Note 'Continuing in Windows PowerShell 5.1 so menu 1 can install pwsh. After that, run the command above.'
+        if (-not $Script:HubOnWindows -and $env:MERIT_HUB_NO_PWSH_PROMPT -ne '1') {
+            $installNow = Read-Host 'Install PowerShell 7 using the detected package manager now? [Y/n]'
+            if ([string]::IsNullOrWhiteSpace($installNow) -or $installNow -match '^[Yy]') {
+                if (Install-MeritPosixPwsh) {
+                    $pwshExe = Resolve-MeritPwshExe
+                    if ($pwshExe) { $argList = Get-HubRelaunchArgumentList; & $pwshExe @argList; exit $LASTEXITCODE }
+                }
+            }
+        }
+        Write-Note 'pwsh was not installed. Follow the platform command above, then run this Hub again.'
     }
 }
 
@@ -2172,6 +2181,30 @@ function Install-MeritToolsPwshPortable {
     Write-Ok "PATH updated: $(Split-Path -Parent $pwshExe) and $tools"
     Write-Ok "Shim: $shim"
     return $true
+}
+
+function Install-MeritPosixPwsh {
+    if ($Script:HubOnWindows) { return $false }
+    $commands = @(
+        @{ Name = 'brew'; Args = @('install','--cask','powershell') },
+        @{ Name = 'apt-get'; Args = @('update') },
+        @{ Name = 'apt-get'; Args = @('install','-y','powershell') },
+        @{ Name = 'dnf'; Args = @('install','-y','powershell') },
+        @{ Name = 'yum'; Args = @('install','-y','powershell') }
+    )
+    $brew = Get-Command brew -ErrorAction SilentlyContinue
+    if ($brew) { & $brew.Source @($commands[0].Args); return ($LASTEXITCODE -eq 0) }
+    $apt = Get-Command apt-get -ErrorAction SilentlyContinue
+    if ($apt) {
+        & $apt.Source @($commands[1].Args); if ($LASTEXITCODE -ne 0) { return $false }
+        & $apt.Source @($commands[2].Args); return ($LASTEXITCODE -eq 0)
+    }
+    foreach ($name in @('dnf','yum')) {
+        $cmd = Get-Command $name -ErrorAction SilentlyContinue
+        if ($cmd) { & $cmd.Source @('install','-y','powershell'); return ($LASTEXITCODE -eq 0) }
+    }
+    Write-Warn 'No supported POSIX package manager found (brew, apt-get, dnf, or yum).'
+    return $false
 }
 
 function Get-SkillsRepoRoot {

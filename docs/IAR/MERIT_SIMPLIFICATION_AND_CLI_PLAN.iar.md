@@ -228,3 +228,5 @@ Historical proof packets remain evidence only. A new IAR or checklist requires a
 `Merit-Hub.ps1` at repository root is the stable first-touch launcher. When the full clone is present, it forwards to `Merit-Hub/Merit-Hub.ps1`. When downloaded alone, it creates the adjacent `Merit-Hub/` folder, downloads the pinned implementation from the public repository, and then forwards all arguments. The implementation owns prerequisite checks and reports missing `pwsh`, `git`, or `gh`; the root launcher does not duplicate that logic. A standalone smoke test passed from `C:\Temp\merit-hub-root-smoke`.
 
 `Merit-Hub/oc-bench.ps1` remains an advanced multi-creator bench utility. It is not part of the beginner path and should be linked only from advanced Hub documentation.
+
+The Hub prerequisite contract now covers Windows portable PowerShell and POSIX package-manager installation. POSIX installation is opt-in, package-manager detected, and followed by a re-launch under `pwsh`; unsupported systems receive platform guidance instead of a silent failure.
