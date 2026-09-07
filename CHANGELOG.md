@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.180] - 2026-09-07
+### Changed
+- Reduced everyday Hub versioning to one public label: `MERIT Skills 0.5.180`. The matching `skills-v0.5.180` Git tag is now documented as tag notation, not a separate track.
+- Removed stale `hubVersion`, file timestamp, vault pin, and obsolete `2026.08.3` CompatSet references from normal Hub/README output. Vault and runtime pins remain available only within the advanced operation that uses them.
+- Retained menu **K** as the sole advanced exception: it exposes the current payload plus two approved rollback CompatSets and explains a deliberate rollback only when selected.
+
 ## [0.5.179] - 2026-09-07
 ### Fixed
 - Aligned the root launcher, Hub menu revision, default CompatSet, and new bench template at 0.5.179 so a fresh device no longer reports an unexplained 0.5.138 Hub revision.

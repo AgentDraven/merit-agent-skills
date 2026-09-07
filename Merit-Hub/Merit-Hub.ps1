@@ -116,8 +116,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "hubVersion": "0.5.179",
-  "skillsPin": "skills-v0.5.179",
+  "release": "0.5.180",
+  "skillsPin": "skills-v0.5.180",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -216,7 +216,7 @@ function Write-HubFoolproofGate {
     $oss = Get-MyMeritAppRoot
     $toolsHub = Join-Path $tools 'Merit-Hub.ps1'
     Write-Header 'Foolproof gate'
-    Write-Info ("skillsPin = {0}   vaultPin = {1}" -f $cfg.skillsPin, $cfg.vaultPin)
+    Write-Info ("MERIT Skills release = {0}" -f $cfg.release)
     Write-Info ("This script = {0}" -f $Script:HubScriptPath)
     Write-Info ("MYMERITTOOLS = {0}" -f $tools)
     Write-Info ("MYMERITAPP   = {0}" -f $oss)
@@ -3767,7 +3767,7 @@ function Enter-HubOssPhase {
 
 function Invoke-JumpstartVault {
     $cfg = Get-HubConfig
-    Write-Header "4 V (local) @ $($cfg.vaultPin)"
+    Write-Header '4 V (local)'
     Write-HubMap -Here '4'
     Write-HubDrillIn '4'
     [void](Invoke-MeritPrereqs)
@@ -3848,7 +3848,6 @@ function Show-MeritHubHelp {
     Write-Info "Elevated: $(Test-HubAdmin)"
     Write-HubEnvScopes
     Write-Info "Resolved MYMERITTOOLS=$(Get-MyMeritToolsRoot)  MYMERITAPP=$(Get-MyMeritAppRoot)"
-    Write-Info "Pins: skills=$($cfg.skillsPin)  vault=$($cfg.vaultPin)"
     Write-Info "History log (append): $Script:HistoryLog"
     Write-HubMap
     Write-Host ''
@@ -3928,34 +3927,25 @@ function Invoke-HubTryItValidate {
 function Write-HubBuildIdentity {
     $cfg = $null
     try { $cfg = Get-HubConfig } catch { }
-    $version = if ($cfg -and $cfg.hubVersion) { [string]$cfg.hubVersion } else { 'unknown' }
+    $release = if ($cfg -and $cfg.release) { [string]$cfg.release } else { 'unknown' }
     $pin = if ($cfg -and $cfg.skillsPin) { [string]$cfg.skillsPin } else { 'unknown' }
     $tip = 'unknown'
     try { $tip = ((Get-Content -LiteralPath (Join-Path $Script:HubRoot 'VERSION') -Raw) -split '\r?\n')[0].Trim() } catch { }
-    $created = 'unknown'
-    try { $created = (Get-Item -LiteralPath $Script:HubScriptPath).LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss') } catch { }
-    $launcherVersion = [Environment]::GetEnvironmentVariable('MERIT_HUB_LAUNCHER_VERSION', 'Process')
-    if ([string]::IsNullOrWhiteSpace($launcherVersion)) { $launcherVersion = '(direct Hub run)' }
     $expectedPin = if ($tip -match '^\d+\.\d+\.\d+$') { 'skills-v' + $tip } else { 'unknown' }
-    $hubMatchesTip = ($version -eq $tip)
-    $launcherMatchesTip = ($launcherVersion -eq '(direct Hub run)' -or $launcherVersion -eq $tip)
-    if ($hubMatchesTip -and $launcherMatchesTip) {
-        Write-Ok ("Release identity aligned: launcher={0}; Hub={1}; default payload={2}." -f $launcherVersion, $version, $pin)
+    if ($release -eq $tip -or $tip -eq 'unknown') {
+        Write-Ok ("MERIT Skills release {0} is ready." -f $release)
     } else {
-        Write-Warn ("Release identity needs attention: launcher={0}; Hub={1}; repository tip={2}." -f $launcherVersion, $version, $tip)
-        Write-Note 'Effect: the Hub can still run, but its displayed instructions may be from a different release. Refresh the root launcher, then run Hub 2 before relying on the installed payload.'
+        Write-Warn ("Hub release {0} differs from repository release {1}." -f $release, $tip)
+        Write-Note 'Refresh the root launcher, then run Hub 2 before relying on the installed skills or docs.'
     }
-    if ($pin -eq $expectedPin) {
-        Write-Info ("Default CompatSet payload is aligned with this release: {0}." -f $pin)
-    } else {
-        Write-Info ("Payload pin is {0}; this is allowed when K selected an approved CompatSet rollback. Repository tip expects {1}." -f $pin, $expectedPin)
+    if ($pin -ne $expectedPin) {
+        Write-Note ("Approved alternate CompatSet selected through K: {0}." -f $pin)
     }
     try {
         $reg = Join-Path $Script:HubRoot 'cfg\compatset.skills.json'
         $approved = @((Get-Content $reg -Raw | ConvertFrom-Json).sets | Where-Object { $_.status -eq 'supported' -and $_.pin -eq $pin })
         if (-not $approved) { Write-Warn "Embedded pin $pin is not present in the supported CompatSet registry." }
     } catch { Write-Warn 'Supported CompatSet registry could not be checked.' }
-    Write-Info ("Hub script={0}  file-created/updated={1}  host=pwsh {2}" -f $version, $created, $PSVersionTable.PSVersion.ToString())
 }
 
 function Invoke-HubPathRecovery {

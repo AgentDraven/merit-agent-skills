@@ -260,6 +260,22 @@ Acceptance: `scripts/test-hub-launcher.ps1` asserts all five identity links
 (root launcher, Hub menu, Hub payload, first CompatSet, and bench template)
 under both PowerShell hosts, in addition to launcher transport recovery tests.
 
+### MAS-HUB-ID-02 — one public release label (0.5.180)
+
+**Decision:** beginner-facing Hub output uses one release label only:
+`MERIT Skills <VERSION>`. The matching `skills-v<VERSION>` is Git tag syntax,
+not a parallel product version. `hubVersion` is deprecated and removed;
+file-write timestamps, vault pins, portable-PowerShell versions, component
+pins, and the obsolete vault CompatSet date are not release labels and must not
+appear on the normal menu path.
+
+The only intentional exception is menu **K**. It can select a supported older
+CompatSet for a session, and only then Hub says that an approved alternate
+payload is active. A Hub release that differs from repository `VERSION` is a
+real update warning: refresh the root launcher and rerun Hub 2. The regression
+suite continues to require launcher, Hub release, default payload, CompatSet,
+and bench-template alignment.
+
 ## NextRel FR — README three-step explainability (Peel-The-Onion)
 
 **Peel-The-Onion** is the MERIT teaching model: reveal the smallest useful action first, then progressively expose evidence and advanced detail. A beginner can pause after any layer with a clear success signal.

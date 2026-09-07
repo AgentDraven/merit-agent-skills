@@ -21,8 +21,8 @@ $rootText = Get-Content -LiteralPath $source -Raw
 $hubText = Get-Content -LiteralPath (Join-Path $repoRoot 'Merit-Hub\Merit-Hub.ps1') -Raw
 $compat = Get-Content -LiteralPath (Join-Path $repoRoot 'cfg\compatset.skills.json') -Raw | ConvertFrom-Json
 $benchTemplate = Get-Content -LiteralPath (Join-Path $repoRoot 'cfg\oss-bench.template.json') -Raw | ConvertFrom-Json
-Assert-Test ($rootText -match [regex]::Escape("MERIT launcher $release")) 'root launcher revision matches VERSION'
-Assert-Test ($hubText -match ('"hubVersion"\s*:\s*"' + [regex]::Escape($release) + '"')) 'Hub menu revision matches VERSION'
+Assert-Test ($rootText -match ('\$release\s*=\s*''' + [regex]::Escape($release) + '''')) 'root launcher release matches VERSION'
+Assert-Test ($hubText -match ('"release"\s*:\s*"' + [regex]::Escape($release) + '"')) 'Hub release matches VERSION'
 Assert-Test ($hubText -match ('"skillsPin"\s*:\s*"skills-v' + [regex]::Escape($release) + '"')) 'Hub default payload matches VERSION'
 Assert-Test ($compat.sets[0].pin -eq "skills-v$release") 'first CompatSet is the release default'
 Assert-Test ($benchTemplate.skillsPin -eq "skills-v$release") 'new bench template uses the release default'

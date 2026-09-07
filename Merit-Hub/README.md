@@ -377,12 +377,9 @@ the exact embedded `skills-v*` pin, while `merit-demo` is fast-forward refreshed
 from `origin/main`. Local changes or divergent history stop safely; nothing is
 overwritten. Use menu **K** to list supported skills tags for advanced review.
 
-| Pin | Repo | Role |
-|-----|------|------|
-| `skills-v0.5.179` | merit-agent-skills | OSS cold-start clone (default) |
-| `vault-v0.5.56` | merit-private-vault | Operator cold-start clone |
+For everyday use, there is one number: **MERIT Skills `0.5.180`**. Hub **2** installs that release by default. Its Git tag is named `skills-v0.5.180`; that is the same release written in Git's tag style, not a second version.
 
-**Active CompatSet:** `2026.08.3` (vault `cfg/compat/`).
+Menu **K** is the advanced exception: it lists the current release plus two approved rollback releases. A selected rollback is shown only while it is active. Vault and portable-PowerShell pins are implementation details; they appear only inside their respective advanced operations.
 
 ---
 
@@ -471,20 +468,18 @@ See [`oc-bench.ps1`](oc-bench.ps1). Each bench gets its own `MYMERITAPP` + `oss-
    - Renaming the file to `Merit-Hub-B.ps1` is fine; its contents determine behavior.
 2. **Refresh the launcher**
    - Download the [root launcher](https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub.ps1) once into your tools folder.
-   - Run it from PowerShell; the corrected release prints `MERIT launcher 0.5.179` first.
+   - Run it from PowerShell; the corrected release prints `MERIT Skills 0.5.180` first.
    - It refreshes the main Hub automatically, even if a cached file exists.
 3. **Check the result**
    - Read the embedded skills pin and executable path printed after download.
    - The launcher validates the file before starting the Hub menu.
    - On network or parse failure it stops, preserves the old copy, and prints the cause; retry after addressing that cause.
 
-### Version verdict: what the three labels mean
+### Version verdict: one number unless you choose otherwise
 
-- **Launcher** is the tiny root downloader. Its revision tells you which recovery/download logic ran.
-- **Hub script** is the menu implementation that was downloaded and started. It should normally match the repository tip.
-- **Default payload** is the exact `skills-v*` CompatSet that Hub **2** installs. It normally matches the release, but can intentionally differ after **K** selects a supported rollback.
+The normal screen shows only **MERIT Skills `0.5.180`**. It is the launcher release, Hub release, and Hub 2 default payload. The Git tag `skills-v0.5.180` is the same release with the required tag prefix.
 
-For the default journey, all three labels align at `0.5.179` / `skills-v0.5.179` and Hub prints an explicit **Release identity aligned** receipt. A mismatch does not automatically corrupt a laptop; it means refresh the root launcher and rerun **2** before treating the installed skills and docs as the current default.
+You see a version warning only when the downloaded Hub genuinely disagrees with its repository release. Refresh the root launcher and rerun **2** then. If you deliberately select a rollback with **K**, Hub names that approved CompatSet as an exception—this is expected and reversible.
 
 **Cold start:** `1 2 3 OC 4 VC 5 R RC 6` · **Cleanup:** `G A P S` · **Util:** `I M T W H`
 
