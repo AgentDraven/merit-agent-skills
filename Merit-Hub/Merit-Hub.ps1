@@ -1269,6 +1269,7 @@ function Start-HubTranscript {
     Write-Host ('=' * 72) -ForegroundColor DarkGray
     Write-Host ("  Merit-Hub run  {0}" -f (Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))
     Write-Host ("  user={0}  machine={1}  elevated={2}" -f $env:USERNAME, $env:COMPUTERNAME, (Test-HubAdmin))
+    Write-HubBuildIdentity
     Write-Host ("  script={0}" -f $Script:HubScriptPath)
     Write-Host ("  log (append)={0}" -f $Script:HistoryLog)
     Write-Host ('=' * 72) -ForegroundColor DarkGray
@@ -1343,6 +1344,7 @@ function Ensure-HubPwshHost {
 
     $hint = Get-HubRunHint
     Write-Header 'Use pwsh (PowerShell 7+)'
+    Write-HubBuildIdentity
     Write-Note 'Windows PowerShell 5.1 started this file. Daily use is pwsh -- this host is only a bootstrap.'
     Write-Host ''
     Write-Host "  $hint" -ForegroundColor Cyan
@@ -3789,6 +3791,7 @@ function Show-MeritHubHelp {
     $cfg = Get-HubConfig
     Write-Header 'Merit-Hub'
     Write-Info "Location: $Script:HubScriptPath"
+    Write-HubBuildIdentity
     Write-Info "Elevated: $(Test-HubAdmin)"
     Write-HubEnvScopes
     Write-Info "Resolved MYMERITTOOLS=$(Get-MyMeritToolsRoot)  MYMERITAPP=$(Get-MyMeritAppRoot)"
@@ -3834,6 +3837,14 @@ function Set-MyMeritToolsPrompt {
     Set-UserEnvVar -Name 'MYMERITTOOLS' -Value (Expand-HomePath $path)
 }
 
+function Write-HubBuildIdentity {
+    $version = 'unknown'
+    try { $version = [string](Get-HubConfig).skillsPin } catch { }
+    $created = 'unknown'
+    try { $created = (Get-Item -LiteralPath $Script:HubScriptPath).LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss') } catch { }
+    Write-Info ("build pin={0}  file-created/updated={1}  host=pwsh {2}" -f $version, $created, $PSVersionTable.PSVersion.ToString())
+}
+
 function Invoke-HubPathRecovery {
     param([string]$Choice)
     Write-Warn "The $Choice action could not use the configured MERIT folder."
@@ -3845,6 +3856,17 @@ function Invoke-HubPathRecovery {
     catch {
         Write-Fail ("Path repair failed: " + $_.Exception.Message)
         Write-Note 'Use M to change MYMERITAPP or T to change MYMERITTOOLS, then retry.'
+    }
+}
+
+function Repair-HubProcessEnvironment {
+    if (Test-HubProcessBenchMode) { return }
+    foreach ($name in @('MYMERITTOOLS', 'MYMERITAPP')) {
+        $current = [Environment]::GetEnvironmentVariable($name, 'Process')
+        if (Test-HubConfiguredPathUsable -Path $current -Name $name) { continue }
+        $fallback = if ($name -eq 'MYMERITTOOLS') { Get-DefaultMyMeritTools } else { Get-DefaultMyMeritApp }
+        Set-Item -Path "Env:$name" -Value $fallback
+        Write-Warn ("Using process-only default for {0}: {1}. The saved User value was not changed; choose menu 1 to repair it." -f $name, $fallback)
     }
 }
 
@@ -3925,6 +3947,7 @@ if ($Help) {
 }
 [void](Initialize-HubBackupRoot)
 Sync-HubMeritEnvFromUser
+Repair-HubProcessEnvironment
 [void](Import-HubMeritResolve)
 [void](Import-HubOssHelpers)
 Start-HubTranscript

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.137] - 2026-09-06
+### Added
+- Hub now prints embedded build pin, file timestamp, and PowerShell host at bootstrap, menu, and run stages.
+### Fixed
+- Invalid saved environment roots are replaced with process-only defaults before surface mapping; saved User values remain available for menu 1 repair.
+
 ## [0.5.136] - 2026-09-06
 ### Fixed
 - Updated the embedded Hub skills pin to the current fixed release `skills-v0.5.135`.
