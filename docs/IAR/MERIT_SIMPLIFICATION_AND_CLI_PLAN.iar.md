@@ -158,7 +158,7 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 | 1. IAR and inventory | PASS | This plan, IAR navigation link, dependency-hierarchy link; release `skills-v0.5.98` |
 | 2. Root Hub launcher | PASS | Root `Merit-Hub.ps1 -Help` smoke test; implementation remains under `Merit-Hub/`; release `skills-v0.5.99` |
 | 3. CLI extraction | IN PROGRESS | `merit/modules/Merit.Core.ps1` owns shared primitives; `merit.ps1 help` and `verify` parity pass; remaining command families still being extracted |
-| 4. Unified IDE installer | IN PROGRESS | `merit/modules/Merit.Skills.ps1` exposes `skills list/status/install`; Hub routes IDE installs through the public CLI; existing installer remains compatibility-owned |
+| 4. Unified IDE installer | IN PROGRESS | `merit/modules/Merit.Skills.ps1` exposes `skills list/status/install/remove`; Hub routes IDE installs through the public CLI; install implementation remains compatibility-owned |
 | 5. Bootstrap migration | IN PROGRESS | `Merit.Surface.ps1` is authoritative for CLI and Hub surface loading; legacy `_resolve.ps1` remains fallback |
 | 6. Law relocation | PASS | Canonical `merit/merit.blob` is authoritative; legacy root payload removed; law tests pass; release `skills-v0.5.110` |
 | 7. Vault delegation | IN PROGRESS | Added explicit allow-listed `merit.ps1 vault` delegation with clear no-vault failure; live vault integration test remains pending |

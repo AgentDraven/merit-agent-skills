@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.117] - 2026-09-06
+### Changed
+- Added guarded `merit.ps1 skills remove --target <Host> --yes` for removing MERIT skill folders without touching unrelated host content.
+- Reinstalled and verified the Cursor skill surface after exercising the new removal path.
+
 ## [0.5.116] - 2026-09-06
 ### Changed
 - Updated law documentation and the simplification IAR to reflect canonical payload paths and the remaining compatibility-shim boundary.
