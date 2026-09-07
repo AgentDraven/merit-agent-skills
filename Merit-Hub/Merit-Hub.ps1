@@ -3438,14 +3438,20 @@ function Invoke-HubOc {
             $pname = if ([string]::IsNullOrWhiteSpace($ans)) { $defaultName } else { $ans.Trim() }
         }
     }
-    Write-Info "consumer_id: $cid"
-    Write-Info "product:     $pname"
+    Write-Attention "OC publish starting  |  product='$pname'  |  consumer=$cid"
+    Write-Info 'The Hub will publish play/config, activate registration, publish the marketing portal, then run live checks.'
     $runner = Get-OssRunner
     $env:MERIT_VERIFY_QUIET = '1'
     $ocLines = & $runner.Exe -NoProfile -File $cli 'oc' '--path' $demo '--consumer-id' $cid '--product-name' $pname 6>&1
     foreach ($line in @($ocLines)) {
         $text = [string]$line
-        if ($text.Trim()) { Write-Host $text }
+        if (-not $text.Trim()) { continue }
+        if ($text -match '(?i)fail|error|denied|not found') { Write-Fail $text; continue }
+        if ($text -match 'par scaffold OK') { Write-Ok 'Demo scaffold ready' }
+        elseif ($text -match 'Packing play') { Write-Info 'Publishing play and configuration...' }
+        elseif ($text -match 'Store activated') { Write-Ok 'Registration route activated' }
+        elseif ($text -match 'Packing portal') { Write-Info 'Publishing marketing portal...' }
+        elseif ($text -match 'OC here.now') { Write-Note ($text.Trim()) }
     }
     if ($LASTEXITCODE -ne 0) {
         $Script:HubStepFailed = $true

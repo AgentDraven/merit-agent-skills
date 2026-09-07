@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.165] - 2026-09-07
+### Fixed
+- Simplified OC output into clear staged progress and one canonical receipt, suppressing duplicated raw publish summaries.
+
 ## [0.5.164] - 2026-09-07
 ### Fixed
 - Promoted `skills-v0.5.163` to the supported CompatSet registry and made it the Hub default.
