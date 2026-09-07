@@ -116,6 +116,7 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
+  "hubVersion": "0.5.138",
   "skillsPin": "skills-v0.5.135",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
@@ -3838,11 +3839,13 @@ function Set-MyMeritToolsPrompt {
 }
 
 function Write-HubBuildIdentity {
-    $version = 'unknown'
-    try { $version = [string](Get-HubConfig).skillsPin } catch { }
+    $cfg = $null
+    try { $cfg = Get-HubConfig } catch { }
+    $version = if ($cfg -and $cfg.hubVersion) { [string]$cfg.hubVersion } else { 'unknown' }
+    $pin = if ($cfg -and $cfg.skillsPin) { [string]$cfg.skillsPin } else { 'unknown' }
     $created = 'unknown'
     try { $created = (Get-Item -LiteralPath $Script:HubScriptPath).LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss') } catch { }
-    Write-Info ("build pin={0}  file-created/updated={1}  host=pwsh {2}" -f $version, $created, $PSVersionTable.PSVersion.ToString())
+    Write-Info ("script-version={0}  skills-pin={1}  file-created/updated={2}  host=pwsh {3}" -f $version, $pin, $created, $PSVersionTable.PSVersion.ToString())
 }
 
 function Invoke-HubPathRecovery {

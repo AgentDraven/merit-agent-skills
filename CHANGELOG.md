@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.138] - 2026-09-06
+### Added
+- Hub identity now prints its own script version separately from the skills pin.
+
 ## [0.5.137] - 2026-09-06
 ### Added
 - Hub now prints embedded build pin, file timestamp, and PowerShell host at bootstrap, menu, and run stages.
