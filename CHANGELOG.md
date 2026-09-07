@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.139] - 2026-09-06
+### Fixed
+- Aligned the OSS bench template and Hub documentation with `skills-v0.5.138`, the first supported pin containing `merit/modules/Merit.Oss.ps1`.
+- Prevented fresh devices from cloning a pre-helper tag and then reporting a misleading missing-helper failure.
+
 ## [0.5.138] - 2026-09-06
 ### Added
 - Hub identity now prints its own script version separately from the skills pin.

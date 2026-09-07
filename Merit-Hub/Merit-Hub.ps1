@@ -117,7 +117,7 @@ $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
   "hubVersion": "0.5.138",
-  "skillsPin": "skills-v0.5.135",
+  "skillsPin": "skills-v0.5.138",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -3343,8 +3343,29 @@ function Invoke-HubTryIt {
         Write-HubNextSteps '3'
         return
     }
-    Write-Ok "Opening $play"
-    try { Start-Process $play } catch { Write-Warn "Could not open browser: $($_.Exception.Message)" }
+    # Use the consumer's HTTP server so absolute/relative links (especially
+    # Marketing portal) behave like a real deployment.  file:// is smoke-only.
+    $demoRoot = Split-Path -Parent $play
+    $demoRoot = Split-Path -Parent $demoRoot
+    $cli = Join-Path $demoRoot 'merit.ps1'
+    $opened = $false
+    if (Test-Path -LiteralPath $cli) {
+        try {
+            $listener = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($listener) {
+                Write-Ok 'Reusing the existing merit-demo HTTP server on port 3000.'
+            } else {
+                Start-Process -FilePath (Get-Command pwsh -ErrorAction Stop).Source -WorkingDirectory $demoRoot -ArgumentList @('-NoProfile','-File',$cli,'serve') | Out-Null
+                Start-Sleep -Seconds 2
+                Write-Ok 'Started the merit-demo HTTP server on port 3000.'
+            }
+            Start-Process 'http://localhost:3000/play/'
+            Write-Ok 'Serving merit-demo over HTTP and opening http://localhost:3000/play/.'
+            Write-Note 'Leave the server window running while testing; stop it with Ctrl+C when finished.'
+            $opened = $true
+        } catch { Write-Warn "HTTP serve could not start ($($_.Exception.Message)); opening file smoke view instead." }
+    }
+    if (-not $opened) { try { Start-Process $play } catch { Write-Warn "Could not open browser: $($_.Exception.Message)" } }
     Write-HubReceipt '3'
     Write-HubNextSteps '3'
 }
@@ -3803,7 +3824,8 @@ function Show-MeritHubHelp {
     Write-Host '  KEYS' -ForegroundColor White
     Write-Host '  1) Setup laptop     prereqs + MYMERIT* + Python (venv or global shim)'
     Write-Host '  2) Install OSS      skills pin only (no merit-demo)   (alias J)'
-    Write-Host '  3) Try it           clone public merit-demo + open play/index.html'
+    Write-Host '  3) Try it           clone public merit-demo + serve HTTP + open /play/'
+    Write-Host '  3V Validate demo    guided repeatable checks (browser + verify + e2e)'
     Write-Host '  OC) OSS in the Cloud  DualRail play + register + your marketing site'
     Write-Host '      -NewOc with -Oc mints a new oc-* id (second creator on this bench)'
     Write-Host '  4) Vault (local)    clone private vault (working clone kept)'
@@ -3836,6 +3858,37 @@ function Set-MyMeritToolsPrompt {
     $ans = Read-Host "MYMERITTOOLS path [$current]"
     $path = if ([string]::IsNullOrWhiteSpace($ans)) { $current } else { $ans }
     Set-UserEnvVar -Name 'MYMERITTOOLS' -Value (Expand-HomePath $path)
+}
+
+function Invoke-HubTryItValidate {
+    Write-Header '3V Validate the demo'
+    Write-Note 'Run any check repeatedly, or choose A to run all checks. Enter returns to the Hub menu.'
+    $url = 'http://localhost:3000/play/'
+    while ($true) {
+        Write-Host ''
+        Write-Host '3V CHECKS' -ForegroundColor Cyan
+        Write-Host '1  Open /play/ (Hosted Ready + mounted workbench)'
+        Write-Host '2  Open Register free (hosted MERIT route)'
+        Write-Host '3  Open Marketing portal (/portal/)'
+        Write-Host '4  Run merit.ps1 verify'
+        Write-Host '5  Run merit.ps1 e2e'
+        Write-Host 'A  Run all checks'
+        Write-Host '0  Return to Hub menu'
+        $c = (Read-Host '3V select').Trim()
+        if ($c -match '^(0|q)$') { return }
+        try {
+            $demo = Get-MyMeritAppRoot; $repo = Join-Path $demo 'merit-demo'; $cli = Join-Path $repo 'merit.ps1'
+            switch -Regex ($c) {
+                '^1$' { Start-Process $url; Write-Ok 'Opened /play/. Confirm Hosted Ready and mounted workbench.' }
+                '^2$' { Start-Process 'https://merit-prod.vercel.app/store/merit-demo/register'; Write-Ok 'Opened Register free route.' }
+                '^3$' { Start-Process 'http://localhost:3000/portal/'; Write-Ok 'Opened Marketing portal.' }
+                '^4$' { & (Get-Command pwsh).Source -NoProfile -File $cli verify }
+                '^5$' { & (Get-Command pwsh).Source -NoProfile -File $cli e2e }
+                '^[Aa]$' { Start-Process $url; Start-Process 'https://merit-prod.vercel.app/store/merit-demo/register'; Start-Process 'http://localhost:3000/portal/'; & (Get-Command pwsh).Source -NoProfile -File $cli verify; & (Get-Command pwsh).Source -NoProfile -File $cli e2e }
+                default { Write-Warn 'Choose 1, 2, 3, 4, 5, A, or 0.' }
+            }
+        } catch { Write-Fail ("3V check failed: " + $_.Exception.Message) }
+    }
 }
 
 function Write-HubBuildIdentity {
@@ -3913,6 +3966,7 @@ function Show-InteractiveMenu {
                 '^1$' { Invoke-HubSetupLaptop; $pending = Read-HubContinue }
                 '^(2|J|j|Jumpstart|Oss)$' { Invoke-HubInstallOss; $pending = Read-HubContinue }
                 '^3$' { Invoke-HubTryIt; $pending = Read-HubContinue }
+                '^(3V|3v)$' { Invoke-HubTryItValidate; $pending = Read-HubContinue }
                 '^(OC|oc|Oc)$' { Invoke-HubOc; $pending = Read-HubContinue }
                 '^(4|Vault)$' { Invoke-JumpstartVault; $pending = Read-HubContinue }
                 '^(VC|vc|Vc)$' { Invoke-HubVc; $pending = Read-HubContinue }
