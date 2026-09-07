@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.173] - 2026-09-07
+### Fixed
+- Replaced executable Hub panel Unicode borders/arrows with ASCII-safe text for Windows PowerShell 5.1 bootstrap parsing.
+
 ## [0.5.172] - 2026-09-07
 ### Fixed
 - Root Hub launcher normalizes the implementation to UTF-8 with BOM so Windows PowerShell 5.1 parses Unicode panels safely.

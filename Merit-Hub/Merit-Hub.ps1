@@ -117,7 +117,7 @@ $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
   "hubVersion": "0.5.138",
-  "skillsPin": "skills-v0.5.172",
+  "skillsPin": "skills-v0.5.173",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -3852,19 +3852,19 @@ function Show-MeritHubHelp {
     Write-Info "History log (append): $Script:HistoryLog"
     Write-HubMap
     Write-Host ''
-    Write-Host '  ┌─ BEGINNER PATH ─────────────────────────────────────────────────────┐' -ForegroundColor Cyan
-    Write-Host '  │  1 Setup → 2 Install → 3 Try → 3V Validate → OC Publish → OCV Check │' -ForegroundColor Cyan
-    Write-Host '  └──────────────────────────────────────────────────────────────────────┘' -ForegroundColor Cyan
+    Write-Host '  +-- BEGINNER PATH ----------------------------------------------------+' -ForegroundColor Cyan
+    Write-Host '  |  1 Setup -> 2 Install -> 3 Try -> 3V Validate -> OC Publish -> OCV |' -ForegroundColor Cyan
+    Write-Host '  +---------------------------------------------------------------------+' -ForegroundColor Cyan
     Write-Host '  NEXT FOR A NEW LAPTOP: choose 1, then 2, then 3.' -ForegroundColor Green
     Write-Host '  LOCAL PROOF: 3V     CLOUD PROOF: OC → OCV     EXIT: 0' -ForegroundColor Magenta
     Write-Host ''
-    Write-Host '  ┌─ ADVANCED PATHS ─────────────────────────────────────────────────────┐' -ForegroundColor Yellow
-    Write-Host '  │  4 Vault → VC Validate     |  5 Repo → 5R Status → RC Cloud check    │' -ForegroundColor Yellow
-    Write-Host '  └──────────────────────────────────────────────────────────────────────┘' -ForegroundColor Yellow
-    Write-Host '  ┌─ HELPERS ────────────────────────────────────────────────────────────┐' -ForegroundColor DarkCyan
-    Write-Host '  │  G scan  A archive  P pristine  S soft  I IDE  M app  T tools        │' -ForegroundColor DarkCyan
-    Write-Host '  │  W surface  K CompatSet  H help                                      │' -ForegroundColor DarkCyan
-    Write-Host '  └──────────────────────────────────────────────────────────────────────┘' -ForegroundColor DarkCyan
+    Write-Host '  +-- ADVANCED PATHS ---------------------------------------------------+' -ForegroundColor Yellow
+    Write-Host '  |  4 Vault -> VC Validate     5 Repo -> 5R Status -> RC Cloud check   |' -ForegroundColor Yellow
+    Write-Host '  +---------------------------------------------------------------------+' -ForegroundColor Yellow
+    Write-Host '  +-- HELPERS ----------------------------------------------------------+' -ForegroundColor DarkCyan
+    Write-Host '  |  G scan  A archive  P pristine  S soft  I IDE  M app  T tools       |' -ForegroundColor DarkCyan
+    Write-Host '  |  W surface  K CompatSet  H help                                     |' -ForegroundColor DarkCyan
+    Write-Host '  +---------------------------------------------------------------------+' -ForegroundColor DarkCyan
     Write-Host ''
      Write-Note 'Every action returns to this menu. Colors reinforce the words; copied logs remain understandable.'
     if ($AgentLaw) {
