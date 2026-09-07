@@ -1017,6 +1017,8 @@ function Initialize-HubMeritSurfaceEmbed {
         }
         if ($pinMismatch) {
             Write-Host ('  WARN pin:      Hub {0} != B VERSION {1}' -f $hubPin, $skillsVersion) -ForegroundColor Yellow
+            Write-Host '  CONSEQUENCE:   this bench is running a different skills payload than the Hub default; commands and docs may not match.' -ForegroundColor Yellow
+            Write-Host '  FIX:            run Hub 2 (Install OSS) to re-clone the pinned CompatSet, or use K to select an approved pin.' -ForegroundColor Yellow
         }
         if ($staleIde) {
              Write-Host '  WARN:          stale IDE .merit-surface.json (B path gone) - Hub 2 to re-clone' -ForegroundColor Yellow

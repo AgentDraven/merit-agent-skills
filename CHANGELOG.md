@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.158] - 2026-09-07
+### Fixed
+- Surface pin mismatches now explain the consequence and the exact repair path.
+
 ## [0.5.157] - 2026-09-07
 ### Added
 - Promoted `skills-v0.5.156` to the supported CompatSet registry and made it the Hub default.

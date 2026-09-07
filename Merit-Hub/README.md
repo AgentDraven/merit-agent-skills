@@ -67,6 +67,8 @@ Advanced helpers: `I` install IDE skills, `M` change `MYMERITAPP`, `T` change
 
 ## Three-step pathway cards 🧩
 
+> **Pin warning?** If Surface prints `Hub skills-vX != B VERSION Y`, the local OSS bench is not the payload the Hub expects. Hub actions may be out of sync. Choose **2 Install OSS** to restore the default pin, or use **K** to select an approved CompatSet; do not ignore the warning for a release test.
+
 Every pathway follows the same rhythm: **Start → Make progress → Finish**.
 
 ### Try MERIT / local demo 🚀
