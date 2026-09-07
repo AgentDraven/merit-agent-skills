@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.170] - 2026-09-07
+### Fixed
+- Promoted the current Hub/docs baseline as the default CompatSet and retained only the latest two backups.
+
 ## [0.5.169] - 2026-09-07
 ### Fixed
 - Consolidated Hub legend, map, keys, helper options, and recommendations into one compact beginner-friendly journey display.
