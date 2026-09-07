@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.104] - 2026-09-06
+### Changed
+- Extracted launch configuration parsing and target-path helpers into the shared CLI core module.
+
 ## [0.5.103] - 2026-09-06
 ### Changed
 - Extracted target-path, launch-path, and gitignore helpers into the shared CLI core module.
