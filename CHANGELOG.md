@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.164] - 2026-09-07
+### Fixed
+- Promoted `skills-v0.5.163` to the supported CompatSet registry and made it the Hub default.
+
 ## [0.5.163] - 2026-09-07
 ### Fixed
 - Removed duplicate beginner shortcuts, updated stale manual pin examples, and added OCV to the Hub Mermaid pathway.

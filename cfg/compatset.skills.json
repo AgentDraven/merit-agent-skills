@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
+    { "pin": "skills-v0.5.164", "releasedAt": "2026-09-07", "status": "supported", "notes": "Unified Peel-The-Onion docs, OCV diagram, and Bootstrap cleanup" },
     { "pin": "skills-v0.5.156", "releasedAt": "2026-09-07", "status": "supported", "notes": "README 3-step pathway standard and exported law baseline" },
     { "pin": "skills-v0.5.154", "releasedAt": "2026-09-07", "status": "supported", "notes": "Current OC/OCV beginner journey baseline" },
     { "pin": "skills-v0.5.153", "releasedAt": "2026-09-07", "status": "supported", "notes": "Receipt-driven hosted OC tutorial" },
