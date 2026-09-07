@@ -2,9 +2,8 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
-    { "pin": "skills-v0.5.149", "releasedAt": "2026-09-06", "status": "supported", "notes": "Current beginner journey and Hub baseline" },
-    { "pin": "skills-v0.5.142", "releasedAt": "2026-09-06", "status": "supported", "notes": "Step 3 architecture reporting and HTTP evidence" },
-    { "pin": "skills-v0.5.141", "releasedAt": "2026-09-06", "status": "supported", "notes": "CompatSet registry + Hub selection baseline" },
-    { "pin": "skills-v0.5.140", "releasedAt": "2026-09-06", "status": "supported", "notes": "Current OSS + IDE baseline" }
+    { "pin": "skills-v0.5.154", "releasedAt": "2026-09-07", "status": "supported", "notes": "Current OC/OCV beginner journey baseline" },
+    { "pin": "skills-v0.5.153", "releasedAt": "2026-09-07", "status": "supported", "notes": "Receipt-driven hosted OC tutorial" },
+    { "pin": "skills-v0.5.152", "releasedAt": "2026-09-06", "status": "supported", "notes": "Tip-versus-deployed-pin reporting" }
   ]
 }

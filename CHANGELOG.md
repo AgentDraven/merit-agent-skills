@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.155] - 2026-09-07
+### Fixed
+- Promoted `skills-v0.5.154` as the default and retained only the latest two backup CompatSets in the curated registry.
+
 ## [0.5.154] - 2026-09-07
 ### Fixed
 - Added OCV to the beginner journey, command table, and post-OC acceptance guidance.

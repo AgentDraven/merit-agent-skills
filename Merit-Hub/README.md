@@ -4,7 +4,7 @@
 
 `%MYMERITTOOLS%` (e.g. `C:\Tools` or `C:\DevTools`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.149` · `vault-v0.5.56` — see [CompatSet](#compatSet--pins).
+**Embedded pins (current release):** `skills-v0.5.154` · `vault-v0.5.56` — see [CompatSet](#compatSet--pins).
 
 **Raw download:** `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
 
@@ -94,6 +94,12 @@ Advanced helpers: `I` install IDE skills, `M` change `MYMERITAPP`, `T` change
 **After `6` (Join):** confirm the registration page opens, then record the resulting URL in the applicable receipt.
 
 For full evidence, use the linked consumer TDD checklist and the skills [IAR index](../docs/IAR/README.md). Hub never claims a branch is complete from a menu banner alone.
+
+> **When should I move from OSS to Vault?** Start in OSS while learning, building,
+> and using the public hosted rails. Move to **Vault / VC** when you need private
+> operator controls, tenant-grade runtime gates, private configuration, or
+> production ownership. Your public OC app can remain on merit-prod; Vault is the
+> protected operator lane, not a required upgrade for beginners.
 
 ---
 
