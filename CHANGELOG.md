@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.151] - 2026-09-06
+### Fixed
+- Made supported `skills-v0.5.149` the default embedded Hub pin for fresh installs.
+
 ## [0.5.150] - 2026-09-06
 ### Added
 - Registered `skills-v0.5.149` as the newest supported CompatSet.

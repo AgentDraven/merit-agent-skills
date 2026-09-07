@@ -4,7 +4,7 @@
 
 `%MYMERITTOOLS%` (e.g. `C:\Tools` or `C:\DevTools`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.148` · `vault-v0.5.56` — see [CompatSet](#compatSet--pins).
+**Embedded pins (current release):** `skills-v0.5.149` · `vault-v0.5.56` — see [CompatSet](#compatSet--pins).
 
 **Raw download:** `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
 
