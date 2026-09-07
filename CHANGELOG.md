@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.161] - 2026-09-07
+### Fixed
+- Removed duplicate one-line persona sections and added a complete root README quick index.
+
 ## [0.5.160] - 2026-09-07
 ### Fixed
 - Step 2 receipts now use the shared legend and explicitly distinguish `3V` validation from optional `O/OCV` hosted steps.

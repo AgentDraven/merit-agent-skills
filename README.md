@@ -6,6 +6,8 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 
 Every beginner pathway is explained in three layers: **Start**, **Make progress**, and **Finish**. Each layer includes at least three concrete sub-checks covering the action, what MERIT does, and the evidence to look for. This is the required README standard and a NextRel requirement for vault L1 `MERIT.instructions`.
 
+**Quick index:** [Start paths](#start-here--pick-your-adventure) · [Peel-The-Onion cards](#peel-the-onion-cards-three-steps-three-checks-each-) · [Additional options](#-for-additional-options) · [Public vs private SSOT](#public-vs-private-ssot) · [Quick install](#-quick-install) · [Dinner walkthrough](#-build-your-app-over-dinner)
+
 <a id="start-here--pick-your-adventure"></a>
 <table><tr><td bgcolor="#1f6feb"><strong><big><big>🧭 Start here — pick your adventure</big></big></strong></td></tr></table>
 
@@ -81,28 +83,6 @@ Every beginner pathway is explained in three layers: **Start**, **Make progress*
    - Re-run **I** if the pin changes.
    - Check host status or warning receipt.
    - Keep consumer code independent from IDE files.
-
-### 🚀 I want to try MERIT
-
-Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1), open PowerShell, change to its folder, and run ` .\Merit-Hub.ps1`.
-
-### 🍽️ I want to build my own app over dinner
-
-Follow the [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md) walkthrough.
-
-### 👋 I want a hello-world app
-
-Open [merit-demo](https://github.com/Mr-PI-Bala/merit-demo) and run ` .\merit.ps1 quickstart`.
-
-### 🧠 I want skills in my IDE
-
-Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (use **Raw**), save it in a tools folder such as `C:\Tools`, open PowerShell, change to that folder, and run:
-
-```powershell
-.\Merit-Hub.ps1
-```
-
-When the Hub menu appears, choose **I — Install IDE skills**, then choose your host (Cursor, Codex, VS Code, or another supported host). The Hub installs the skills into that host's correct location.
 
 ### 🧰 For additional options
 
