@@ -1,4 +1,4 @@
-﻿---
+---
 name: merit-mm-upgrade
 description: >-
   MERIT mini upgrade (mmUpgrade): analyze an existing repo against a stated goal,
@@ -113,8 +113,8 @@ End with a **3-3** in chat: **Done** Ã‚Â· **State** Ã‚Â· **Next** (Ã�
 ```powershell
 git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
-.\install.ps1 -Target Cursor
-# or: .\install.ps1 -Target Project -Path <repo>
+.\merit.ps1 skills install --target Cursor
+# or: .\merit.ps1 skills install -Target Project -Path <repo>
 ```
 
 Also copy `skills/merit-mm-upgrade/` into `~/.agents/skills/`, `~/.claude/skills/`, `~/.codex/skills/`, or Hermes/OpenClaw skill dirs Ã¢â‚¬â€ same `SKILL.md` body.

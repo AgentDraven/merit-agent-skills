@@ -6,7 +6,7 @@ Three install planes are **independent**. Merit-Hub and `merit.ps1 where` discov
 
 | Sym | Name | What | Has public `merit.ps1`? |
 |-----|------|------|-------------------------|
-| **A** | IDE skills | `install.ps1` / Hub **I** → `~/.cursor/skills/merit-*` | No — markdown only |
+| **A** | IDE skills | `merit.ps1 skills install / Hub **I** → `~/.cursor/skills/merit-*` | No — markdown only |
 | **B** | OSS bench | Full `merit-agent-skills` under `%MYMERITAPP%` + `oss-bench.json` | Yes — repo root |
 | **C** | Vault | `merit-private-vault` clone | Yes — `scripts\merit.ps1` (operator) |
 
@@ -70,4 +70,4 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1 -Surface
 
 ## IDE marker
 
-After `install.ps1` or Hub **I**, each host `destRoot` gets `.merit-surface.json` (hint only — resolver re-validates B path).
+After `merit.ps1 skills install` or Hub **I**, each host `destRoot` gets `.merit-surface.json` (hint only — resolver re-validates B path).

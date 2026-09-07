@@ -1,4 +1,4 @@
-﻿# MERIT deploy PoV
+# MERIT deploy PoV
 
 This is the public creator path for launching a MERIT consumer with one local launch file and one public command surface: `merit.ps1` on Windows or `merit.sh` on Linux/macOS.
 
@@ -16,7 +16,7 @@ cd C:\MyMeritApp
 git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
-.\install.ps1 -Target Cursor
+.\merit.ps1 skills install --target Cursor
 ```
 
 Linux/macOS:
@@ -27,7 +27,7 @@ cd ~/MyMeritApp
 git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 git clone https://github.com/Mr-PI-Bala/merit-demo.git
 cd merit-agent-skills
-./install.sh -Target Cursor
+./merit.sh skills install --target Cursor
 ```
 
 Baseline check:

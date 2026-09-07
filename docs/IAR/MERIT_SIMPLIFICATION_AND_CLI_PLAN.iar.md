@@ -72,7 +72,7 @@ Root launchers remain stable public APIs; internal modules are not user-facing c
 
 ## Bootstrap and law migration
 
-`BootStrap/_resolve.ps1`, `_oss.ps1`, and `_law.ps1` move into the appropriate Hub/MERIT modules. The new modules become authoritative. Bootstrap files remain silent compatibility shims for one release, then `BootStrap/` is removed.
+`merit/modules/Merit.SurfaceImpl.ps1`, `_oss.ps1`, and `_law.ps1` move into the appropriate Hub/MERIT modules. The new modules become authoritative. Bootstrap files remain silent compatibility shims for one release, then `BootStrap/` is removed.
 
 Move the public law payload from `merit.blob` to `merit/merit.blob`. For one migration release, the root location is a warning-only fallback. `cfg/merit_closeout_contract.json` remains the machine-readable closeout contract. No business logic is duplicated across blob, JSON, Bootstrap, and CLI modules.
 
@@ -88,7 +88,7 @@ Hub invokes:
 
 ## Installer transition
 
-The root `install.ps1` and `install.sh` wrappers have now been removed. The canonical command is `merit.ps1 skills install`; implementation lives in `merit/modules/Merit.SkillsInstall.ps1`.
+The root `merit.ps1 skills install` and `merit.sh skills install` wrappers have now been removed. The canonical command is `merit.ps1 skills install`; implementation lives in `merit/modules/Merit.SkillsInstall.ps1`.
 
 ## Vault precedence
 
@@ -146,7 +146,7 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 - Root `Merit-Hub.ps1` and `merit.ps1` are permanent public APIs.
 - Internal modules are not user commands.
 - `merit.ps1 skills install --target <Host>` is canonical.
-- `install.ps1` and `install.sh` are removed; use `merit.ps1 skills install`.
+- The legacy installer wrappers are removed; use `merit.ps1 skills install`.
 - `BootStrap/` is temporary migration infrastructure.
 - `merit/merit.blob` becomes the canonical public law location.
 - Vault delegation is explicit by command ownership.

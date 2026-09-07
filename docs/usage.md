@@ -37,7 +37,7 @@ mkdir C:\MeritOverDinner
 cd C:\MeritOverDinner
 git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
-.\install.ps1 -Target Cursor
+.\merit.ps1 skills install --target Cursor
 ```
 
 ### 2. AutoMagic create (preferred)
@@ -84,7 +84,7 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 | `git clone` public `merit-agent-skills` or `merit-demo` | **None** (anonymous HTTPS read) |
 | `merit apply` + `verify` | **None** |
 | Open `play/index.html` locally (static PAR from CDN) | **None** |
-| `scripts/smoke-freemium.ps1` / `scripts/smoke-freemium.sh` (Hub **G**) | **None** � ignore optional `verify NOTE` community files; do **not** create a here.now account |
+| `scripts/smoke-freemium.ps1` / `scripts/smoke-freemium.sh` (Hub **G**) | **None** � ignore optional `verify NOTE` community files; do **not** create a here.now account |
 | `merit-demo`: `npm install`, `npm run verify`, `npm run e2e` (PAR CDN HEAD) | **None** (network only) |
 
 **GitHub account is optional** for Tier-2. Use it only when you **fork**, **push** your own remote, open PRs, or use `gh` against private repos. Cloning and working locally does not require signing in.
@@ -96,7 +96,7 @@ There are two separate actions:
 | Action | When | Command |
 |--------|------|---------|
 | Clone/download repo | Always first, because it brings down the skills, docs, templates, and `merit.ps1` / `merit.sh` CLI | `git clone --branch skills-v0.5.0 https://github.com/AgentDraven/merit-agent-skills.git` |
-| Install skills into an AI IDE host | Optional, only when you want the host to see skill instructions as installed skills | Windows `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./install.sh -Target …` (aliases: `Claude`, `Agents`; `Project` needs `-Path`) |
+| Install skills into an AI IDE host | Optional, only when you want the host to see skill instructions as installed skills | Windows `.\merit.ps1 skills install --target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./merit.sh skills install -Target …` (aliases: `Claude`, `Agents`; `Project` needs `-Path`) |
 
 You can run `merit.ps1` / `merit.sh` directly from the cloned repo without installing skills. Install is for agent authoring convenience, not for runtime deployment.
 
@@ -364,7 +364,7 @@ Linux/macOS equivalents use the shell wrapper:
 ./merit.sh closeout --path <dir>
 ```
 
-Install skills to Cursor: Windows `.\install.ps1 -Target Cursor`; Linux/macOS `./install.sh -Target Cursor`.
+Install skills to Cursor: Windows `.\merit.ps1 skills install --target Cursor`; Linux/macOS `./merit.sh skills install --target Cursor`.
 
 Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-freemium.sh`.
 
@@ -389,4 +389,3 @@ No. You need a provisioned `consumer_id`, production MERIT metered-provider moun
 
 **Operator validation?**
 MERIT vault operators run private validation separately. Public users should start with `.\scripts\smoke-freemium.ps1` on Windows or `./scripts/smoke-freemium.sh` on Linux/macOS.
-

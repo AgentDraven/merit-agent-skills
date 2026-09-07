@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.128] - 2026-09-06
+### Changed
+- Scrubbed current documentation and IAR references for removed installer wrappers and migrated Bootstrap paths.
+
 ## [0.5.127] - 2026-09-06
 ### Changed
 - Migrated OSS, law, surface, and template helpers out of `BootStrap/` into `merit/modules` and `cfg`.

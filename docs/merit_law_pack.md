@@ -8,7 +8,7 @@ Public OSS distribution of **near-comprehensive L1 excerpt** without shipping pl
 |------|------|
 | `merit/merit.blob` | Obfuscated gzip + XOR law pack (committed, not human-readable) |
 | `cfg/merit_law.json` | Section index + skill→section map (metadata only, no law text) |
-| `BootStrap/_law.ps1` | Unpack + query (in-memory only) |
+| `merit/modules/Merit.LawImpl.ps1` | Unpack + query (in-memory only) |
 | `scripts/export-merit-law-blob.ps1` | Regenerate blob (operators / release) |
 
 ## Agent usage

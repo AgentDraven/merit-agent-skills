@@ -1,4 +1,4 @@
-﻿# merit-agent-skills — Low-Level Design Map (LLD_MAP)
+# merit-agent-skills — Low-Level Design Map (LLD_MAP)
 
 **Document ID:** MAS-IAR-LLD-001  
 **Repo:** `AgentDraven/merit-agent-skills` (OSS public distribution)  
@@ -42,7 +42,7 @@ merit-agent-skills/
 ├── docs/                        # usage.md TRY_BUNDLES.md
 ├── docs/IAR/                    # this LLD_MAP
 ├── scripts/                     # smoke-freemium.ps1
-├── merit.ps1 merit.sh install.ps1
+├── merit.ps1 merit.sh
 └── LICENSING.md LICENSE
 ```
 
@@ -110,7 +110,7 @@ merit deploy:
   summary: Deploy consumer static/portal surfaces
   skill: merit-deploy-vercel/SKILL.md
 
-install.ps1:
+merit.ps1 skills install:
   summary: Copy skills/ to %USERPROFILE%\.cursor\skills-cursor\ or Agents path
 ```
 

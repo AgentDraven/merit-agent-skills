@@ -39,14 +39,14 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 | **Live ecosystems (bolt-on targets)** | [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json) � default **v00** until vault publishes **v01** as `live_public`. Hobby is never listed. |
 | **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)**, open Windows PowerShell or PowerShell 7, change to its folder, and run ` .\Merit-Hub.ps1`. The ` .\` prefix is required by PowerShell for a script in the current folder. The Hub detects Windows PowerShell 5.1, installs/launches `pwsh` when needed, and guides **1** → **2** → **3** (optional **OC**). Full menu + personas: [Merit-Hub/README.md](Merit-Hub/README.md). |
 | **Build over dinner (start here)** | **[docs/howto/launch-over-dinner.md](docs/howto/launch-over-dinner.md)** — 3 steps, no accounts night one |
-| **OSS internals** | Hub **2** dotsources `BootStrap/_oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
+| **OSS internals** | Hub **2** dotsources `merit/modules/Merit.Oss.ps1` in the skills clone. Do **not** copy BootStrap to `%MYMERITAPP%\BootStrap\`. Pathway: [docs/bootstrap_pathway.md](docs/bootstrap_pathway.md). |
 | **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
 | **Launch/deploy PoV** | [docs/deploy.md](docs/deploy.md) — one local `.merit_launch.md`, one `merit` command |
 | **LLD map (audit)** | [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md) |
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) — workbench, journal, AMA, subs, legal |
 | **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) — independent consumer ID using the same hosted providers |
 | **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
-| **Skills only** | Merit-Hub menu **I** or `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1 -InstallSkills Cursor` (after **J**). Or from cloned repo: `.\install.ps1 -Target Cursor|ClaudeCode|Codex|VSCode|Hermes|OpenClaw|GrokBot|Devin` |
+| **Skills only** | Merit-Hub menu **I** or `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1 -InstallSkills Cursor` (after **J**). Or from cloned repo: `.\merit.ps1 skills install --target Cursor|ClaudeCode|Codex|VSCode|Hermes|OpenClaw|GrokBot|Devin` |
 | **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** — gap analysis → FR/AGENT_REQ (no vault) |
 | **Referral / design partner** | [`skills/merit-referral`](skills/merit-referral/SKILL.md) — free attribution + portal recipes (no billing) |
 | **Live alpha elevate** | `.\merit.ps1 livealpha --path <consumer>` then Cursor `/merit-livealpha …` |
@@ -98,7 +98,7 @@ mkdir C:\MyMeritApp
 cd C:\MyMeritApp
 git clone --branch skills-v0.5.66 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
-.\install.ps1 -Target Cursor
+.\merit.ps1 skills install --target Cursor
 # omit -Target to print usage (no default host)
 # Do not run BootStrap as a second product. Use Merit-Hub (required full command):
 # pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
@@ -111,22 +111,22 @@ mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
 git clone --branch skills-v0.5.66 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
-./install.sh -Target Cursor
+./merit.sh skills install --target Cursor
 ```
 
 ## Multi-runtime install (same `skills/` tree)
 
 | Runtime | Status | Install |
 |---------|--------|---------|
-| **Cursor** | supported | `.\install.ps1 -Target Cursor` ? `~/.cursor/skills` |
-| **Claude Code** | supported | `.\install.ps1 -Target ClaudeCode` ? `~/.claude/skills` (alias: `Claude`) |
-| **Codex** | supported | `.\install.ps1 -Target Codex` ? `~/.codex/skills` (or `$CODEX_HOME/skills`) |
-| **VS Code / Open Agents** | supported | `.\install.ps1 -Target VSCode` ? `~/.agents/skills` (alias: `Agents`) |
-| **Hermes** | supported | `.\install.ps1 -Target Hermes` ? `~/.hermes/skills` � or `hermes skills tap add AgentDraven/merit-agent-skills` |
-| **OpenClaw** | supported | `.\install.ps1 -Target OpenClaw` ? `~/.openclaw/skills` � or `openclaw skills install ./skills/<skill>` |
-| **Grok Bot** | supported | `.\install.ps1 -Target GrokBot` ? `~/.grok/skills` (alias: `Grok`) |
-| **Devin** | supported | `.\install.ps1 -Target Devin` ? `~/.devin/skills` + repo `AGENTS.md` in cloud sessions |
-| **Project (Cursor)** | supported | `.\install.ps1 -Target Project -Path <repo>` ? `<repo>/.cursor/skills` |
+| **Cursor** | supported | `.\merit.ps1 skills install --target Cursor` ? `~/.cursor/skills` |
+| **Claude Code** | supported | `.\merit.ps1 skills install -Target ClaudeCode` ? `~/.claude/skills` (alias: `Claude`) |
+| **Codex** | supported | `.\merit.ps1 skills install -Target Codex` ? `~/.codex/skills` (or `$CODEX_HOME/skills`) |
+| **VS Code / Open Agents** | supported | `.\merit.ps1 skills install -Target VSCode` ? `~/.agents/skills` (alias: `Agents`) |
+| **Hermes** | supported | `.\merit.ps1 skills install -Target Hermes` ? `~/.hermes/skills` � or `hermes skills tap add AgentDraven/merit-agent-skills` |
+| **OpenClaw** | supported | `.\merit.ps1 skills install -Target OpenClaw` ? `~/.openclaw/skills` � or `openclaw skills install ./skills/<skill>` |
+| **Grok Bot** | supported | `.\merit.ps1 skills install -Target GrokBot` ? `~/.grok/skills` (alias: `Grok`) |
+| **Devin** | supported | `.\merit.ps1 skills install -Target Devin` ? `~/.devin/skills` + repo `AGENTS.md` in cloud sessions |
+| **Project (Cursor)** | supported | `.\merit.ps1 skills install -Target Project -Path <repo>` ? `<repo>/.cursor/skills` |
 | **Paperclip** | research | � (suggest via email below) |
 
 Registry source of truth: [`cfg/agent_hosts.json`](cfg/agent_hosts.json).
@@ -139,7 +139,7 @@ MERIT aims to be the **one-stop** public path for builders on **any** AI IDE, ag
 
 - Host / product name (e.g. your IDE, CLI agent, or cloud agent)
 - Where skills or instructions are loaded from (path, env var, or doc link)
-- Whether you want file-copy install (`install.ps1 -Target �`) or CLI-only integration
+- Whether you want file-copy install (`merit.ps1 skills install --target �`) or CLI-only integration
 
 We add vetted hosts to [`cfg/agent_hosts.json`](cfg/agent_hosts.json) and promote `research` ? `supported` when install wiring lands. Same instruction chain (L1 ? L2 ? L3) for every host � hosts mount skills; they do not fork product law.
 

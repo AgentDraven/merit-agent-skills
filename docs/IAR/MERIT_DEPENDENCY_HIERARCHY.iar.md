@@ -31,12 +31,12 @@ The OSS CLI is the public plane-B implementation. When a vault is discovered, th
 |---|---|---|---|
 | Consumer admin/where/surface forwarding | PASS | `merit-demo/merit.ps1:Invoke-MeritSkillsForward` | Delegates to sibling or `MYMERITAPP/oss-bench.json` skills path |
 | Consumer closeout delegation | PARTIAL | wrapper forwards `release --path` | Uses OSS release alias directly; does not first select vault operator CLI |
-| OSS law source | PASS | `BootStrap/_law.ps1`, `merit.blob` | In-memory law unpacking is centralized in B |
-| Vault discovery | PASS | `BootStrap/_resolve.ps1`, `operatorMeritCli` | B can discover C and prints operator preference |
+| OSS law source | PASS | `merit/modules/Merit.LawImpl.ps1`, `merit.blob` | In-memory law unpacking is centralized in B |
+| Vault discovery | PASS | `merit/modules/Merit.SurfaceImpl.ps1`, `operatorMeritCli` | B can discover C and prints operator preference |
 | Consumer vault preference | OPEN | no vault branch in consumer `Invoke-Closeout` | Must be added or explicitly documented as operator-only handoff |
 | OSS CLI version display | FIXED | `merit.ps1` now reads `VERSION` | Removed hard-coded stale `0.5.66` |
 | CompatSet ownership | PASS | `merit-demo/cfg/par_pins.json` | Runtime package versions/SRI remain consumer-owned pins |
-| Install law ownership | PASS | `install.ps1`, `install.sh` | Installs skills; does not vendor `merit.blob` into consumer |
+| Install law ownership | PASS | `merit.ps1 skills install`, `merit.sh skills install` | Installs skills; does not vendor `merit.blob` into consumer |
 | Hub skills pin | VERIFY | `Merit-Hub/Merit-Hub.ps1`, `oss-bench.json` | Hub has embedded/persisted pin logic; must be checked against current skills release |
 
 ## Required hierarchy rule
@@ -90,7 +90,7 @@ erDiagram
 
 ## Install and law model
 
-`install.ps1` / `install.sh` copy selected skill cards and write installation metadata to the selected host. They do not copy the full OSS CLI into the consumer and do not make a host the law authority. `Merit-Hub` seeds B, installs skills into A, and records surface paths. `merit.blob` remains in B and is read only by B's law router.
+`merit.ps1 skills install` / `merit.sh skills install` copy selected skill cards and write installation metadata to the selected host. They do not copy the full OSS CLI into the consumer and do not make a host the law authority. `Merit-Hub` seeds B, installs skills into A, and records surface paths. `merit.blob` remains in B and is read only by B's law router.
 
 ## Corrective actions
 

@@ -1,4 +1,4 @@
-﻿---
+---
 name: merit-onboard
 description: MERIT OSS quickstart and vault persona/repo onboard.
 ---
@@ -23,7 +23,7 @@ cd %MYMERITAPP%\merit-agent-skills
 .\merit.ps1 verify --path ..\merit-demo
 ```
 
-Install IDE skills: Hub **I** or `.\install.ps1 -Target Cursor`.
+Install IDE skills: Hub **I** or `.\merit.ps1 skills install --target Cursor`.
 
 ## Closeout (OSS)
 

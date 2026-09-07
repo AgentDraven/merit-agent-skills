@@ -1,4 +1,4 @@
-﻿# BootStrap â€” design & introduction (OSS)
+# BootStrap â€” design & introduction (OSS)
 
 ## Purpose
 
@@ -9,7 +9,7 @@ Separate **device BootStrap** from the public **MERIT CLI** (`merit.ps1`) so bui
 | Location | Role |
 |----------|------|
 | `Merit-Hub/Merit-Hub.ps1` | Only user script (map 1 2 3 OC 4 VC 5) |
-| `BootStrap/_oss.ps1` | Install OSS internals (not user-run) |
+| `merit/modules/Merit.Oss.ps1` | Install OSS internals (not user-run) |
 | `BootStrap/oss-bench.json` | Template; live copy is `%MYMERITAPP%\oss-bench.json` |
 | `BootStrap/README.md` | Hub map internals |
 | `docs/bootstrap_pathway.md` | Annotated OSS → Private handoff flowchart |
@@ -86,14 +86,14 @@ flowchart TD
 
 | Field | Purpose |
 |-------|---------|
-| `hosts[].id` | Stable id used by `install.ps1 -Target` / BootStrap |
+| `hosts[].id` | Stable id used by `merit.ps1 skills install --target` / BootStrap |
 | `status` | `supported` (wired today) Â· `planned` (docs + path known) Â· `research` (named, path TBD) |
 | `destSkills` | Where `skills/` folders are copied |
 | `detectHints` | `dir` / `env` / `cmd` probes for **auto-detect** |
 | `aliases` | e.g. `Claude` â†’ `ClaudeCode`, `Agents` â†’ `VSCode` |
-| `installHint` | CLI one-liner when not yet in `install.ps1` |
+| `installHint` | CLI one-liner when not yet in `merit.ps1 skills install` |
 
-**Supported today (`install.ps1`):** Cursor, ClaudeCode, Codex, VSCode/Agents, Project. Hook enforcement status is maintained in [MERIT_CLOSEOUT_ENFORCEMENT.iar.md](IAR/MERIT_CLOSEOUT_ENFORCEMENT.iar.md); installed skills do not imply hard lifecycle enforcement.
+**Supported today (`merit.ps1 skills install`):** Cursor, ClaudeCode, Codex, VSCode/Agents, Project. Hook enforcement status is maintained in [MERIT_CLOSEOUT_ENFORCEMENT.iar.md](IAR/MERIT_CLOSEOUT_ENFORCEMENT.iar.md); installed skills do not imply hard lifecycle enforcement.
 **Planned:** Hermes, OpenClaw.  
 **Research (add paths before promoting):** Paperclip, GrokBot, Devin â€” plus any future host (same JSON row pattern).
 
@@ -103,7 +103,7 @@ flowchart TD
 2. For each host with `status` in `supported|planned` and non-empty `detectHints`, evaluate probes.  
 3. Present multi-select of **found** hosts (plus always-available manual `-Target`).  
 4. Install skills only to selected destinations.  
-5. **Adding a future host (e.g. Grok Bot, Devin):** append a `hosts[]` object with `id`, `detectHints`, `destSkills`; set `status` to `planned` then `supported` when `install.ps1` / BootStrap gain the target. No L1 edit required unless policy itself changes.
+5. **Adding a future host (e.g. Grok Bot, Devin):** append a `hosts[]` object with `id`, `detectHints`, `destSkills`; set `status` to `planned` then `supported` when `merit.ps1 skills install` / BootStrap gain the target. No L1 edit required unless policy itself changes.
 
 OSS BootStrap does **not** deploy vault L1. It may later offer â€œinstall skills to detected hostsâ€ using this registry only.
 

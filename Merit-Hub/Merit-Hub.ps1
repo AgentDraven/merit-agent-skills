@@ -1810,7 +1810,7 @@ function Invoke-WipeOssBenches {
 function Remove-RetiredOssLiveBootStrap {
     # Old OSS BootStrap copied a second product to %MYMERITAPP%\BootStrap plus a
     # bench-root MERIT_BootStrap.cmd. Hub never creates those. Git source stays at
-    # %MYMERITAPP%\merit-agent-skills\BootStrap\_oss.ps1.
+    # %MYMERITAPP%\merit-agent-skills\merit\modules\Merit.Oss.ps1.
     $benches = [System.Collections.Generic.List[string]]::new()
     foreach ($p in @(Get-AllKnownMeritEnvPaths -Name 'MYMERITAPP')) {
         if (-not $benches.Contains($p)) { [void]$benches.Add($p) }
@@ -2517,7 +2517,7 @@ function Invoke-InstallMeritSkills {
 
 function Invoke-InstallSkillsMenu {
     Write-Header 'Install skills to AI host'
-    Write-Info 'Same as repo install.ps1  -  built into Merit-Hub (no separate script needed).'
+    Write-Info 'Same as repo merit.ps1 skills install  -  built into Merit-Hub (no separate script needed).'
     Write-Host ''
     Write-Host '  1 Cursor   2 Claude Code   3 Codex   4 VS Code/Agents'
     Write-Host '  5 Hermes   6 OpenClaw      7 Grok    8 Devin'
