@@ -16,25 +16,17 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 
 ### 🚀 I want to try MERIT
 
----
-
 Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1), open PowerShell, change to its folder, and run ` .\Merit-Hub.ps1`.
 
 ### 🍽️ I want to build my own app over dinner
-
----
 
 Follow the [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md) walkthrough.
 
 ### 👋 I want a hello-world app
 
----
-
 Open [merit-demo](https://github.com/Mr-PI-Bala/merit-demo) and run ` .\merit.ps1 quickstart`.
 
 ### 🧠 I want skills in my IDE
-
----
 
 Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (use **Raw**), save it in a tools folder such as `C:\Tools`, open PowerShell, change to that folder, and run:
 
@@ -45,8 +37,6 @@ Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (use **Raw**), save it in a 
 When the Hub menu appears, choose **I — Install IDE skills**, then choose your host (Cursor, Codex, VS Code, or another supported host). The Hub installs the skills into that host's correct location.
 
 ### 🧰 For additional options
-
----
 
 Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](docs/usage.md), [deployment guide](docs/deploy.md), [try bundles](docs/TRY_BUNDLES.md), or [IAR architecture map](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md).
 
