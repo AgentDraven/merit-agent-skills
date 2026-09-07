@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.150] - 2026-09-06
+### Added
+- Registered `skills-v0.5.149` as the newest supported CompatSet.
+
 ## [0.5.149] - 2026-09-06
 ### Fixed
 - Aligned the Hub embedded skills pin and beginner README with the latest released baseline.
