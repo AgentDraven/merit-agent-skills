@@ -45,7 +45,7 @@ Root `merit.ps1` / `merit.sh` remain the **CLI** (`init` / `apply` / `verify` / 
 
 `BootStrap/` is **Install OSS internals** for Merit-Hub, not a second user product:
 
-- Lives in GitHub under `merit-agent-skills/BootStrap/` (`_oss.ps1`)
+- Historical source lived under `merit-agent-skills/BootStrap/`; current implementation lives in `merit/modules/` and is invoked by `Merit-Hub.ps1`.
 - Hub **2** (alias **J**) clones this repo under `%MYMERITAPP%\merit-agent-skills` and dotsources `_oss.ps1` in the same window
 - **Do not** install a live copy to `%MYMERITAPP%\BootStrap\` or `%MYMERITAPP%\MERIT_BootStrap.cmd` — that leftover drifted from git and is retired
 - Laptop status is `%MYMERITAPP%\oss-bench.json`

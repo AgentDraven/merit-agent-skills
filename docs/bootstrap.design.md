@@ -10,7 +10,7 @@ Separate **device BootStrap** from the public **MERIT CLI** (`merit.ps1`) so bui
 |----------|------|
 | `Merit-Hub/Merit-Hub.ps1` | Only user script (map 1 2 3 OC 4 VC 5) |
 | `merit/modules/Merit.Oss.ps1` | Install OSS internals (not user-run) |
-| `BootStrap/oss-bench.json` | Template; live copy is `%MYMERITAPP%\oss-bench.json` |
+| `cfg/oss-bench.template.json` | Template; live copy is `%MYMERITAPP%\oss-bench.json` |
 | `BootStrap/README.md` | Hub map internals |
 | `docs/bootstrap_pathway.md` | Annotated OSS → Private handoff flowchart |
 | `cfg/agent_hosts.json` | AI IDE / agent host registry (install paths + auto-detect hints) |

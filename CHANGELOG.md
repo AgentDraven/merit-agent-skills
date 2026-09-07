@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.131] - 2026-09-06
+### Changed
+- Final alpha documentation scrub: current docs use Hub-first setup and `merit.ps1 skills install`; retired pins and installer commands are confined to historical context.
+
 ## [0.5.130] - 2026-09-06
 ### Changed
 - Alpha documentation scrub: Hub-first usage, retired installer wording, README section bands, and cross-repo documentation format standard.

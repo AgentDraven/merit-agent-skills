@@ -11,14 +11,13 @@ $ErrorActionPreference = 'Stop'
 
 function Write-InstallUsage {
     Write-Host @"
-install.ps1 - install MERIT agent skills into an AI IDE host
+merit.ps1 skills install - install MERIT agent skills into an AI IDE host
 
 Also available from Merit-Hub (no separate script): menu I or -InstallSkills <host>
 
 Usage:
-  .\install.ps1 -Target <host>
-  .\install.ps1 -Target Project -Path <repo-root>
-  ./install.sh -Target <host>          # Linux/macOS (requires pwsh/powershell)
+  .\merit.ps1 skills install --target <host>
+  .\merit.ps1 skills install --target Project --path <repo-root>
 
 Targets:
   Cursor       -> ~/.cursor/skills
@@ -32,13 +31,13 @@ Targets:
   Project      -> <repo>/.cursor/skills  (requires -Path)
 
 Examples:
-  .\install.ps1 -Target Cursor
-  .\install.ps1 -Target ClaudeCode
-  .\install.ps1 -Target Hermes
-  .\install.ps1 -Target OpenClaw
-  .\install.ps1 -Target GrokBot
-  .\install.ps1 -Target Devin
-  .\install.ps1 -Target Project -Path ..\my-app
+  .\merit.ps1 skills install --target Cursor
+  .\merit.ps1 skills install --target ClaudeCode
+  .\merit.ps1 skills install --target Hermes
+  .\merit.ps1 skills install --target OpenClaw
+  .\merit.ps1 skills install --target GrokBot
+  .\merit.ps1 skills install --target Devin
+  .\merit.ps1 skills install --target Project --path ..\my-app
 
 Re-run after git pull to refresh installed skills. Existing skill folders are replaced (not nested).
 "@

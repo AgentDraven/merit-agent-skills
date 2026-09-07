@@ -300,7 +300,7 @@ Read only after the three steps.
 
 ## Checklist
 
-- [ ] Step 1 — Cloned merit-agent-skills @ `skills-v0.5.0` under C:\MyMeritApp (or ~/MyMeritApp) and merit-demo
+- [ ] Step 1 — Ran Hub 1 → 2 → 3 (or manually cloned merit-agent-skills @ `skills-v0.5.130`) and merit-demo
 - [ ] Step 2 — Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
 - [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed

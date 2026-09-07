@@ -84,8 +84,8 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 |------|------------|----------------|
 | This repo **`merit.ps1` / `merit.sh`** | Public OSS CLI (`create` / `apply` / `verify` / `portal` / consumer `closeout`) | Vault operator CLI |
 | Vault **`scripts/merit.ps1`** | Operator CLI (`mXin`, `runtime`, `env`, hygiene) | Public create/deploy CLI |
-| This repo **`BootStrap/oss-bench.json`** | Template field names for the laptop status file | Live laptop state (that is `%MYMERITAPP%\oss-bench.json`) |
-| Vault **`BootStrap/MERIT.json`** | Vault BootStrap template (edition `vault`) | Public OSS registry |
+| This repo **`cfg/oss-bench.template.json`** | Template field names for the laptop status file | Live laptop state (that is `%MYMERITAPP%\oss-bench.json`) |
+| Vault **`BootStrap/MERIT.json`** | Vault-only operator template (edition `vault`) | Public OSS registry |
 | **`~/dev/MERIT.json`** | Live machine BootStrap state after first run | A committed repo file |
 
 <table><tr><td bgcolor="#0d9488"><strong><big><big>⚡ Quick install</big></big></strong></td></tr></table>
@@ -105,12 +105,12 @@ Follow [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md). I
 
 The ` .\` prefix matters: PowerShell does not execute a script from the current directory when you type only its filename. The Hub handles the PowerShell-version check and offers to install/launch PowerShell 7 when only Windows PowerShell is available. Menu **2** / **J** clones the pinned OSS release for you — no full repo clone is required first. Cleanup keys (**G** sprawl scan, **A** archive, **P** pristine): [Merit-Hub/README.md](Merit-Hub/README.md).
 
-**Full repo install** (OSS bench = `%MYMERITAPP%`, default `C:\MyMeritApp`):
+**Advanced/manual clone** (most users should use Hub **1 → 2 → 3** above):
 
 ```powershell
 mkdir C:\MyMeritApp
 cd C:\MyMeritApp
-git clone --branch skills-v0.5.66 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 .\merit.ps1 skills install --target Cursor
 # omit -Target to print usage (no default host)
@@ -123,7 +123,7 @@ Linux/macOS:
 ```bash
 mkdir -p ~/MyMeritApp
 cd ~/MyMeritApp
-git clone --branch skills-v0.5.66 https://github.com/AgentDraven/merit-agent-skills.git
+git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git
 cd merit-agent-skills
 ./merit.sh skills install --target Cursor
 ```
