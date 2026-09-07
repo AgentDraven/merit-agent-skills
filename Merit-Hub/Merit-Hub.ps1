@@ -3063,6 +3063,7 @@ function Write-HubReceipt {
     $vault = Get-HubVaultDest
     Write-Host ''
     Write-Host "  RECEIPT - step $Step" -ForegroundColor Cyan
+    Write-Host '  LEGEND: 1 Setup | 2 Install OSS | 3 Try it | 3V Validate demo | O/OC OSS in Cloud + OCV hosted validation | 0 Stop' -ForegroundColor DarkGray
     switch ($Step) {
         '1' {
             Write-Info "Hub script : $Script:HubScriptPath"

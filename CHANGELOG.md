@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.162] - 2026-09-07
+### Fixed
+- Added one shared legend line to every Hub receipt so Step 2, Step 3, 3V, and OC terminology stays consistent.
+
 ## [0.5.161] - 2026-09-07
 ### Fixed
 - Removed duplicate one-line persona sections and added a complete root README quick index.
