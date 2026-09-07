@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.144] - 2026-09-06
+### Added
+- Added OC preflight checks for local routes, CompatSet artifacts, merit-prod health, and here.now readiness.
+
 ## [0.5.143] - 2026-09-06
 ### Added
 - Registered `skills-v0.5.142` as a supported CompatSet choice.

@@ -3401,6 +3401,12 @@ function Invoke-HubOc {
         Write-Fail "Demo play missing under $demo - run 3."
         return
     }
+    $preflight = Join-Path $Script:HubRoot 'oc-preflight.ps1'
+    if (Test-Path -LiteralPath $preflight) {
+        Write-Attention 'Running OC preflight: local routes, CompatSet pin/artifact, merit-prod health, and here.now (if configured).'
+        & (Get-Command pwsh -ErrorAction Stop).Source -NoProfile -File $preflight -DemoRoot $demo
+        if ($LASTEXITCODE -ne 0) { $Script:HubStepFailed=$true; Write-Fail 'OC stopped by preflight. Fix the listed checks, then retry O.'; Write-HubReceipt 'OC'; return }
+    }
     $cid = ''
     try { $cid = [string]$state.ocConsumerId } catch { }
     if ($NewOc -or [string]::IsNullOrWhiteSpace($cid) -or $cid -notmatch '^oc-') {

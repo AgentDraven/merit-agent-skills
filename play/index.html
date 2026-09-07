@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en" data-webpage-shell="createAppShell">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OC oc-d7d2822bed - Play</title>
+  <link rel="stylesheet" href="https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.3/themes/gloss-aurora.css" integrity="sha384-t2lrh9VYGPmekcUt8/mNthwxEkgOBstLDnLn6g/dhFgWen+h3pDYGx+FLE4u4NiS" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.3/merit_ux.css" integrity="sha384-t2lrh9VYGPmekcUt8/mNthwxEkgOBstLDnLn6g/dhFgWen+h3pDYGx+FLE4u4NiS" crossorigin="anonymous">
+  <style id="play-make-art">
+    /* Layout tokens - colors from GlossPack. Make Art composition (TB/Apple editorial bar). */
+    .ma-home {
+      display: flex; flex-direction: column; gap: 0;
+      max-width: 52rem; margin: 0 auto;
+    }
+    .ma-hero {
+      min-height: min(70vh, 36rem);
+      display: flex; flex-direction: column; justify-content: center;
+      gap: 1rem; padding: 2.5rem 0 3rem;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 0%, color-mix(in srgb, var(--merit-accent, #2a6f6a) 18%, transparent), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 100% 30%, color-mix(in srgb, var(--merit-accent, #2a6f6a) 10%, transparent), transparent 50%);
+    }
+    .ma-hero__brand {
+      margin: 0; font-size: clamp(2.4rem, 7vw, 3.75rem);
+      line-height: 1.05; font-weight: 500; letter-spacing: -0.03em;
+    }
+    .ma-hero__headline {
+      margin: 0; font-size: clamp(1.2rem, 2.8vw, 1.55rem);
+      font-weight: 500; opacity: 0.95; max-width: 28rem;
+    }
+    .ma-hero__lede {
+      margin: 0; max-width: 32rem; line-height: 1.5; opacity: 0.88; font-size: 1.05rem;
+    }
+    .ma-cta-row { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 0.5rem; }
+    /* Beat .merit-ux-root a { color: accent } — fill+label were the same teal. */
+    .merit-ux-root a.ma-cta {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0.85rem 1.35rem; font-weight: 700; text-decoration: none;
+      border-radius: 999px; border: 2px solid transparent;
+      background: var(--merit-accent, #5eead4);
+      color: var(--merit-on-accent, #041018);
+    }
+    .merit-ux-root a.ma-cta--ghost {
+      background: transparent;
+      color: var(--merit-accent, #5eead4);
+      border-color: var(--merit-accent, #5eead4);
+    }
+    .ma-section { padding: 2.5rem 0 1rem; }
+    .ma-section h2 {
+      margin: 0 0 1rem; font-size: 1.65rem; font-weight: 500; letter-spacing: -0.02em;
+    }
+    .ma-paths {
+      display: grid; gap: 1.25rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 48rem) {
+      .ma-paths { grid-template-columns: 1fr 1fr; gap: 1.5rem 2rem; }
+    }
+    .ma-path { display: flex; flex-direction: column; gap: 0.35rem; }
+    .ma-path h3 { margin: 0; font-size: 1.15rem; font-weight: 600; }
+    .ma-path p { margin: 0; line-height: 1.45; opacity: 0.88; font-size: 0.98rem; }
+    .ma-path a {
+      margin-top: 0.25rem; font-weight: 600; color: var(--merit-accent, #2a6f6a);
+      text-decoration: none; width: fit-content;
+    }
+    .ma-path a:hover { text-decoration: underline; }
+    .ma-table-wrap { overflow-x: auto; margin-top: 0.5rem; }
+    .ma-table {
+      width: 100%; border-collapse: collapse; font-size: 0.95rem;
+    }
+    .ma-table th, .ma-table td {
+      text-align: left; padding: 0.7rem 0.55rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--merit-fg, #222) 14%, transparent);
+      vertical-align: top;
+    }
+    .ma-table th { font-weight: 700; opacity: 0.95; }
+    .ma-table td { opacity: 0.9; }
+    .ma-one-liner {
+      margin: 1.25rem 0 0; padding: 0.7rem 0.9rem;
+      border-radius: 10px; font-size: 0.95rem; line-height: 1.4;
+      border: 1px dashed color-mix(in srgb, var(--merit-accent, #5eead4) 40%, transparent);
+      opacity: 0.92;
+    }
+    .ma-tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 700;
+      padding: 0.15rem 0.5rem; border-radius: 999px;
+      background: color-mix(in srgb, var(--merit-accent, #2a6f6a) 16%, transparent);
+      color: var(--merit-accent, #2a6f6a);
+    }
+    details.geek { margin: 2.75rem 0 1rem; }
+    details.geek > summary { cursor: pointer; font-weight: 600; }
+    .ma-geek-list { margin: 0.75rem 0 0; padding-left: 1.15rem; line-height: 1.55; }
+    .ma-geek-list a { color: var(--merit-accent, #2a6f6a); }
+    /* FR-MPD-43 fallback when merit_ux loginChooser is pre-0.1.1 */
+    .ma-login-fallback {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.65rem;
+      padding: 0.55rem 1.25rem; font-size: 0.88rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--merit-fg, #222) 12%, transparent);
+    }
+    .ma-login-fallback__label { font-weight: 600; opacity: 0.85; margin-right: 0.25rem; }
+    .ma-login-fallback__opt {
+      padding: 0.25rem 0.6rem; border-radius: 999px; font-weight: 600;
+      text-decoration: none; color: var(--merit-accent, #2a6f6a);
+      border: 1px solid color-mix(in srgb, var(--merit-accent, #2a6f6a) 35%, transparent);
+    }
+    .ma-login-fallback__opt.is-active {
+      background: color-mix(in srgb, var(--merit-accent, #2a6f6a) 12%, transparent);
+    }
+    .merit-ux-legal__status-slot { position: relative; }
+    .ma-status-tip {
+      position: absolute; left: 0; bottom: calc(100% + 0.4rem);
+      min-width: 16.5rem; max-width: min(24rem, 92vw);
+      padding: 0.65rem 0.75rem; border-radius: 8px;
+      background: var(--merit-surface-elevated, #132a44);
+      color: var(--merit-text, #eaf6ff);
+      border: 1px solid var(--merit-border, rgba(94, 234, 212, 0.16));
+      font-size: 0.78rem; line-height: 1.4; z-index: 40;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35); display: none; text-align: left;
+    }
+    .ma-status-tip.is-open { display: block; }
+    .ma-status-tip__head { font-weight: 700; margin: 0 0 0.4rem; }
+    .ma-status-tip ul { margin: 0; padding: 0; list-style: none; }
+    .ma-status-tip li { margin: 0.28rem 0; }
+    .ma-status-tip .is-ok { color: var(--merit-ok, #4ade80); }
+    .ma-status-tip .is-warn { color: var(--merit-warn, #fbbf24); }
+    .ma-status-tip .is-down { color: var(--merit-err, #f87171); }
+    .ma-status-tip .is-pending { color: var(--merit-text-muted, #9aa8c0); }
+  </style>
+</head>
+<body data-make-art="1" data-merit-dualrail="1">
+  <script src="https://merit-prod.vercel.app/pkg/meritutils/merit_ux/0.1.3/merit_ux.global.js" integrity="sha384-YRjy1HhTmiGmhS96Pk4WqHIo5MfZ0JcNavwVh+3zOI1ONUiKa0zhuBQRuUs4jXVD" crossorigin="anonymous"></script>
+  <script>
+    (function () {
+      var PRODUCT = "OC oc-d7d2822bed";
+      var CONSUMER_ID = "oc-d7d2822bed";
+      var REGISTER_URL = "https://merit-prod.vercel.app/store/oc-d7d2822bed/register";
+      var GLOSS_THEME = "gloss-aurora";
+      var COMMUNITY_RAILS_URL = "https://merit-prod.vercel.app/portal/developers/community-rails/";
+      var GW = 'https://merit-prod.vercel.app';
+
+      function esc(s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function registerPlan(plan) {
+        var base = String(REGISTER_URL || '');
+        if (!plan) return base;
+        return base + (base.indexOf('?') >= 0 ? '&' : '?') + 'plan=' + encodeURIComponent(plan);
+      }
+
+      var STATUS_MARK = { ok: 'OK — working', warn: 'Attention', down: 'Issue', pending: 'Checking' };
+      var STATUS_HEAD = {
+        ok: 'All systems go',
+        warn: 'Something needs attention',
+        down: 'Service unavailable',
+        pending: 'Checking status…'
+      };
+
+      function rollupSystems(systems) {
+        if (!systems || !systems.length) return 'pending';
+        if (systems.some(function (s) { return s.state === 'down'; })) return 'down';
+        if (systems.some(function (s) { return s.state === 'warn'; })) return 'warn';
+        if (systems.some(function (s) { return s.state === 'pending'; })) return 'pending';
+        return 'ok';
+      }
+
+      function applySystemsStatus(btn, systems) {
+        if (!btn || !systems) return;
+        var rollup = rollupSystems(systems);
+        var head = STATUS_HEAD[rollup];
+        var ux = window.meritUx;
+        if (ux && typeof ux.setStatusState === 'function') {
+          ux.setStatusState(btn, rollup, head);
+        } else {
+          btn.className = 'merit-ux-status merit-ux-status--' + rollup + ' status-float--' + rollup;
+          btn.textContent = head;
+        }
+        var lines = systems.map(function (s) {
+          var st = STATUS_MARK[s.state] || STATUS_MARK.pending;
+          return '• ' + s.label + ' — ' + st + (s.detail ? ': ' + s.detail : '');
+        });
+        var tipText = [head].concat(lines).join('\n');
+        btn.setAttribute('aria-label', tipText.replace(/\n/g, '. '));
+        var slot = btn.closest ? btn.closest('.merit-ux-legal__status-slot') : null;
+        slot = slot || btn.parentNode;
+        if (!slot) return;
+        var tip = slot.querySelector('.ma-status-tip');
+        if (!tip) {
+          tip = document.createElement('div');
+          tip.className = 'ma-status-tip';
+          tip.id = 'status-float-tip';
+          tip.setAttribute('role', 'tooltip');
+          slot.appendChild(tip);
+          btn.addEventListener('mouseenter', function () { tip.classList.add('is-open'); });
+          btn.addEventListener('mouseleave', function () { tip.classList.remove('is-open'); });
+          btn.addEventListener('focus', function () { tip.classList.add('is-open'); });
+          btn.addEventListener('blur', function () { tip.classList.remove('is-open'); });
+        }
+        btn.setAttribute('aria-describedby', tip.id);
+        btn.removeAttribute('title');
+        tip.innerHTML = '<p class="ma-status-tip__head">' + esc(head) + '</p><ul>' +
+          systems.map(function (s) {
+            var st = s.state || 'pending';
+            return '<li class="is-' + st + '"><strong>' + esc(s.label) + '</strong> · ' +
+              esc(STATUS_MARK[st] || STATUS_MARK.pending) +
+              (s.detail ? ' — ' + esc(s.detail) : '') + '</li>';
+          }).join('') + '</ul>';
+      }
+
+      function probeCheck(id, label, url, okWhen) {
+        return fetch(url, { method: 'GET', credentials: 'omit' }).then(function (res) {
+          return res.text().then(function (body) {
+            var ok = res.ok && (!okWhen || okWhen(res, body));
+            return {
+              id: id,
+              label: label,
+              state: ok ? 'ok' : 'down',
+              detail: 'HTTP ' + res.status
+            };
+          });
+        }).catch(function (err) {
+          return { id: id, label: label, state: 'down', detail: String(err && err.message || err) };
+        });
+      }
+
+      function probeRails() {
+        var local = [
+          {
+            id: 'play',
+            label: 'Play host',
+            state: document.getElementById('app-logic') ? 'ok' : 'down',
+            detail: document.getElementById('app-logic') ? 'App UI is live' : 'Main shell missing'
+          },
+          {
+            id: 'ux',
+            label: 'UX shell (merit_ux)',
+            state: (document.querySelector('.merit-ux-brand') && document.querySelector('.merit-ux-legal')) ? 'ok' : 'warn',
+            detail: (document.querySelector('.merit-ux-brand') && document.querySelector('.merit-ux-legal'))
+              ? 'Moniker and legal footer loaded' : 'Chrome incomplete'
+          },
+          {
+            id: 'catalog',
+            label: 'Plans catalog',
+            state: (document.getElementById('plans') || document.querySelector('.ma-table')) ? 'ok' : 'warn',
+            detail: (document.getElementById('plans') || document.querySelector('.ma-table'))
+              ? 'Capability SKUs on the home' : 'Plans table not found'
+          }
+        ];
+        return Promise.all([
+          probeCheck('gateway', 'Gateway health', GW + '/api/health'),
+          probeCheck('store', 'Store / register', registerPlan('community-member'), function (res, body) {
+            return res.ok && body.indexOf('__next_error__') < 0;
+          }),
+          probeCheck('cdn', 'UX CDN pin', (document.querySelector('script[src*="merit_ux"]') || {}).src || (GW + '/pkg/meritutils/merit_ux/0.1.3/merit_ux.global.js')),
+          probeCheck('subs', 'Entitlements (meritsubs)', GW + '/api/meritsubs/api/v1/health').then(function (row) {
+            if (row.state === 'down') {
+              row.state = 'warn';
+              row.detail = (row.detail || '') + ' — mount may still be live via store';
+            } else {
+              row.detail = 'Health reachable (' + row.detail + ')';
+            }
+            return row;
+          })
+        ]).then(function (remote) { return local.concat(remote); });
+      }
+
+      /* Clean default catalog — keep in sync with cfg/store_catalog.json (FR-MPD-40) */
+      var PLANS = [
+        {
+          name: 'Community Member',
+          promise: 'Join your community and post when eligible.',
+          price: 'Free',
+          plan: 'community-member',
+          tag: 'Start'
+        },
+        {
+          name: 'Office Hours',
+          promise: 'Sit with the host — chat and/or video when hours are live.',
+          price: 'Free',
+          plan: 'oh-attend',
+          tag: 'Meet'
+        },
+        {
+          name: 'Consult 20 minutes',
+          promise: 'Book a collaboration slot when the calendar opens.',
+          price: 'Free',
+          plan: 'consult-20m',
+          tag: 'Book'
+        },
+        {
+          name: 'Plus',
+          promise: 'Room to grow — open caps on journal, AMA, and member seats.',
+          price: '$10.79 / mo',
+          plan: 'plus-monthly',
+          tag: 'Grow'
+        }
+      ];
+
+      function plansTableHtml() {
+        var rows = PLANS.map(function (p) {
+          return (
+            '<tr>' +
+              '<td><strong>' + esc(p.name) + '</strong><br><span class="ma-tag">' + esc(p.tag) + '</span></td>' +
+              '<td>' + esc(p.promise) + '</td>' +
+              '<td>' + esc(p.price) + '</td>' +
+              '<td><a href="' + esc(registerPlan(p.plan)) + '">Choose</a></td>' +
+            '</tr>'
+          );
+        }).join('');
+        return (
+          '<div class="ma-table-wrap"><table class="ma-table">' +
+            '<thead><tr><th>Plan</th><th>What you get</th><th>Price</th><th></th></tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+          '</table></div>'
+        );
+      }
+
+      function homeHtml() {
+        return (
+          '<div class="ma-home">' +
+            '<section class="ma-hero" aria-label="Welcome">' +
+              '<h1 class="ma-hero__headline">Ask, meet, book, and journal - together.</h1>' +
+              '<p class="ma-hero__lede">Your community is live. Register free to join channels, office hours, consults, and a private journal. Grow into Plus when you need more room.</p>' +
+              '<div class="ma-cta-row">' +
+                '<a class="ma-cta" href="' + esc(registerPlan('community-member')) + '">Register free</a>' +
+                '<a class="ma-cta ma-cta--ghost" href="#plans">See plans</a>' +
+                '<a class="ma-cta ma-cta--ghost" href="https://merit-prod.vercel.app/apps/oc-d7d2822bed/play/site">Marketing site</a>' +
+              '</div>' +
+            '</section>' +
+
+            '<section class="ma-section" aria-label="What you can do">' +
+              '<h2>How it comes together</h2>' +
+              '<div class="ma-paths">' +
+                pathHtml('Ask', 'Bring questions to the community AMA - free for eligible members.', registerPlan('community-member'), 'Join free to ask') +
+                pathHtml('Meet', 'Weekly office hours on chat and video when the host is live.', registerPlan('oh-attend'), 'Save a seat') +
+                pathHtml('Book', 'Twenty-minute consult slots with calm booking.', registerPlan('consult-20m'), 'Book a slot') +
+                pathHtml('Journal', 'Private notes with share modes when you are ready.', registerPlan('community-member'), 'Start free') +
+              '</div>' +
+            '</section>' +
+
+            '<section class="ma-section" id="plans" aria-label="Plans">' +
+              '<h2>Plans</h2>' +
+              '<p class="ma-hero__lede" style="margin-bottom:0.75rem">Clean access for every default capability. Plus opens freemium caps.</p>' +
+              plansTableHtml() +
+            '</section>' +
+
+            '<details class="geek">' +
+              '<summary>Advanced: builder next steps</summary>' +
+              '<ul class="ma-geek-list">' +
+                '<li>Your live app: <code>/apps/' + esc(CONSUMER_ID) + '/play</code> on merit-prod</li>' +
+                '<li>Register for this app: <a href="' + esc(REGISTER_URL) + '">' + esc(REGISTER_URL) + '</a></li>' +
+                '<li>Usage &amp; quotas: <a href="' + esc(GW + '/apps/' + CONSUMER_ID + '/usage') + '">' + esc('/apps/' + CONSUMER_ID + '/usage') + '</a></li>' +
+                '<li><a href="' + esc(GW + '/portal/developers/full-app/') + '" target="_blank" rel="noopener noreferrer">Your app over dinner</a> — PRD, portal, then <code>app_logic/</code></li>' +
+                '<li><a href="' + esc(GW + '/portal/developers/sku-commerce/') + '" target="_blank" rel="noopener noreferrer">Sell SKUs and subscriptions</a></li>' +
+                '<li><a href="' + esc(GW + '/portal/developers/par-packages/') + '" target="_blank" rel="noopener noreferrer">UI packages on the gateway</a></li>' +
+                '<li><a href="' + esc(COMMUNITY_RAILS_URL) + '" target="_blank" rel="noopener noreferrer">Platform live-check evidence</a> (operator probes — not product screenshots)</li>' +
+                '<li>Optional platform builder join: <a href="' + esc(GW + '/store/merit/register?plan=app-builder') + '" target="_blank" rel="noopener noreferrer">/store/merit/register?plan=app-builder</a></li>' +
+                '<li><a href="' + esc(GW + '/portal/developers/troubleshooting/#start-over') + '" target="_blank" rel="noopener noreferrer">Start over — leave platform and create again</a></li>' +
+              '</ul>' +
+            '</details>' +
+          '</div>'
+        );
+      }
+
+      function pathHtml(title, blurb, href, cta) {
+        return (
+          '<article class="ma-path">' +
+            '<h3>' + esc(title) + '</h3>' +
+            '<p>' + esc(blurb) + '</p>' +
+            '<a href="' + esc(href) + '">' + esc(cta) + '</a>' +
+          '</article>'
+        );
+      }
+
+      function bootGlossShell() {
+        var ux = window.MeritUx;
+        if (!ux || typeof ux.createAppShell !== 'function') {
+          document.body.className = 'merit-ux-shell';
+          document.body.innerHTML =
+            '<header class="merit-ux-brand" data-merit-ux="brand" role="banner">' +
+              '<p class="merit-ux-brand__kicker">Powered by MERIT</p>' +
+              '<div class="merit-ux-brand__moniker" data-merit-ux="moniker" role="group" aria-label="' + esc(PRODUCT) + '">' +
+                '<p class="merit-ux-brand__wordmark">' + esc(PRODUCT) + '</p>' +
+              '</div>' +
+              '<p class="merit-ux-brand__subhead" data-merit-ux="subhead">Your community home for ask, meet, book, and journal.</p>' +
+            '</header>' +
+            '<nav class="ma-login-fallback" aria-label="Your plan"><span class="ma-login-fallback__label">You are</span> ' +
+              '<span class="ma-login-fallback__opt is-active">Guest</span> ' +
+              '<a class="ma-login-fallback__opt" href="' + esc(registerPlan('community-member')) + '">Free member</a> ' +
+              '<a class="ma-login-fallback__opt" href="' + esc(registerPlan('plus-monthly')) + '">Plus</a></nav>' +
+            '<main id="app-logic" class="merit-ux-main">' + homeHtml() + '</main>' +
+            '<footer class="merit-ux-legal" data-merit-ux="legal" aria-label="Site footer">' +
+              '<div class="merit-ux-legal__row"><nav class="merit-ux-legal__nav" aria-label="Legal">' +
+              '<a href="' + esc(GW + '/portal/legal.html') + '">Legal</a> · ' +
+              '<a href="' + esc(GW + '/portal/terms.html') + '">Terms</a> · ' +
+              '<a href="' + esc(GW + '/portal/security.html') + '">Security</a></nav></div>' +
+              '<div class="merit-ux-legal__note"><div>&copy; ' + new Date().getFullYear() + ' ' + esc(PRODUCT) +
+              ' · <span class="merit-ux-legal__powered">Powered by MERIT</span></div>' +
+              '<p class="merit-ux-legal__disclaimer">MERIT Powered. Product features run on platform rails; your brand is yours.</p></div></footer>';
+          return null;
+        }
+        var shell = ux.createAppShell({
+          host: document.body,
+          theme: GLOSS_THEME,
+          brand: {
+            name: PRODUCT,
+            kicker: 'Powered by MERIT',
+            subhead: 'Your community home for ask, meet, book, and journal.',
+            useDefaultFlanks: true
+          },
+          freemium: {
+            identity: 'guest',
+            hideCta: true,
+            upgradeHref: registerPlan('plus-monthly')
+          },
+          loginChooser: typeof ux.createLoginChooser === 'function' ? {
+            identity: 'guest',
+            memberHref: registerPlan('community-member'),
+            plusHref: registerPlan('plus-monthly'),
+            label: 'You are'
+          } : undefined,
+          legal: {
+            brandName: PRODUCT,
+            includeDefaultLegalLinks: true,
+            disclaimer: 'MERIT Powered. Product features run on platform rails; your brand is yours.'
+          },
+          slots: { main: '#app-logic' },
+          peers: { workbench: false, journal: false }
+        });
+        if (shell && !shell.loginChooser && shell.freemium && shell.freemium.parentNode) {
+          var strip = document.createElement('nav');
+          strip.className = 'ma-login-fallback';
+          strip.setAttribute('aria-label', 'Your plan');
+          strip.innerHTML =
+            '<span class="ma-login-fallback__label">You are</span> ' +
+            '<span class="ma-login-fallback__opt is-active">Guest</span> ' +
+            '<a class="ma-login-fallback__opt" href="' + esc(registerPlan('community-member')) + '">Free member</a> ' +
+            '<a class="ma-login-fallback__opt" href="' + esc(registerPlan('plus-monthly')) + '">Plus</a>';
+          shell.freemium.parentNode.insertBefore(strip, shell.freemium.nextSibling);
+        }
+        if (shell && shell.main) {
+          shell.main.innerHTML = homeHtml();
+        }
+        if (shell && shell.status) {
+          ux.setStatusState(shell.status, 'pending', 'Checking status…');
+          probeRails().then(function (systems) {
+            applySystemsStatus(shell.status, systems);
+          });
+        }
+        return shell;
+      }
+
+      function mountOneLiners() {
+        fetch(GW + '/apps/' + CONSUMER_ID + '/cfg/usage.json', { cache: 'no-store' })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (cfg) {
+            if (!cfg || !cfg.one_liners || cfg.one_liners.enabled !== true) return;
+            var lines = Array.isArray(cfg.one_liners.lines) ? cfg.one_liners.lines.filter(Boolean) : [];
+            if (!lines.length) return;
+            var el = document.createElement('p');
+            el.className = 'ma-one-liner';
+            el.setAttribute('data-one-liners', 'on');
+            el.textContent = String(lines[0]).slice(0, 160);
+            var home = document.querySelector('.ma-home');
+            if (home) home.appendChild(el);
+          })
+          .catch(function () {});
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () {
+          bootGlossShell();
+          mountOneLiners();
+        });
+      } else {
+        bootGlossShell();
+        mountOneLiners();
+      }
+    })();
+  </script>
+  
+</body>
+</html>
