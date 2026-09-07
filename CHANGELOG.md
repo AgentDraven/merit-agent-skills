@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.105] - 2026-09-06
+### Changed
+- Extracted consumer slug and usage-environment helpers into the shared CLI core module.
+
 ## [0.5.104] - 2026-09-06
 ### Changed
 - Extracted launch configuration parsing and target-path helpers into the shared CLI core module.

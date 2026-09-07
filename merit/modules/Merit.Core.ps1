@@ -95,3 +95,16 @@ function Set-LaunchIniValue {
     if (-not $found) { $out += "$key = $Value" }
     Set-Content -LiteralPath $Path -Value $out -Encoding UTF8
 }
+
+function ConvertTo-ConsumerSlug {
+    param([string]$Name)
+    $s = $Name.ToLowerInvariant() -replace '[^a-z0-9]+', '-' -replace '^-+|-+$', ''
+    if (-not $s) { $s = 'my-app' }
+    return $s
+}
+
+function Get-UsagePassphraseEnvName {
+    param([string]$ConsumerId)
+    $slug = ($ConsumerId.ToUpperInvariant() -replace '[^A-Z0-9]+', '_')
+    return "MERIT_${slug}_PASSPHRASE"
+}

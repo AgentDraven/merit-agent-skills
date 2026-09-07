@@ -106,19 +106,6 @@ Redo a single phase anytime - phase map is printed below on help, and again in R
     Write-CreatePhaseGuide -TargetRoot '..\<app>'
 }
 
-function ConvertTo-ConsumerSlug {
-    param([string]$Name)
-    $s = $Name.ToLowerInvariant() -replace '[^a-z0-9]+', '-' -replace '^-+|-+$', ''
-    if (-not $s) { $s = 'my-app' }
-    return $s
-}
-
-function Get-UsagePassphraseEnvName {
-    param([string]$ConsumerId)
-    $slug = ($ConsumerId.ToUpperInvariant() -replace '[^A-Z0-9]+', '_')
-    return "MERIT_${slug}_PASSPHRASE"
-}
-
 function New-UsageOperatorPhrase {
     $wlPath = Join-Path $Root 'cfg/operator_gate_wordlists.excerpt.json'
     $wl = Read-JsonFile $wlPath
