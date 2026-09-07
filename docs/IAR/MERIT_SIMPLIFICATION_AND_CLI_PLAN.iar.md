@@ -146,7 +146,7 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 - Root `Merit-Hub.ps1` and `merit.ps1` are permanent public APIs.
 - Internal modules are not user commands.
 - `merit.ps1 skills install --target <Host>` is canonical.
-- `install.ps1` and `install.sh` are deprecated for one compatibility release.
+- `install.ps1` and `install.sh` are removed; use `merit.ps1 skills install`.
 - `BootStrap/` is temporary migration infrastructure.
 - `merit/merit.blob` becomes the canonical public law location.
 - Vault delegation is explicit by command ownership.
@@ -158,7 +158,7 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 | 1. IAR and inventory | PASS | This plan, IAR navigation link, dependency-hierarchy link; release `skills-v0.5.98` |
 | 2. Root Hub launcher | PASS | Root `Merit-Hub.ps1 -Help` smoke test; implementation remains under `Merit-Hub/`; release `skills-v0.5.99` |
 | 3. CLI extraction | IN PROGRESS | `merit/modules/Merit.Core.ps1` owns shared primitives; `merit.ps1 help` and `verify` parity pass; remaining command families still being extracted |
-| 4. Unified IDE installer | PASS | Implementation moved to `merit/modules/Merit.SkillsInstall.ps1`; `install.ps1` is a compatibility wrapper; install/remove/reinstall acceptance passed; release `skills-v0.5.118` |
+| 4. Unified IDE installer | PASS | Implementation moved to `merit/modules/Merit.SkillsInstall.ps1`; root wrappers removed; install/remove/reinstall acceptance passed; release `skills-v0.5.123` |
 | 5. Bootstrap migration | IN PROGRESS | `Merit.Surface.ps1` is authoritative for CLI and Hub surface loading; legacy `_resolve.ps1` remains fallback |
 | 6. Law relocation | PASS | Canonical `merit/merit.blob` is authoritative; legacy root payload removed; law tests pass; release `skills-v0.5.110` |
 | 7. Vault delegation | PASS | Clean AgentDraven vault checkout at `C:\DApps\merit-private-vault`; allow-listed delegation and `mXin --help` live test pass; vault tree unchanged; surface now reports `oss+ide+vault`; release `skills-v0.5.120` |
@@ -181,7 +181,7 @@ This section records what was actually implemented and tested, rather than leavi
 | `skills-v0.5.111`–`skills-v0.5.114` | Law/surface compatibility modules and IAR status updates released |
 | `skills-v0.5.115` | Explicit allow-listed vault delegation released |
 | `skills-v0.5.116`–`skills-v0.5.117` | Compatibility documentation and guarded skill removal released |
-| `skills-v0.5.118` | Installer implementation moved to `merit/modules/Merit.SkillsInstall.ps1`; root wrapper retained |
+| `skills-v0.5.118`–`skills-v0.5.123` | Installer implementation moved to `merit/modules/Merit.SkillsInstall.ps1`; root wrappers then removed |
 | `skills-v0.5.119` | Read-only AgentDraven vault checkout and sibling discovery released |
 | `skills-v0.5.120` | Surface vault display fix and final acceptance release |
 
@@ -193,7 +193,7 @@ This section records what was actually implemented and tested, rather than leavi
 | Surface tests | PASS | `scripts/test-merit-surface.ps1`: 6 passed, 0 failed |
 | Skills repository verify | PASS | `merit.ps1 verify --path .` |
 | CLI skill install | PASS | `merit.ps1 skills install --target Cursor` |
-| Compatibility installer | PASS | `install.ps1 -Target Cursor` routes through the public CLI |
+| Canonical skills installer | PASS | `merit.ps1 skills install --target Cursor` |
 | Guarded skill removal | PASS | `merit.ps1 skills remove --target Cursor --yes` |
 | Vault discovery display | PASS | `merit.ps1 where` reports `oss+ide+vault` and `C:\DApps\merit-private-vault` when configured |
 | Vault delegation | PASS | `merit.ps1 vault mXin --help` delegates to the read-only checkout |
@@ -205,7 +205,7 @@ This section records what was actually implemented and tested, rather than leavi
 
 ### Final operating boundary
 
-The implementation now has one public CLI, a root Hub launcher, a canonical law payload, shared skill installation/removal, explicit vault delegation, and recorded acceptance evidence. `install.ps1` and the `BootStrap/` scripts remain compatibility shims until all downstream consumers have migrated and a later release explicitly removes them. They are not additional user-facing authorities.
+The implementation now has one public CLI, a root Hub launcher, a canonical law payload, shared skill installation/removal, explicit vault delegation, and recorded acceptance evidence. `BootStrap/` remains only as an internal Hub compatibility surface until its active callers are migrated; it is not a second user-facing product.
 
 Closeout evidence receipts are currently written to the deterministic temporary fallback under `C:\Users\Draven\AppData\Local\Temp\merit-closeout\...` because the repository evidence directory is not writable in this environment. This is an evidence-storage limitation, not a validation failure.
 

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.124] - 2026-09-06
+### Changed
+- Updated the controlling IAR to reflect root installer removal and the remaining internal Bootstrap migration boundary.
+
 ## [0.5.123] - 2026-09-06
 ### Removed
 - Removed obsolete root `install.ps1` and `install.sh`; `merit.ps1 skills install` is now the only supported installer command.
