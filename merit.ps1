@@ -812,8 +812,8 @@ function Invoke-Closeout {
         }
         $evidenceDir = $null
         foreach ($candidate in @(
-                (Join-Path $TargetRoot 'merit-demo docs\IAR\evidence'),
                 (Join-Path $TargetRoot 'docs\IAR\evidence'),
+                (Join-Path $TargetRoot 'merit-demo docs\IAR\evidence'),
                 (Join-Path $TargetRoot '.merit\evidence')
             )) {
             if (Test-Path -LiteralPath $candidate -PathType Container) {
