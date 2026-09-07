@@ -47,7 +47,7 @@ Assert-Test 'merit-closeout skill requires law, release, and 3-3' {
     }
 }
 
-. (Join-Path $Root 'BootStrap\_law.ps1')
+. (Join-Path $Root 'merit\modules\Merit.Law.ps1')
 $Script:MeritResolveRepoRoot = $Root
 
 Assert-Test 'Read-MeritLawPack unpacks' {

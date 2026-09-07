@@ -11,7 +11,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 if (-not $RepoRoot) { $RepoRoot = Split-Path -Parent $PSScriptRoot }
-. (Join-Path $RepoRoot 'BootStrap\_law.ps1')
+. (Join-Path $RepoRoot 'merit\modules\Merit.Law.ps1')
 
 function Get-DefaultOssLawSections {
     return @(

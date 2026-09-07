@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.113] - 2026-09-06
+### Changed
+- Law test and export utilities now load the shared law module, reducing direct Bootstrap coupling while preserving compatibility behavior.
+
 ## [0.5.112] - 2026-09-06
 ### Changed
 - Hub surface discovery now prefers the shared `merit/modules/Merit.Surface.ps1` module, with the legacy Bootstrap resolver retained as fallback.
