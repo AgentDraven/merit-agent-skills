@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.145] - 2026-09-06
+### Fixed
+- Clarified Hub menu hierarchy so `O` (letter) is the only OC command; `0` remains exit.
+
 ## [0.5.144] - 2026-09-06
 ### Added
 - Added OC preflight checks for local routes, CompatSet artifacts, merit-prod health, and here.now readiness.
