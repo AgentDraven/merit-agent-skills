@@ -379,7 +379,7 @@ overwritten. Use menu **K** to list supported skills tags for advanced review.
 
 | Pin | Repo | Role |
 |-----|------|------|
-| `skills-v0.5.138` | merit-agent-skills | OSS cold-start clone |
+| `skills-v0.5.179` | merit-agent-skills | OSS cold-start clone (default) |
 | `vault-v0.5.56` | merit-private-vault | Operator cold-start clone |
 
 **Active CompatSet:** `2026.08.3` (vault `cfg/compat/`).
@@ -471,12 +471,20 @@ See [`oc-bench.ps1`](oc-bench.ps1). Each bench gets its own `MYMERITAPP` + `oss-
    - Renaming the file to `Merit-Hub-B.ps1` is fine; its contents determine behavior.
 2. **Refresh the launcher**
    - Download the [root launcher](https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub.ps1) once into your tools folder.
-   - Run it from PowerShell; the corrected release prints `MERIT launcher 0.5.178` first.
+   - Run it from PowerShell; the corrected release prints `MERIT launcher 0.5.179` first.
    - It refreshes the main Hub automatically, even if a cached file exists.
 3. **Check the result**
    - Read the embedded skills pin and executable path printed after download.
    - The launcher validates the file before starting the Hub menu.
    - On network or parse failure it stops, preserves the old copy, and prints the cause; retry after addressing that cause.
+
+### Version verdict: what the three labels mean
+
+- **Launcher** is the tiny root downloader. Its revision tells you which recovery/download logic ran.
+- **Hub script** is the menu implementation that was downloaded and started. It should normally match the repository tip.
+- **Default payload** is the exact `skills-v*` CompatSet that Hub **2** installs. It normally matches the release, but can intentionally differ after **K** selects a supported rollback.
+
+For the default journey, all three labels align at `0.5.179` / `skills-v0.5.179` and Hub prints an explicit **Release identity aligned** receipt. A mismatch does not automatically corrupt a laptop; it means refresh the root launcher and rerun **2** before treating the installed skills and docs as the current default.
 
 **Cold start:** `1 2 3 OC 4 VC 5 R RC 6` · **Cleanup:** `G A P S` · **Util:** `I M T W H`
 

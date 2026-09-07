@@ -240,6 +240,26 @@ and add `-LiveDownload` for GitHub transport and parse verification. Replace the
 root launcher once on affected devices; deleting only its child folder leaves
 the faulty expression in the root launcher. Current CompatSet: 0.5.178.
 
+### MAS-HUB-ID-01 — release identity alignment (0.5.179)
+
+**Verdict: the earlier `script-version=0.5.138` beside
+`MERIT launcher 0.5.178` was harmless to execution but unacceptable as a
+beginner-facing receipt.** They are distinct layers: the root launcher obtains
+the Hub, the Hub is the running menu, and the CompatSet pin is the payload that
+Hub 2 installs. They may differ only when an advanced user deliberately selects
+an approved rollback through **K**.
+
+Default release rule: launcher revision = Hub revision = repository `VERSION`;
+the first supported CompatSet and new `oss-bench.json` template use
+`skills-v<VERSION>`. Hub now prints an explicit aligned/mismatch verdict and
+explains the only expected divergence (an approved K rollback). A mismatch
+requires refreshing the root launcher and rerunning Hub 2 before relying on
+the default documentation or installed payload.
+
+Acceptance: `scripts/test-hub-launcher.ps1` asserts all five identity links
+(root launcher, Hub menu, Hub payload, first CompatSet, and bench template)
+under both PowerShell hosts, in addition to launcher transport recovery tests.
+
 ## NextRel FR — README three-step explainability (Peel-The-Onion)
 
 **Peel-The-Onion** is the MERIT teaching model: reveal the smallest useful action first, then progressively expose evidence and advanced detail. A beginner can pause after any layer with a clear success signal.

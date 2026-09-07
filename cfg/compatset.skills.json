@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
-    { "pin": "skills-v0.5.178", "releasedAt": "2026-09-07", "status": "supported", "notes": "Tested launcher refresh, revision banner, staged UTF-8 parsing and failure recovery" },
-    { "pin": "skills-v0.5.177", "releasedAt": "2026-09-07", "status": "supported", "notes": "Direct URI fix; first backup" },
-    { "pin": "skills-v0.5.176", "releasedAt": "2026-09-07", "status": "supported", "notes": "Historical backup; launcher URL interpolation bug remains, use current root launcher" }
+    { "pin": "skills-v0.5.179", "releasedAt": "2026-09-07", "status": "supported", "notes": "Release identity alignment: launcher, Hub UI, default payload, and bench template agree" },
+    { "pin": "skills-v0.5.178", "releasedAt": "2026-09-07", "status": "supported", "notes": "Staged UTF-8 launcher refresh and failure recovery; first backup" },
+    { "pin": "skills-v0.5.177", "releasedAt": "2026-09-07", "status": "supported", "notes": "Direct-URI launcher fix; second backup" }
   ]
 }

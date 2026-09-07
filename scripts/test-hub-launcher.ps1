@@ -1,7 +1,8 @@
 # Regression coverage for the standalone launcher; never runs the real Hub.
 param([switch]$LiveDownload)
 $ErrorActionPreference = 'Stop'
-$source = Join-Path (Split-Path -Parent $PSScriptRoot) 'Merit-Hub.ps1'
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$source = Join-Path $repoRoot 'Merit-Hub.ps1'
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('merit-launcher-test-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $testRoot | Out-Null
 $launcher = Join-Path $testRoot 'Merit-Hub-B.ps1'
@@ -12,6 +13,19 @@ function Assert-Test([bool]$Condition, [string]$Message) {
     if (-not $Condition) { throw "FAIL: $Message" }
     Write-Host "PASS: $Message"
 }
+
+# Release identity is a user-facing contract. Keep the tiny launcher, menu Hub,
+# current CompatSet and newly written bench records on the same default release.
+$release = (Get-Content -LiteralPath (Join-Path $repoRoot 'VERSION') -Raw).Trim()
+$rootText = Get-Content -LiteralPath $source -Raw
+$hubText = Get-Content -LiteralPath (Join-Path $repoRoot 'Merit-Hub\Merit-Hub.ps1') -Raw
+$compat = Get-Content -LiteralPath (Join-Path $repoRoot 'cfg\compatset.skills.json') -Raw | ConvertFrom-Json
+$benchTemplate = Get-Content -LiteralPath (Join-Path $repoRoot 'cfg\oss-bench.template.json') -Raw | ConvertFrom-Json
+Assert-Test ($rootText -match [regex]::Escape("MERIT launcher $release")) 'root launcher revision matches VERSION'
+Assert-Test ($hubText -match ('"hubVersion"\s*:\s*"' + [regex]::Escape($release) + '"')) 'Hub menu revision matches VERSION'
+Assert-Test ($hubText -match ('"skillsPin"\s*:\s*"skills-v' + [regex]::Escape($release) + '"')) 'Hub default payload matches VERSION'
+Assert-Test ($compat.sets[0].pin -eq "skills-v$release") 'first CompatSet is the release default'
+Assert-Test ($benchTemplate.skillsPin -eq "skills-v$release") 'new bench template uses the release default'
 
 Copy-Item -LiteralPath $source -Destination $launcher
 if ($LiveDownload) {

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.179] - 2026-09-07
+### Fixed
+- Aligned the root launcher, Hub menu revision, default CompatSet, and new bench template at 0.5.179 so a fresh device no longer reports an unexplained 0.5.138 Hub revision.
+- Replaced the ambiguous version line with an explicit release-identity verdict: launcher, Hub implementation, repository tip, and default payload are shown separately; approved **K** rollbacks are explained as intentional.
+
 ## [0.5.178] - 2026-09-07
 ### Fixed
 - Corrected the URI failure diagnosis: `$url?v` is parsed as a variable name in both PowerShell 5.1 and 7; the base URL and renamed launcher were not the cause. Direct URI requests replace that expression.

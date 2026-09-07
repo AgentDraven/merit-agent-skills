@@ -1,7 +1,8 @@
 # MERIT root Hub launcher.
 # Keep this file small and stable: the implementation lives under Merit-Hub/.
 $ErrorActionPreference = 'Stop'
-Write-Host 'MERIT launcher 0.5.178 | direct URI downloads' -ForegroundColor Cyan
+Write-Host 'MERIT launcher 0.5.179 | direct URI downloads' -ForegroundColor Cyan
+$env:MERIT_HUB_LAUNCHER_VERSION = '0.5.179'
 $implementation = Join-Path $PSScriptRoot 'Merit-Hub\Merit-Hub.ps1'
 $url = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1'
 $folder = Split-Path -Parent $implementation
