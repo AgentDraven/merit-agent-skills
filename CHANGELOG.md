@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.174] - 2026-09-07
+### Fixed
+- Completed release closeout with an in-repository IAR evidence receipt and promoted this release as the default CompatSet.
+
 ## [0.5.173] - 2026-09-07
 ### Fixed
 - Replaced executable Hub panel Unicode borders/arrows with ASCII-safe text for Windows PowerShell 5.1 bootstrap parsing.
