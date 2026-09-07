@@ -222,3 +222,9 @@ The active IAR set is intentionally small:
 5. `MERIT_AGENT_SKILLS_LLD_MAP.md` — stable architecture reference.
 
 Historical proof packets remain evidence only. A new IAR or checklist requires a written rationale in `docs/IAR/README.md`; otherwise, consolidate into one of the files above.
+
+## Root Hub launcher contract
+
+`Merit-Hub.ps1` at repository root is the stable first-touch launcher. When the full clone is present, it forwards to `Merit-Hub/Merit-Hub.ps1`. When downloaded alone, it creates the adjacent `Merit-Hub/` folder, downloads the pinned implementation from the public repository, and then forwards all arguments. The implementation owns prerequisite checks and reports missing `pwsh`, `git`, or `gh`; the root launcher does not duplicate that logic. A standalone smoke test passed from `C:\Temp\merit-hub-root-smoke`.
+
+`Merit-Hub/oc-bench.ps1` remains an advanced multi-creator bench utility. It is not part of the beginner path and should be linked only from advanced Hub documentation.

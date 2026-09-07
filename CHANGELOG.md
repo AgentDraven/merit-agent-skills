@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.125] - 2026-09-06
+### Changed
+- Root `Merit-Hub.ps1` now bootstraps the real Hub implementation when downloaded standalone, then delegates prerequisite checks and menu behavior to it.
+
 ## [0.5.124] - 2026-09-06
 ### Changed
 - Updated the controlling IAR to reflect root installer removal and the remaining internal Bootstrap migration boundary.
