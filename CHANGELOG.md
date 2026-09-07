@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.147] - 2026-09-06
+### Added
+- Consolidated beginner Hub command map, hierarchy, emoji guidance, and Mermaid flow in `Merit-Hub/README.md`.
+
 ## [0.5.146] - 2026-09-06
 ### Fixed
 - Standardized second-tier Hub commands as OC, 3V, VC, 5R, and RC; clarified 0 as exit.

@@ -4,9 +4,41 @@
 
 `%MYMERITTOOLS%` (e.g. `C:\Tools` or `C:\DevTools`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Embedded pins (current release):** `skills-v0.5.138` · `vault-v0.5.56` — see [CompatSet](#compatSet--pins).
+**Embedded pins (current release):** `skills-v0.5.146` · `vault-v0.5.56` — see [CompatSet](#compatSet--pins).
 
 **Raw download:** `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
+
+---
+
+## Beginner command map 🎮
+
+Choose one row and follow it left-to-right. Subcommands are indented so the
+letter `O` cannot be confused with zero `0` (Stop).
+
+```mermaid
+flowchart LR
+  S["1 Setup"] --> I["2 Install OSS"] --> T["3 Try it"]
+  T --> OC["OC • OSS in Cloud"]
+  T --> V3["3V • Validate demo"]
+  I --> VA["4 Vault"] --> VC["VC • Validate Vault"]
+  I --> R["5 Repo"] --> R5["5R • Repo/Cloud"] --> RC["RC • Repo in Cloud"]
+```
+
+| Command | What it does | When to use it |
+|---|---|---|
+| `1` | Sets laptop folders and prerequisites | First run or path repair |
+| `2` | Installs pinned `merit-agent-skills` | After `1` |
+| `3` | Refreshes demo, starts/reuses HTTP port 3000, opens `/play/` | Try the local consumer |
+| `OC` | Preflights and publishes the OSS demo to merit-prod | After `3` passes |
+| `3V` | Walks through browser, verify, and E2E checks | Repeatable validation |
+| `4` / `VC` | Clones vault / validates Venture-Capable status | Operator path |
+| `5` / `5R` / `RC` | Clones and validates a catalog repo/cloud host | Catalog path |
+| `6` | Opens MERIT registration/join routes | After `OC` or `4` |
+| `0` | Stops Hub | Only exit command |
+
+Advanced helpers: `I` install IDE skills, `M` change `MYMERITAPP`, `T` change
+`MYMERITTOOLS`, `W` show surfaces, `K` list/select approved CompatSets, and
+`G/A/P/S` provide sprawl and cleanup modes.
 
 ---
 
