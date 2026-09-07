@@ -1,5 +1,5 @@
 # Unified IDE skill command adapter. The implementation lives beside this
-# adapter; install.ps1 is only a compatibility wrapper.
+# adapter; root installer scripts were removed. Use `merit.ps1 skills install`.
 function Invoke-MeritSkillsCommand {
     param([string[]]$ArgList, [string]$RepoRoot)
     $sub = if ($ArgList.Count) { "$($ArgList[0])".ToLowerInvariant() } else { 'list' }

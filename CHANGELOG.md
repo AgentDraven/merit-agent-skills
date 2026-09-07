@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.130] - 2026-09-06
+### Changed
+- Alpha documentation scrub: Hub-first usage, retired installer wording, README section bands, and cross-repo documentation format standard.
+- Hub cleanup actions now return to the interactive menu after elevation.
+
 ## [0.5.129] - 2026-09-06
 ### Changed
 - Replaced the cryptic IDE-skills instruction with the full download, PowerShell, `\.\Merit-Hub.ps1`, menu-I, and host-selection flow.
