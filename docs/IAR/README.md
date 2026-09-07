@@ -19,6 +19,8 @@ This directory is an evidence and architecture surface, not a dumping ground. Ke
 4. A new subfolder is justified only when evidence volume or lifecycle ownership makes a flat file impractical; the subfolder must have its own README and no second authority.
 5. Historical proof packets remain immutable evidence, but current status belongs in the controlling IAR.
 
+The default is consolidation, not file creation. The current implementation and acceptance results for CLI, Hub, Bootstrap, law, installer, vault, and compatibility work belong in `MERIT_SIMPLIFICATION_AND_CLI_PLAN.iar.md`. Do not create a new report for a new phase, test run, or gotcha unless this index records why the existing controlling IAR and checklist are insufficient.
+
 ## Vault handoff
 
 When `merit-private-vault` and `MERIT.instructions` are activated, port this policy, the controlling contract, and the checklist as one vault IAR package. The vault version may add protected operator evidence, but must not create a parallel consumer authority.

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.122] - 2026-09-06
+### Changed
+- Strengthened the IAR consolidation policy: current implementation and acceptance work must be added to the existing controlling documents, not split into new reports without written rationale.
+
 ## [0.5.121] - 2026-09-06
 ### Changed
 - Added the complete implementation result, release trail, acceptance evidence, and final operating boundary to the controlling simplification IAR.

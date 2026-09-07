@@ -208,3 +208,17 @@ This section records what was actually implemented and tested, rather than leavi
 The implementation now has one public CLI, a root Hub launcher, a canonical law payload, shared skill installation/removal, explicit vault delegation, and recorded acceptance evidence. `install.ps1` and the `BootStrap/` scripts remain compatibility shims until all downstream consumers have migrated and a later release explicitly removes them. They are not additional user-facing authorities.
 
 Closeout evidence receipts are currently written to the deterministic temporary fallback under `C:\Users\Draven\AppData\Local\Temp\merit-closeout\...` because the repository evidence directory is not writable in this environment. This is an evidence-storage limitation, not a validation failure.
+
+## Document-sprawl guardrail
+
+This IAR is the single controlling plan for CLI simplification, Hub/Bootstrap migration, law placement, installer ownership, vault precedence, implementation status, and acceptance results. New findings and future-release requirements must be added as sections or tables here unless the existing IAR index explicitly approves a separate artifact.
+
+The active IAR set is intentionally small:
+
+1. `MERIT_SIMPLIFICATION_AND_CLI_PLAN.iar.md` — implementation and acceptance authority.
+2. `MERIT_CLOSEOUT_ENFORCEMENT.iar.md` — cross-harness closeout policy.
+3. `MERIT_CLOSEOUT_ENFORCEMENT_CHECKLIST.md` — executable enforcement checklist.
+4. `MERIT_DEPENDENCY_HIERARCHY.iar.md` — cross-repository ownership map.
+5. `MERIT_AGENT_SKILLS_LLD_MAP.md` — stable architecture reference.
+
+Historical proof packets remain evidence only. A new IAR or checklist requires a written rationale in `docs/IAR/README.md`; otherwise, consolidate into one of the files above.
