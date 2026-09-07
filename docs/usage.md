@@ -389,3 +389,14 @@ No. You need a provisioned `consumer_id`, production MERIT metered-provider moun
 
 **Operator validation?**
 MERIT vault operators run private validation separately. Public users should start with `.\scripts\smoke-freemium.ps1` on Windows or `./scripts/smoke-freemium.sh` on Linux/macOS.
+# Hosted OC tutorial boundary
+
+The planned `OC-Tutorial.ps1` is a reusable skills/Hub workflow for validating
+an already-published OC receipt. It should open hosted play, registration, and
+marketing URLs, explain each result, and write evidence. It must not embed a
+consumer's branding or replace the consumer application.
+
+Implementation decision: the orchestration belongs in `merit-agent-skills`
+(reusable skill + Hub adapter); `merit-demo` may provide the optional branded
+launchpad page and content cards. This keeps the validation logic reusable while
+letting each consumer explain its own features.

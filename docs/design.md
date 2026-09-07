@@ -53,3 +53,15 @@ Root `merit.ps1` / `merit.sh` remain the **CLI** (`init` / `apply` / `verify` / 
 - **OC** publishes to merit-prod (activate required). **VC** is operator grade after local vault.
 
 See [bootstrap.design.md](bootstrap.design.md) for how this was introduced and pushed.
+# OC tutorial implementation decision
+
+| Option | Strengths | Risks | Decision |
+|---|---|---|---|
+| Skills/Hub | Reusable across every consumer; one validation contract; consistent receipts; works without changing app code | Must accept consumer URLs/branding as inputs; host-specific UI needs adapters | **Winner for orchestration** |
+| `merit-demo` only | Fast to tailor; attractive demo-specific launchpad; simple local assets | Duplicates logic; other consumers cannot reuse it; validation can drift | **Use only for optional branded launchpad** |
+| Split model | Shared runner and contract plus consumer-owned presentation; strongest reuse and UX | Requires a small interface between them | **Final architecture** |
+
+The shared `OC-Tutorial.ps1`/skill owns receipt loading, URL checks, browser
+launches, status, and evidence. `merit-demo` owns an optional
+`MERIT-OC: OSS in the Cloud` HTML launchpad generated or opened by that runner.
+Here.now remains an optional independent publication step.

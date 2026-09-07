@@ -3843,6 +3843,7 @@ function Show-MeritHubHelp {
     Write-Host '  2) Install OSS      skills pin only (no merit-demo)   (alias J)'
     Write-Host '  3) Try it           clone public merit-demo + serve HTTP + open /play/'
     Write-Host '       OC  OSS in the Cloud — publish DualRail + register + marketing site'
+    Write-Host '       OCV Hosted OC Tutorial — open and review published URLs step-by-step'
     Write-Host '       3V  Validate demo deployed by Step 3 (Try it)'
     Write-Host '          -NewOc creates a new oc-* id (advanced command-line switch)'
     Write-Host '  4) Vault (local)    clone private vault (working clone kept)'
@@ -3877,6 +3878,14 @@ function Set-MyMeritToolsPrompt {
     $ans = Read-Host "MYMERITTOOLS path [$current]"
     $path = if ([string]::IsNullOrWhiteSpace($ans)) { $current } else { $ans }
     Set-UserEnvVar -Name 'MYMERITTOOLS' -Value (Expand-HomePath $path)
+}
+
+function Invoke-HubOcTutorial {
+    $bench = Get-MyMeritAppRoot
+    $script = Join-Path $Script:HubRoot 'OC-Tutorial.ps1'
+    if (-not (Test-Path $script)) { Write-Fail "OC tutorial missing: $script"; return }
+    Write-Attention 'OCV: walking through the published play, registration, and marketing URLs from the OC receipt.'
+    & (Get-Command pwsh -ErrorAction Stop).Source -NoProfile -File $script -BenchRoot $bench
 }
 
 function Invoke-HubTryItValidate {
@@ -4012,6 +4021,7 @@ function Show-InteractiveMenu {
                 '^3$' { Invoke-HubTryIt; $pending = Read-HubContinue }
                 '^(3V|3v)$' { Invoke-HubTryItValidate; $pending = Read-HubContinue }
                 '^(OC|oc|Oc)$' { Invoke-HubOc; $pending = Read-HubContinue }
+                '^(OCV|ocv)$' { Invoke-HubOcTutorial; $pending = Read-HubContinue }
                 '^(4|Vault)$' { Invoke-JumpstartVault; $pending = Read-HubContinue }
                 '^(VC|vc|Vc)$' { Invoke-HubVc; $pending = Read-HubContinue }
                 '^(5|5R|5r|R)$' { Invoke-HubR; $pending = Read-HubContinue }

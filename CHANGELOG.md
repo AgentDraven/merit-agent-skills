@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.153] - 2026-09-07
+### Added
+- Added receipt-driven `OC-Tutorial.ps1` and Hub `OCV` walkthrough for hosted OC validation.
+
 ## [0.5.152] - 2026-09-06
 ### Fixed
 - Hub now reports repository tip versus deployed CompatSet pin and warns when the default pin is not registry-approved.
