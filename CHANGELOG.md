@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.167] - 2026-09-07
+### Fixed
+- OCV now self-heals a missing `OC-Tutorial.ps1` by downloading the matching helper and reporting the action.
+
 ## [0.5.166] - 2026-09-07
 ### Fixed
 - Promoted `skills-v0.5.165` to the supported CompatSet registry and made it the Hub default.

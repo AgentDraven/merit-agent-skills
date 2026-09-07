@@ -3892,7 +3892,15 @@ function Set-MyMeritToolsPrompt {
 function Invoke-HubOcTutorial {
     $bench = Get-MyMeritAppRoot
     $script = Join-Path $Script:HubRoot 'OC-Tutorial.ps1'
-    if (-not (Test-Path $script)) { Write-Fail "OC tutorial missing: $script"; return }
+    if (-not (Test-Path -LiteralPath $script)) {
+        Write-Warn "OC tutorial helper missing: $script"
+        $url = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/OC-Tutorial.ps1'
+        try {
+            Write-Info "Downloading the matching OC tutorial helper from GitHub..."
+            Invoke-WebRequest -Uri $url -OutFile $script -UseBasicParsing -ErrorAction Stop
+            Write-Ok "OC tutorial helper downloaded: $script"
+        } catch { Write-Fail "Could not download OC tutorial helper: $($_.Exception.Message)"; return }
+    }
     Write-Attention 'OCV: walking through the published play, registration, and marketing URLs from the OC receipt.'
     & (Get-Command pwsh -ErrorAction Stop).Source -NoProfile -File $script -BenchRoot $bench
 }
