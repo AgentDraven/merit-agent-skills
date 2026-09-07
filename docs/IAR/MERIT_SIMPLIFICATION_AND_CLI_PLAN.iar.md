@@ -165,3 +165,46 @@ This file is the consolidated implementation plan. `docs/IAR/README.md` must lis
 | 8. Compatibility cleanup | IN PROGRESS | Canonical law references and Hub surface loading updated; installer and legacy Bootstrap shims remain until downstream callers are migrated and one compatibility release is complete |
 
 Law migration note: the resolver now uses canonical `merit/merit.blob`; the legacy root blob has been removed after migration validation.
+
+## Implementation result and acceptance record
+
+This section records what was actually implemented and tested, rather than leaving the plan as prose-only intent.
+
+### Release trail
+
+| Release | Result |
+|---|---|
+| `skills-v0.5.98` | IAR baseline and inventory established |
+| `skills-v0.5.99` | Root `Merit-Hub.ps1` launcher released |
+| `skills-v0.5.100`–`skills-v0.5.108` | Shared CLI core helpers extracted |
+| `skills-v0.5.109`–`skills-v0.5.110` | Canonical law payload migration completed |
+| `skills-v0.5.111`–`skills-v0.5.114` | Law/surface compatibility modules and IAR status updates released |
+| `skills-v0.5.115` | Explicit allow-listed vault delegation released |
+| `skills-v0.5.116`–`skills-v0.5.117` | Compatibility documentation and guarded skill removal released |
+| `skills-v0.5.118` | Installer implementation moved to `merit/modules/Merit.SkillsInstall.ps1`; root wrapper retained |
+| `skills-v0.5.119` | Read-only AgentDraven vault checkout and sibling discovery released |
+| `skills-v0.5.120` | Surface vault display fix and final acceptance release |
+
+### Acceptance evidence
+
+| Check | Result | Evidence |
+|---|---|---|
+| Law pack tests | PASS | `scripts/test-merit-law.ps1`: 9 passed, 0 failed |
+| Surface tests | PASS | `scripts/test-merit-surface.ps1`: 6 passed, 0 failed |
+| Skills repository verify | PASS | `merit.ps1 verify --path .` |
+| CLI skill install | PASS | `merit.ps1 skills install --target Cursor` |
+| Compatibility installer | PASS | `install.ps1 -Target Cursor` routes through the public CLI |
+| Guarded skill removal | PASS | `merit.ps1 skills remove --target Cursor --yes` |
+| Vault discovery display | PASS | `merit.ps1 where` reports `oss+ide+vault` and `C:\DApps\merit-private-vault` when configured |
+| Vault delegation | PASS | `merit.ps1 vault mXin --help` delegates to the read-only checkout |
+| Vault mutation safety | PASS | `git status --short` remains clean in `C:\DApps\merit-private-vault` |
+| Consumer verify | PASS | `C:\DApps\merit-demo\merit.ps1 verify --path .` |
+| Consumer static E2E | PASS | `merit-demo` E2E smoke completed successfully |
+| Consumer Playwright E2E | PASS | Routes, Hosted Ready, mount, Register, mobile/desktop screenshots, provider checks |
+| Release closeout | PASS | Latest commit `57e03c7`, tag `skills-v0.5.120`, main pushed |
+
+### Final operating boundary
+
+The implementation now has one public CLI, a root Hub launcher, a canonical law payload, shared skill installation/removal, explicit vault delegation, and recorded acceptance evidence. `install.ps1` and the `BootStrap/` scripts remain compatibility shims until all downstream consumers have migrated and a later release explicitly removes them. They are not additional user-facing authorities.
+
+Closeout evidence receipts are currently written to the deterministic temporary fallback under `C:\Users\Draven\AppData\Local\Temp\merit-closeout\...` because the repository evidence directory is not writable in this environment. This is an evidence-storage limitation, not a validation failure.

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.121] - 2026-09-06
+### Changed
+- Added the complete implementation result, release trail, acceptance evidence, and final operating boundary to the controlling simplification IAR.
+
 ## [0.5.120] - 2026-09-06
 ### Fixed
 - Surface reports now include an explicitly configured or standard sibling vault, including edition and operator CLI path.
