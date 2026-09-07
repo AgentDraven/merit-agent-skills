@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.129] - 2026-09-06
+### Changed
+- Replaced the cryptic IDE-skills instruction with the full download, PowerShell, `\.\Merit-Hub.ps1`, menu-I, and host-selection flow.
+
 ## [0.5.128] - 2026-09-06
 ### Changed
 - Scrubbed current documentation and IAR references for removed installer wrappers and migrated Bootstrap paths.

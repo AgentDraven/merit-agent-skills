@@ -26,7 +26,13 @@ Open [merit-demo](https://github.com/Mr-PI-Bala/merit-demo) and run ` .\merit.ps
 
 ### I want skills in my IDE
 
-Run Hub and choose **I**. It installs skills into the correct host location.
+Download [`Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1) (use **Raw**), save it in a tools folder such as `C:\Tools`, open PowerShell, change to that folder, and run:
+
+```powershell
+.\Merit-Hub.ps1
+```
+
+When the Hub menu appears, choose **I — Install IDE skills**, then choose your host (Cursor, Codex, VS Code, or another supported host). The Hub installs the skills into that host's correct location.
 
 ### For additional options
 
