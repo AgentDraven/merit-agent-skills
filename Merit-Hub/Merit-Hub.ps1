@@ -1089,10 +1089,28 @@ function Get-DefaultMyMeritApp {
     return Expand-HomePath ([string]$cfg.defaultMyMeritAppUnix)
 }
 
+function Test-HubConfiguredPathUsable {
+    param([string]$Path, [string]$Name)
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $false }
+    try {
+        $full = Expand-HomePath $Path
+        $root = [IO.Path]::GetPathRoot($full)
+        if ($root -and -not (Test-Path -LiteralPath $root)) {
+            Write-Warn ("Ignoring stale {0}={1}; drive/root {2} is unavailable on this device." -f $Name, $Path, $root)
+            return $false
+        }
+        return $true
+    }
+    catch {
+        Write-Warn ("Ignoring invalid {0}={1}: {2}" -f $Name, $Path, $_.Exception.Message)
+        return $false
+    }
+}
+
 function Get-MyMeritToolsRoot {
     foreach ($scope in @('Process', 'User', 'Machine')) {
         $v = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', $scope)
-        if (-not [string]::IsNullOrWhiteSpace($v)) {
+        if ((Test-HubConfiguredPathUsable -Path $v -Name 'MYMERITTOOLS')) {
             return Expand-HomePath $v
         }
     }
@@ -1102,7 +1120,7 @@ function Get-MyMeritToolsRoot {
 function Get-MyMeritAppRoot {
     foreach ($scope in @('Process', 'User', 'Machine')) {
         $v = [Environment]::GetEnvironmentVariable('MYMERITAPP', $scope)
-        if (-not [string]::IsNullOrWhiteSpace($v)) {
+        if ((Test-HubConfiguredPathUsable -Path $v -Name 'MYMERITAPP')) {
             return Expand-HomePath $v
         }
     }

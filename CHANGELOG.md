@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.5.134] - 2026-09-06
+### Fixed
+- Hub ignores stale environment roots whose drive is unavailable, preventing `Join-Path` crashes during PowerShell relaunch.
+
 ## [0.5.133] - 2026-09-06
 ### Fixed
 - Hub option 1 now explicitly reconfigures `MYMERITTOOLS` and `MYMERITAPP` instead of silently reusing stale paths.
