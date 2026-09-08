@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.190] - 2026-09-07
+### Changed
+- Added a friendly hosted-path FAQ covering consumer IDs, MERIT-managed services, the beginner route, and optional self-hosting.
+- Added the same explanation to the `merit-demo` usage guide for consistent messaging.
+- Promoted `skills-v0.5.190` to the approved default CompatSet.
+
 ## [0.5.189] - 2026-09-07
 ### Changed
 - Clarified that `npm install` is an optional screenshot lab, not part of the normal beginner check.
