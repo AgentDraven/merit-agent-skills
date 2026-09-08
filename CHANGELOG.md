@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [0.5.184] - 2026-09-07
+### Fixed
+- Fixed the README Collaboration link with an explicit anchor.
+### Changed
+- Replaced the repetitive adventure diagram/table with a true decision tree and short user-focused route descriptions.
+- Removed internal NextRel/vault-instruction language from the public beginner explanation.
+- Promoted `skills-v0.5.184` to the approved default CompatSet.
+
 ## [0.5.183] - 2026-09-07
 ### Changed
 - Added a plain-language “Which adventure fits you?” decision flowchart and outcome table before the beginner path matrix.

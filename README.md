@@ -4,7 +4,7 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 
 ### Peel-The-Onion beginner guide 🧅
 
-Every beginner pathway is explained in three layers: **Start**, **Make progress**, and **Finish**. Each layer includes at least three concrete sub-checks covering the action, what MERIT does, and the evidence to look for. This is the required README standard and a NextRel requirement for vault L1 `MERIT.instructions`.
+Every beginner pathway is explained in three layers: **Start**, **Make progress**, and **Finish**. Each layer shows the action, what MERIT does for you, and the evidence to look for.
 
 **Quick index:** [Choose your adventure](#which-adventure-fits-you-) · [Start paths](#start-here--pick-your-adventure) · [Peel-The-Onion cards](#peel-the-onion-cards-three-steps-three-checks-each-) · [Additional options](#-for-additional-options) · [Public vs private SSOT](#public-vs-private-ssot) · [Quick install](#-quick-install) · [Dinner walkthrough](#-build-your-app-over-dinner)
 
@@ -14,22 +14,19 @@ Pick the outcome you want—not a command you have to decode. Every route is saf
 
 ```mermaid
 flowchart TD
-  Q{"What do you want today?"}
-  Q -->|"See MERIT work on this laptop"| TRY["🚀 Try MERIT\nHub-guided local demo"]
-  Q -->|"Make a simple app appear quickly"| HELLO["👋 Hello-world app\nquick local /play proof"]
-  Q -->|"Shape the demo into my idea"| DINNER["🍽️ Build over dinner\nbrand, story, preview, share"]
-  Q -->|"Give my AI editor MERIT helpers"| IDE["🧠 Skills in my IDE\ninstall helpers; no app created"]
-  TRY --> NEXT["Then: 3V local proof → OC cloud publish → OCV hosted walkthrough"]
-  HELLO --> NEXT
-  DINNER --> NEXT
+  START{"Is this your first MERIT visit\nor does this laptop need setup?"}
+  START -->|"Yes"| TRY["🚀 Try MERIT\nHub 1 → 2 → 3"]
+  START -->|"No"| IDEA{"Do you want to\nshape the demo into your idea?"}
+  IDEA -->|"Yes"| DINNER["🍽️ Build over dinner\nbrand, story, preview, share"]
+  IDEA -->|"No"| HELPER{"Do you need an app proof\nor AI-editor helpers?"}
+  HELPER -->|"App proof"| HELLO["👋 Hello-world app\nquick local /play proof"]
+  HELPER -->|"AI-editor helpers"| IDE["🧠 Skills in my IDE\nno app created"]
 ```
 
-| If you say… | Choose this path | What you get today | Best when |
-|---|---|---|---|
-| “Show me what MERIT does.” | 🚀 **Try MERIT** | Hub sets up the laptop, installs the approved skills, and opens a working local demo. | This is your first visit or you want the complete guided tour. |
-| “Just give me a tiny working example.” | 👋 **Hello-world app** | A fast local `merit-demo` proof: open `/play/`, see **Hosted Ready**, and try the workbench. | Hub setup is already done and you want the shortest app check. |
-| “I want to make this feel like my product.” | 🍽️ **Build over dinner** | A friendly evening walkthrough for changing the demo’s name, story, branding, and sharing a preview. | You are ready to turn the example into your own idea. |
-| “I want MERIT tools inside Cursor/Codex/another IDE.” | 🧠 **Skills in my IDE** | Installs guidance skills into the selected AI host; it does **not** create or publish an app. | You want an AI helper first, or want it alongside any of the other paths. |
+- **🚀 Try MERIT** — the complete first-time trip: the Hub prepares the laptop, installs OSS, and opens a working demo.
+- **👋 Hello-world app** — the shortest local proof when setup is already complete: open `/play/`, see **Hosted Ready**, and use the workbench.
+- **🍽️ Build over dinner** — the creative route: give the demo your name, story, and branding, then preview or share it.
+- **🧠 Skills in my IDE** — installs MERIT helpers into your AI editor. It helps with the other routes but does not create an app by itself.
 
 > **Recommended first trip:** choose **🚀 Try MERIT**, then follow `1 Setup → 2 Install OSS → 3 Try it → 3V Validate → OC Publish → OCV hosted walkthrough`. Pick **👋 Hello-world** only when steps 1 and 2 are already complete.
 
@@ -219,6 +216,7 @@ cd merit-agent-skills
 
 Registry source of truth: [`cfg/agent_hosts.json`](cfg/agent_hosts.json).
 
+<a id="collaboration--suggest-a-host"></a>
 <table><tr><td bgcolor="#0d9488"><strong><big><big>🤝 Collaboration — suggest a host</big></big></strong></td></tr></table>
 
 MERIT aims to be the **one-stop** public path for builders on **any** AI IDE, agentic harness, or autonomous agent � not just the hosts above.
