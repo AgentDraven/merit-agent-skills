@@ -555,7 +555,7 @@ function Ensure-VercelLinked {
     }
     Push-Location $TargetRoot
     try {
-        Write-Host "vercel link: npx vercel link --yes --scope $Scope"
+        Write-Host "vercel link: MERIT-managed project link"
         & npx vercel link --yes --scope $Scope
         if ($LASTEXITCODE -ne 0) { throw "vercel link failed (exit $LASTEXITCODE). Log in with vercel login, check --vercel-scope / vercel_scope, then retry." }
     } finally {
@@ -581,7 +581,7 @@ function Invoke-Deploy {
             npm run build
             if ($LASTEXITCODE -ne 0) { throw "npm run build failed (exit $LASTEXITCODE). Fix build errors, then retry deploy or create." }
         }
-        Write-Host "npx vercel --prod --scope $scope"
+        Write-Host "vercel deploy: MERIT-managed production publish"
         & npx vercel --prod --scope $scope
         if ($LASTEXITCODE -ne 0) { throw "vercel --prod failed (exit $LASTEXITCODE). Fix the Vercel error above, then: .\merit.ps1 deploy --path <repo>" }
     } finally {
