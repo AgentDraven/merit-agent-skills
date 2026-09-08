@@ -2228,6 +2228,16 @@ function Resolve-MeritPwshExe {
     return $null
 }
 
+function Resolve-HubPowerShellRunner {
+    $preferred = Resolve-MeritPwshExe
+    if ($preferred) { return $preferred }
+    $fallback = Get-Command powershell -ErrorAction SilentlyContinue
+    if ($fallback -and $fallback.Source) { return $fallback.Source }
+    $current = Join-Path $PSHOME 'powershell.exe'
+    if (Test-Path -LiteralPath $current) { return $current }
+    throw 'No PowerShell runner is available. Install PowerShell 7+ or use the Windows PowerShell 5.1 launcher.'
+}
+
 function Install-MeritToolsPwshPortable {
     if (-not $Script:HubOnWindows) {
         Show-PwshInstallGuide
@@ -3460,9 +3470,21 @@ function Invoke-HubTryIt {
             } else {
                 $log = Join-Path $demoRoot 'merit-demo docs\IAR\evidence\hub-serve.log'
                 New-Item -ItemType Directory -Force -Path (Split-Path $log) | Out-Null
-                Start-Process -FilePath (Get-Command pwsh -ErrorAction Stop).Source -WorkingDirectory $demoRoot -ArgumentList @('-NoProfile','-File',$cli,'serve') -RedirectStandardOutput $log -RedirectStandardError $log -WindowStyle Minimized | Out-Null
-                Start-Sleep -Seconds 2
-                Write-Ok 'Started the merit-demo HTTP server on port 3000 (output -> IAR/evidence/hub-serve.log).'
+                $runner = Resolve-HubPowerShellRunner
+                Start-Process -FilePath $runner -WorkingDirectory $demoRoot -ArgumentList @('-NoProfile','-File',$cli,'serve') -RedirectStandardOutput $log -RedirectStandardError $log -WindowStyle Minimized | Out-Null
+                $ready = $false
+                for ($i = 0; $i -lt 20; $i++) {
+                    Start-Sleep -Milliseconds 250
+                    try {
+                        $probe = Invoke-WebRequest -UseBasicParsing -Uri 'http://localhost:3000/play/' -TimeoutSec 1 -ErrorAction Stop
+                        if ($probe.StatusCode -ge 200 -and $probe.StatusCode -lt 500) { $ready = $true; break }
+                    } catch { }
+                }
+                if ($ready) {
+                    Write-Ok 'Started the merit-demo HTTP server on port 3000 (output -> IAR/evidence/hub-serve.log).'
+                } else {
+                    Write-Warn 'The merit-demo HTTP server did not answer within 5 seconds; check IAR/evidence/hub-serve.log.'
+                }
             }
             Start-Process 'http://localhost:3000/play/'
             Write-Ok 'Serving merit-demo over HTTP and opening http://localhost:3000/play/.'
@@ -3498,7 +3520,7 @@ function Invoke-HubOc {
     $preflight = Join-Path $Script:HubRoot 'oc-preflight.ps1'
     if (Test-Path -LiteralPath $preflight) {
         Write-Attention 'Running OC preflight: local routes, CompatSet pin/artifact, merit-prod health, and here.now (if configured).'
-        & (Get-Command pwsh -ErrorAction Stop).Source -NoProfile -File $preflight -DemoRoot $demo
+        & (Resolve-HubPowerShellRunner) -NoProfile -File $preflight -DemoRoot $demo
         if ($LASTEXITCODE -ne 0) { $Script:HubStepFailed=$true; Write-Fail 'OC stopped by preflight. Fix the listed checks, then retry O.'; Write-HubReceipt 'OC'; return }
     }
     $cid = ''
@@ -3985,7 +4007,7 @@ function Invoke-HubOcTutorial {
         Write-Ok "OC tutorial helper ready: $script"
     } catch { Write-Fail "Could not download OC tutorial helper: $($_.Exception.Message)"; return }
     Write-Attention 'OCV: walking through the published play, registration, and marketing URLs from the OC receipt.'
-    & (Get-Command pwsh -ErrorAction Stop).Source -NoProfile -File $script -BenchRoot $bench
+    & (Resolve-HubPowerShellRunner) -NoProfile -File $script -BenchRoot $bench
 }
 
 function Invoke-HubTryItValidate {
@@ -3995,9 +4017,9 @@ function Invoke-HubTryItValidate {
     while ($true) {
         Write-Host ''
         Write-Host '3V CHECKS' -ForegroundColor Cyan
-        Write-Host '1  Open /play/ (Hosted Ready + mounted workbench)'
-        Write-Host '2  Open Register free (hosted MERIT route)'
-        Write-Host '3  Open Marketing portal (/portal/)'
+        Write-Host '1  Open /play/ (local page + hosted MERIT workbench)'
+        Write-Host '2  Open Register free (hosted; may open the MERIT commerce guide)'
+        Write-Host '3  Open Marketing portal (local /portal/; OC/OCV opens the hosted copy)'
         Write-Host '4  Run merit.ps1 verify'
         Write-Host '5  Run merit.ps1 e2e'
         Write-Host 'A  Run all checks'
@@ -4008,11 +4030,11 @@ function Invoke-HubTryItValidate {
             $demo = Get-MyMeritAppRoot; $repo = Join-Path $demo 'merit-demo'; $cli = Join-Path $repo 'merit.ps1'
             switch -Regex ($c) {
                 '^1$' { Start-Process $url; Write-Ok 'Opened /play/. Confirm Hosted Ready and mounted workbench.' }
-                '^2$' { Start-Process 'https://merit-prod.vercel.app/store/merit-demo/register'; Write-Ok 'Opened Register free route.' }
-                '^3$' { Start-Process 'http://localhost:3000/portal/'; Write-Ok 'Opened Marketing portal.' }
-                '^4$' { & (Get-Command pwsh).Source -NoProfile -File $cli verify }
-                '^5$' { & (Get-Command pwsh).Source -NoProfile -File $cli e2e }
-                '^[Aa]$' { Start-Process $url; Start-Process 'https://merit-prod.vercel.app/store/merit-demo/register'; Start-Process 'http://localhost:3000/portal/'; & (Get-Command pwsh).Source -NoProfile -File $cli verify; & (Get-Command pwsh).Source -NoProfile -File $cli e2e }
+                '^2$' { Start-Process 'https://merit-prod.vercel.app/store/merit-demo/register'; Write-Ok 'Opened hosted Register free. A redirect to the MERIT commerce guide is expected when you are learning how SKUs and subscriptions work.' }
+                '^3$' { Start-Process 'http://localhost:3000/portal/'; Write-Ok 'Opened the local marketing portal. Use OC then OCV when you want the hosted portal URL.' }
+                '^4$' { & (Resolve-HubPowerShellRunner) -NoProfile -File $cli verify }
+                '^5$' { & (Resolve-HubPowerShellRunner) -NoProfile -File $cli e2e }
+                '^[Aa]$' { $runner = Resolve-HubPowerShellRunner; Start-Process $url; Start-Process 'https://merit-prod.vercel.app/store/merit-demo/register'; Start-Process 'http://localhost:3000/portal/'; & $runner -NoProfile -File $cli verify; & $runner -NoProfile -File $cli e2e }
                 default { Write-Warn 'Choose 1, 2, 3, 4, 5, A, or 0.' }
             }
         } catch { Write-Fail ("3V check failed: " + $_.Exception.Message) }

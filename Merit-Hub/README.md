@@ -87,11 +87,11 @@ Every pathway follows the same rhythm: **Start → Make progress → Finish**.
    - Choose `2` to install the pinned OSS skills.
 2. **Make progress**
    - Choose `3`; Hub refreshes `merit-demo` and serves HTTP on port 3000.
-   - Open `/play/` and confirm Hosted Ready plus the mounted workbench.
+   - Open local `/play/`; its workbench is loaded from MERIT-hosted services, so **Hosted Ready** is the expected message.
    - Run `3V` to repeat browser, verify, and E2E checks.
 3. **Finish**
-   - Confirm Register free opens the hosted route.
-   - Confirm the local marketing portal opens over HTTP.
+   - Confirm **Register free** opens the hosted MERIT route; it may redirect to the commerce guide when the demo tenant is not yet provisioned.
+   - Confirm the local `/portal/` marketing page opens over HTTP. The hosted marketing URL is supplied later by `OC` and reviewed with `OCV`.
    - Keep the receipt/evidence before moving to `OC`.
 
 ### Publish OSS in Cloud / OC ☁️
@@ -143,9 +143,9 @@ Every pathway follows the same rhythm: **Start → Make progress → Finish**.
 
 **After `3` / `3V` (local demo):**
 
-- `/play/` opens over HTTP and reports Hosted Ready.
+- `/play/` opens locally over HTTP and reports Hosted Ready after loading the hosted workbench.
 - The workbench is mounted and `Register free` opens the hosted route.
-- `/portal/` opens locally; no `C:\` file path is treated as hosting proof.
+- `/portal/` opens locally; no `C:\` file path is treated as hosting proof. `OC`/`OCV` are the hosted-portal proof.
 - `3V` checks can be repeated in any order. See the [consumer checklist](../merit-demo%20docs/IAR/MERIT_DEMO_TDD_CHECKLIST.md).
 
 **After `OC` (OSS in the Cloud):**
