@@ -14,7 +14,7 @@ Operator-only vault workflows are optional and not required for a first-time pub
 
 | Section | Topic |
 |---------|--------|
-| [What is free without any account](#what-is-free-without-any-account) | Clone, scaffold, local PAR |
+| [What is free without any account](#what-is-free-without-any-account) | Hub download, scaffold, local PAR |
 | [Accounts — what needs one and when](#accounts--what-needs-one-and-when) | GitHub, Vercel, here.now, Supabase, commerce |
 | [Platform vs BYOK](#platform-vs-byok-what-merit-hosts-for-you) | PAR CDN, meritstore, meritsubs, data plane |
 | [Validation tiers](#validation-tiers) | Tier 1–4 on a clean machine |
@@ -30,14 +30,12 @@ Operator-only vault workflows are optional and not required for a first-time pub
 
 ### 1. Local Setup
 
-Create an empty directory, clone the pinned skills release, clone `merit-demo`, install the skills, and verify the baseline:
+Run Hub **1 → 2 → 3**. It prepares the folders, downloads the approved OSS tools and `merit-demo`, and opens the local experience. No release tag or Git command is needed:
 
 ```powershell
-mkdir C:\MeritOverDinner
-cd C:\MeritOverDinner
-git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
-cd merit-agent-skills
-.\merit.ps1 skills install --target Cursor
+cd C:\Tools
+.\Merit-Hub.ps1
+# Choose 1, then 2, then 3
 ```
 
 ### 2. AutoMagic create (preferred)
@@ -81,7 +79,7 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 
 | Action | Accounts needed |
 |--------|-----------------|
-| `git clone` public `merit-agent-skills` or `merit-demo` | **None** (anonymous HTTPS read) |
+| Hub **2** downloads the approved tools; Hub **3** downloads the demo | **None** |
 | `merit apply` + `verify` | **None** |
 | Open `play/index.html` locally (static PAR from CDN) | **None** |
 | `scripts/smoke-freemium.ps1` / `scripts/smoke-freemium.sh` (Hub **G**) | **None** � ignore optional `verify NOTE` community files; do **not** create a here.now account |
@@ -95,10 +93,10 @@ There are two separate actions:
 
 | Action | When | Command |
 |--------|------|---------|
-| Clone/download repo | Advanced/manual path; beginners should use Hub 1 → 2 → 3 | `git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git` |
+| Download OSS tools | Hub **2** after Hub **1** | Hub selects the approved CompatSet automatically; no Git command or tag choice |
 | Install skills into an AI IDE host | Optional, only when you want the host to see skill instructions as installed skills | Windows `.\merit.ps1 skills install --target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./merit.sh skills install -Target …` (aliases: `Claude`, `Agents`; `Project` needs `-Path`) |
 
-You can run `merit.ps1` / `merit.sh` directly from the cloned repo without installing skills. Install is for agent authoring convenience, not for runtime deployment.
+After Hub **2**, run `merit.ps1` / `merit.sh` from the downloaded skills folder. IDE skill installation is for agent-authoring convenience, not runtime deployment.
 
 ---
 
@@ -147,7 +145,7 @@ If `npm install` has not been run, the MERIT wrapper still performs non-visual c
 You do **not** need all three of here.now, Vercel, and Supabase to **start** Tier-2. They unlock different surfaces:
 
 ```text
-Tier 2 local only     →  git clone + merit + verify       (0 cloud accounts)
+Tier 2 local only     →  Hub 1 → 2 → merit verify          (0 cloud accounts)
 Angle 1 play          →  PAR CDN only                     (0 cloud accounts)
 OC play + marketing   →  Hub OC on merit-prod             (0 cloud accounts)
 Angle 2 marketing     →  + here.now                       (1 account)
@@ -190,20 +188,17 @@ Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
 | Tier | Goal | GitHub login? | Typical accounts |
 |------|------|---------------|------------------|
 | **1** | `smoke-freemium.ps1` in temp dir | No | None |
-| **2** | Isolated folder: clone @ tag + scaffold or merit-demo verify/e2e | **No** | None for local; optional deploy accounts later |
+| **2** | Hub-installed tools: scaffold or merit-demo verify/e2e | **No** | None for local; optional deploy accounts later |
 | **3** | Vault `skills verify` (operators only) | N/A | Vault access |
 | **4** | Production host + optional portals | Only if pushing your fork | Vercel ± here.now ± Supabase |
 
 ### Tier 2 — vanilla start (recommended)
 
 ```powershell
-mkdir C:\MeritValidate
-cd C:\MeritValidate
+# Run Hub 1 then 2 first; this folder is created by Hub 2.
+cd $env:MYMERITAPP\merit-agent-skills
 
-git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git
-cd merit-agent-skills
-
-mkdir ..\my-app
+mkdir ..\my-app -Force
 .\merit.ps1 init --path ..\my-app
 # edit ..\my-app\.merit_launch.md
 .\merit.ps1 apply --path ..\my-app
@@ -213,11 +208,8 @@ mkdir ..\my-app
 Linux/macOS:
 
 ```bash
-mkdir -p ~/MeritValidate
-cd ~/MeritValidate
-
-git clone --branch skills-v0.5.130 https://github.com/AgentDraven/merit-agent-skills.git
-cd merit-agent-skills
+# Run Hub 1 then 2 first; this folder is created by Hub 2.
+cd "$MYMERITAPP/merit-agent-skills"
 
 mkdir -p ../my-app
 ./merit.sh init --path ../my-app
@@ -229,9 +221,8 @@ mkdir -p ../my-app
 Optional canonical consumer (still no GitHub login):
 
 ```powershell
-cd C:\MeritValidate
-git clone https://github.com/Mr-PI-Bala/merit-demo.git
-cd merit-demo
+# Run Hub 3 first; it downloads the canonical demo.
+cd $env:MYMERITAPP\merit-demo
 npm install
 npm run verify
 npm run e2e
@@ -317,7 +308,7 @@ See `cfg/meritstore_tenant.json` (`status: pending_platform_provision`) on merit
 
 ### Refresh rails without touching `app_logic/` (`apps refresh`)
 
-When the platform catalog, UserGuide, or play shell move, do **not** delete+create (that would risk `app_logic/`). From **skills-v0.5.130+**:
+When the platform catalog, UserGuide, or play shell move, do **not** delete+create (that would risk `app_logic/`). With the current Hub-installed release:
 
 ```powershell
 .\merit.ps1 apps refresh --path ..\<app>
@@ -373,7 +364,7 @@ Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-fre
 ## FAQ
 
 **Do I need a GitHub account for Tier 2?**  
-No. `git clone` of public repos works without login. Add GitHub when you fork or push.
+No. Hub downloads the public tools and demo without login. Add GitHub only when you decide to fork or push your own remote.
 
 **Do I need here.now, Vercel, and Supabase together?**  
 No. They are independent unlocks: local PAR (none), marketing (here.now), live app (Vercel), persistent app DB (Supabase on your deploy).

@@ -8,37 +8,32 @@ This is the public creator path for launching a MERIT consumer with one local la
 
 ### 1. Local Setup
 
-Create a clean working directory and clone the two public repos:
+Start the Hub and let it prepare the working folders and download the OSS tools plus demo. You do not need to choose a tag or type a Git command:
 
 ```powershell
-mkdir C:\MyMeritApp
-cd C:\MyMeritApp
-git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
-git clone https://github.com/Mr-PI-Bala/merit-demo.git
-cd merit-agent-skills
-.\merit.ps1 skills install --target Cursor
+cd C:\Tools
+.\Merit-Hub.ps1
+# Choose: 1 Setup, then 2 Install OSS, then 3 Try it
 ```
 
 Linux/macOS:
 
 ```bash
-mkdir -p ~/MyMeritApp
-cd ~/MyMeritApp
-git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
-git clone https://github.com/Mr-PI-Bala/merit-demo.git
-cd merit-agent-skills
-./merit.sh skills install --target Cursor
+# Download and run Merit-Hub.sh as described in Merit-Hub/README.md.
+# Choose: 1 Setup, then 2 Install OSS, then 3 Try it.
 ```
 
-Baseline check:
+After Hub **2** and **3**, run the baseline check from the downloaded skills folder:
 
 ```powershell
+cd $env:MYMERITAPP\merit-agent-skills
 .\merit.ps1 verify --path ..\merit-demo
 ```
 
 For Linux/macOS:
 
 ```bash
+cd "$MYMERITAPP/merit-agent-skills"
 ./merit.sh verify --path ../merit-demo
 ```
 

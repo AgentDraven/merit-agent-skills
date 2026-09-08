@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
-    { "pin": "skills-v0.5.184", "releasedAt": "2026-09-07", "status": "supported", "notes": "User-first adventure decision tree; fixed Collaboration link" },
-    { "pin": "skills-v0.5.183", "releasedAt": "2026-09-07", "status": "supported", "notes": "First backup; beginner path chooser and plain-language outcomes" },
-    { "pin": "skills-v0.5.182", "releasedAt": "2026-09-07", "status": "supported", "notes": "Second backup; concise menu includes CLEAN sequence" }
+    { "pin": "skills-v0.5.185", "releasedAt": "2026-09-07", "status": "supported", "notes": "Hub-first public docs; no raw clone or stale tag instructions" },
+    { "pin": "skills-v0.5.184", "releasedAt": "2026-09-07", "status": "supported", "notes": "First backup; user-first adventure decision tree and Collaboration link" },
+    { "pin": "skills-v0.5.183", "releasedAt": "2026-09-07", "status": "supported", "notes": "Second backup; beginner path chooser and plain-language outcomes" }
   ]
 }

@@ -171,32 +171,11 @@ cd C:\Tools
 
 Follow [🍽️ Build Your App Over Dinner](docs/howto/launch-over-dinner.md). It turns the three rows above into three tiny actions each.
 
-The ` .\` prefix matters: PowerShell does not execute a script from the current directory when you type only its filename. The Hub handles the PowerShell-version check and offers to install/launch PowerShell 7 when only Windows PowerShell is available. Menu **2** / **J** clones the pinned OSS release for you — no full repo clone is required first. Cleanup keys (**G** sprawl scan, **A** archive, **P** pristine): [Merit-Hub/README.md](Merit-Hub/README.md).
+The ` .\` prefix matters: PowerShell does not execute a script from the current directory when you type only its filename. The Hub handles the PowerShell-version check and offers to install/launch PowerShell 7 when only Windows PowerShell is available. Menu **2** / **J** downloads the approved OSS tools for you—there is no release tag or Git command to choose. Cleanup keys (**G** sprawl scan, **A** archive, **P** pristine): [Merit-Hub/README.md](Merit-Hub/README.md).
 
 **Fresh-device check:** after Hub **2 → 3**, open the seeded demo and run `.\merit.ps1 where`, `.\merit.ps1 verify`, then `.\merit.ps1 serve`. Open `/play/` and confirm **Hosted Ready**, the mounted workbench, and **Register free**. Use `.\merit.ps1 closeout` for the full release gate.
 
-**Advanced/manual clone** (most users should use Hub **1 → 2 → 3** above):
-
-```powershell
-mkdir C:\MyMeritApp
-cd C:\MyMeritApp
-git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
-cd merit-agent-skills
-.\merit.ps1 skills install --target Cursor
-# omit -Target to print usage (no default host)
-# Use Merit-Hub for device setup (required full command):
-# pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1
-```
-
-Linux/macOS:
-
-```bash
-mkdir -p ~/MyMeritApp
-cd ~/MyMeritApp
-git clone --branch skills-v0.5.162 https://github.com/AgentDraven/merit-agent-skills.git
-cd merit-agent-skills
-./merit.sh skills install --target Cursor
-```
+**No Git commands needed:** Hub **1 → 2 → 3** creates the local tools and demo. Once Hub **2** is complete, use the installed `merit.ps1` from the skills folder only for named checks such as `where`, `verify`, `serve`, and `closeout`.
 
 <table><tr><td bgcolor="#0d9488"><strong><big><big>🧩 Multi-runtime install (same `skills/` tree)</big></big></strong></td></tr></table>
 

@@ -42,7 +42,7 @@ Use any folder (example: `C:\MyMeritApp`). You are **not** connecting this lapto
 
 ### 1A — Start the Hub
 
-The Hub downloads the correct toolkit and app for you. You do not need to type `git clone` or choose a release tag.
+The Hub downloads the correct toolkit and app for you. You do not need to manage source-control downloads or choose a release tag.
 
 ```powershell
 cd C:\Tools

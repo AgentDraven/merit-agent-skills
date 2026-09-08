@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.185] - 2026-09-07
+### Changed
+- Replaced public `git clone` and manually pinned-release instructions with the Hub-first flow: **1 Setup → 2 Install OSS → 3 Try it**.
+- Updated the deployment and usage guides to use Hub-installed `merit.ps1` / `merit.sh` for validation and launch work.
+- Promoted `skills-v0.5.185` to the approved default CompatSet.
+
 ## [0.5.184] - 2026-09-07
 ### Fixed
 - Fixed the README Collaboration link with an explicit anchor.
