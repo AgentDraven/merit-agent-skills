@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.186] - 2026-09-07
+### Fixed
+- Pristine now refuses a stale `MYMERITAPP` path inside `MYMERITTOOLS`, portable `pwsh`, or the running Hub; it explains the safe recovery through menu **M** without deleting that path.
+- Recursive cleanup helpers now time out after 15 seconds instead of blocking the Hub indefinitely on a locked/access-denied tree.
+- Promoted `skills-v0.5.186` to the approved default CompatSet.
+
 ## [0.5.185] - 2026-09-07
 ### Changed
 - Replaced public `git clone` and manually pinned-release instructions with the Hub-first flow: **1 Setup → 2 Install OSS → 3 Try it**.

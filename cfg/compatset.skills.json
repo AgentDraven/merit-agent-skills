@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
-    { "pin": "skills-v0.5.185", "releasedAt": "2026-09-07", "status": "supported", "notes": "Hub-first public docs; no raw clone or stale tag instructions" },
-    { "pin": "skills-v0.5.184", "releasedAt": "2026-09-07", "status": "supported", "notes": "First backup; user-first adventure decision tree and Collaboration link" },
-    { "pin": "skills-v0.5.183", "releasedAt": "2026-09-07", "status": "supported", "notes": "Second backup; beginner path chooser and plain-language outcomes" }
+    { "pin": "skills-v0.5.186", "releasedAt": "2026-09-07", "status": "supported", "notes": "Pristine rejects tools/runtime as app benches and times out locked cleanup helpers" },
+    { "pin": "skills-v0.5.185", "releasedAt": "2026-09-07", "status": "supported", "notes": "First backup; Hub-first public docs with no raw clone instructions" },
+    { "pin": "skills-v0.5.184", "releasedAt": "2026-09-07", "status": "supported", "notes": "Second backup; user-first adventure decision tree and Collaboration link" }
   ]
 }

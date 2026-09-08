@@ -10,6 +10,8 @@
 
 **Output:** normal runs are concise and show three ready-to-use sequences: `START` for a new laptop, `PROVE` for local-to-cloud validation, and `CLEAN` for safe cleanup: `G` scan → `A` archive → `P` pristine (`S` is the non-destructive soft-cleanup alternative). Add `-Verbose` (or `-v`) to show the full journey map, paths, environment scopes, drill-ins, and diagnostic details.
 
+**Cleanup safety:** Pristine never treats the Hub, `MYMERITTOOLS`, or portable `pwsh` as an app bench. If an old `MYMERITAPP` value points there, Hub refuses it, removes nothing from that path, explains why, and tells you to use **M** to select a separate app folder. Cleanup helpers time out rather than waiting forever on a locked path.
+
 ---
 
 ## Quick index 🧭

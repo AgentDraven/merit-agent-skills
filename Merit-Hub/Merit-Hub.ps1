@@ -121,8 +121,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "release": "0.5.185",
-  "skillsPin": "skills-v0.5.185",
+  "release": "0.5.186",
+  "skillsPin": "skills-v0.5.186",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -1495,10 +1495,19 @@ function Refresh-ProcessPath {
 }
 
 function Invoke-HubNativeQuiet {
-    param([string]$FilePath, [string[]]$NativeArgs)
+    param(
+        [string]$FilePath,
+        [string[]]$NativeArgs,
+        [int]$TimeoutSeconds = 15
+    )
     if (-not (Test-Path -LiteralPath $FilePath)) { return }
     try {
-        $p = Start-Process -FilePath $FilePath -ArgumentList $NativeArgs -Wait -PassThru -WindowStyle Hidden -ErrorAction SilentlyContinue
+        $p = Start-Process -FilePath $FilePath -ArgumentList $NativeArgs -PassThru -WindowStyle Hidden -ErrorAction SilentlyContinue
+        if (-not $p.WaitForExit($TimeoutSeconds * 1000)) {
+            try { $p.Kill() } catch { }
+            Write-Warn ("cleanup helper timed out after {0}s: {1}" -f $TimeoutSeconds, (Split-Path -Leaf $FilePath))
+            return $null
+        }
         return $p.ExitCode
     }
     catch { return $null }
@@ -1790,17 +1799,42 @@ Do not double-click. Do not run Hub from a path under MYMERITAPP after Pre-Prist
 }
 
 function Test-HubSafeWipeTarget {
-    param([string]$Path)
-    if ([string]::IsNullOrWhiteSpace($Path)) { return $false }
+    param(
+        [string]$Path,
+        [ref]$Reason
+    )
+    if ($Reason) { $Reason.Value = '' }
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        if ($Reason) { $Reason.Value = 'path is empty' }
+        return $false
+    }
     $full = Expand-HomePath $Path
     $homeRoot = Expand-HomePath $HOME
     $dev = Get-DevRoot
+    $tools = Expand-HomePath (Get-MyMeritToolsRoot)
+    $hubScript = Expand-HomePath $Script:HubScriptPath
+    $pathPrefix = $full.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+    $toolsPrefix = $tools.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
     $roots = @($homeRoot)
     if ($Script:HubOnWindows) {
         $roots += [IO.Path]::GetFullPath('C:\')
     }
-    if ($full -in $roots) { return $false }
-    if ($full -eq (Expand-HomePath $dev)) { return $false }
+    if ($full -in $roots) {
+        if ($Reason) { $Reason.Value = 'it is a machine/home root' }
+        return $false
+    }
+    if ($full -eq (Expand-HomePath $dev)) {
+        if ($Reason) { $Reason.Value = 'it is the shared dev root' }
+        return $false
+    }
+    if ($full -eq $tools -or $full.StartsWith($toolsPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        if ($Reason) { $Reason.Value = "it is inside MYMERITTOOLS ($tools)" }
+        return $false
+    }
+    if ($hubScript.StartsWith($pathPrefix, [StringComparison]::OrdinalIgnoreCase) -or $hubScript -eq $full) {
+        if ($Reason) { $Reason.Value = 'it contains the running Hub' }
+        return $false
+    }
     return $true
 }
 
@@ -1833,8 +1867,10 @@ function Invoke-WipeOssBenches {
     }
     $hubDir = Expand-HomePath $Script:HubRoot
     foreach ($fullOss in $targets) {
-        if (-not (Test-HubSafeWipeTarget $fullOss)) {
-            Write-Fail "Refusing to wipe unsafe OSS path: $fullOss"
+        $unsafeReason = ''
+        if (-not (Test-HubSafeWipeTarget -Path $fullOss -Reason ([ref]$unsafeReason))) {
+            Write-Fail "Refusing to wipe unsafe OSS path: $fullOss ($unsafeReason)"
+            Write-Note 'No files were removed from that path. Use menu M to set a separate MYMERITAPP bench, then retry.'
             continue
         }
         if ($fullOss -eq $hubDir) {
