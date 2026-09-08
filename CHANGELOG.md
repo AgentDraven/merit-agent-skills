@@ -1,3 +1,8 @@
+## [0.5.198] - 2026-09-08
+
+### Docs
+- Documented the consumer-owned registration lookup and confirmed that the standard Hub setup path and CLI usage are unchanged.
+
 ## [0.5.197] - 2026-09-08
 
 ### Fixed
@@ -1101,5 +1106,3 @@ The repository contains older tagged releases whose original changelog sections 
 - `skills-v0.5.62`–`skills-v0.5.76`: closeout, access, ownership, and release-policy iterations.
 
 For exact historical details, use `git show skills-vX.Y.Z` and the tag annotation. New releases must use a dedicated `## [X.Y.Z]` section and are rejected by closeout when `VERSION` lacks changelog coverage.
-
-\r\n

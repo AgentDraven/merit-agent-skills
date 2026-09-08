@@ -1,7 +1,7 @@
 # MERIT root Hub launcher.
 # Keep this file small and stable: the implementation lives under Merit-Hub/.
 $ErrorActionPreference = 'Stop'
-$release = '0.5.197'
+$release = '0.5.198'
 Write-Host "MERIT Skills $release | checking for the current Hub" -ForegroundColor Cyan
 $implementation = Join-Path $PSScriptRoot 'Merit-Hub\Merit-Hub.ps1'
 $url = 'https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1'
@@ -39,5 +39,3 @@ finally {
 
 & $implementation @args
 exit $LASTEXITCODE
-
-\r\n

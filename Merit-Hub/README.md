@@ -94,6 +94,8 @@ Every pathway follows the same rhythm: **Start → Make progress → Finish**.
    - Confirm the local `/portal/` marketing page opens over HTTP. The hosted marketing URL is supplied later by `OC` and reviewed with `OCV`.
    - Keep the receipt/evidence before moving to `OC`.
 
+**Registration URL ownership:** `3V` first uses the `ocRegisterUrl` recorded by the `OC` receipt. Before `OC`, it falls back to the selected consumer repository's `cfg/alpha_trial_consumer.json` and reads only its `register_url`. If neither is available, Hub reports that registration is not configured. Consumer IDs and tenant URLs are therefore supplied by the consumer or by the provider receipt, never by the generic skills release.
+
 ### Publish OSS in Cloud / OC ☁️
 
 1. **Start**
@@ -147,6 +149,7 @@ Every pathway follows the same rhythm: **Start → Make progress → Finish**.
 - The workbench is mounted and `Register free` opens the hosted route.
 - `/portal/` opens locally; no `C:\` file path is treated as hosting proof. `OC`/`OCV` are the hosted-portal proof.
 - `3V` checks can be repeated in any order. See the [consumer checklist](../merit-demo%20docs/IAR/MERIT_DEMO_TDD_CHECKLIST.md).
+- The standard setup path is unchanged: `1` setup → `2` install skills → `3` try the demo → `3V` validate. The consumer contract is read automatically; no new setup command or flag is required.
 
 **After `OC` (OSS in the Cloud):**
 
