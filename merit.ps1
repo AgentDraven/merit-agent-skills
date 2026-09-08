@@ -28,8 +28,8 @@ Commands:
   init --path <repo>       Create .merit_launch.md and gitignore it
   apply --path <repo>      Read .merit_launch.md and generate config + .env.local
   verify --path <repo>     Verify local MERIT scaffold
-  e2e --path <repo>        Run consumer static smoke E2E (npm run e2e)
-  e2e:playwright --path <repo>  Run consumer browser E2E (npm run e2e:playwright)
+  e2e --path <repo>        Run consumer static smoke checks
+  e2e:playwright --path <repo>  Run consumer browser checks
   deploy --path <repo>     Apply launch file, link Vercel if needed, deploy production
   portal --path <repo>     Apply launch file, then publish here.now portal targets
   all --path <repo>        Apply, deploy Vercel, then publish portal targets
@@ -1084,7 +1084,7 @@ function Invoke-ConsumerE2E {
     }
     Push-Location $TargetRoot
     try {
-        Write-Host "consumer ${Mode}: npm run $scriptName"
+        Write-Host "consumer ${Mode}: MERIT-managed test"
         & npm run $scriptName
         if ($LASTEXITCODE -ne 0) {
             throw "consumer $Mode failed (exit $LASTEXITCODE)"

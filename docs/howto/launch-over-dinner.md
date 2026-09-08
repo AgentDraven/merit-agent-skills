@@ -135,20 +135,18 @@ Each line can become **one ToI pack** in Step 3. Night one uses **one pack only*
 Double-click `merit-demo\play\index.html` in your browser.  
 Widgets load from MERIT’s public package CDN — no account.
 
-Optional (Node.js installed):
+Optional deeper check:
 
 ```powershell
 cd C:\MyMeritApp\merit-demo
-npm install
-npm run verify
+.\merit.ps1 verify
 ```
 
 Linux/macOS:
 
 ```bash
 cd ~/MyMeritApp/merit-demo
-npm install
-npm run verify
+./merit.sh verify
 ```
 
 **Step 2 complete.** Named product, your words, topic list, local preview. Still no Vercel, Supabase, or Square.

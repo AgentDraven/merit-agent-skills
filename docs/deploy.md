@@ -66,7 +66,7 @@ What `apply` creates:
 | `cfg/portals.json` | here.now portal surfaces |
 | `.gitignore` entries | Protect `.merit_launch.md`, `.env.local`, and `.vercel` |
 
-Vercel still requires `.vercel/project.json`. MERIT does not replace that file because Vercel owns it. `merit deploy` now runs `npx vercel link --yes --scope <your-vercel-scope>` automatically when `.vercel/project.json` is missing, then records local state tags in `.env.local` (`MERIT_VERCEL_LINKED`, `MERIT_VERCEL_DEPLOYED`, `MERIT_VERCEL_DEPLOYED_AT`).
+Vercel still requires `.vercel/project.json`. MERIT does not replace that file because Vercel owns it. `merit deploy` links the project automatically when that file is missing, then records local state tags in `.env.local` (`MERIT_VERCEL_LINKED`, `MERIT_VERCEL_DEPLOYED`, `MERIT_VERCEL_DEPLOYED_AT`).
 
 ### 3. Add Marketing Front-End & Save
 

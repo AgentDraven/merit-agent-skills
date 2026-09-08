@@ -91,7 +91,7 @@ Then implement the Must bodies after ACK.
 | Do | Don’t |
 |----|--------|
 | Put product features in `app_logic/` | Fork meritsubs / meritstore / Square / Supabase provider code into the app |
-| Use merit-prod cloud URL for proof | Treat laptop `npx serve` as the product host |
+| Use merit-prod cloud URL for proof | Treat a laptop-only preview server as the product host |
 | Align strings with portal / PRD tone | Invent Must FRs the PRD does not list |
 | Fail closed on entitlement gaps | Soft-fail into unpaid Plus features |
 | Keep FR IDs stable in `FR_MAP.md` | Rewrite auth/store/payments “just for dinner” |

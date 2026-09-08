@@ -99,29 +99,27 @@ After **Get the free MERIT tools (2)**, run `merit.ps1` / `merit.sh` from the do
 
 ### Optional picture-check lab
 
-You can finish the beginner journey without installing Node or running `npm`. The Hub and `merit verify` already perform the useful no-account checks.
+You can finish the standard journey without installing extra developer tooling. The Hub and `merit verify` already perform the useful no-account checks.
 
 The main example is `merit-demo`. A separate `merit-test` example is used by maintainers for extra service checks.
 
-Choose this extra lab only when you want screenshots of every page. `npm install` downloads the small testing tools listed by the demo; it does **not** install MERIT, change your app, or create an account:
+Choose this extra lab only when you want screenshots of every page. The MERIT helper runs the small browser check when its optional tools are available; it does **not** install MERIT, change your app, or create an account:
 
 ```powershell
 cd ..\merit-demo
-npm install
-npm run e2e:playwright
+.\merit.ps1 e2e:playwright
 ```
 
 Linux/macOS:
 
 ```bash
 cd ../merit-demo
-npm install
-npm run e2e:playwright
+./merit.sh e2e:playwright
 ```
 
-What happens: the package manager reads `package.json`, downloads the declared Playwright test tool, and the picture-check command opens a temporary local browser. It checks the same routes a visitor sees and saves pictures under `merit-demo docs/evidence/`.
+What happens: the helper opens a temporary local browser, checks the same routes a visitor sees, and saves pictures under `merit-demo docs/evidence/`.
 
-If `npm install` fails or you skip it, nothing is broken. Run `merit verify` (or the Hub’s **Validate my local demo (3V)**) for the normal proof. Screenshots are a bonus, not a requirement for trying MERIT.
+If the optional browser check is unavailable or you skip it, nothing is broken. Run `merit verify` (or the Hub’s **Validate my local demo (3V)**) for the normal proof. Screenshots are a bonus, not a requirement for trying MERIT.
 
 ---
 
@@ -234,7 +232,7 @@ The Hub-created example app (still no GitHub login):
 # First choose Try it (3); it downloads and opens the example demo.
 cd $env:MYMERITAPP\merit-demo
 # Then choose Validate my local demo (3V) in the Hub.
-# No npm command is needed for the beginner path.
+# No extra developer-tool command is needed for the standard path.
 ```
 
 For this local path, skip private operator tools and hosting settings you do not own.

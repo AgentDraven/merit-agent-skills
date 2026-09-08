@@ -4,6 +4,6 @@
   "sets": [
     { "pin": "skills-v0.5.193", "releasedAt": "2026-09-07", "status": "supported", "notes": "Standard-usage wording and advanced operator pointer keep the public path uncluttered" },
     { "pin": "skills-v0.5.192", "releasedAt": "2026-09-07", "status": "supported", "notes": "Advanced provider, screenshot, commerce, and command details are collapsed" },
-    { "pin": "skills-v0.5.191", "releasedAt": "2026-09-07", "status": "supported", "notes": "Beginner path removes npm work; hosted creator and partner journey is front and center" }
+    { "pin": "skills-v0.5.191", "releasedAt": "2026-09-07", "status": "supported", "notes": "Standard path keeps extra developer tooling out of the tour; hosted creator and partner journey is front and center" }
   ]
 }

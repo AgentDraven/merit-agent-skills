@@ -241,21 +241,19 @@ Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-fre
 <table><tr><td bgcolor="#0d9488"><strong><big><big>🧪 E2E Testing Using Playwright (optional)</big></big></strong></td></tr></table>
 
 
-The public quickstart does not require Node dependencies, but full visual validation does. In `merit-demo`, run:
+The public quickstart does not require extra developer tooling. For the optional full visual check in `merit-demo`, use the MERIT helper:
 
 ```powershell
-npm install
 .\merit.ps1 e2e
 ```
 
 Linux/macOS:
 
 ```bash
-npm install
 ./merit.sh e2e
 ```
 
-`npm install` installs the demo’s declared Node dev tooling, including `@playwright/test`; the repo postinstall attempts to install the Chromium browser used for screenshots. The MERIT wrapper then runs the route/provider checks and writes screenshots under `merit-demo docs/evidence/`. If dependencies are not installed, `verify` can still pass, but screenshot capture is skipped.
+The MERIT helper runs the demo checks and writes screenshots under `merit-demo docs/evidence/` when the optional browser tools are available. If that optional check is unavailable, the normal `verify` and Hub **3V** path still provide the standard proof.
 
 <table><tr><td bgcolor="#0d9488"><strong><big><big>🧠 Skills</big></big></strong></td></tr></table>
 

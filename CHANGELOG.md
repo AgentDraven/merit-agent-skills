@@ -14,7 +14,7 @@
 
 ## [0.5.191] - 2026-09-07
 ### Changed
-- Removed the remaining beginner `npm` example and routed users through Hub **3V** validation.
+- Removed the remaining beginner package-manager example and routed users through Hub **3V** validation.
 - Added a three-step hosted creator, affiliate, and design-partner journey that stays on OC.
 - Hid technical attribution fields behind an optional details panel.
 - Promoted `skills-v0.5.191` to the approved default CompatSet.
@@ -27,7 +27,7 @@
 
 ## [0.5.189] - 2026-09-07
 ### Changed
-- Clarified that `npm install` is an optional screenshot lab, not part of the normal beginner check.
+- Clarified that screenshot capture is an optional lab, not part of the normal standard check.
 - Corrected the Playwright package description and added a friendly fallback when Node tools are skipped.
 - Promoted `skills-v0.5.189` to the approved default CompatSet.
 
