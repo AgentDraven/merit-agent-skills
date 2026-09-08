@@ -121,8 +121,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "release": "0.5.181",
-  "skillsPin": "skills-v0.5.181",
+  "release": "0.5.182",
+  "skillsPin": "skills-v0.5.182",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -3879,6 +3879,7 @@ function Show-MeritHubHelp {
     } else {
         Write-Host '  START:  1 Setup -> 2 Install -> 3 Try it' -ForegroundColor Green
         Write-Host '  PROVE:  3V local -> OC publish -> OCV hosted' -ForegroundColor Cyan
+        Write-Host '  CLEAN:  G scan -> A archive -> P pristine  (S = soft cleanup)' -ForegroundColor Yellow
         Write-Host '  MORE:   4/VC Vault | 5/5R/RC Repo | I skills | K rollback | 0 exit' -ForegroundColor DarkCyan
         Write-Note 'Use -Verbose (or -v) for the journey map, paths, environment, and diagnostic details.'
     }

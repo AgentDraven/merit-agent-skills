@@ -8,7 +8,7 @@
 
 **Raw download:** `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
 
-**Output:** normal runs are concise. Add `-Verbose` (or `-v`) to show the full journey map, paths, environment scopes, drill-ins, and diagnostic details.
+**Output:** normal runs are concise and show three ready-to-use sequences: `START` for a new laptop, `PROVE` for local-to-cloud validation, and `CLEAN` for safe cleanup: `G` scan → `A` archive → `P` pristine (`S` is the non-destructive soft-cleanup alternative). Add `-Verbose` (or `-v`) to show the full journey map, paths, environment scopes, drill-ins, and diagnostic details.
 
 ---
 

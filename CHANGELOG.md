@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.182] - 2026-09-07
+### Changed
+- The concise Hub menu now includes `CLEAN: G scan -> A archive -> P pristine`, with `S` identified as the soft-cleanup alternative.
+- Promoted `skills-v0.5.182` to the current approved CompatSet and retained the prior two releases as rollback choices.
+
 ## [0.5.181] - 2026-09-07
 ### Changed
 - Hub now defaults to concise receipts, outcomes, and next actions. `-Verbose` or `-v` reveals the full journey map, environment scopes, paths, drill-ins, and diagnostic detail; this preference survives Hub relaunches.

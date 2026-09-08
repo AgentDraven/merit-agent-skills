@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
-    { "pin": "skills-v0.5.181", "releasedAt": "2026-09-07", "status": "supported", "notes": "Concise-by-default Hub; use -Verbose or -v for diagnostic details" },
-    { "pin": "skills-v0.5.180", "releasedAt": "2026-09-07", "status": "supported", "notes": "One public release label; first rollback backup" },
-    { "pin": "skills-v0.5.179", "releasedAt": "2026-09-07", "status": "supported", "notes": "Release-identity alignment; second rollback backup" }
+    { "pin": "skills-v0.5.182", "releasedAt": "2026-09-07", "status": "supported", "notes": "Concise menu now includes CLEAN: G scan → A archive → P pristine" },
+    { "pin": "skills-v0.5.181", "releasedAt": "2026-09-07", "status": "supported", "notes": "First backup; concise-by-default Hub with -Verbose diagnostics" },
+    { "pin": "skills-v0.5.180", "releasedAt": "2026-09-07", "status": "supported", "notes": "Second backup; one public release label" }
   ]
 }
