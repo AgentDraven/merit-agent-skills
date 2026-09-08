@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "status": "validated",
   "target": "C:\\DApps\\merit-agent-skills",
-  "validatedAt": "2026-09-07T20:55:15.5761750-07:00",
-  "gitHead": "31b57be",
+  "validatedAt": "2026-09-07T21:14:50.2303422-07:00",
+  "gitHead": "bc1e084",
   "gitStatus": [
     " M CHANGELOG.md",
     " M Merit-Hub.ps1",

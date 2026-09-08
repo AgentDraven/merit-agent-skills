@@ -12,6 +12,8 @@
 
 **Cleanup safety:** Pristine never treats the Hub, `MYMERITTOOLS`, or portable `pwsh` as an app bench. If an old `MYMERITAPP` value points there, Hub refuses it, removes nothing from that path, explains why, and tells you to use **M** to select a separate app folder. Cleanup helpers time out rather than waiting forever on a locked path.
 
+**One permanent MERIT home:** Hub stores all new backups, step receipts, state, and run history in `%USERPROFILE%\.MERIT\` on Windows or `~/.MERIT/` on macOS/Linux. This location is independent of `MYMERITTOOLS` and `MYMERITAPP`, survives Pristine, and is hidden on Windows. If older Hub backup folders exist, they are left untouched and listed in `.MERIT\state\legacy-storage-locations.txt`; nothing historical is silently moved or deleted.
+
 ---
 
 ## Quick index 🧭

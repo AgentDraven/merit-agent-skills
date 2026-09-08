@@ -98,9 +98,12 @@ if (-not $Script:HubScriptPath) { $Script:HubScriptPath = $MyInvocation.MyComman
 $Script:HubRoot = Split-Path -Parent $Script:HubScriptPath
 $Script:HubBoundParameters = [hashtable]$PSBoundParameters
 $Script:HubVerbose = [bool]($Detailed -or $PSBoundParameters.ContainsKey('Verbose'))
-# Prefer MYMERITTOOLS\backups so Pristine (which wipes MYMERITAPP) cannot delete the archive.
+# Persistent user-owned Hub home. It survives tool/app path changes and Pristine.
+$Script:MeritHome = $null
 $Script:BackupRoot = $null
 $Script:HistoryLog = $null
+$Script:ReceiptRoot = $null
+$Script:StateRoot = $null
 $Script:TranscriptStarted = $false
 $Script:HubStepFailed = $false
 $Script:HubInteractiveAction = $false
@@ -121,8 +124,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "release": "0.5.186",
-  "skillsPin": "skills-v0.5.186",
+  "release": "0.5.187",
+  "skillsPin": "skills-v0.5.187",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -147,42 +150,61 @@ function Get-HubRunHint {
     return "pwsh -NoProfile -ExecutionPolicy Bypass -File `"$($Script:HubScriptPath)`""
 }
 
-function Initialize-HubBackupRoot {
+function Get-MeritHomeRoot {
+    return Expand-HomePath (Join-Path $HOME '.MERIT')
+}
+
+function Set-MeritHomeHidden {
+    param([string]$Path)
+    if (-not $Script:HubOnWindows -or -not (Test-Path -LiteralPath $Path)) { return }
+    try {
+        $item = Get-Item -LiteralPath $Path -Force
+        $item.Attributes = $item.Attributes -bor [IO.FileAttributes]::Hidden
+    }
+    catch { }
+}
+
+function Write-MeritLegacyStorageNote {
+    param([string]$StateRoot)
+    $candidates = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     $tools = $null
     try { $tools = Get-MyMeritToolsRoot } catch { }
-    if ([string]::IsNullOrWhiteSpace($tools)) {
-        foreach ($scope in @('Process', 'User', 'Machine')) {
-            $v = [Environment]::GetEnvironmentVariable('MYMERITTOOLS', $scope)
-            if (-not [string]::IsNullOrWhiteSpace($v)) { $tools = $v; break }
-        }
-    }
-    if ([string]::IsNullOrWhiteSpace($tools)) {
-        $tools = if ($Script:HubOnWindows) { 'C:\Tools' } else { (Join-Path $HOME 'Tools') }
-    }
-    try { $tools = Expand-HomePath $tools } catch { }
-    $candidate = Join-Path $tools 'backups'
-    $app = $null
-    try { $app = Get-MyMeritAppRoot } catch { }
-    if ($app) {
+    foreach ($root in @($tools, (Split-Path -Parent $Script:HubRoot), $Script:HubRoot, (Join-Path $HOME 'MeritHub-backups'))) {
+        if ([string]::IsNullOrWhiteSpace($root)) { continue }
         try {
-            $appFull = Expand-HomePath $app
-            $candFull = Expand-HomePath $candidate
-            if ($candFull.StartsWith(($appFull.TrimEnd('\', '/') + '\'), [StringComparison]::OrdinalIgnoreCase) -or
-                $candFull -eq $appFull) {
-                $hubDir = Expand-HomePath $Script:HubRoot
-                if (-not ($hubDir.StartsWith(($appFull.TrimEnd('\', '/') + '\'), [StringComparison]::OrdinalIgnoreCase))) {
-                    $candidate = Join-Path $Script:HubRoot 'backups'
-                }
-                else {
-                    $candidate = Join-Path $env:USERPROFILE 'MeritHub-backups'
-                }
+            $full = Expand-HomePath $root
+            foreach ($leaf in @('backups', 'Merit-Hub-backups')) {
+                $candidate = if ((Split-Path -Leaf $full) -eq $leaf) { $full } else { Join-Path $full $leaf }
+                if (Test-Path -LiteralPath $candidate -PathType Container) { [void]$candidates.Add($candidate) }
             }
         }
         catch { }
     }
-    $Script:BackupRoot = $candidate
-    New-Item -ItemType Directory -Force -Path $Script:BackupRoot | Out-Null
-    $Script:HistoryLog = Join-Path $Script:BackupRoot 'Merit-Hub-history.log'
+    $legacy = @($candidates | Where-Object { $_ -ne $Script:BackupRoot })
+    if ($legacy.Count -eq 0) { return }
+    $note = Join-Path $StateRoot 'legacy-storage-locations.txt'
+    $body = @(
+        'MERIT legacy storage locations',
+        'New Hub backups, history, receipts, and state live under: ' + $Script:MeritHome,
+        'The folders below were found from older Hub layouts. They were left untouched so no history is silently moved or deleted.',
+        '',
+        $legacy
+    ) -join [Environment]::NewLine
+    Set-Content -LiteralPath $note -Value $body -Encoding UTF8
+}
+
+function Initialize-HubBackupRoot {
+    $Script:MeritHome = Get-MeritHomeRoot
+    $Script:BackupRoot = Join-Path $Script:MeritHome 'backups'
+    $historyRoot = Join-Path $Script:MeritHome 'history'
+    $Script:ReceiptRoot = Join-Path $Script:MeritHome 'receipts'
+    $Script:StateRoot = Join-Path $Script:MeritHome 'state'
+    foreach ($dir in @($Script:MeritHome, $Script:BackupRoot, $historyRoot, $Script:ReceiptRoot, $Script:StateRoot)) {
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+    }
+    Set-MeritHomeHidden -Path $Script:MeritHome
+    $Script:HistoryLog = Join-Path $historyRoot 'Merit-Hub-history.log'
+    Write-MeritLegacyStorageNote -StateRoot $Script:StateRoot
     return $Script:BackupRoot
 }
 
@@ -3106,6 +3128,7 @@ function Get-HubVaultDest {
 
 function Write-HubReceipt {
     param([string]$Step)
+    [void](Initialize-HubBackupRoot)
     $tools = Get-MyMeritToolsRoot
     $bench = Get-MyMeritAppRoot
     $venv = Join-Path $tools 'merit-venv'
@@ -3113,6 +3136,22 @@ function Write-HubReceipt {
     $demo = Join-Path $bench 'merit-demo'
     $status = Join-Path $bench 'oss-bench.json'
     $vault = Get-HubVaultDest
+    try {
+        $stamp = Get-Date -Format 'yyyyMMdd-HHmmssfff'
+        $receipt = [ordered]@{
+            recordedAt = (Get-Date).ToString('o')
+            step       = $Step
+            release    = (Get-HubConfig).release
+            hubScript  = $Script:HubScriptPath
+            toolsRoot  = $tools
+            appRoot    = $bench
+            historyLog = $Script:HistoryLog
+        } | ConvertTo-Json
+        $receiptPath = Join-Path $Script:ReceiptRoot ("{0}-step-{1}.json" -f $stamp, $Step)
+        Set-Content -LiteralPath $receiptPath -Value $receipt -Encoding UTF8
+        Write-Info "Receipt saved: $receiptPath"
+    }
+    catch { Write-Warn "Could not save Hub receipt: $($_.Exception.Message)" }
     Write-Host ''
     Write-Host "  RECEIPT - step $Step" -ForegroundColor Cyan
     Write-Host '  LEGEND: 1 Setup | 2 Install OSS | 3 Try it | 3V Validate demo | O/OC OSS in Cloud + OCV hosted validation | 0 Stop' -ForegroundColor DarkGray
@@ -3888,6 +3927,7 @@ function Invoke-HubVestigialScan {
 
 function Show-MeritHubHelp {
     param([switch]$AgentLaw)
+    [void](Initialize-HubBackupRoot)
     $cfg = Get-HubConfig
     Write-Header 'Merit-Hub'
     Write-Info "Location: $Script:HubScriptPath"

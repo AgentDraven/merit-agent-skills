@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.187] - 2026-09-07
+### Changed
+- Hub now uses one permanent user-owned state home: `%USERPROFILE%\.MERIT\` / `~/.MERIT/`, independent of tools and app paths.
+- New backups, step receipts, state, and Hub history are separated under that home; older backup locations remain untouched and are recorded for review.
+- Promoted `skills-v0.5.187` to the approved default CompatSet.
+
 ## [0.5.186] - 2026-09-07
 ### Fixed
 - Pristine now refuses a stale `MYMERITAPP` path inside `MYMERITTOOLS`, portable `pwsh`, or the running Hub; it explains the safe recovery through menu **M** without deleting that path.
