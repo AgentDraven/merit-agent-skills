@@ -22,7 +22,7 @@ This document is the **only** guide you need for night one. Technical permutatio
 
 | Row | 1. Start | 2. Next | 3. Finish |
 |---|---|---|---|
-| 🧰 **Get ready** | [Open PowerShell](#1a--start-the-hub) | [Run the Hub](#1a--start-the-hub) | [Choose Hub 2 + 3](#1b--merit-demo) |
+| 🧰 **Get ready** | [Open PowerShell](#1a--start-the-hub) | [Run the Hub](#1a--start-the-hub) | [Get the free tools, then open the demo](#1b--merit-demo) |
 | 🎨 **Make it yours** | [Pick a name](#step-2--make-it-yours) | [Add your story](#step-2--make-it-yours) | [Preview](#step-2--make-it-yours) |
 | 🚀 **Share it** | [Register](#step-3--share-it) | [Choose Journal or AMA](#step-3--share-it) | [Share your idea](#step-3--share-it) |
 
@@ -56,11 +56,11 @@ cd ~/Tools
 ./Merit-Hub.sh
 ```
 
-Choose Hub **2** to install the pinned OSS toolkit, then **3** to seed the demo. The Hub records paths and release pins for you.
+Choose **Get the free MERIT tools (2)**, then **Try it (3)** to open the example demo. The Hub records the folders and tested-together version for you.
 
 ### 1B — merit-demo
 
-Pre-scaffolded application: Journal, AMA, portal pages, legal templates, subscriber funnel cfg. Hub **3** seeds it for you.
+Ready-made application: Journal, AMA, portal pages, legal templates, and starter visitor flows. **Try it (3)** opens it for you.
 
 ### GitHub account?
 
@@ -74,7 +74,7 @@ Open the `merit-demo` folder in your AI IDE and ask it to help edit branding or 
 
 ### 1C — Confirm the fresh-device install
 
-After Hub **2** and **3** finish, run this short acceptance check from the seeded demo folder:
+After **Get the free MERIT tools (2)** and **Try it (3)** finish, run this short check from the example demo folder:
 
 ```powershell
 cd $env:MYMERITAPP\merit-demo
@@ -179,10 +179,10 @@ Free CC registration
 ### 3A — Free registration
 
 1. Open the creator registration URL for your assigned **consumer id** (MERIT operator provides this after onboarding).
-2. Sign up with email — **Content Creator** tier (free).
+2. Sign up with email for the free creator option.
 3. No Square, Supabase, or Vercel for this step.
 
-**Pattern example** (canonical demo, not your app):
+**Example only** (the shared demo, not your app):
 
 `https://merit-prod.vercel.app/store/merit-demo/register`
 
@@ -212,7 +212,7 @@ Both are already in merit-demo. Most creators start with **Journal** or **AMA**.
 - DIRT routes interested readers to your topic.
 - merit-demo is the **face** they see.
 - **Guests** and **free subscribers** arrive first.
-- **Plus** paid tier and **payouts** require separate setup (see below).
+- Paid Plus and payouts require separate setup later (see below).
 
 **Step 3 complete.** Registered CC with one live topic lane.
 
@@ -227,7 +227,7 @@ Both are already in merit-demo. Most creators start with **Journal** or **AMA**.
 | **PAR CDN** | Free UI widgets (`merit_workbench`, `journal`) on `/play/` |
 | **meritstore** (platform) | Registration and checkout UI for provisioned creators |
 | **DIRT + CoC** | Overnight discovery and routing for your ToI |
-| **Free guest tier** | Visitors use Journal/AMA with daily freemium caps |
+| **Free guest access** | Visitors use Journal/AMA with daily limits |
 
 ### You set up only when needed (lazy accounts)
 
@@ -306,16 +306,16 @@ Read only after the three steps.
 
 | Document | Purpose |
 |----------|---------|
-| [docs/usage.md](docs/usage.md) | Tiers, BYOK, commerce |
+| [docs/usage.md](docs/usage.md) | Accounts, hosting, and common questions |
 | [merit-demo OPERATOR_PROVISION](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md) | Vercel + Supabase + meritstore tenant |
-| [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) | Angle 1–4 bundles |
+| [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) | Pick a path by the result you want |
 | [DIRT user guide](https://github.com/AgentDraven/dirt/blob/main/DIRT%20docs/dirt_usage.md) | Full discovery dashboard |
 
 ---
 
 ## Checklist
 
-- [ ] Step 1 — Ran Hub 1 → 2 → 3 (or manually cloned merit-agent-skills @ the current supported CompatSet) and merit-demo
+- [ ] Step 1 — Chose Set up this laptop (1), Get the free MERIT tools (2), and Try it (3)
 - [ ] Step 2 — Updated `branding.json`, portal text, `MyTopics.txt`, previewed `play/index.html`
 - [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed

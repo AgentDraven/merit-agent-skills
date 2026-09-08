@@ -15,7 +15,7 @@ Pick the outcome you want—not a command you have to decode. Every route is saf
 ```mermaid
 flowchart TD
   START{"Is this your first MERIT visit\nor does this laptop need setup?"}
-  START -->|"Yes"| TRY["🚀 Try MERIT\nHub 1 → 2 → 3"]
+  START -->|"Yes"| TRY["🚀 Try MERIT\nprepare laptop → get tools → open demo"]
   START -->|"No"| IDEA{"Do you want to\nshape the demo into your idea?"}
   IDEA -->|"Yes"| DINNER["🍽️ Build over dinner\nbrand, story, preview, share"]
   IDEA -->|"No"| HELPER{"Do you need an app proof\nor AI-editor helpers?"}
@@ -28,7 +28,7 @@ flowchart TD
 - **🍽️ Build over dinner** — the creative route: give the demo your name, story, and branding, then preview or share it.
 - **🧠 Skills in my IDE** — installs MERIT helpers into your AI editor. It helps with the other routes but does not create an app by itself.
 
-> **Recommended first trip:** choose **🚀 Try MERIT**, then follow `1 Setup → 2 Install OSS → 3 Try it → 3V Validate → OC Publish → OCV hosted walkthrough`. Pick **👋 Hello-world** only when steps 1 and 2 are already complete.
+> **Recommended first trip:** choose **🚀 Try MERIT**, then follow **Set up this laptop (1) → Get the free tools (2) → Try it (3) → Validate my local demo (3V) → OSS in Cloud (OC) → Walk through my hosted demo (OCV)**. Pick **👋 Hello-world** only when your laptop is already prepared and the free tools are installed.
 
 <a id="start-here--pick-your-adventure"></a>
 <table><tr><td bgcolor="#1f6feb"><strong><big><big>🧭 Start here — pick your adventure</big></big></strong></td></tr></table>
@@ -48,10 +48,10 @@ flowchart TD
 
 #### 🚀 I want to try MERIT
 
-1. **Start** — open PowerShell, run `\.\Merit-Hub.ps1`, then choose **1** and **2**.
-   - Hub checks prerequisites.
-   - Hub installs the approved CompatSet.
-   - Receipt shows the skills path and pin.
+1. **Start** — open PowerShell, run `\.\Merit-Hub.ps1`, then choose **Set up this laptop (1)** and **Get the free MERIT tools (2)**.
+   - The Hub checks what this laptop needs.
+   - The Hub downloads a tested-together version of the free tools.
+   - The receipt shows where the tools were placed and which version was used.
 2. **Make progress** — choose **3 Try it**.
    - Hub reuses a clean local demo.
    - HTTP server starts on the reusable port.
@@ -72,7 +72,7 @@ flowchart TD
    - Preview through the local HTTP server.
    - Run verification after each change.
 3. **Finish** — validate and share the idea.
-   - Run closeout and review the receipt.
+   - Run the local check and review the receipt.
    - Choose a Journal or AMA surface.
    - Publish only after hosted checks pass.
 
@@ -93,13 +93,13 @@ flowchart TD
 
 #### 🧠 I want skills in my IDE
 
-1. **Start** — run `Merit-Hub.ps1` and choose **I**.
+1. **Start** — run `Merit-Hub.ps1` and choose **Install skills in my AI editor (I)**.
    - Select your host.
    - Hub checks the adapter and target.
    - Unrelated settings are preserved.
 2. **Make progress** — use the installed skills.
-   - Ask the IDE to follow MERIT law.
-   - Use closeout and 3-3 at the end of work.
+   - Ask the IDE to help with your MERIT project.
+   - Use the project’s own check list when you finish work.
    - Treat unsupported hosts as guidance-only.
 3. **Finish** — verify the installation.
    - Re-run **I** if the pin changes.
@@ -108,7 +108,7 @@ flowchart TD
 
 ### 🧰 For additional options
 
-Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](docs/usage.md), [deployment guide](docs/deploy.md), [try bundles](docs/TRY_BUNDLES.md), or [IAR architecture map](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md).
+Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [plain-English usage guide](docs/usage.md), [deployment guide](docs/deploy.md), or [choose-a-path guide](docs/TRY_BUNDLES.md).
 
 <details><summary>Reference map and advanced options</summary>
 
@@ -117,13 +117,13 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [usage guide](do
 | **Live ecosystems (bolt-on targets)** | [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json) � default **v00** until vault publishes **v01** as `live_public`. Hobby is never listed. |
 | **Laptop hub (easiest cold start)** | **[Download `Merit-Hub.ps1`](Merit-Hub/Merit-Hub.ps1)**, open Windows PowerShell or PowerShell 7, change to its folder, and run ` .\Merit-Hub.ps1`. The ` .\` prefix is required by PowerShell for a script in the current folder. The Hub detects Windows PowerShell 5.1, installs/launches `pwsh` when needed, and guides **1** → **2** → **3** (optional **OC**). Full menu + personas: [Merit-Hub/README.md](Merit-Hub/README.md). |
 | **Build over dinner (start here)** | **[docs/howto/launch-over-dinner.md](docs/howto/launch-over-dinner.md)** — 3 steps, no accounts night one |
-| **OSS internals** | Hub **2** loads `merit/modules/Merit.Oss.ps1` in the skills clone. No separate Bootstrap product or live copy is used. |
-| **Usage (accounts, tiers, commerce)** | [docs/usage.md](docs/usage.md) |
+| **How the free tools arrive** | Choose **Get the free MERIT tools (2)**. The Hub downloads the tested-together release; you do not choose a Git tag. |
+| **Usage (accounts and hosting)** | [docs/usage.md](docs/usage.md) |
 | **Launch/deploy PoV** | [docs/deploy.md](docs/deploy.md) — one local `.merit_launch.md`, one `merit` command |
 | **LLD map (audit)** | [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md) |
 | **Full freemium showcase** | [Mr-PI-Bala/merit-demo](https://github.com/Mr-PI-Bala/merit-demo) — workbench, journal, AMA, subs, legal |
-| **Clean-clone proof** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) — independent consumer ID using the same hosted providers |
-| **Try bundles (Angles 1–4)** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
+| **Independent example app** | [Mr-PI-Bala/merit-test](https://github.com/Mr-PI-Bala/merit-test) — a separate example used by maintainers to check shared services |
+| **Choose a try path** | [docs/TRY_BUNDLES.md](docs/TRY_BUNDLES.md) |
 | **Skills only** | Merit-Hub menu **I** or `pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Tools\Merit-Hub.ps1 -InstallSkills Cursor` (after **J**). Or from cloned repo: `.\merit.ps1 skills install --target Cursor|ClaudeCode|Codex|VSCode|Hermes|OpenClaw|GrokBot|Devin` |
 | **Mini upgrade (mmUpgrade)** | `/merit-mm-upgrade` or say **mmUpgrade** — gap analysis → FR/AGENT_REQ (no vault) |
 | **Referral / design partner** | [`skills/merit-referral`](skills/merit-referral/SKILL.md) — free attribution + portal recipes (no billing) |
@@ -195,8 +195,8 @@ The ` .\` prefix matters: PowerShell does not execute a script from the current 
 
 Registry source of truth: [`cfg/agent_hosts.json`](cfg/agent_hosts.json).
 
-<a id="collaboration--suggest-a-host"></a>
-<table><tr><td bgcolor="#0d9488"><strong><big><big>🤝 Collaboration — suggest a host</big></big></strong></td></tr></table>
+<a name="collaboration--suggest-a-host"></a>
+## Collaboration — suggest a host 🤝
 
 MERIT aims to be the **one-stop** public path for builders on **any** AI IDE, agentic harness, or autonomous agent � not just the hosts above.
 
@@ -206,29 +206,7 @@ MERIT aims to be the **one-stop** public path for builders on **any** AI IDE, ag
 - Where skills or instructions are loaded from (path, env var, or doc link)
 - Whether you want file-copy install (`merit.ps1 skills install --target �`) or CLI-only integration
 
-We add vetted hosts to [`cfg/agent_hosts.json`](cfg/agent_hosts.json) and promote `research` ? `supported` when install wiring lands. Same instruction chain (L1 ? L2 ? L3) for every host � hosts mount skills; they do not fork product law.
-
-**mmUpgrade** is public freeware (`merit-mm-upgrade`). Full **`merit-upgrade`** (IAR / hygiene / maturity / closeout) stays vault-only via `merit.ps1 runtime out` — not in this OSS tree.
-
-<table><tr><td bgcolor="#0d9488"><strong><big><big>🍽️ 3 Steps Over Dinner cheatsheet</big></big></strong></td></tr></table>
-
-
-Use this review order for human validation once code, docs, and E2E are complete:
-
-1. **Start here:** [docs/howto/launch-over-dinner.md](docs/howto/launch-over-dinner.md)
-   - Goal: confirm the zero-account, first-night story makes sense.
-2. **Understand the commands:** [docs/usage.md](docs/usage.md)
-   - Goal: verify clone, install, `init`, `apply`, `verify`, optional `e2e`, and optional `deploy`.
-3. **Deploy PoV:** [docs/deploy.md](docs/deploy.md)
-   - Goal: confirm `.merit_launch.md` is the one user-edited launch profile and generated files are explained.
-4. **Demo proof:** [merit-demo usage](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md)
-   - Goal: validate the hello-world consumer, screenshots, hosted provider links, and no local metered provider source.
-5. **Clean-clone proof:** [merit-test usage](https://github.com/Mr-PI-Bala/merit-test/blob/main/merit-test%20docs/merit_test_usage.md)
-   - Goal: confirm a second consumer identity uses the same hosted meritutils, meritsubs, and meritstore boundaries without inheriting `merit-demo` identity.
-6. **Release/audit map:** [docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md](docs/IAR/MERIT_AGENT_SKILLS_LLD_MAP.md)
-   - Goal: confirm the public skills repo is standalone, skills-only, and aligned to MERIT Prod.
-
-Optional confidence pass: run **E2E Testing Using Playwright** in both `merit-demo` and `merit-test` after `npm install`; screenshots prove the local routes and responsive flows, while provider checks prove the hosted MERIT boundary and independent consumer identities.
+When a suggested host is ready, we add it to [`cfg/agent_hosts.json`](cfg/agent_hosts.json) and make the Hub installer available. You only need to tell us which tool you use and where it expects skills to live.
 
 <table><tr><td bgcolor="#0d9488"><strong><big><big>🛠️ One public CLI</big></big></strong></td></tr></table>
 

@@ -13,17 +13,17 @@ Start the Hub and let it prepare the working folders and download the OSS tools 
 ```powershell
 cd C:\Tools
 .\Merit-Hub.ps1
-# Choose: 1 Setup, then 2 Install OSS, then 3 Try it
+# Choose: Set up this laptop (1), Get the free MERIT tools (2), then Try it (3)
 ```
 
 Linux/macOS:
 
 ```bash
 # Download and run Merit-Hub.sh as described in Merit-Hub/README.md.
-# Choose: 1 Setup, then 2 Install OSS, then 3 Try it.
+# Choose: Set up this laptop (1), Get the free MERIT tools (2), then Try it (3).
 ```
 
-After Hub **2** and **3**, run the baseline check from the downloaded skills folder:
+After **Get the free MERIT tools (2)** and **Try it (3)**, run the baseline check from the downloaded tools folder:
 
 ```powershell
 cd $env:MYMERITAPP\merit-agent-skills

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.188] - 2026-09-07
+### Changed
+- Rewrote public start, usage, dinner, deployment, and try-path guides in plain language with three-layer Peel-The-Onion walkthroughs.
+- Removed the internal release-review cheatsheet from the public README and repaired the Collaboration destination.
+- Promoted `skills-v0.5.188` to the approved default CompatSet.
+
 ## [0.5.187] - 2026-09-07
 ### Changed
 - Hub now uses one permanent user-owned state home: `%USERPROFILE%\.MERIT\` / `~/.MERIT/`, independent of tools and app paths.

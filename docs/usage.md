@@ -1,23 +1,17 @@
-# merit-agent-skills — usage
+# Use MERIT in plain English 🧭
 
-Public guide for the **OSS** path: `merit.ps1`, skills, and freemium try bundles.
-Operator-only vault workflows are optional and not required for a first-time public user.
+This guide explains what the free tools do, when an account is actually needed, and what to do after the Hub opens your first demo. You do not need private operator tools for a first-time public experience.
 
-**Related:** [TRY_BUNDLES.md](TRY_BUNDLES.md) · [README](../README.md) · [LICENSING.md](../LICENSING.md) · canonical consumer [merit-demo usage](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md)
-
-### Public vs private product law
-
-- **Public (this file + README + production Portal):** how to install, create, verify, deploy, and use free vs paid *hosted* services.
-- **Private (merit-private-vault only):** full platform PRD (`PRD_MERIT_AGENT_SKILLS_PLATFORM.md`, ACCEPTED for technical implement 2026-08-09). Not shipped in this OSS tree; operators with vault access implement FR-SK / commerce / PAR against that SSOT.
+**Related:** [Choose a try path](TRY_BUNDLES.md) · [Start here](../README.md) · [Licensing](../LICENSING.md) · [merit-demo walkthrough](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md)
 
 ## Document map
 
 | Section | Topic |
 |---------|--------|
-| [What is free without any account](#what-is-free-without-any-account) | Hub download, scaffold, local PAR |
+| [What is free without any account](#what-is-free-without-any-account) | Hub setup, local demo, and checks |
 | [Accounts — what needs one and when](#accounts--what-needs-one-and-when) | GitHub, Vercel, here.now, Supabase, commerce |
 | [Platform vs BYOK](#platform-vs-byok-what-merit-hosts-for-you) | PAR CDN, meritstore, meritsubs, data plane |
-| [Validation tiers](#validation-tiers) | Tier 1–4 on a clean machine |
+| [Ways to check your work](#ways-to-check-your-work) | From a quick laptop check to a live site |
 | [Commerce and payouts](#commerce-and-payouts-guest--creator--subscriber) | Who pays whom, KYC, Square |
 | [Attribution](#attribution-for-later-paid-conversion) | Optional consumer id, affiliate, promo |
 | [merit commands](#merit-commands) | CLI reference |
@@ -26,16 +20,16 @@ Operator-only vault workflows are optional and not required for a first-time pub
 
 ---
 
-## 3 Steps Over Dinner
+## Your first three steps
 
-### 1. Local Setup
+### 1. Let the Hub prepare your laptop
 
-Run Hub **1 → 2 → 3**. It prepares the folders, downloads the approved OSS tools and `merit-demo`, and opens the local experience. No release tag or Git command is needed:
+Run the Hub and choose **Set up this laptop (1)**, **Get the free MERIT tools (2)**, then **Try it (3)**. It prepares folders, downloads `merit-demo`, and opens the local experience. No release tag or Git command is needed:
 
 ```powershell
 cd C:\Tools
 .\Merit-Hub.ps1
-# Choose 1, then 2, then 3
+# Choose: Set up this laptop, Get the free MERIT tools, then Try it
 ```
 
 ### 2. AutoMagic create (preferred)
@@ -79,13 +73,13 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 
 | Action | Accounts needed |
 |--------|-----------------|
-| Hub **2** downloads the approved tools; Hub **3** downloads the demo | **None** |
+| The Hub downloads the free tools and then opens the demo | **None** |
 | `merit apply` + `verify` | **None** |
 | Open `play/index.html` locally (static PAR from CDN) | **None** |
-| `scripts/smoke-freemium.ps1` / `scripts/smoke-freemium.sh` (Hub **G**) | **None** � ignore optional `verify NOTE` community files; do **not** create a here.now account |
+| Optional automatic check (`scripts/smoke-freemium.ps1` / `.sh`) | **None** — ignore an optional community-file note; do **not** create a here.now account |
 | `merit-demo`: `npm install`, `npm run verify`, `npm run e2e` (PAR CDN HEAD) | **None** (network only) |
 
-**GitHub account is optional** for Tier-2. Use it only when you **fork**, **push** your own remote, open PRs, or use `gh` against private repos. Cloning and working locally does not require signing in.
+**A GitHub account is optional.** You need one only to save your own copy online, send a pull request, or work with a private repository. The normal local Hub path works without signing in.
 
 ## When skills are downloaded and installed
 
@@ -93,10 +87,10 @@ There are two separate actions:
 
 | Action | When | Command |
 |--------|------|---------|
-| Download OSS tools | Hub **2** after Hub **1** | Hub selects the approved CompatSet automatically; no Git command or tag choice |
-| Install skills into an AI IDE host | Optional, only when you want the host to see skill instructions as installed skills | Windows `.\merit.ps1 skills install --target Cursor|ClaudeCode|Codex|VSCode`; Linux/macOS `./merit.sh skills install -Target …` (aliases: `Claude`, `Agents`; `Project` needs `-Path`) |
+| Download the free tools | Choose **Get the free MERIT tools (2)** after setup | The Hub chooses the tested-together version automatically; no Git command or tag choice |
+| Add helpful skills to an AI editor | Optional, only when you want your editor to see the MERIT helpers | Choose **Install skills in my AI editor (I)** or use the named command for your editor |
 
-After Hub **2**, run `merit.ps1` / `merit.sh` from the downloaded skills folder. IDE skill installation is for agent-authoring convenience, not runtime deployment.
+After **Get the free MERIT tools (2)**, run `merit.ps1` / `merit.sh` from the downloaded tools folder when the Hub or a guide asks for a named check. Adding skills to an editor is optional help for writing; it does not run or publish your app.
 
 ---
 
@@ -104,8 +98,8 @@ After Hub **2**, run `merit.ps1` / `merit.sh` from the downloaded skills folder.
 
 Run this against both public proof consumers:
 
-- `merit-demo` is the canonical Hello World showcase.
-- `merit-test` is the independent clean-clone proof and must report consumer ID `merit-test`.
+- `merit-demo` is the main Hello World showcase.
+- `merit-test` is a separate example that maintainers use to check shared services.
 
 The dinner-path baseline only needs `merit verify`. Full screenshot validation is optional and requires Node dependencies in the consumer repo:
 
@@ -131,27 +125,26 @@ If `npm install` has not been run, the MERIT wrapper still performs non-visual c
 
 ## Accounts — what needs one and when
 
-| Service | Required for | Tier / angle | Who creates it |
+| Service | What it is for | When you need it | Who creates it |
 |---------|--------------|--------------|----------------|
-| **Git** (CLI) | Clone, local commits | Tier 2+ | Install only — no cloud account |
+| **Git** (CLI) | Saving versions on your laptop | Only if you choose to use source-control commands | Install only — no cloud account |
 | **GitHub** | Fork, push, PRs | Optional until you publish source | You |
-| **MERIT package route** (`merit-prod.vercel.app/pkg/meritutils`) | Free workbench/journal widgets | Angle 1 — always public | **Nobody** — MERIT provider CDN behind gateway |
-| **Vercel** | Live app at `*.vercel.app` | Tier 4 / deploy | You (BYOK) |
-| **here.now** | **Your** marketing site at `{slug}.here.now` | Angle 2 BYOK, or an **OC upgrade** via merit-prod (laptop never sees a key) | Angle 2: you (`HERENOW_API_KEY`). **OC needs no here.now account:** Hub **OC** publishes your `portal/` tree to MERIT at `merit-prod.vercel.app/apps/{oc-id}/play/site`; subscribers join at `merit-prod.vercel.app/store/{oc-id}/register`. |
+| **MERIT package route** (`merit-prod.vercel.app/pkg/meritutils`) | Free workbench and journal widgets | Always available for the local demo | **Nobody** — MERIT provides it |
+| **Vercel** | Your own live app at `*.vercel.app` | Only when you choose to run your own live site | You |
+| **here.now** | **Your** marketing site at `{slug}.here.now` | Only when you choose your own marketing host | You. **OC does not need a here.now account:** **OSS in Cloud (OC)** publishes your marketing page on MERIT hosting and prints its link. |
 | **Supabase** | Persistent journal/AMA + meritsubs data on **your** deploy | Full merit-demo deploy | You (consumer project) |
-| **meritstore tenant** | Checkout under **your** `consumer_id` | Angle 4 — operator provision | MERIT platform (after integration cert) |
+| **meritstore tenant** | Checkout under **your** `consumer_id` | Later, when you sell through MERIT | MERIT platform after onboarding |
 | **Square** (or tenant payment provider) | **Payout** from Plus subscriptions to you | After meritstore tenant + onboarding | You via platform tenant config |
 
-You do **not** need all three of here.now, Vercel, and Supabase to **start** Tier-2. They unlock different surfaces:
+You do **not** need here.now, Vercel, or Supabase to begin. They unlock different things later:
 
 ```text
-Tier 2 local only     →  Hub 1 → 2 → merit verify          (0 cloud accounts)
-Angle 1 play          →  PAR CDN only                     (0 cloud accounts)
-OC play + marketing   →  Hub OC on merit-prod             (0 cloud accounts)
-Angle 2 marketing     →  + here.now                       (1 account)
-Live consumer app     →  + Vercel                         (1 account)
-Full merit-demo stack →  + Vercel + Supabase              (2 accounts)
-Paid commerce         →  + meritstore tenant + payment    (platform onboarding)
+Local demo            →  Hub setup → tools → demo         (0 cloud accounts)
+Free hosted showcase  →  OSS in Cloud (OC)                (0 cloud accounts)
+Your marketing site   →  + here.now                       (1 account)
+Your live app         →  + Vercel                         (1 account)
+Live journal or AMA   →  + Vercel + Supabase              (2 accounts)
+Paid checkout         →  + meritstore onboarding + payment (later)
 ```
 
 ---
@@ -181,21 +174,21 @@ For **local-only** try bundles, journal/AMA may render static UI, but metered ut
 
 ---
 
-## Validation tiers
+## Ways to check your work
 
-Aligned with vault `docs/vault_usage.md` § merit-agent-skills validation.
+Start with the simplest check that matches what you are doing.
 
-| Tier | Goal | GitHub login? | Typical accounts |
+| Check | Goal | GitHub login? | Typical accounts |
 |------|------|---------------|------------------|
-| **1** | `smoke-freemium.ps1` in temp dir | No | None |
-| **2** | Hub-installed tools: scaffold or merit-demo verify/e2e | **No** | None for local; optional deploy accounts later |
-| **3** | Vault `skills verify` (operators only) | N/A | Vault access |
-| **4** | Production host + optional portals | Only if pushing your fork | Vercel ± here.now ± Supabase |
+| **Quick** | Optional automatic check in a temporary folder | No | None |
+| **Local** | Hub-installed tools: build or check `merit-demo` | **No** | None; optional hosting later |
+| **Private operator** | Private operator checks | N/A | Private access |
+| **Live site** | Your production host and optional pages | Only if you save your own source online | Vercel, here.now, or Supabase as needed |
 
-### Tier 2 — vanilla start (recommended)
+### Local start (recommended)
 
 ```powershell
-# Run Hub 1 then 2 first; this folder is created by Hub 2.
+# First choose Set up this laptop (1) and Get the free MERIT tools (2).
 cd $env:MYMERITAPP\merit-agent-skills
 
 mkdir ..\my-app -Force
@@ -208,7 +201,7 @@ mkdir ..\my-app -Force
 Linux/macOS:
 
 ```bash
-# Run Hub 1 then 2 first; this folder is created by Hub 2.
+# First choose Set up this laptop (1) and Get the free MERIT tools (2).
 cd "$MYMERITAPP/merit-agent-skills"
 
 mkdir -p ../my-app
@@ -218,17 +211,17 @@ mkdir -p ../my-app
 ./merit.sh verify --path ../my-app
 ```
 
-Optional canonical consumer (still no GitHub login):
+Optional example app (still no GitHub login):
 
 ```powershell
-# Run Hub 3 first; it downloads the canonical demo.
+# First choose Try it (3); it downloads the example demo.
 cd $env:MYMERITAPP\merit-demo
 npm install
 npm run verify
 npm run e2e
 ```
 
-Avoid on Tier 2: private operator runtimes, vault `merit.ps1 env out`, or Vercel scopes you do not own.
+For this local path, skip private operator tools and hosting settings you do not own.
 
 ---
 
@@ -280,7 +273,7 @@ Three roles — do not conflate them:
 - **Your share** flows to the **tenant payment provider** configured for your meritstore tenant — after MERIT provisions the tenant (integration cert minimum) and you complete payment-provider onboarding (KYC as required by Square or successor).
 - Until that onboarding: subscribers may still pay on **existing provisioned demos** (e.g. `merit-demo`, `auravybe`); a **new** cloner does not automatically receive those funds.
 
-**Angle 4 (operator)** — not self-service in pre-GA `skills-v0.3.x`:
+**Selling through your own MERIT checkout** is a later, assisted path:
 
 ```text
 Fork merit-demo pattern → MERIT assigns consumer_id → integration cert → meritstore tenant → payment provider link
@@ -363,7 +356,7 @@ Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-fre
 
 ## FAQ
 
-**Do I need a GitHub account for Tier 2?**  
+**Do I need a GitHub account for a local demo?**
 No. Hub downloads the public tools and demo without login. Add GitHub only when you decide to fork or push your own remote.
 
 **Do I need here.now, Vercel, and Supabase together?**  
