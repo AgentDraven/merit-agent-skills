@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.193] - 2026-09-07
+### Changed
+- Renamed the public FAQ pointer to **Standard hosted path** and the demo pointer to standard usage.
+- Marked operator provisioning as an advanced reference without labeling the standard guide.
+- Promoted `skills-v0.5.193` to the approved default CompatSet.
+
 ## [0.5.192] - 2026-09-07
 ### Changed
 - Collapsed screenshot tooling, provider/account tables, platform details, deeper validation, commerce, attribution, and command recipes behind beginner-friendly expandable panels.

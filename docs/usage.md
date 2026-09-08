@@ -404,7 +404,7 @@ Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-fre
 
 ## FAQ
 
-### 🌟 The easy, hosted path
+### 🌟 The standard hosted path
 
 **Can I get my own MERIT app without becoming a cloud administrator?**
 Yes. Run the Hub, open the demo, and choose **OSS in Cloud (OC)**. MERIT gives your app a `consumer_id`, publishes the play page and creator-facing pages on `merit-prod.vercel.app`, and prints the three links. You can share those links without opening a Vercel project or managing a server.
@@ -413,7 +413,7 @@ Yes. Run the Hub, open the demo, and choose **OSS in Cloud (OC)**. MERIT gives y
 Your app has its own name, words, settings, and `consumer_id`. MERIT hosts the shared building blocks and keeps each consumer’s routes and registration link separate. You are customizing your own front door, not copying somebody else’s identity.
 
 **Does MERIT quietly set up Vercel, Supabase, Square, or here.now accounts for me?**
-No extra account is required for the normal hosted path. MERIT operates the shared hosting, package delivery, registration, and usage rails behind the scenes. The Hub never asks a beginner for a Vercel token, a Supabase project, a Square account, or a here.now key just to try or share the hosted showcase.
+No extra account is required for the standard hosted path. MERIT operates the shared hosting, package delivery, registration, and usage rails behind the scenes. The Hub never asks you for a Vercel token, a Supabase project, a Square account, or a here.now key just to try or share the hosted showcase.
 
 **Can I stay on MERIT hosting forever?**
 Yes—this is the recommended path for creators, affiliates, and subscribers who want a simple managed experience. Keep using the MERIT-hosted consumer URL while MERIT manages the common platform pieces. Move to your own providers only when you have a specific reason, such as owning infrastructure, custom data storage, or a separate deployment policy.
@@ -422,7 +422,7 @@ Yes—this is the recommended path for creators, affiliates, and subscribers who
 Visitors start in the free guest experience, can register through the MERIT-hosted page, and see clear limits when they reach a free-use cap. If you enable a paid offering, MERIT’s hosted checkout and entitlement rails handle the platform flow for your provisioned consumer. Any platform fee, creator share, and payout terms are shown during onboarding; cloning the public demo alone does not create a payout account.
 
 **Why would I ever choose Vercel, Supabase, Square, or here.now?**
-Those are advanced “bring your own service” choices, not homework for a beginner. Choose them only when you want your own live infrastructure, your own application database, your own payment-provider relationship, or your own marketing host. The hosted OC path remains available for learning and sharing.
+Those are advanced “bring your own service” choices, not required setup. Choose them only when you want your own live infrastructure, your own application database, your own payment-provider relationship, or your own marketing host. The hosted OC path remains available for learning and sharing.
 
 **What is the difference between OC and OCV?**
 **OC** publishes your free OSS showcase. **OCV** is the guided tour afterward: it opens the hosted play, registration, and marketing pages one at a time and tells you what each page should show. If OC has not succeeded, finish the local check first and rerun OC.
@@ -439,8 +439,8 @@ PAR CDN and meritstore **registration/checkout UI** are platform-hosted for prov
 **Can I collect Plus revenue right after clone?**  
 No. You need a provisioned `consumer_id`, production MERIT metered-provider mounts, and meritstore tenant payment config. Until then, use live demos (e.g. merit-demo) to see the subscriber path.
 
-**Where is the full deploy checklist?**  
-[merit-demo OPERATOR_PROVISION.md](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md)
+**Where is the standard demo guide?**  
+[merit-demo usage](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md) explains the Hub, local checks, OC, and OCV. The [operator provision checklist](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md) is advanced and optional.
 
 **Operator validation?**
 MERIT vault operators run private validation separately. Public users should start with `.\scripts\smoke-freemium.ps1` on Windows or `./scripts/smoke-freemium.sh` on Linux/macOS.

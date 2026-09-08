@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
-    { "pin": "skills-v0.5.192", "releasedAt": "2026-09-07", "status": "supported", "notes": "Advanced provider, screenshot, commerce, and command details are collapsed for beginners" },
-    { "pin": "skills-v0.5.191", "releasedAt": "2026-09-07", "status": "supported", "notes": "Beginner path removes npm work; hosted creator and partner journey is front and center" },
-    { "pin": "skills-v0.5.190", "releasedAt": "2026-09-07", "status": "supported", "notes": "Hosted-path FAQ explains consumer IDs, managed rails, and optional advanced providers" }
+    { "pin": "skills-v0.5.193", "releasedAt": "2026-09-07", "status": "supported", "notes": "Standard-usage wording and advanced operator pointer keep the public path uncluttered" },
+    { "pin": "skills-v0.5.192", "releasedAt": "2026-09-07", "status": "supported", "notes": "Advanced provider, screenshot, commerce, and command details are collapsed" },
+    { "pin": "skills-v0.5.191", "releasedAt": "2026-09-07", "status": "supported", "notes": "Beginner path removes npm work; hosted creator and partner journey is front and center" }
   ]
 }
