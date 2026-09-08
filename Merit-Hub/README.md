@@ -15,6 +15,7 @@
 ## Quick index 🧭
 
 - [⭐ Recommended first journey](#recommended-first-journey)
+- [Choose your adventure](../README.md#which-adventure-fits-you-)
 - [Beginner command map](#beginner-command-map-)
 - [After each path: acceptance](#after-each-path-quick-acceptance-)
 - [Persona pathways](#if-you-want-to-personas)

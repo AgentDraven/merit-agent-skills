@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.5.183] - 2026-09-07
+### Changed
+- Added a plain-language “Which adventure fits you?” decision flowchart and outcome table before the beginner path matrix.
+- Promoted `skills-v0.5.183` to the approved default CompatSet; the prior two releases remain available as rollbacks.
+
 ## [0.5.182] - 2026-09-07
 ### Changed
 - The concise Hub menu now includes `CLEAN: G scan -> A archive -> P pristine`, with `S` identified as the soft-cleanup alternative.

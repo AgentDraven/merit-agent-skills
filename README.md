@@ -6,7 +6,32 @@ Free **MERIT agent skills** and **`merit`** CLI � one-stop OSS cold start for 
 
 Every beginner pathway is explained in three layers: **Start**, **Make progress**, and **Finish**. Each layer includes at least three concrete sub-checks covering the action, what MERIT does, and the evidence to look for. This is the required README standard and a NextRel requirement for vault L1 `MERIT.instructions`.
 
-**Quick index:** [Start paths](#start-here--pick-your-adventure) · [Peel-The-Onion cards](#peel-the-onion-cards-three-steps-three-checks-each-) · [Additional options](#-for-additional-options) · [Public vs private SSOT](#public-vs-private-ssot) · [Quick install](#-quick-install) · [Dinner walkthrough](#-build-your-app-over-dinner)
+**Quick index:** [Choose your adventure](#which-adventure-fits-you-) · [Start paths](#start-here--pick-your-adventure) · [Peel-The-Onion cards](#peel-the-onion-cards-three-steps-three-checks-each-) · [Additional options](#-for-additional-options) · [Public vs private SSOT](#public-vs-private-ssot) · [Quick install](#-quick-install) · [Dinner walkthrough](#-build-your-app-over-dinner)
+
+## Which adventure fits you? 🧭
+
+Pick the outcome you want—not a command you have to decode. Every route is safe to repeat; the Hub keeps the setup work in one place.
+
+```mermaid
+flowchart TD
+  Q{"What do you want today?"}
+  Q -->|"See MERIT work on this laptop"| TRY["🚀 Try MERIT\nHub-guided local demo"]
+  Q -->|"Make a simple app appear quickly"| HELLO["👋 Hello-world app\nquick local /play proof"]
+  Q -->|"Shape the demo into my idea"| DINNER["🍽️ Build over dinner\nbrand, story, preview, share"]
+  Q -->|"Give my AI editor MERIT helpers"| IDE["🧠 Skills in my IDE\ninstall helpers; no app created"]
+  TRY --> NEXT["Then: 3V local proof → OC cloud publish → OCV hosted walkthrough"]
+  HELLO --> NEXT
+  DINNER --> NEXT
+```
+
+| If you say… | Choose this path | What you get today | Best when |
+|---|---|---|---|
+| “Show me what MERIT does.” | 🚀 **Try MERIT** | Hub sets up the laptop, installs the approved skills, and opens a working local demo. | This is your first visit or you want the complete guided tour. |
+| “Just give me a tiny working example.” | 👋 **Hello-world app** | A fast local `merit-demo` proof: open `/play/`, see **Hosted Ready**, and try the workbench. | Hub setup is already done and you want the shortest app check. |
+| “I want to make this feel like my product.” | 🍽️ **Build over dinner** | A friendly evening walkthrough for changing the demo’s name, story, branding, and sharing a preview. | You are ready to turn the example into your own idea. |
+| “I want MERIT tools inside Cursor/Codex/another IDE.” | 🧠 **Skills in my IDE** | Installs guidance skills into the selected AI host; it does **not** create or publish an app. | You want an AI helper first, or want it alongside any of the other paths. |
+
+> **Recommended first trip:** choose **🚀 Try MERIT**, then follow `1 Setup → 2 Install OSS → 3 Try it → 3V Validate → OC Publish → OCV hosted walkthrough`. Pick **👋 Hello-world** only when steps 1 and 2 are already complete.
 
 <a id="start-here--pick-your-adventure"></a>
 <table><tr><td bgcolor="#1f6feb"><strong><big><big>🧭 Start here — pick your adventure</big></big></strong></td></tr></table>
