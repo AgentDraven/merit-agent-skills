@@ -439,7 +439,7 @@ PAR CDN and meritstore **registration/checkout UI** are platform-hosted for prov
 **Can I collect Plus revenue right after clone?**  
 No. You need a provisioned `consumer_id`, production MERIT metered-provider mounts, and meritstore tenant payment config. Until then, use live demos (e.g. merit-demo) to see the subscriber path.
 
-**Where is the standard demo guide?**  
+**Where is the standard demo guide?**
 [merit-demo usage](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md) explains the Hub, local checks, OC, and OCV. The [operator provision checklist](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/OPERATOR_PROVISION.md) is advanced and optional.
 
 **Operator validation?**
