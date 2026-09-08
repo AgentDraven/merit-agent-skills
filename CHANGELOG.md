@@ -1,3 +1,9 @@
+## [0.5.197] - 2026-09-08
+
+### Fixed
+- Removed the remaining hardcoded merit-demo registration URL from the generic Hub 3V helper.
+- Hub now reads a consumer registration URL from the OC receipt or the consumer repository contract, so consumer IDs stay outside the public skills distribution.
+
 # CHANGELOG
 
 ## [0.5.196] - 2026-09-08
@@ -1095,3 +1101,5 @@ The repository contains older tagged releases whose original changelog sections 
 - `skills-v0.5.62`–`skills-v0.5.76`: closeout, access, ownership, and release-policy iterations.
 
 For exact historical details, use `git show skills-vX.Y.Z` and the tag annotation. New releases must use a dedicated `## [X.Y.Z]` section and are rejected by closeout when `VERSION` lacks changelog coverage.
+
+\r\n

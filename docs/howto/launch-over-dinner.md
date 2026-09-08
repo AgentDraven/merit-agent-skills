@@ -180,13 +180,11 @@ Free CC registration
 2. Sign up with email for the free creator option.
 3. No Square, Supabase, or Vercel for this step.
 
-**Example only** (the shared demo, not your app):
-
-`https://merit-prod.vercel.app/store/merit-demo/register`
-
-**Your URL** (after MERIT assigns your id):
+**Your URL** (after MERIT assigns your consumer id):
 
 `https://merit-prod.vercel.app/store/YOUR_ID/register`
+
+The assigned consumer repository owns the concrete registration URL and its provider contract. The public skills package keeps this flow parameterized.
 
 ### 3B — Submit one ToI pack
 
@@ -318,3 +316,4 @@ Read only after the three steps.
 - [ ] Step 3 — Registered as CC, one ToI pack, Journal or AMA selected
 - [ ] Deferred Vercel, here.now, Supabase, Square until needed
 
+\r\n

@@ -1,4 +1,4 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 <#
 .SYNOPSIS
   Merit-Hub - laptop cleanup (Pristine v2), jumpstart OSS/vault, shared tools (MYMERITTOOLS).
@@ -124,8 +124,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "release": "0.5.196",
-  "skillsPin": "skills-v0.5.196",
+  "release": "0.5.197",
+  "skillsPin": "skills-v0.5.197",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -4010,6 +4010,26 @@ function Invoke-HubOcTutorial {
     & (Resolve-HubPowerShellRunner) -NoProfile -File $script -BenchRoot $bench
 }
 
+function Get-HubConsumerRegistrationUrl {
+    param([string]$DemoRoot)
+    try {
+        if (Get-Command Get-OssState -ErrorAction SilentlyContinue) {
+            $state = Get-OssState
+            $receiptUrl = [string]$state.ocRegisterUrl
+            if ($receiptUrl -match '^https?://') { return $receiptUrl }
+        }
+    } catch { }
+    $contractPath = Join-Path $DemoRoot 'cfg\alpha_trial_consumer.json'
+    if (Test-Path -LiteralPath $contractPath) {
+        try {
+            $contract = Get-Content -LiteralPath $contractPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            $contractUrl = [string]$contract.register_url
+            if ($contractUrl -match '^https?://') { return $contractUrl }
+        } catch { }
+    }
+    return ''
+}
+
 function Invoke-HubTryItValidate {
     Write-Header '3V Validate the demo'
     Write-Note 'Run any check repeatedly, or choose A to run all checks. Enter returns to the Hub menu.'
@@ -4027,14 +4047,14 @@ function Invoke-HubTryItValidate {
         $c = (Read-Host '3V select').Trim()
         if ($c -match '^(0|q)$') { return }
         try {
-            $demo = Get-MyMeritAppRoot; $repo = Join-Path $demo 'merit-demo'; $cli = Join-Path $repo 'merit.ps1'
+            $demo = Get-MyMeritAppRoot; $repo = Join-Path $demo 'merit-demo'; $cli = Join-Path $repo 'merit.ps1'; $registerUrl = Get-HubConsumerRegistrationUrl -DemoRoot $repo
             switch -Regex ($c) {
                 '^1$' { Start-Process $url; Write-Ok 'Opened /play/. Confirm Hosted Ready and mounted workbench.' }
-                '^2$' { Start-Process 'https://merit-prod.vercel.app/store/merit-demo/register'; Write-Ok 'Opened hosted Register free. A redirect to the MERIT commerce guide is expected when you are learning how SKUs and subscriptions work.' }
+                '^2$' { if ($registerUrl) { Start-Process $registerUrl; Write-Ok "Opened consumer registration: $registerUrl" } else { Write-Warn 'Registration URL missing. Run OC for this consumer or add its consumer-owned contract.' } }
                 '^3$' { Start-Process 'http://localhost:3000/portal/'; Write-Ok 'Opened the local marketing portal. Use OC then OCV when you want the hosted portal URL.' }
                 '^4$' { & (Resolve-HubPowerShellRunner) -NoProfile -File $cli verify }
                 '^5$' { & (Resolve-HubPowerShellRunner) -NoProfile -File $cli e2e }
-                '^[Aa]$' { $runner = Resolve-HubPowerShellRunner; Start-Process $url; Start-Process 'https://merit-prod.vercel.app/store/merit-demo/register'; Start-Process 'http://localhost:3000/portal/'; & $runner -NoProfile -File $cli verify; & $runner -NoProfile -File $cli e2e }
+                '^[Aa]$' { $runner = Resolve-HubPowerShellRunner; Start-Process $url; if ($registerUrl) { Start-Process $registerUrl } else { Write-Warn 'Registration URL missing; skipped hosted registration.' }; Start-Process 'http://localhost:3000/portal/'; & $runner -NoProfile -File $cli verify; & $runner -NoProfile -File $cli e2e }
                 default { Write-Warn 'Choose 1, 2, 3, 4, 5, A, or 0.' }
             }
         } catch { Write-Fail ("3V check failed: " + $_.Exception.Message) }
@@ -4221,3 +4241,5 @@ try {
 finally {
     Complete-HubSession
 }
+
+\r\n

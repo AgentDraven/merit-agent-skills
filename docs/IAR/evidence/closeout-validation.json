@@ -2,18 +2,17 @@
   "schemaVersion": 1,
   "status": "validated",
   "target": "C:\\DApps\\merit-agent-skills",
-  "validatedAt": "2026-09-08T14:41:20.6630396-07:00",
-  "gitHead": "8b46071",
+  "validatedAt": "2026-09-08T14:45:51.2221897-07:00",
+  "gitHead": "dc664db",
   "gitStatus": [
     " M CHANGELOG.md",
     " M Merit-Hub.ps1",
     " M Merit-Hub/Merit-Hub.ps1",
     " M README.md",
     " M VERSION",
-    " D cfg/alpha_trial_consumers.json",
     " M cfg/compatset.skills.json",
     " M cfg/oss-bench.template.json",
-    " D scripts/test-alpha-trial-consumers.mjs"
+    " M docs/howto/launch-over-dinner.md"
   ],
   "lawContractId": "MERIT-CLOSEOUT-1",
   "lawContractVersion": 1,
