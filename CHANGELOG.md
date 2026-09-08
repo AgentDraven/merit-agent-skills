@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [0.5.194] - 2026-09-08
+
+### Fixed
+- Released the existing 3V PowerShell runner fallback so supported Windows hosts without pwsh receive the fix through the default skills payload.
+- Included public CLI and route-check guidance fixes committed after 0.5.193.
+- Aligned launcher, Hub, CompatSet, bench template and public release reference to skills-v0.5.194; retained the historical human-validation baseline without claiming fresh human signoff.
+
 ## [0.5.193] - 2026-09-07
 ### Changed
 - Renamed the public FAQ pointer to **Standard hosted path** and the demo pointer to standard usage.
