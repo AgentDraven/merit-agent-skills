@@ -94,7 +94,10 @@ After **Get the free MERIT tools (2)**, run `merit.ps1` / `merit.sh` from the do
 
 ---
 
-## Optional picture-check lab 📸
+<details>
+<summary>📸 Optional picture-check lab (advanced)</summary>
+
+### Optional picture-check lab
 
 You can finish the beginner journey without installing Node or running `npm`. The Hub and `merit verify` already perform the useful no-account checks.
 
@@ -122,6 +125,11 @@ If `npm install` fails or you skip it, nothing is broken. Run `merit verify` (or
 
 ---
 
+</details>
+
+<details>
+<summary>🔧 Accounts and services (advanced)</summary>
+
 ## Accounts — what needs one and when
 
 | Service | What it is for | When you need it | Who creates it |
@@ -148,6 +156,11 @@ Paid checkout         →  + meritstore onboarding + payment (later)
 
 ---
 
+</details>
+
+<details>
+<summary>☁️ Platform details and your own hosting (advanced)</summary>
+
 ## Platform vs BYOK — what MERIT hosts for you
 
 | Layer | Hosted by MERIT (freemium) | You bring (BYOK) |
@@ -172,6 +185,11 @@ Paid checkout         →  + meritstore onboarding + payment (later)
 For **local-only** try bundles, journal/AMA may render static UI, but metered utility calls use production MERIT provider mounts. Public clones must not ship local usage-metering stubs.
 
 ---
+
+</details>
+
+<details>
+<summary>🧪 Deeper validation and command-line checks (advanced)</summary>
 
 ## Ways to check your work
 
@@ -223,6 +241,8 @@ For this local path, skip private operator tools and hosting settings you do not
 
 ---
 
+</details>
+
 ## Hosted creator path: grow without cloud-admin homework 🌱
 
 Most creators should stay on the MERIT-hosted path:
@@ -241,6 +261,9 @@ Most creators should stay on the MERIT-hosted path:
    - If you later enable paid features, onboarding explains platform fees, creator share, and payout requirements.
 
 You can remain on this managed path as long as it meets your needs. Bring your own providers only for a deliberate advanced reason.
+
+<details>
+<summary>💼 Commerce, partner links, and command recipes (advanced)</summary>
 
 ## Commerce and payouts (guest → creator → subscriber)
 
@@ -376,6 +399,8 @@ Install skills to Cursor: Windows `.\merit.ps1 skills install --target Cursor`; 
 Smokes: Windows `.\scripts\smoke-freemium.ps1`; Linux/macOS `./scripts/smoke-freemium.sh`.
 
 ---
+
+</details>
 
 ## FAQ
 

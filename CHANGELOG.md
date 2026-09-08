@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.192] - 2026-09-07
+### Changed
+- Collapsed screenshot tooling, provider/account tables, platform details, deeper validation, commerce, attribution, and command recipes behind beginner-friendly expandable panels.
+- Kept the hosted creator, affiliate, and design-partner journey visible as the recommended default.
+- Promoted `skills-v0.5.192` to the approved default CompatSet.
+
 ## [0.5.191] - 2026-09-07
 ### Changed
 - Removed the remaining beginner `npm` example and routed users through Hub **3V** validation.
