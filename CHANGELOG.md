@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [0.5.189] - 2026-09-07
+### Changed
+- Clarified that `npm install` is an optional screenshot lab, not part of the normal beginner check.
+- Corrected the Playwright package description and added a friendly fallback when Node tools are skipped.
+- Promoted `skills-v0.5.189` to the approved default CompatSet.
+
 ## [0.5.188] - 2026-09-07
 ### Changed
 - Rewrote public start, usage, dinner, deployment, and try-path guides in plain language with three-layer Peel-The-Onion walkthroughs.

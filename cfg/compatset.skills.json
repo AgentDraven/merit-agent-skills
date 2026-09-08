@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
+    { "pin": "skills-v0.5.189", "releasedAt": "2026-09-07", "status": "supported", "notes": "Friendly optional screenshot lab; npm is no longer required for the normal check" },
     { "pin": "skills-v0.5.188", "releasedAt": "2026-09-07", "status": "supported", "notes": "Plain-English Peel-The-Onion beginner guides and repaired Collaboration link" },
-    { "pin": "skills-v0.5.187", "releasedAt": "2026-09-07", "status": "supported", "notes": "Permanent user .MERIT home for backups, receipts, state, and history" },
-    { "pin": "skills-v0.5.186", "releasedAt": "2026-09-07", "status": "supported", "notes": "First backup; Pristine rejects tools/runtime as app benches" }
+    { "pin": "skills-v0.5.187", "releasedAt": "2026-09-07", "status": "supported", "notes": "Permanent user .MERIT home for backups, receipts, state, and history" }
   ]
 }

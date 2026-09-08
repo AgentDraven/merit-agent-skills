@@ -94,19 +94,18 @@ After **Get the free MERIT tools (2)**, run `merit.ps1` / `merit.sh` from the do
 
 ---
 
-## E2E Testing Using Playwright (optional)
+## Optional picture-check lab 📸
 
-Run this against both public proof consumers:
+You can finish the beginner journey without installing Node or running `npm`. The Hub and `merit verify` already perform the useful no-account checks.
 
-- `merit-demo` is the main Hello World showcase.
-- `merit-test` is a separate example that maintainers use to check shared services.
+The main example is `merit-demo`. A separate `merit-test` example is used by maintainers for extra service checks.
 
-The dinner-path baseline only needs `merit verify`. Full screenshot validation is optional and requires Node dependencies in the consumer repo:
+Choose this extra lab only when you want screenshots of every page. `npm install` downloads the small testing tools listed by the demo; it does **not** install MERIT, change your app, or create an account:
 
 ```powershell
 cd ..\merit-demo
 npm install
-.\merit.ps1 e2e
+npm run e2e:playwright
 ```
 
 Linux/macOS:
@@ -114,12 +113,12 @@ Linux/macOS:
 ```bash
 cd ../merit-demo
 npm install
-./merit.sh e2e
+npm run e2e:playwright
 ```
 
-What gets installed: `npm install` reads `merit-demo/package.json` and installs the declared dev tooling, including `@playwright/test`; the repo postinstall attempts to install the Chromium browser used for screenshots. The E2E wrapper checks local demo routes, hosted provider links, metered-source boundaries, and responsive screenshots under `merit-demo docs/evidence/`.
+What happens: the package manager reads `package.json`, downloads the declared Playwright test tool, and the picture-check command opens a temporary local browser. It checks the same routes a visitor sees and saves pictures under `merit-demo docs/evidence/`.
 
-If `npm install` has not been run, the MERIT wrapper still performs non-visual checks and reports that Playwright screenshots were skipped. That is acceptable for a lightweight first pass, but not for launch proof.
+If `npm install` fails or you skip it, nothing is broken. Run `merit verify` (or the Hub’s **Validate my local demo (3V)**) for the normal proof. Screenshots are a bonus, not a requirement for trying MERIT.
 
 ---
 
