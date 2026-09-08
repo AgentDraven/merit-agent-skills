@@ -77,7 +77,7 @@ You can validate MERIT freemium **without** GitHub login, Vercel, here.now, or S
 | `merit apply` + `verify` | **None** |
 | Open `play/index.html` locally (static PAR from CDN) | **None** |
 | Optional automatic check (`scripts/smoke-freemium.ps1` / `.sh`) | **None** — ignore an optional community-file note; do **not** create a here.now account |
-| `merit-demo`: `npm install`, `npm run verify`, `npm run e2e` (PAR CDN HEAD) | **None** (network only) |
+| Open the demo and choose **Validate my local demo (3V)** | **None** |
 
 **A GitHub account is optional.** You need one only to save your own copy online, send a pull request, or work with a private repository. The normal local Hub path works without signing in.
 
@@ -210,21 +210,43 @@ mkdir -p ../my-app
 ./merit.sh verify --path ../my-app
 ```
 
-Optional example app (still no GitHub login):
+The Hub-created example app (still no GitHub login):
 
 ```powershell
-# First choose Try it (3); it downloads the example demo.
+# First choose Try it (3); it downloads and opens the example demo.
 cd $env:MYMERITAPP\merit-demo
-npm install
-npm run verify
-npm run e2e
+# Then choose Validate my local demo (3V) in the Hub.
+# No npm command is needed for the beginner path.
 ```
 
 For this local path, skip private operator tools and hosting settings you do not own.
 
 ---
 
+## Hosted creator path: grow without cloud-admin homework 🌱
+
+Most creators should stay on the MERIT-hosted path:
+
+1. **Start — become a creator, affiliate, or design partner.**
+   - Use the hosted partner page or the invitation from MERIT.
+   - Tell us the consumer name and the audience you want to serve.
+   - You do not need to create a Vercel, Supabase, Square, or here.now account.
+2. **Make progress — keep building on your OC app.**
+   - OC publishes your consumer-specific play, registration, and marketing pages.
+   - MERIT manages the shared hosting, usage limits, registration, and checkout rails.
+   - Use the Hub and your plain-language content; advanced service setup stays optional.
+3. **Finish — invite people and grow.**
+   - Share the hosted play or marketing link printed by OC.
+   - Visitors can try the free experience and register through MERIT.
+   - If you later enable paid features, onboarding explains platform fees, creator share, and payout requirements.
+
+You can remain on this managed path as long as it meets your needs. Bring your own providers only for a deliberate advanced reason.
+
 ## Commerce and payouts (guest → creator → subscriber)
+
+<details><summary>Optional technical partner-link details</summary>
+
+Beginners can skip this section. The Hub and hosted partner flow handle normal setup; these fields are for advanced attribution links.
 
 ### Attribution for later paid conversion
 
@@ -281,6 +303,8 @@ Fork merit-demo pattern → MERIT assigns consumer_id → integration cert → m
 See `cfg/meritstore_tenant.json` (`status: pending_platform_provision`) on merit-demo.
 
 ---
+
+</details>
 
 ## merit commands
 

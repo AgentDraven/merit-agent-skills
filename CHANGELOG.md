@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [0.5.191] - 2026-09-07
+### Changed
+- Removed the remaining beginner `npm` example and routed users through Hub **3V** validation.
+- Added a three-step hosted creator, affiliate, and design-partner journey that stays on OC.
+- Hid technical attribution fields behind an optional details panel.
+- Promoted `skills-v0.5.191` to the approved default CompatSet.
+
 ## [0.5.190] - 2026-09-07
 ### Changed
 - Added a friendly hosted-path FAQ covering consumer IDs, MERIT-managed services, the beginner route, and optional self-hosting.

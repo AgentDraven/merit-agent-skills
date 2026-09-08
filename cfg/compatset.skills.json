@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "description": "Manually curated skills CompatSet releases supported by Merit-Hub.",
   "sets": [
+    { "pin": "skills-v0.5.191", "releasedAt": "2026-09-07", "status": "supported", "notes": "Beginner path removes npm work; hosted creator and partner journey is front and center" },
     { "pin": "skills-v0.5.190", "releasedAt": "2026-09-07", "status": "supported", "notes": "Hosted-path FAQ explains consumer IDs, managed rails, and optional advanced providers" },
-    { "pin": "skills-v0.5.189", "releasedAt": "2026-09-07", "status": "supported", "notes": "Friendly optional screenshot lab; npm is no longer required for the normal check" },
-    { "pin": "skills-v0.5.188", "releasedAt": "2026-09-07", "status": "supported", "notes": "Plain-English Peel-The-Onion beginner guides and repaired Collaboration link" }
+    { "pin": "skills-v0.5.189", "releasedAt": "2026-09-07", "status": "supported", "notes": "Friendly optional screenshot lab; npm is no longer required for the normal check" }
   ]
 }
