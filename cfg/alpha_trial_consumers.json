@@ -1,0 +1,19 @@
+{
+  "schema": "merit.alpha_trial_consumers.v1",
+  "primary": {
+    "consumer_id": "merit-demo",
+    "role": "showcase consumer",
+    "register_url": "https://merit-prod.vercel.app/store/merit-demo/register"
+  },
+  "secondary": {
+    "consumer_id": "merit-test",
+    "role": "independent clean-clone and cross-tenant proof",
+    "register_url": "https://merit-prod.vercel.app/store/merit-test/register"
+  },
+  "oc_pattern": "oc-<lowercase-slug>",
+  "rules": [
+    "Do not use merit-demo as proof that an arbitrary OC tenant is provisioned.",
+    "Run isolation checks with merit-demo and merit-test as separate consumer contexts.",
+    "Generated oc-* IDs require explicit activation before registration acceptance."
+  ]
+}
