@@ -1,10 +1,15 @@
 # CHANGELOG
 
+## [0.5.196] - 2026-09-08
+
+### Fixed
+- Removed consumer-specific alpha trial IDs, registration URLs, and live trial tests from the generic skills distribution plane.
+- Consumer/provider contract evidence now belongs in the owning consumer repository; public skills remains reusable across consumers.
+
 ## [0.5.195] - 2026-09-08
 
 ### Added
-- Added the explicit alpha trial consumer matrix for `merit-demo` and `merit-test`.
-- Added a public live registration-route test that fails closed on wrong-tenant redirects and does not require vault secrets.
+- Added release validation improvements for hosted consumer workflows without embedding any consumer-specific IDs or provider URLs.
 
 ## [0.5.194] - 2026-09-08
 
