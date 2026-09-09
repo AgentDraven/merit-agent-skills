@@ -1,3 +1,9 @@
+## [0.5.200] - 2026-09-08
+
+### Added
+- Added a plain-English student guide for the Hub and merit.ps1, with persona paths, evidence checks, and provider-profile guidance.
+- Added a docs README and index so first-time readers can find the generic public workflow.
+
 ## [0.5.199] - 2026-09-08\n\n### Added\n- Added provider ecosystem profiles with v00 as the default and a guarded switch for future live_public providers such as v01.\n- Parameterized gateway, registration base, and package CDN resolution without embedding consumer IDs.\n\n## [0.5.198] - 2026-09-08
 
 ### Docs
