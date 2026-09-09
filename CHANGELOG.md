@@ -1,3 +1,8 @@
+## [0.5.202] - 2026-09-08
+
+### Fixed
+- Reworked the student and docs-root guides to the MERIT documentation standard with accurate public commands, persona flows, evidence, and ownership boundaries.
+
 ## [0.5.201] - 2026-09-08
 
 ### Fixed

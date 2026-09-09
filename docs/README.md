@@ -1,12 +1,43 @@
-# MERIT documentation
+# MERIT public documentation
 
-Start with [the plain-English `merit.ps1` guide](merit.md). It explains the learner, builder, tester, publisher, and caretaker paths using **Start → Make progress → Finish**.
+**Document ID:** MAS-DOC-INDEX-001
+**Audience:** Builders and maintainers using the public skills release
+**Owner:** `merit-agent-skills`
 
-- [Plain-English guide](merit.md) — first journey, command map, provider profiles, and safety.
-- [Usage](usage.md) — accounts, hosting, freemium behavior, and the full CLI reference.
-- [Try bundles](TRY_BUNDLES.md) — choose a route by outcome.
-- [Build over dinner](howto/launch-over-dinner.md) — guided personalization.
-- [Deployment](deploy.md) — consumer launch profiles and BYOK publishing.
-- [Documentation index](INDEX.md) — the topic map for this folder.
+The public documentation follows the same ownership boundary as the CLI: generic commands and provider profiles live here; consumer configuration belongs in the consumer repository; private policy belongs in the vault.
 
-Public docs describe the generic OSS tools. Consumer-specific IDs and configuration belong in the consumer repository; private policy and operator procedures remain in the private vault.
+<a id="start"></a>
+<table><tr><td bgcolor="#1f6feb"><strong><big>🧭 Start here</big></strong></td></tr></table>
+
+| Need | Read | Evidence |
+|---|---|---|
+| First visit or classroom walkthrough | [MERIT CLI student guide](merit.md) | Hub path and expected receipts |
+| Choose a route by outcome | [Try bundles](TRY_BUNDLES.md) | Selected pathway |
+| Personalize a first consumer | [Build over dinner](howto/launch-over-dinner.md) | Local preview and verification |
+
+<a id="build"></a>
+<table><tr><td bgcolor="#0d9488"><strong><big>🛠️ Build and publish</big></strong></td></tr></table>
+
+| Need | Read | Evidence |
+|---|---|---|
+| Accounts, hosting, and freemium behavior | [Usage](usage.md) | Correct account boundary |
+| Launch profile and BYOK deployment | [Deployment](deploy.md) | Consumer-owned launch settings |
+| Surface and ownership map | [Surface matrix](merit_surface_matrix.md) | Generic versus consumer/provider ownership |
+
+<a id="maintain"></a>
+<table><tr><td bgcolor="#6f42c1"><strong><big>🔐 Validate and maintain</big></strong></td></tr></table>
+
+| Need | Read | Evidence |
+|---|---|---|
+| Public closeout behavior | [Closeout checklist](IAR/MERIT_CLOSEOUT_ENFORCEMENT_CHECKLIST.md) | Validation receipt |
+| Public IAR and evidence | [IAR directory](IAR/) | Acceptance IDs and evidence links |
+| Public law boundary | [Law pack](merit_law_pack.md) | OSS excerpt only |
+
+> Private L1, registries, operator procedures, and future `merit.blob` decisions stay in `merit-private-vault`. This folder does not copy private policy.
+
+## Document control
+
+| Version | Date | Change |
+|---|---|---|
+| 1.0.1 | 2026-09-08 | Added the standard navigation bands and ownership/evidence map. |
+| 1.0.0 | 2026-09-08 | Initial docs-root map. |

@@ -1,116 +1,166 @@
-# MERIT with `merit.ps1`
+# MERIT CLI student guide
 
-This is the friendly first guide for students, families, and new builders. MERIT helps you try a small app, check your work, and share it when you are ready. You can start without knowing Git, servers, Vercel, databases, or private operator tools.
+**Document ID:** MAS-DOC-CLI-001
+**Audience:** Students, families, first-time builders, and classroom mentors
+**Surface:** Public `merit-agent-skills` Hub and CLI
+**Owner:** `merit-agent-skills`
 
-Use the Hub for the first visit. Use `merit.ps1` when you want a named command. The Hub and the CLI use the same public `merit-agent-skills` release.
+MERIT gives you a safe path from a first local app to a checked hosted demo. You can start without Git, Vercel, databases, or private operator tools. The Hub is the easiest first step; `merit.ps1` is the named command surface when you want to build or check your own consumer.
 
-## The three-step journey
+<a id="choose-a-path"></a>
+<table><tr><td bgcolor="#1f6feb"><strong><big>🧭 Choose a path</big></strong></td></tr></table>
 
-Every pathway uses **Start → Make progress → Finish**. Read the evidence line before moving on.
+> Choose one row and read from **Start** to **Make progress** to **Finish**. The evidence column tells you what must be visible before you continue.
 
-### Start: open MERIT
+| Persona | Start | Make progress | Finish | Evidence |
+|---|---|---|---|---|
+| **Learner** | Run `Merit-Hub.ps1`; choose `1`, then `2` | Choose Hub `3` to open the demo | Run Hub `3V` | Local `/play/` over HTTP, **Hosted Ready**, and a receipt |
+| **Builder** | `merit.ps1 init --path <consumer>` | Edit `.merit_launch.md`; run `apply` | Run `verify` | Consumer config and `verify OK` |
+| **Tester** | Resolve the repo with `where` | Run `verify`, `e2e`, and browser E2E | Save the failing or passing receipt | Expected result, observed result, and remediation |
+| **Publisher** | Pass local checks | Run `oc`, `deploy`, `portal`, or `all` as applicable | Run hosted `OCV` from the Hub | Hosted URL and provider profile are recorded |
+| **Caretaker** | Run `version` and `ecosystem list` | Review the release pin and evidence | Run `closeout --validate-only` | Release version, tag, and validation receipt |
 
-- **You do:** download `Merit-Hub.ps1`, open PowerShell, and run `./Merit-Hub.ps1` from its folder.
-- **MERIT does:** checks the laptop and offers `1` to set up folders, then `2` to install the pinned free tools.
-- **Look for:** a receipt showing the tools folder, the selected release, and any setup warning. Choose `0` only when you want to stop.
+<a id="first-trip"></a>
+<table><tr><td bgcolor="#0d9488"><strong><big>🚀 First trip: Hub 1 → 2 → 3 → 3V</big></strong></td></tr></table>
 
-### Make progress: try a local app
+### Start — prepare the laptop
 
-- **You do:** choose `3` in the Hub, or run `./merit.ps1 serve` from a consumer folder.
-- **MERIT does:** reuses the local demo, starts an HTTP server, and opens `/play/`.
-- **Look for:** **Hosted Ready**, a mounted workbench, working navigation, and a local URL such as `http://localhost:3000/play/`. Use HTTP; opening HTML with `file://` skips the normal server checks.
+1. Download the [Hub script](../Merit-Hub/Merit-Hub.ps1) to a tools folder such as `C:\Tools`.
+2. Open PowerShell in that folder and run:
 
-### Finish: validate and share
+   ```powershell
+   .\Merit-Hub.ps1
+   ```
 
-- **You do:** run the Hub's `3V` check. When the local proof is good, choose `OC` and then `OCV` for hosted validation.
-- **MERIT does:** checks routes, records URLs, and keeps the provider profile visible in the receipt.
-- **Look for:** a passing verification receipt, a hosted `/play/` page, and a working **Register free** link before inviting another person.
+3. Choose **1 — Set up this laptop**, then **2 — Get the free MERIT tools**.
 
-## Pick a persona
+The Hub checks the laptop, installs the tested public skills release, and writes a receipt. The receipt must identify the tools path and release pin. `0` exits the Hub.
 
-- **Learner:** Hub `1 → 2 → 3`, then read the local `/play/` page.
-- **Builder:** `./merit.ps1 init --path ../my-app`, edit `.merit_launch.md`, then `apply` and `verify`.
-- **Tester:** run `verify`, `e2e`, or Hub `3V`; save the receipt and screenshots when a check fails.
-- **Publisher:** run `OC` after local checks, or use `deploy`/`portal` with your own credentials for a consumer you own.
-- **Caretaker:** run `where`, `version`, `ecosystem list`, and `closeout --validate-only` before changing a release.
+### Make progress — open the demo
 
-## Command map
+Choose **3 — Try it**. The Hub reuses the selected consumer folder, starts the local HTTP path, and opens `/play/`.
 
-Start with `./merit.ps1 help`. The usual commands are grouped below.
+Look for:
 
-### Learn
+- a URL beginning with `http://`, not `file://`;
+- **Hosted Ready** and a mounted workbench; and
+- a visible **Register free** route or a labeled fallback state.
 
-- `help`, `version`, and `where` explain the installed CLI, version, and active paths.
-- `ecosystem list` shows the provider profiles available to this release.
-- `ecosystem use <id> --path <consumer>` selects a profile for one consumer; use `--allow-nonlive` only when deliberately testing a profile that is not live.
+### Finish — validate the local proof
 
-### Build
+Choose **3V — Validate my local demo**. The Hub checks the page, routes, and configured public rails and records the result.
 
-- `init --path <consumer>` creates a small launch profile.
-- `apply --path <consumer>` applies that profile.
-- `par scaffold` and `subs scaffold` add the optional public workbench or subscription example.
-- `create --path <consumer>` creates a new Cloud First consumer when its required account details are available.
+> `3V` proves the local consumer path. It does not prove that a hosted deployment is live.
 
-### Check
+When the local receipt passes, choose **OC — OSS in Cloud** and then **OCV — Walk through my hosted demo**. `OCV` is the evidence for a hosted claim.
 
-- `verify --path <consumer>` checks the consumer files and configuration.
-- `serve --path <consumer>` starts the local HTTP proof.
-- `e2e --path <consumer>` runs the optional browser checks when Playwright is installed.
-- `e2e:playwright` is the explicit browser route used by the full demo check.
+<a id="build-your-own"></a>
+<table><tr><td bgcolor="#0d9488"><strong><big>🛠️ Build your own consumer</big></strong></td></tr></table>
+
+Run these commands from the `merit-agent-skills` checkout. Replace `<consumer>` with the path to your own repository.
+
+| Step | Command | What you do | What MERIT does | Evidence |
+|---|---|---|---|---|
+| Start | `.\merit.ps1 init --path <consumer>` | Choose your consumer folder | Creates `.merit_launch.md` and protects it with gitignore | Launch profile exists |
+| Make progress | `.\merit.ps1 apply --path <consumer>` | Review the generated settings | Generates the consumer config and local environment template | Files are present; secrets are still local |
+| Finish | `.\merit.ps1 verify --path <consumer>` | Read each check | Validates the public scaffold | `verify OK` and no unexplained failure |
+
+For a guided Cloud First scaffold, use:
+
+```powershell
+.\merit.ps1 create --path <consumer> --profile fullstack-consumer
+```
+
+Use `par scaffold`, `branding scaffold`, `subs scaffold`, or `community scaffold` only when that feature is part of your consumer plan. They add public templates; they do not turn this generic repository into your consumer application.
+
+<a id="test-and-publish"></a>
+<table><tr><td bgcolor="#0d9488"><strong><big>🧪 Test and publish</big></strong></td></tr></table>
+
+### Test
+
+```powershell
+.\merit.ps1 where
+.\merit.ps1 verify --path <consumer>
+.\merit.ps1 e2e --path <consumer>
+.\merit.ps1 e2e:playwright --path <consumer>
+```
+
+Run the browser command only when its optional browser tooling is installed. Record the command, expected result, observed result, and receipt path. A browser check must use local HTTP or a deployed HTTPS origin; `file://` is smoke-only.
 
 ### Publish
 
-- `deploy --path <consumer>` deploys a consumer through its chosen provider flow.
-- `portal --path <consumer>` publishes only `portal/` through your own BYOK account.
-- `all --path <consumer>` runs the supported publish sequence when its prerequisites are present.
-- Hub `OC` is the guided public demo route; Hub `OCV` checks the hosted result.
+| Command | Use it when | Boundary |
+|---|---|---|
+| `oc --path <consumer>` | You want the guided MERIT-hosted demo route | Uses the selected public provider profile |
+| `deploy --path <consumer>` | You own a Vercel deployment path | Uses your deployment credentials and scope |
+| `portal --path <consumer>` | You own a here.now portal path | Uses your BYOK portal credentials |
+| `all --path <consumer>` | Your consumer is ready for the supported combined sequence | Runs the applicable publish steps |
+| `apps publish --path <consumer>` | You need to repeat the platform upload phase | Publishes only the consumer's play/config surface |
 
-### Finish and maintain
+After publishing, use the Hub's `OCV` route and save the hosted URL and receipt. Do not describe a local `3V` result as a hosted release.
 
-- `closeout --validate-only` checks release evidence without publishing.
-- `closeout` runs the consumer release gate after the required checks pass.
-- `apps refresh` and `apps remove --yes` maintain optional app integrations. Read the prompt carefully before removal.
-- `law`, `vault`, and `admin` are operator or policy paths. They are not needed for a first student journey.
+<a id="provider-profiles"></a>
+<table><tr><td bgcolor="#6f42c1"><strong><big>🔌 Provider profiles and ownership</big></strong></td></tr></table>
 
-For every command, use this pattern: **you choose an action → MERIT prints what it did → you check the receipt or URL**.
+The public default is **v00**:
 
-## Provider profiles
-
-The default public provider is **v00** at `https://merit-prod.vercel.app`. The release may also list **v01** at `https://merit-prodv01.vercel.app`; it is selectable only when its profile is marked live, unless you explicitly pass `--allow-nonlive` for testing. The guide and the CLI do not hardcode a consumer's identity. A consumer chooses its provider profile locally, and the provider owns registration and hosted behavior.
-
-Check before a hosted run:
-
-```powershell
-./merit.ps1 ecosystem list
-./merit.ps1 ecosystem use v00 --path ../my-app
+```text
+gateway:  https://merit-prod.vercel.app
 ```
 
-Switching is per consumer. The default remains v00 until the provider publishes a live v01 profile.
+The release may also list **v01**:
 
-## Safety and paths
+```text
+gateway:  https://merit-prodv01.vercel.app
+status:   coming_soon until the provider promotes it to live_public
+```
 
-- Run `./merit.ps1` from the public skills checkout, or use the installed copy selected by the Hub.
-- Use `./merit.ps1 where` to discover the active app and tools folders; do not assume `C:\MyMeritApp`.
-- Keep consumer settings in the consumer repository. Do not put consumer IDs, secrets, or private provider data into this generic skills repository.
-- Never commit `.env.local`, credentials, or generated receipts that contain secrets.
-- Use `--yes` only for a deliberate destructive action such as `apps remove`.
+Inspect and select profiles with:
 
-## When a check fails
+```powershell
+.\merit.ps1 ecosystem list
+.\merit.ps1 ecosystem use v00 --path <consumer>
+```
 
-Run `help`, then `where`, then `verify`. Read the first failing line in the receipt. A local URL proves the local consumer path; an `OCV` receipt is needed for a hosted claim. If a provider profile is not live, leave the default on v00 and report the profile status instead of bypassing the gate.
+Selection is per consumer. The default remains v00 until the provider publishes v01 as live. `--allow-nonlive` is for deliberate preview validation only.
 
-## More help
+| Surface | Owns |
+|---|---|
+| `merit-agent-skills` | Generic CLI, Hub, templates, release pins, and provider-profile selection |
+| Consumer repository, such as `merit-demo` | Consumer ID, launch settings, app routes, product content, and consumer tests |
+| Provider repository, such as `merit-prod` | Registration, hosted runtime, provider rails, and live profile promotion |
+| `merit-private-vault` | Private policy, registries, operator procedures, and future `merit.blob` decisions |
 
-- [MERIT public README](../README.md) — the visual adventure map.
-- [Merit-Hub guide](../Merit-Hub/README.md) — menu keys and receipts.
-- [Full usage guide](usage.md) — accounts, hosting, and command detail.
-- [Build over dinner](howto/launch-over-dinner.md) — a guided creative exercise.
-- [Try bundles](TRY_BUNDLES.md) — choose a route by outcome.
+> A consumer ID never belongs in this generic skills repository. The CLI selects a provider profile; the provider owns registration and hosted behavior.
 
-## Ready checklist
+<a id="recovery"></a>
+<table><tr><td bgcolor="#0d9488"><strong><big>🧯 Recovery and safety</big></strong></td></tr></table>
 
-You are ready to show a first alpha when you can:
+When a check fails, run:
 
-1. start the Hub and reach `/play/` over HTTP;
-2. run `verify` and save a passing receipt; and
-3. explain whether your evidence is local (`3V`) or hosted (`OCV`).
+```powershell
+.\merit.ps1 help
+.\merit.ps1 where
+.\merit.ps1 verify --path <consumer>
+```
+
+Read the first failing line in the receipt. It should tell you the expected result, observed result, reason, and remediation. Keep `.env.local`, credentials, and generated secret-bearing receipts out of Git. Use `apps remove --yes` only after checking the target consumer and platform ID.
+
+Operator and policy commands such as `law`, `vault`, and `admin` are not part of the first student path. They remain documented in the public law pack and private operator materials.
+
+<a id="references"></a>
+<table><tr><td bgcolor="#6f42c1"><strong><big>📚 References</big></strong></td></tr></table>
+
+- [MERIT public README](../README.md) — visual path chooser and quick install.
+- [Merit-Hub README](../Merit-Hub/README.md) — menu keys, receipts, and clean-device behavior.
+- [Usage guide](usage.md) — accounts, hosting, and freemium behavior.
+- [Try bundles](TRY_BUNDLES.md) — route selection by outcome.
+- [Build over dinner](howto/launch-over-dinner.md) — guided personalization.
+- [Public/private law pack](merit_law_pack.md) — the public boundary for MERIT law.
+
+## Document control
+
+| Version | Date | Change |
+|---|---|---|
+| 1.0.1 | 2026-09-08 | Reworked to the MERIT documentation standard; corrected the public command map and ownership boundaries. |
+| 1.0.0 | 2026-09-08 | Initial student guide. |

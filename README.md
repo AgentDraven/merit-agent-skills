@@ -8,7 +8,7 @@ Every beginner pathway is explained in three layers: **Start**, **Make progress*
 
 **Quick index:** [Choose your adventure](#which-adventure-fits-you-) · [Start paths](#start-here--pick-your-adventure) · [Peel-The-Onion cards](#peel-the-onion-cards-three-steps-three-checks-each-) · [Additional options](#-for-additional-options) · [Public vs private SSOT](#public-vs-private-ssot) · [Quick install](#-quick-install) · [Dinner walkthrough](#-build-your-app-over-dinner)
 
-New to the command line? Read the [plain-English `merit.ps1` guide](docs/merit.md) for the learner, builder, tester, publisher, and caretaker paths.
+New to the command line? Read the [MERIT CLI student guide](docs/merit.md) for the learner, builder, tester, publisher, and caretaker paths.
 
 ## Which adventure fits you? 🧭
 
@@ -300,7 +300,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when the **Affiliate Owner** approves (this program: HumanBala) |
 | Pin | Release tags, not floating `main` (L1 §E.0 / FR-SK-14) |
-| Current public CLI / Hub release | **`skills-v0.5.201`** |
+| Current public CLI / Hub release | **`skills-v0.5.202`** |
 | Historical human-validation baseline | **`skills-v0.5.63`**; no new human-validation claim in this patch |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
