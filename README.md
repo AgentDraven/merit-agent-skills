@@ -300,7 +300,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when the **Affiliate Owner** approves (this program: HumanBala) |
 | Pin | Release tags, not floating `main` (L1 §E.0 / FR-SK-14) |
-| Current public CLI / Hub release | **`skills-v0.5.203`** |
+| Current public CLI / Hub release | **`skills-v0.5.204`** |
 | Historical human-validation baseline | **`skills-v0.5.63`**; no new human-validation claim in this patch |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.

@@ -1,3 +1,8 @@
+## [0.5.204] - 2026-09-08
+
+### Docs
+- Replaced cryptic Hub-only menu references in the student guide with the English action names and retained keys only as optional shortcuts.
+
 ## [0.5.203] - 2026-09-08
 
 ### Fixed

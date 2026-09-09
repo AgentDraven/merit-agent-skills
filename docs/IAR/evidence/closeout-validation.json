@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "status": "validated",
   "target": "C:\\DApps\\merit-agent-skills",
-  "validatedAt": "2026-09-08T20:50:37.0986240-07:00",
-  "gitHead": "1431b42",
+  "validatedAt": "2026-09-08T20:52:11.5038940-07:00",
+  "gitHead": "e4ee579",
   "gitStatus": [
     " M CHANGELOG.md",
     " M Merit-Hub.ps1",
@@ -12,7 +12,8 @@
     " M README.md",
     " M VERSION",
     " M cfg/compatset.skills.json",
-    " M cfg/oss-bench.template.json"
+    " M cfg/oss-bench.template.json",
+    " M docs/merit.md"
   ],
   "lawContractId": "MERIT-CLOSEOUT-1",
   "lawContractVersion": 1,

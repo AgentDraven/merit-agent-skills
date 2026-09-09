@@ -4,7 +4,7 @@
   "ecosystem_registry": "cfg/live_ecosystems.json",
   "default_ecosystem_id": "v00",
   "sets": [
-    { "pin": "skills-v0.5.203", "releasedAt": "2026-09-08", "status": "supported", "ecosystems": ["v00"], "notes": "Generic public CLI and Hub release; consumer-specific trial checks live in each consumer" },
+    { "pin": "skills-v0.5.204", "releasedAt": "2026-09-08", "status": "supported", "ecosystems": ["v00"], "notes": "Generic public CLI and Hub release; consumer-specific trial checks live in each consumer" },
     { "pin": "skills-v0.5.195", "releasedAt": "2026-09-08", "status": "supported", "notes": "Generic public CLI and Hub release" },
     { "pin": "skills-v0.5.194", "releasedAt": "2026-09-08", "status": "supported", "notes": "Includes 3V PowerShell fallback and public CLI guidance fixes" },
     { "pin": "skills-v0.5.193", "releasedAt": "2026-09-07", "status": "supported", "notes": "Standard-usage wording and advanced operator pointer keep the public path uncluttered" },

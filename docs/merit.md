@@ -14,14 +14,14 @@ MERIT gives you a safe path from a first local app to a checked hosted demo. You
 
 | Persona | Start | Make progress | Finish | Evidence |
 |---|---|---|---|---|
-| **Learner** | Run `Merit-Hub.ps1`; choose `1`, then `2` | Choose Hub `3` to open the demo | Run Hub `3V` | Local `/play/` over HTTP, **Hosted Ready**, and a receipt |
+| **Learner** | Run `Merit-Hub.ps1`; choose **Set up this laptop** (`1`), then **Get the free MERIT tools** (`2`) | Choose **Try it** (`3`) to open the demo | Run **Validate my local demo** (`3V`) | Local `/play/` over HTTP, **Hosted Ready**, and a receipt |
 | **Builder** | `merit.ps1 init --path <consumer>` | Edit `.merit_launch.md`; run `apply` | Run `verify` | Consumer config and `verify OK` |
 | **Tester** | Resolve the repo with `where` | Run `verify`, `e2e`, and browser E2E | Save the failing or passing receipt | Expected result, observed result, and remediation |
 | **Publisher** | Pass local checks | Run `oc`, `deploy`, `portal`, or `all` as applicable | Run hosted `OCV` from the Hub | Hosted URL and provider profile are recorded |
 | **Caretaker** | Run `version` and `ecosystem list` | Review the release pin and evidence | Run `closeout --validate-only` | Release version, tag, and validation receipt |
 
 <a id="first-trip"></a>
-<table><tr><td bgcolor="#0d9488"><strong><big>🚀 First trip: Hub 1 → 2 → 3 → 3V</big></strong></td></tr></table>
+<table><tr><td bgcolor="#0d9488"><strong><big>🚀 First trip: Set up → Install → Try → Validate</big></strong></td></tr></table>
 
 ### Start — prepare the laptop
 
@@ -32,13 +32,13 @@ MERIT gives you a safe path from a first local app to a checked hosted demo. You
    .\Merit-Hub.ps1
    ```
 
-3. Choose **1 — Set up this laptop**, then **2 — Get the free MERIT tools**.
+3. Choose **Set up this laptop** (`1`), then **Get the free MERIT tools** (`2`).
 
 The Hub checks the laptop, installs the tested public skills release, and writes a receipt. The receipt must identify the tools path and release pin. `0` exits the Hub.
 
 ### Make progress — open the demo
 
-Choose **3 — Try it**. The Hub reuses the selected consumer folder, starts the local HTTP path, and opens `/play/`.
+Choose **Try it** (`3`). The Hub reuses the selected consumer folder, starts the local HTTP path, and opens `/play/`.
 
 Look for:
 
@@ -48,11 +48,11 @@ Look for:
 
 ### Finish — validate the local proof
 
-Choose **3V — Validate my local demo**. The Hub checks the page, routes, and configured public rails and records the result.
+Choose **Validate my local demo** (`3V`). The Hub checks the page, routes, and configured public rails and records the result.
 
 > `3V` proves the local consumer path. It does not prove that a hosted deployment is live.
 
-When the local receipt passes, choose **OC — OSS in Cloud** and then **OCV — Walk through my hosted demo**. `OCV` is the evidence for a hosted claim.
+When the local receipt passes, choose **OSS in Cloud** (`OC`) and then **Walk through my hosted demo** (`OCV`). The hosted walkthrough is the evidence for a hosted claim.
 
 <a id="build-your-own"></a>
 <table><tr><td bgcolor="#0d9488"><strong><big>🛠️ Build your own consumer</big></strong></td></tr></table>
