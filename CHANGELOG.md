@@ -1,3 +1,8 @@
+## [0.5.203] - 2026-09-08
+
+### Fixed
+- Corrected the Hub README consumer IAR link to the canonical merit-demo repository URL.
+
 ## [0.5.202] - 2026-09-08
 
 ### Fixed

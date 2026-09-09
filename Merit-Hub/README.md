@@ -4,7 +4,7 @@
 
 `%MYMERITTOOLS%` (e.g. `C:\Tools` or `C:\DevTools`) is a **laptop folder**, not a git repo. Menu **1** installs `merit-venv` and shims on the machine; do not copy your Tools tree back into this repo.
 
-**Current release:** **MERIT Skills `0.5.202`**. The matching Git tag is `skills-v0.5.202`; menu **K** is the advanced rollback selector.
+**Current release:** **MERIT Skills `0.5.203`**. The matching Git tag is `skills-v0.5.203`; menu **K** is the advanced rollback selector.
 
 **Raw download:** `https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub/Merit-Hub.ps1`
 
@@ -149,7 +149,7 @@ Every pathway follows the same rhythm: **Start → Make progress → Finish**.
 - `/play/` opens locally over HTTP and reports Hosted Ready after loading the hosted workbench.
 - The workbench is mounted and `Register free` opens the hosted route.
 - `/portal/` opens locally; no `C:\` file path is treated as hosting proof. `OC`/`OCV` are the hosted-portal proof.
-- `3V` checks can be repeated in any order. See the [consumer checklist](../merit-demo%20docs/IAR/MERIT_DEMO_TDD_CHECKLIST.md).
+- `3V` checks can be repeated in any order. See the [consumer checklist](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/IAR/MERIT_DEMO_TDD_CHECKLIST.md).
 - The standard setup path is unchanged: `1` setup → `2` install skills → `3` try the demo → `3V` validate. The consumer contract is read automatically; no new setup command or flag is required.
 
 **After `OC` (OSS in the Cloud):**
@@ -421,7 +421,7 @@ the exact embedded `skills-v*` pin, while `merit-demo` is fast-forward refreshed
 from `origin/main`. Local changes or divergent history stop safely; nothing is
 overwritten. Use menu **K** to list supported skills tags for advanced review.
 
-For everyday use, there is one number: **MERIT Skills `0.5.202`**. Hub **2** installs that release by default. Its Git tag is named `skills-v0.5.202`; that is the same release written in Git's tag style, not a second version.
+For everyday use, there is one number: **MERIT Skills `0.5.203`**. Hub **2** installs that release by default. Its Git tag is named `skills-v0.5.203`; that is the same release written in Git's tag style, not a second version.
 
 Menu **K** is the advanced exception: it lists the current release plus two approved rollback releases. A selected rollback is shown only while it is active. Vault and portable-PowerShell pins are implementation details; they appear only inside their respective advanced operations.
 
@@ -512,7 +512,7 @@ See [`oc-bench.ps1`](oc-bench.ps1). Each bench gets its own `MYMERITAPP` + `oss-
    - Renaming the file to `Merit-Hub-B.ps1` is fine; its contents determine behavior.
 2. **Refresh the launcher**
    - Download the [root launcher](https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub.ps1) once into your tools folder.
-   - Run it from PowerShell; the corrected release prints `MERIT Skills 0.5.202` first.
+   - Run it from PowerShell; the corrected release prints `MERIT Skills 0.5.203` first.
    - It refreshes the main Hub automatically, even if a cached file exists.
 3. **Check the result**
    - Read the embedded skills pin and executable path printed after download.
@@ -521,7 +521,7 @@ See [`oc-bench.ps1`](oc-bench.ps1). Each bench gets its own `MYMERITAPP` + `oss-
 
 ### Version verdict: one number unless you choose otherwise
 
-The normal screen shows only **MERIT Skills `0.5.202`**. It is the launcher release, Hub release, and Hub 2 default payload. The Git tag `skills-v0.5.202` is the same release with the required tag prefix.
+The normal screen shows only **MERIT Skills `0.5.203`**. It is the launcher release, Hub release, and Hub 2 default payload. The Git tag `skills-v0.5.203` is the same release with the required tag prefix.
 
 You see a version warning only when the downloaded Hub genuinely disagrees with its repository release. Refresh the root launcher and rerun **2** then. If you deliberately select a rollback with **K**, Hub names that approved CompatSet as an exception—this is expected and reversible.
 
