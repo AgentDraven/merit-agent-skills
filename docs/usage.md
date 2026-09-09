@@ -161,11 +161,21 @@ Paid checkout         →  + meritstore onboarding + payment (later)
 
 ## Platform vs BYOK — what MERIT hosts for you
 
+### Provider ecosystem profiles
+
+The default provider profile is `v00` (`https://merit-prod.vercel.app`). The
+catalog in [`cfg/live_ecosystems.json`](../cfg/live_ecosystems.json) also carries
+future provider profiles such as `v01`; they are rejected until marked
+`live_public` and added to the current CompatSet's certified ecosystem list.
+Use `.\merit.ps1 ecosystem list` to inspect profiles, then
+`.\merit.ps1 ecosystem use <id> [--path <consumer>]` to switch globally or
+for one consumer repository. `--allow-nonlive` is reserved for preview checks.
+
 | Layer | Hosted by MERIT (freemium) | You bring (BYOK) |
 |-------|---------------------------|------------------|
 | **Skill templates + merit CLI** | Public GitHub OSS | — |
-| **PAR packages** `@0.4.x` / `@0.2.x` | `merit-prod.vercel.app/pkg/meritutils` | — |
-| **MERIT registration UI** | `merit-prod.vercel.app/store/{consumer_id}/register` for **provisioned** tenants | Your `consumer_id` must be provisioned (not automatic on clone) |
+| **PAR packages** `@0.4.x` / `@0.2.x` | Selected profile's package CDN (`merit-prod.vercel.app/pkg/meritutils` for v00) | — |
+| **MERIT registration UI** | Selected profile's registration base (`merit-prod.vercel.app/store/{consumer_id}/register` for v00) for **provisioned** tenants | Your `consumer_id` must be provisioned (not automatic on clone) |
 | **Checkout / Square** | Platform meritstore runs payment UI | Per-tenant payment provider + payout onboarding |
 | **meritsubs / usage API** | Hosted MERIT authority for usage, credits, and entitlements | Your app calls the hosted provider; do not fork billing logic |
 | **Journal / AMA / subscriber DB** | **Not** a shared MERIT Supabase for your app | **Your** Supabase project (consumer-scoped data plane) |

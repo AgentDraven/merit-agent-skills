@@ -124,8 +124,8 @@ if ($Script:HubOnWindows -and $Script:HubScriptPath) {
 $Script:EmbeddedHubConfigJson = @'
 {
   "schemaVersion": 1,
-  "release": "0.5.198",
-  "skillsPin": "skills-v0.5.198",
+  "release": "0.5.199",
+  "skillsPin": "skills-v0.5.199",
   "vaultPin": "vault-v0.5.56",
   "agentCloseoutRequired": true,
   "agentCloseout": "MERIT closeout (binding): merit.ps1 law closeout -> closeout (validate + commit + push + applicable OSS skills-v* tag) + chat 3-3. Operator when vault on disk: vault scripts\\merit.ps1 mXin + git verify. closeout --validate-only = validation only. Exception: WIP / no commit / local-only.",
@@ -3247,9 +3247,14 @@ function Write-HubReceipt {
             Write-Note 'RC = this catalog repo on its Vercel/host. Not OC (OSS demo on merit-prod).'
         }
         '6' {
-            Write-Info 'https://merit-prod.vercel.app/portal/'
-            Write-Info 'https://merit-prod.vercel.app/portal/partners.html'
-            Write-Info 'After OC: https://merit-prod.vercel.app/store/{your-oc-id}/register'
+            $demoRoot = ''
+            try { $demoRoot = [string](Get-OssState).demoFolder } catch { }
+            $provider = Get-HubProviderProfile -DemoRoot $demoRoot
+            $gw = ([string]$provider.gateway).TrimEnd('/')
+            $reg = if ($provider.register_base) { ([string]$provider.register_base).TrimEnd('/') } else { "$gw/store" }
+            Write-Info "$gw/portal/"
+            Write-Info "$gw/portal/partners.html"
+            Write-Info "After OC: $reg/{your-oc-id}/register"
             Write-Note 'Join (sign up) after OC or after 4 - same key. Affiliate: ?affiliate= on register. Not a here.now slug.'
         }
     }
@@ -3509,6 +3514,8 @@ function Invoke-HubOc {
     $state = Get-OssState
     $cli = Join-Path ([string]$state.skillsFolder) 'merit.ps1'
     $demo = [string]$state.demoFolder
+    $provider = Get-HubProviderProfile -DemoRoot $demo
+    $gateway = ([string]$provider.gateway).TrimEnd('/')
     if (-not (Test-Path -LiteralPath $cli)) {
         Write-Fail "merit.ps1 missing: $cli - run 2 first."
         return
@@ -3519,8 +3526,8 @@ function Invoke-HubOc {
     }
     $preflight = Join-Path $Script:HubRoot 'oc-preflight.ps1'
     if (Test-Path -LiteralPath $preflight) {
-        Write-Attention 'Running OC preflight: local routes, CompatSet pin/artifact, merit-prod health, and here.now (if configured).'
-        & (Resolve-HubPowerShellRunner) -NoProfile -File $preflight -DemoRoot $demo
+        Write-Attention "Running OC preflight: local routes, CompatSet pin/artifact, $gateway health, and here.now (if configured)."
+        & (Resolve-HubPowerShellRunner) -NoProfile -File $preflight -DemoRoot $demo -Gateway $gateway
         if ($LASTEXITCODE -ne 0) { $Script:HubStepFailed=$true; Write-Fail 'OC stopped by preflight. Fix the listed checks, then retry O.'; Write-HubReceipt 'OC'; return }
     }
     $cid = ''
@@ -3572,11 +3579,12 @@ function Invoke-HubOc {
         Write-HubReceipt 'OC'
         return
     }
-    $gw = 'https://merit-prod.vercel.app'
+    $gw = $gateway
+    $store = if ($provider.register_base) { ([string]$provider.register_base).TrimEnd('/') } elseif ($provider.store) { ([string]$provider.store).TrimEnd('/') } else { "$gw/store" }
     $state.ocConsumerId = $cid
     $state.ocProductName = $pname
     $state.ocPlayUrl = "$gw/apps/$cid/play"
-    $state.ocRegisterUrl = "$gw/store/$cid/register"
+    $state.ocRegisterUrl = "$store/$cid/register"
     $state.ocPortalUrl = "$gw/apps/$cid/play/site"
     $state.ocHereNowUrl = ''
     # Scalar, not array: -match on an array filters and never fills $Matches.
@@ -3841,7 +3849,9 @@ function Invoke-HubJoinMerit {
     Write-HubMap -Here '6'
     Write-HubDrillIn '6'
     Write-HubReceipt '6'
-    $portal = 'https://merit-prod.vercel.app/portal/'
+    $demo = ''
+    try { $demo = [string](Get-OssState).demoFolder } catch { }
+    $portal = "$((Get-HubProviderProfile -DemoRoot $demo).gateway.TrimEnd('/'))/portal/"
     try { Start-Process $portal } catch { Write-Warn "Could not open $portal" }
 }
 
@@ -4028,6 +4038,27 @@ function Get-HubConsumerRegistrationUrl {
         } catch { }
     }
     return ''
+}
+
+function Get-HubProviderProfile {
+    param([string]$DemoRoot)
+    $catalogPath = Join-Path (Split-Path -Parent $Script:HubRoot) 'cfg\live_ecosystems.json'
+    if (-not (Test-Path -LiteralPath $catalogPath)) { throw "Provider ecosystem catalog missing: $catalogPath" }
+    $catalog = Get-Content -LiteralPath $catalogPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $selected = ''
+    $launch = Join-Path $DemoRoot '.merit_launch.md'
+    if (Test-Path -LiteralPath $launch) {
+        foreach ($line in Get-Content -LiteralPath $launch -Encoding UTF8) {
+            if ($line -match '^\s*ecosystem_id\s*=\s*(\S+)') { $selected = $Matches[1]; break }
+        }
+    }
+    if (-not $selected) { $selected = [Environment]::GetEnvironmentVariable('MERIT_ECOSYSTEM_ID', 'Process') }
+    if (-not $selected) { $selected = [Environment]::GetEnvironmentVariable('MERIT_ECOSYSTEM_ID', 'User') }
+    if (-not $selected) { $selected = [string]$catalog.default_ecosystem_id }
+    $profile = @($catalog.ecosystems | Where-Object { [string]$_.id -eq $selected }) | Select-Object -First 1
+    if (-not $profile) { throw "Unknown provider ecosystem '$selected'. Run merit.ps1 ecosystem list." }
+    if ([string]$profile.status -ne 'live_public') { throw "Provider ecosystem '$selected' is $($profile.status), not live_public." }
+    return $profile
 }
 
 function Invoke-HubTryItValidate {

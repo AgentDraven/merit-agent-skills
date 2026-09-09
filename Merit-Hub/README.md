@@ -380,6 +380,39 @@ Hub **P** does not delete `%USERPROFILE%\.cursor\` wholesale; use **I** for skil
 
 ## CompatSet & pins
 
+### Provider ecosystem selection
+
+The public skills package uses the `v00` ecosystem by default, currently backed by
+`https://merit-prod.vercel.app`. The supported ecosystem catalog is
+[`cfg/live_ecosystems.json`](../cfg/live_ecosystems.json); it currently lists
+`v01` as `coming_soon` at `https://merit-prodv01.vercel.app`.
+
+Inspect the catalog with:
+
+```powershell
+.\merit.ps1 ecosystem list
+```
+
+When an ecosystem is published as `live_public`, select it globally or for one
+consumer repository:
+
+```powershell
+.\merit.ps1 ecosystem use v01
+.\merit.ps1 ecosystem use v01 --path C:\path\to\consumer
+```
+
+The first command stores the user-level `MERIT_ECOSYSTEM_ID`; the second writes
+`ecosystem_id` into that repository's private `.merit_launch.md`. Until `v01` is
+promoted to `live_public`, selection is rejected unless
+`--allow-nonlive` is explicitly used for preview validation. Provider gateway,
+registration base, and package CDN URLs are resolved from the selected profile;
+consumer IDs remain in the consumer repository.
+
+The skills CompatSet pin and the provider ecosystem are separate selections:
+menu `K` chooses the public skills release, while `merit ecosystem use` chooses
+the hosted provider profile. A CompatSet is advertised for an ecosystem only
+after that provider is marked `live_public` and validated.
+
 ### What Hub reports
 
 Hub highlights synchronization decisions in magenta: skills are checked out at
@@ -387,7 +420,7 @@ the exact embedded `skills-v*` pin, while `merit-demo` is fast-forward refreshed
 from `origin/main`. Local changes or divergent history stop safely; nothing is
 overwritten. Use menu **K** to list supported skills tags for advanced review.
 
-For everyday use, there is one number: **MERIT Skills `0.5.180`**. Hub **2** installs that release by default. Its Git tag is named `skills-v0.5.180`; that is the same release written in Git's tag style, not a second version.
+For everyday use, there is one number: **MERIT Skills `0.5.199`**. Hub **2** installs that release by default. Its Git tag is named `skills-v0.5.199`; that is the same release written in Git's tag style, not a second version.
 
 Menu **K** is the advanced exception: it lists the current release plus two approved rollback releases. A selected rollback is shown only while it is active. Vault and portable-PowerShell pins are implementation details; they appear only inside their respective advanced operations.
 
@@ -478,7 +511,7 @@ See [`oc-bench.ps1`](oc-bench.ps1). Each bench gets its own `MYMERITAPP` + `oss-
    - Renaming the file to `Merit-Hub-B.ps1` is fine; its contents determine behavior.
 2. **Refresh the launcher**
    - Download the [root launcher](https://raw.githubusercontent.com/AgentDraven/merit-agent-skills/main/Merit-Hub.ps1) once into your tools folder.
-   - Run it from PowerShell; the corrected release prints `MERIT Skills 0.5.180` first.
+   - Run it from PowerShell; the corrected release prints `MERIT Skills 0.5.199` first.
    - It refreshes the main Hub automatically, even if a cached file exists.
 3. **Check the result**
    - Read the embedded skills pin and executable path printed after download.
@@ -487,7 +520,7 @@ See [`oc-bench.ps1`](oc-bench.ps1). Each bench gets its own `MYMERITAPP` + `oss-
 
 ### Version verdict: one number unless you choose otherwise
 
-The normal screen shows only **MERIT Skills `0.5.180`**. It is the launcher release, Hub release, and Hub 2 default payload. The Git tag `skills-v0.5.180` is the same release with the required tag prefix.
+The normal screen shows only **MERIT Skills `0.5.199`**. It is the launcher release, Hub release, and Hub 2 default payload. The Git tag `skills-v0.5.199` is the same release with the required tag prefix.
 
 You see a version warning only when the downloaded Hub genuinely disagrees with its repository release. Refresh the root launcher and rerun **2** then. If you deliberately select a rollback with **K**, Hub names that approved CompatSet as an exception—this is expected and reversible.
 

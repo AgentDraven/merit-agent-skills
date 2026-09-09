@@ -18,6 +18,124 @@ try { . (Join-Path $Root 'merit\modules\Merit.Vault.ps1') } catch { throw "MERIT
 $Command = if ($args.Count -gt 0) { "$($args[0])".ToLowerInvariant() } else { 'help' }
 $Rest = if ($args.Count -gt 1) { @($args[1..($args.Count - 1)]) } else { @() }
 
+$Script:LiveEcosystemsPath = Join-Path $Root 'cfg/live_ecosystems.json'
+
+function Get-MeritEcosystemCatalog {
+    if (-not (Test-Path -LiteralPath $Script:LiveEcosystemsPath)) {
+        throw "MERIT ecosystem catalog missing: $Script:LiveEcosystemsPath"
+    }
+    return Read-JsonFile $Script:LiveEcosystemsPath
+}
+
+function Get-MeritEcosystemProfile {
+    param(
+        [string]$TargetRoot = '',
+        [string[]]$ArgList = @(),
+        [string]$EcosystemId = '',
+        [switch]$AllowNonLive
+    )
+    $catalog = Get-MeritEcosystemCatalog
+    $selected = $EcosystemId
+    if (-not $selected) { $selected = Get-ArgValue -ArgList $ArgList -Name '--ecosystem' }
+    if (-not $selected) { $selected = Get-ArgValue -ArgList $ArgList -Name '--ecosystem-id' }
+    if (-not $selected -and $TargetRoot) {
+        $launch = Join-Path $TargetRoot '.merit_launch.md'
+        if (Test-Path -LiteralPath $launch) {
+            try { $selected = Get-Setting -Settings (Get-LaunchSettings -Path $launch) -Name 'ecosystem_id' } catch { }
+        }
+    }
+    if (-not $selected) { $selected = [Environment]::GetEnvironmentVariable('MERIT_ECOSYSTEM_ID', 'Process') }
+    if (-not $selected) { $selected = [Environment]::GetEnvironmentVariable('MERIT_ECOSYSTEM_ID', 'User') }
+    if (-not $selected) { $selected = [string]$catalog.default_ecosystem_id }
+    $selected = $selected.Trim().ToLowerInvariant()
+    $profile = @($catalog.ecosystems | Where-Object { [string]$_.id -eq $selected }) | Select-Object -First 1
+    if (-not $profile) { throw "Unknown MERIT ecosystem '$selected'. Run: .\merit.ps1 ecosystem list" }
+    if ([string]$profile.status -ne 'live_public' -and -not $AllowNonLive) {
+        throw "MERIT ecosystem '$selected' is $($profile.status), not live_public. Wait for provider publish_gate or pass --allow-nonlive for preview testing."
+    }
+    if (-not $AllowNonLive) {
+        $compatPath = Join-Path $Root 'cfg/compatset.skills.json'
+        if (Test-Path -LiteralPath $compatPath) {
+            $currentSet = @((Read-JsonFile $compatPath).sets | Where-Object { $_.status -eq 'supported' } | Select-Object -First 1)
+            if ($currentSet -and $currentSet.ecosystems -and ([string]$selected -notin @($currentSet.ecosystems))) {
+                throw "Skills CompatSet $($currentSet.pin) is not certified for ecosystem '$selected'. Update the CompatSet registry after provider validation."
+            }
+        }
+    }
+    return $profile
+}
+
+function Get-MeritGateway {
+    param([string]$TargetRoot = '', [string[]]$ArgList = @(), [string]$EcosystemId = '')
+    return [string](Get-MeritEcosystemProfile -TargetRoot $TargetRoot -ArgList $ArgList -EcosystemId $EcosystemId).gateway
+}
+
+function Get-MeritStoreBase {
+    param([string]$TargetRoot = '', [string[]]$ArgList = @(), [string]$EcosystemId = '')
+    $profile = Get-MeritEcosystemProfile -TargetRoot $TargetRoot -ArgList $ArgList -EcosystemId $EcosystemId
+    if ($profile.register_base) { return ([string]$profile.register_base).TrimEnd('/') }
+    if ($profile.store) { return ([string]$profile.store).TrimEnd('/') }
+    return (([string]$profile.gateway).TrimEnd('/') + '/store')
+}
+
+function Get-MeritRegisterUrl {
+    param([string]$ConsumerId, [string]$TargetRoot = '', [string[]]$ArgList = @(), [string]$EcosystemId = '')
+    return "$(Get-MeritStoreBase -TargetRoot $TargetRoot -ArgList $ArgList -EcosystemId $EcosystemId)/$ConsumerId/register"
+}
+
+function Set-MeritPackageProfile {
+    param([object]$Pins, [object]$Profile)
+    $base = if ($Profile.package_base) { ([string]$Profile.package_base).TrimEnd('/') } else { (([string]$Profile.gateway).TrimEnd('/') + '/pkg/meritutils') }
+    foreach ($prop in $Pins.packages.PSObject.Properties) {
+        $pkg = $prop.Value
+        if ($pkg.cdn_base) { $pkg.cdn_base = $base }
+        if ($pkg.artifacts) {
+            foreach ($artifact in $pkg.artifacts.PSObject.Properties) {
+                if ($artifact.Value.url -and ([string]$artifact.Value.url -match '/pkg/meritutils/(.+)$')) {
+                    $artifact.Value.url = "$base/$($Matches[1])"
+                }
+            }
+        }
+    }
+    return $Pins
+}
+
+function Invoke-EcosystemCommand {
+    param([string[]]$ArgList, [string]$TargetRoot)
+    $sub = if ($ArgList.Count -gt 0) { [string]$ArgList[0] } else { 'list' }
+    $catalog = Get-MeritEcosystemCatalog
+    if ($sub -match '^(list|show)$') {
+        $current = Get-MeritEcosystemProfile -TargetRoot $TargetRoot -ArgList @() -AllowNonLive
+        Write-Host 'MERIT provider ecosystems:' -ForegroundColor Cyan
+        foreach ($p in @($catalog.ecosystems)) {
+            $mark = if ([string]$p.id -eq [string]$current.id) { '*' } else { ' ' }
+            Write-Host (" {0} {1}  {2}  gateway={3}  register={4}  packages={5}" -f $mark,$p.id,$p.status,$p.gateway,$p.register_base,$p.package_base)
+        }
+        Write-Host "Default: $($catalog.default_ecosystem_id)"
+        return
+    }
+    if ($sub -eq 'use') {
+        $id = if ($ArgList.Count -gt 1) { [string]$ArgList[1] } else { '' }
+        if (-not $id) { throw 'ecosystem use: pass an id, for example v00 or v01' }
+        $preview = Test-ArgFlag -ArgList $ArgList -Name '--allow-nonlive'
+        $profile = Get-MeritEcosystemProfile -EcosystemId $id -AllowNonLive:$preview
+        $path = Get-ArgValue -ArgList $ArgList -Name '--path'
+        if ($path) {
+            $repo = (Resolve-Path -LiteralPath $path).Path
+            $launch = Join-Path $repo '.merit_launch.md'
+            if (-not (Test-Path -LiteralPath $launch)) { throw "ecosystem use: launch file missing at $launch; run init first" }
+            Set-LaunchIniValue -Path $launch -Name 'ecosystem_id' -Value ([string]$profile.id)
+            Write-Host "Selected $($profile.id) for $repo (stored in .merit_launch.md)."
+        } else {
+            [Environment]::SetEnvironmentVariable('MERIT_ECOSYSTEM_ID', [string]$profile.id, 'User')
+            Write-Host "Selected $($profile.id) for this user (MERIT_ECOSYSTEM_ID)."
+        }
+        if ([string]$profile.status -ne 'live_public') { Write-Warning "Preview only: $($profile.id) is $($profile.status)." }
+        return
+    }
+    throw 'ecosystem: use list, or use <id> [--path <repo>] [--allow-nonlive]'
+}
+
 function Write-MeritHelp {
     Write-Host @"
 merit.ps1 v$MERIT_VERSION - public MERIT CLI
@@ -40,6 +158,9 @@ Commands:
                            law --section VIII.F | law --for-skill merit-portal
   where                    Print Merit Surface map (OSS bench / IDE / vault discovery)
   surface                  Alias for where
+  ecosystem list           Show provider ecosystems and the selected/default profile
+  ecosystem use <id>       Select a live provider globally or with --path <repo>
+                           Use --allow-nonlive only for preview validation
   vault <mXin|mXout|runtime|env|cert|git>  Delegate explicit operator commands when a vault is present
   skills list|status|install|remove      Install and inspect IDE skills
   par scaffold             Advanced: create play shell + cfg/par_pins.json
@@ -59,7 +180,7 @@ Commands:
   admin github auth login                      Authenticate another GitHub account
   admin github auth switch [--user <login>]   Switch the active GitHub account
   app scaffold             Print merit-demo clone guidance
-  create --path <repo>     AutoMagic fullstack-consumer (default = platform URL on merit-prod)
+  create --path <repo>     AutoMagic fullstack-consumer (default = selected platform profile)
                            [--profile fullstack-consumer] [--deploy]
                            [--vercel-scope <slug>] [--product-name <name>]
                            [--scaffold-only]  (alias of default platform mode)
@@ -80,7 +201,7 @@ Commands:
   version                  Print version
   help                     Print help (includes create phase redo map)
 
-Typical flow (AutoMagic - live on merit-prod):
+Typical flow (AutoMagic - live on the selected MERIT provider profile):
   .\merit.ps1 create --path ..\<app> --profile fullstack-consumer
 
 Create phase redo map (after a failed phase):
@@ -91,7 +212,7 @@ Create phase redo map (after a failed phase):
   .\merit.ps1 apps refresh --path ..\my-app
   # rails-only upgrade: store activate + UserGuide + publish (keeps app_logic/)
   .\merit.ps1 create --path ..\my-app --profile fullstack-consumer
-  # or re-run full create (idempotent); opens https://merit-prod.vercel.app/apps/<app>/play
+  # or re-run full create (idempotent); opens the selected provider /apps/<app>/play
 
 Optional later (your own Vercel host):
   .\merit.ps1 create --path ..\my-app --profile fullstack-consumer --deploy --vercel-scope <your-team>
@@ -153,6 +274,12 @@ function Invoke-Apply {
     param([string]$TargetRoot, [string[]]$ArgList)
     $launch = Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList
     $settings = Get-LaunchSettings -Path $launch
+    $provider = Get-MeritEcosystemProfile -TargetRoot $TargetRoot -ArgList $ArgList
+    $gateway = ([string]$provider.gateway).TrimEnd('/')
+    $store = Get-MeritStoreBase -TargetRoot $TargetRoot -ArgList $ArgList
+    if (-not $settings.Contains('merit_metered_api_base_url') -or $settings.merit_metered_api_base_url -eq 'https://merit-prod.vercel.app') { $settings.merit_metered_api_base_url = $gateway }
+    if (-not $settings.Contains('meritsubs_public_base_url') -or $settings.meritsubs_public_base_url -eq 'https://merit-prod.vercel.app/api/meritsubs') { $settings.meritsubs_public_base_url = "$gateway/api/meritsubs" }
+    if (-not $settings.Contains('meritstore_base_url') -or $settings.meritstore_base_url -eq 'https://merit-prod.vercel.app/store') { $settings.meritstore_base_url = $store }
     $consumerId = Require-Setting -Settings $settings -Name 'consumer_id'
     $scope = Require-Setting -Settings $settings -Name 'vercel_scope'
     $branch = Get-Setting -Settings $settings -Name 'production_branch' -Default 'main'
@@ -278,11 +405,16 @@ function Resolve-ScaffoldConsumerId {
 
 function Invoke-ParScaffold {
     param([string]$TargetRoot, [string]$Variant, [string]$Theme = '', [string]$ConsumerId = '')
+    $profile = Get-MeritEcosystemProfile -TargetRoot $TargetRoot
+    $gateway = ([string]$profile.gateway).TrimEnd('/')
+    $store = Get-MeritStoreBase -TargetRoot $TargetRoot
     $pinsSrc = Join-Path $Root 'cfg/par_pins.free.json'
     $destCfg = Join-Path $TargetRoot 'cfg'
     New-Item -ItemType Directory -Force -Path $destCfg | Out-Null
     Copy-Item -LiteralPath $pinsSrc -Destination (Join-Path $destCfg 'par_pins.json') -Force
     $pins = Read-JsonFile (Join-Path $destCfg 'par_pins.json')
+    $pins = Set-MeritPackageProfile -Pins $pins -Profile $profile
+    Write-JsonFile -Path (Join-Path $destCfg 'par_pins.json') -Object $pins
     $wb = $pins.packages.merit_workbench
     $ux = $pins.packages.merit_ux
     if (-not $ux) { throw 'par scaffold: merit_ux pin missing from cfg/par_pins.free.json (DualRail Gloss)' }
@@ -312,9 +444,9 @@ function Invoke-ParScaffold {
         $themeArt = $ux.artifacts.themes.'gloss-aurora'
     }
     $consumerId = if ($ConsumerId) { ([string]$ConsumerId).Trim().ToLowerInvariant() } else { Resolve-ScaffoldConsumerId -TargetRoot $TargetRoot }
-    $registerUrl = "https://merit-prod.vercel.app/store/$consumerId/register"
-    $communityRailsUrl = 'https://merit-prod.vercel.app/portal/developers/community-rails/'
-    $evidenceBaseUrl = 'https://merit-prod.vercel.app/portal/developers/community-rails/evidence'
+    $registerUrl = "$store/$consumerId/register"
+    $communityRailsUrl = "$gateway/portal/developers/community-rails/"
+    $evidenceBaseUrl = "$gateway/portal/developers/community-rails/evidence"
     $productNameJs = ConvertTo-Json -InputObject $productName -Compress
     $consumerIdJs = ConvertTo-Json -InputObject $consumerId -Compress
     $registerUrlJs = ConvertTo-Json -InputObject $registerUrl -Compress
@@ -368,14 +500,18 @@ function Invoke-BrandingScaffold {
 
 function Invoke-SubsScaffold {
     param([string]$TargetRoot)
+    $profile = Get-MeritEcosystemProfile -TargetRoot $TargetRoot
+    $gateway = ([string]$profile.gateway).TrimEnd('/')
+    $store = Get-MeritStoreBase -TargetRoot $TargetRoot
     $cfg = Join-Path $TargetRoot 'cfg'
     New-Item -ItemType Directory -Force -Path $cfg | Out-Null
     Write-JsonFile -Path (Join-Path $cfg 'merit-sync.json') -Object ([ordered]@{
         schema = 'merit.merit_sync.v1'
         consumer_id = 'YOUR_CONSUMER_ID'
-        metered_api_base = 'https://merit-prod.vercel.app'
-        meritsubs_base = 'https://merit-prod.vercel.app/api/meritsubs'
-        meritstore_register_url = 'https://merit-prod.vercel.app/store/YOUR_CONSUMER_ID/register'
+        ecosystem_id = [string]$profile.id
+        metered_api_base = $gateway
+        meritsubs_base = "$gateway/api/meritsubs"
+        meritstore_register_url = "$store/YOUR_CONSUMER_ID/register"
         freemium_limits = 'cfg/freemium_limits.json'
         plus_sku = 'cfg/plus_sku.json'
     })
@@ -1195,9 +1331,11 @@ function Invoke-PortalScaffold {
         [string]$ProductName,
         [string]$ConsumerId,
         [string]$AppUrl = '',
-        [string]$PortalUrl = ''
+        [string]$PortalUrl = '',
+        [string]$Gateway = ''
     )
-    if (-not $AppUrl) { $AppUrl = "https://merit-prod.vercel.app/apps/$ConsumerId/play" }
+    if (-not $Gateway) { $Gateway = Get-MeritGateway -TargetRoot $TargetRoot }
+    if (-not $AppUrl) { $AppUrl = "$Gateway/apps/$ConsumerId/play" }
     if (-not $PortalUrl) { $PortalUrl = "https://$ConsumerId.here.now" }
     $portalDir = Join-Path $TargetRoot 'portal'
     New-Item -ItemType Directory -Force -Path $portalDir | Out-Null
@@ -1210,7 +1348,7 @@ function Invoke-PortalScaffold {
         throw "portal scaffold: missing template $tpl"
     } else {
         $html = Get-Content -LiteralPath $tpl -Raw -Encoding UTF8
-        $html = $html.Replace('{{PRODUCT_NAME}}', $ProductName).Replace('{{CONSUMER_ID}}', $ConsumerId).Replace('{{APP_URL}}', $AppUrl).Replace('{{DINNER_URL}}', 'https://merit-prod.vercel.app/portal/developers/full-app/')
+        $html = $html.Replace('{{PRODUCT_NAME}}', $ProductName).Replace('{{CONSUMER_ID}}', $ConsumerId).Replace('{{APP_URL}}', $AppUrl).Replace('{{DINNER_URL}}', "$Gateway/portal/developers/full-app/")
         Set-Content -LiteralPath $indexPath -Value $html -Encoding UTF8
         Write-Host "portal jumpstart OK -> $indexPath (overwrite unless portal/.merit-keep)"
     }
@@ -1266,8 +1404,9 @@ function Write-UserGuideScaffold {
         [string]$ProductName,
         [string]$ConsumerId,
         [bool]$Force = $false,
-        [string]$Gateway = 'https://merit-prod.vercel.app'
+        [string]$Gateway = ''
     )
+    if (-not $Gateway) { $Gateway = Get-MeritGateway -TargetRoot $TargetRoot }
     $docsDir = Join-Path $TargetRoot 'docs'
     New-Item -ItemType Directory -Force -Path $docsDir | Out-Null
     $guidePath = Join-Path $docsDir 'UserGuide.md'
@@ -1313,8 +1452,10 @@ function Invoke-AppsRefresh {
         [string]$TargetRoot,
         [string]$ConsumerId,
         [string[]]$ArgList,
-        [string]$Gateway = 'https://merit-prod.vercel.app'
+        [string]$Gateway = ''
     )
+    if (-not $Gateway) { $Gateway = Get-MeritGateway -TargetRoot $TargetRoot -ArgList $ArgList }
+    $store = Get-MeritStoreBase -TargetRoot $TargetRoot -ArgList $ArgList
     # GOAT lifecycle verb: re-activate store catalog + sync rails scaffold without touching app_logic/.
     Write-Host "apps refresh: consumer_id=$ConsumerId (never edits app_logic/)"
     $logicProbe = Join-Path $TargetRoot 'app_logic'
@@ -1334,7 +1475,7 @@ function Invoke-AppsRefresh {
     $activateBody = (@{ template = 'free-community'; display_name = $display } | ConvertTo-Json -Compress)
     try {
         $null = Invoke-RestMethod -Uri $activateUri -Method Post -Body $activateBody -ContentType 'application/json' -TimeoutSec 60
-        Write-Host "Store re-activated (free-community): $Gateway/store/$ConsumerId/register"
+        Write-Host "Store re-activated (free-community): $store/$ConsumerId/register"
     } catch {
         throw "apps refresh: store activate failed ($activateUri). $_"
     }
@@ -1414,8 +1555,9 @@ function Invoke-AppsPublish {
     param(
         [string]$TargetRoot,
         [string]$ConsumerId,
-        [string]$Gateway = 'https://merit-prod.vercel.app'
+        [string]$Gateway = ''
     )
+    if (-not $Gateway) { $Gateway = Get-MeritGateway -TargetRoot $TargetRoot }
     # Vercel Functions reject bodies > ~4.5MB (413 FUNCTION_PAYLOAD_TOO_LARGE).
     # Upload one file per request so dinner create never hits that ceiling.
     Write-Host "Packing play/ + cfg/ for $Gateway/apps/$ConsumerId/play ..."
@@ -1466,7 +1608,7 @@ function Send-AppFileList {
     param(
         [object[]]$Files,
         [string]$ConsumerId,
-        [string]$Gateway = 'https://merit-prod.vercel.app',
+        [string]$Gateway = '',
         [string]$UsageGateHash = '',
         [string]$Label = 'apps publish'
     )
@@ -1773,8 +1915,9 @@ function Invoke-OcSitePublish {
         [string]$TargetRoot,
         [string]$ConsumerId,
         [string]$ProductName,
-        [string]$Gateway = 'https://merit-prod.vercel.app'
+        [string]$Gateway = ''
     )
+    if (-not $Gateway) { $Gateway = Get-MeritGateway -TargetRoot $TargetRoot }
     $files = Get-OcSiteFiles -TargetRoot $TargetRoot -ConsumerId $ConsumerId -ProductName $ProductName
     Write-Host "Packing portal/ -> MERIT-hosted marketing site ($($files.Count) file(s))..."
     [void](Send-AppFileList -Files $files -ConsumerId $ConsumerId -Gateway $Gateway -Label 'oc site publish')
@@ -1786,8 +1929,10 @@ function Invoke-Oc {
         [string]$TargetRoot,
         [string]$ConsumerId,
         [string]$ProductName = '',
-        [string]$Gateway = 'https://merit-prod.vercel.app'
+        [string]$Gateway = ''
     )
+    if (-not $Gateway) { $Gateway = Get-MeritGateway -TargetRoot $TargetRoot }
+    $store = Get-MeritStoreBase -TargetRoot $TargetRoot
     $cid = Test-OcConsumerId -ConsumerId $ConsumerId
     $name = ([string]$ProductName).Trim()
     if (-not $name) {
@@ -1803,7 +1948,7 @@ function Invoke-Oc {
         $name = "OC $cid"
     }
     $probePlay = "$Gateway/apps/$cid/play"
-    $probeReg = "$Gateway/store/$cid/register"
+    $probeReg = "$store/$cid/register"
     $probeSite = "$Gateway/apps/$cid/play/site"
     Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $probePlay -RegisterUrl $probeReg -ConsumerId $cid -SiteUrl $probeSite
     $appUrl = Invoke-AppsPublish -TargetRoot $TargetRoot -ConsumerId $cid -Gateway $Gateway
@@ -1814,7 +1959,7 @@ function Invoke-Oc {
     } catch {
         throw "OC activate is required and failed ($activateUri). $_"
     }
-    $registerUrl = "$Gateway/store/$cid/register"
+    $registerUrl = "$store/$cid/register"
     Write-Host "Store activated (free-community): $registerUrl"
     Set-OcCreatorFace -TargetRoot $TargetRoot -ProductName $name -PlayUrl $appUrl -RegisterUrl $registerUrl -SiteUrl $probeSite -SkipScaffold
     $siteUrl = Invoke-OcSitePublish -TargetRoot $TargetRoot -ConsumerId $cid -ProductName $name -Gateway $Gateway
@@ -1921,8 +2066,9 @@ function Invoke-AppsRemove {
         [string]$TargetRoot,
         [string]$ConsumerId,
         [string[]]$ArgList,
-        [string]$Gateway = 'https://merit-prod.vercel.app'
+        [string]$Gateway = ''
     )
+    if (-not $Gateway) { $Gateway = Get-MeritGateway -TargetRoot $TargetRoot -ArgList $ArgList }
     if (-not (Test-ArgFlag -ArgList $ArgList -Name '--yes')) {
         $playUi = '{0}/apps/{1}/play' -f $Gateway, $ConsumerId
         throw @"
@@ -1998,8 +2144,12 @@ function Write-CreateSuccessCelebration {
         [string]$ProductName,
         [string]$AppUrl,
         [object]$PortalUrls,
-        [bool]$OwnHost = $false
+        [bool]$OwnHost = $false,
+        [string]$Gateway = '',
+        [string]$Store = ''
     )
+    if (-not $Gateway) { $Gateway = Get-MeritGateway -TargetRoot $TargetRoot }
+    if (-not $Store) { $Store = Get-MeritStoreBase -TargetRoot $TargetRoot }
     if (-not $OwnHost -and -not $AppUrl) {
         throw 'create: missing cloud app URL after phase 8 (Cloud First Security Centric). Re-run create.'
     }
@@ -2020,7 +2170,7 @@ function Write-CreateSuccessCelebration {
     if (-not $OwnHost) {
         $linkColor = 'Cyan'
         $noteColor = 'DarkGray'
-        $gatewayHost = 'https://merit-prod.vercel.app'
+        $gatewayHost = $Gateway
         Write-Host '  === Open these in the browser (production) ===' -ForegroundColor Cyan
         Write-Host '  1) App UI (play)  - open this first (your live app):' -ForegroundColor White
         Write-Host "     $AppUrl" -ForegroundColor $linkColor
@@ -2041,7 +2191,7 @@ function Write-CreateSuccessCelebration {
         Write-Host '  === Validate / celebrate (2 minutes) ===' -ForegroundColor Cyan
         Write-Host '  [ ] Paste link 1 (App UI) into Chrome/Edge/Safari (incognito is fine).'
         Write-Host '  [ ] Confirm the page loads (play shell / workbench chrome) - hard-refresh if blank.'
-        Write-Host '  [ ] Confirm the address bar is merit-prod.vercel.app/apps/<id>/play (cloud, not localhost).'
+        Write-Host "  [ ] Confirm the address bar is $Gateway/apps/<id>/play (cloud, not localhost)."
         if ($portalLine) {
             Write-Host '  [ ] Open link 2 (Marketing portal) - jumpstart PRD / app_logic guide should appear.'
         }
@@ -2060,9 +2210,9 @@ function Write-CreateSuccessCelebration {
         Write-Host '  /merit-portal -> shape portal/ then: .\merit.ps1 portal --path <repo>'
         Write-Host '  /merit-applogic -> implement Must FRs under app_logic/'
         Write-Host '  Guide: ' -NoNewline
-        Write-Host 'https://merit-prod.vercel.app/portal/developers/full-app/' -ForegroundColor $linkColor
+        Write-Host "$Gateway/portal/developers/full-app/" -ForegroundColor $linkColor
         Write-Host '  4) Store register  - members join your app:' -ForegroundColor White
-        Write-Host "     https://merit-prod.vercel.app/store/$ConsumerId/register" -ForegroundColor $linkColor
+        Write-Host "     $Store/$ConsumerId/register" -ForegroundColor $linkColor
         Write-Host '     <== free-community path; activate re-runs if this 404s' -ForegroundColor $noteColor
         Write-Host '  Optional: push this folder to GitHub to archive the repo.'
         Write-Host '  Advanced later: --deploy --vercel-scope <your-team> (own host).'
@@ -2072,7 +2222,7 @@ function Write-CreateSuccessCelebration {
         Write-Host "  consumer_id=$ConsumerId"
         Write-Host '  Next: shape portal/ then .\merit.ps1 portal --path <repo>'
         Write-Host '  Then /merit-applogic under app_logic/.'
-        Write-Host "  Checkout later: https://merit-prod.vercel.app/store/$ConsumerId/register"
+        Write-Host "  Checkout later: $Store/$ConsumerId/register"
     }
     Write-Host ''
     Write-Host $box -ForegroundColor Green
@@ -2133,11 +2283,15 @@ function Write-CreateRecoveryTips {
         Write-Host "  - After phase $FailedPhase succeeds, run each later phase command above through phase 8."
     }
     Write-Host '  - Full command list (all verbs + phase map): .\merit.ps1 help'
-    Write-Host '  - Dinner guide: https://merit-prod.vercel.app/portal/developers/full-app/'
+    Write-Host '  - Dinner guide: use the selected provider profile''s developer portal.'
 }
 
 function Invoke-Create {
     param([string]$TargetRoot, [string[]]$ArgList)
+
+    $provider = Get-MeritEcosystemProfile -TargetRoot $TargetRoot -ArgList $ArgList
+    $gateway = ([string]$provider.gateway).TrimEnd('/')
+    $store = Get-MeritStoreBase -TargetRoot $TargetRoot -ArgList $ArgList
 
     $profile = Get-ArgValue -ArgList $ArgList -Name '--profile'
     if (-not $profile) { $profile = 'fullstack-consumer' }
@@ -2177,13 +2331,15 @@ function Invoke-Create {
     Write-Host " MERIT AutoMagic create  v$MERIT_VERSION"
     Write-Host " profile=$profile"
     Write-Host " path=$TargetRoot"
-    if ($wantDeploy) { Write-Host ' mode=deploy (your Vercel host)' } else { Write-Host ' mode=platform (default - live on merit-prod.vercel.app/apps/<app>/)' }
+    if ($wantDeploy) { Write-Host ' mode=deploy (your Vercel host)' } else { Write-Host " mode=platform (selected provider - $gateway/apps/<app>/)" }
+    Write-Host " ecosystem=$($provider.id)"
     Write-Host "============================================================"
 
     $phases = @(
         @{ n = 1; title = 'Repo skeleton and MERIT wiring (init + apply)'; script = {
             Invoke-Init -TargetRoot $TargetRoot -ArgList $ArgList
             Ensure-CreateLaunchDefaults -TargetRoot $TargetRoot -ArgList $ArgList
+            Set-LaunchIniValue -Path (Get-LaunchPath -TargetRoot $TargetRoot -ArgList $ArgList) -Name 'ecosystem_id' -Value ([string]$provider.id)
             Invoke-Apply -TargetRoot $TargetRoot -ArgList $ArgList
         }},
         @{ n = 2; title = 'DualRail Gloss Make Art play (par scaffold)'; script = {
@@ -2204,7 +2360,8 @@ function Invoke-Create {
             if (Test-Path $syncPath) {
                 $sync = Read-JsonFile $syncPath
                 $sync.consumer_id = $cid
-                $sync.meritstore_register_url = "https://merit-prod.vercel.app/store/$cid/register"
+                $sync.ecosystem_id = [string]$provider.id
+                $sync.meritstore_register_url = "$store/$cid/register"
                 Write-JsonFile -Path $syncPath -Object $sync
             }
         }},
@@ -2222,7 +2379,7 @@ function Invoke-Create {
             $cid = Require-Setting -Settings $settings -Name 'consumer_id'
             $pname = Get-Setting -Settings $settings -Name 'product_name' -Default $cid
             $baseSlug = Get-Setting -Settings $settings -Name 'here_now_slug' -Default $cid
-            Invoke-PortalScaffold -TargetRoot $TargetRoot -ProductName $pname -ConsumerId $cid -AppUrl "https://merit-prod.vercel.app/apps/$cid/play" -PortalUrl "https://$baseSlug.here.now"
+            Invoke-PortalScaffold -TargetRoot $TargetRoot -ProductName $pname -ConsumerId $cid -AppUrl "$gateway/apps/$cid/play" -PortalUrl "https://$baseSlug.here.now" -Gateway $gateway
         }},
         @{ n = 8; title = 'Publish UI to merit-prod /apps + baseline here.now portal'; script = {
             if (-not $scaffoldOnly) {
@@ -2231,7 +2388,6 @@ function Invoke-Create {
                 return
             }
             # Dinner default: host UI + rails on merit-prod (no builder Vercel).
-            $gateway = 'https://merit-prod.vercel.app'
             Write-Host "Platform host for dinner: $gateway"
             try {
                 $health = Invoke-RestMethod -Uri "$gateway/api/health" -Method Get -TimeoutSec 20
@@ -2244,7 +2400,7 @@ function Invoke-Create {
             $settings = Get-LaunchSettings -Path $launch
             $cid = Require-Setting -Settings $settings -Name 'consumer_id'
             Write-Host "Rails wired for consumer_id=$cid (store/auth via $gateway)"
-            Write-Host "Register path (after your store is live): $gateway/store/$cid/register"
+            Write-Host "Register path (after your store is live): $store/$cid/register"
             Write-Host 'Phase 8 next: publish UI to merit-prod /apps (re-run create is safe if this step hangs).'
             $script:CreateAppUrl = Invoke-AppsPublish -TargetRoot $TargetRoot -ConsumerId $cid -Gateway $gateway
             if (-not $script:CreateAppUrl) {
@@ -2255,7 +2411,7 @@ function Invoke-Create {
                 $activateUri = "$gateway/api/meritstore/v1/tenants/$cid/activate"
                 $activateBody = (@{ template = 'free-community'; display_name = $cid } | ConvertTo-Json -Compress)
                 $null = Invoke-RestMethod -Uri $activateUri -Method Post -Body $activateBody -ContentType 'application/json' -TimeoutSec 60
-                Write-Host "Store activated (free-community): $gateway/store/$cid/register"
+                Write-Host "Store activated (free-community): $store/$cid/register"
             } catch {
                 Write-Host "Store activate deferred (re-try POST $gateway/api/meritstore/v1/tenants/$cid/activate): $($_.Exception.Message)"
             }
@@ -2277,7 +2433,7 @@ function Invoke-Create {
             $settings = Get-LaunchSettings -Path $launch
             $cid = Get-Setting -Settings $settings -Name 'consumer_id' -Default (Split-Path -Leaf $TargetRoot)
             $pname = Get-Setting -Settings $settings -Name 'product_name' -Default $cid
-            Write-CreateSuccessCelebration -TargetRoot $TargetRoot -ConsumerId $cid -ProductName $pname -AppUrl $script:CreateAppUrl -PortalUrls $script:CreatePortalUrls -OwnHost (-not $scaffoldOnly)
+            Write-CreateSuccessCelebration -TargetRoot $TargetRoot -ConsumerId $cid -ProductName $pname -AppUrl $script:CreateAppUrl -PortalUrls $script:CreatePortalUrls -OwnHost (-not $scaffoldOnly) -Gateway $gateway -Store $store
         }}
     )
 
@@ -2306,6 +2462,7 @@ $target = Resolve-TargetRoot -ArgList $Rest
 switch -Regex ($Command) {
     '^(help|\?)$' { Write-MeritHelp; exit 0 }
     '^version$' { Write-Host "merit $MERIT_VERSION"; exit 0 }
+    '^ecosystem$' { try { Invoke-EcosystemCommand -ArgList $Rest -TargetRoot $target; exit 0 } catch { Write-Host $_.Exception.Message; exit 1 } }
     '^init$' { Invoke-Init -TargetRoot $target -ArgList $Rest; exit 0 }
     '^apply$' { Invoke-Apply -TargetRoot $target -ArgList $Rest; exit 0 }
     '^verify$' {

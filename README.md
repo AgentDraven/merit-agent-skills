@@ -131,7 +131,7 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [plain-English u
 
 </details>
 
-**Production MERIT base (skills default):** `https://merit-prod.vercel.app` (**v00** in [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json)). Operator **v01** hosts exist but are not the skills default until vault `publish_gate` promotes them. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
+**Production MERIT base (skills default):** `https://merit-prod.vercel.app` (**v00** in [`cfg/live_ecosystems.json`](cfg/live_ecosystems.json)). Operator **v01** hosts exist but are not the skills default until vault `publish_gate` promotes them. Use `.\merit.ps1 ecosystem list` and `.\merit.ps1 ecosystem use <id>` to inspect or switch the provider profile; a non-live profile is rejected unless `--allow-nonlive` is explicit. Portfolio consumers such as SoulOS, SomaTune, DIRT, M4FI, and AURAVYBE stay separate.
 
 <a id="public-vs-private-ssot"></a>
 <table><tr><td bgcolor="#6f42c1"><strong><big><big>🔐 Public vs private SSOT</big></big></strong></td></tr></table>
@@ -298,7 +298,7 @@ Guest OSS PAR → free register (meritstore) → hit freemium cap → **Plus** S
 | Pre-GA tags | `skills-v0.x.y` — minor bumps in this program |
 | GA | `skills-v1.0.0` when the **Affiliate Owner** approves (this program: HumanBala) |
 | Pin | Release tags, not floating `main` (L1 §E.0 / FR-SK-14) |
-| Current public CLI / Hub release | **`skills-v0.5.198`** |
+| Current public CLI / Hub release | **`skills-v0.5.199`** |
 | Historical human-validation baseline | **`skills-v0.5.63`**; no new human-validation claim in this patch |
 
 Phase 1 shipped skills-only (`skills-v0.1.0`). Freemium merit CLI is pre-GA until dogfood smokes green.
