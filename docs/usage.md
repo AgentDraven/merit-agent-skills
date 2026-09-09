@@ -2,7 +2,7 @@
 
 This guide explains what the free tools do, when an account is actually needed, and what to do after the Hub opens your first demo. You do not need private operator tools for a first-time public experience.
 
-**Related:** [Choose a try path](TRY_BUNDLES.md) · [Start here](../README.md) · [Licensing](../LICENSING.md) · [merit-demo walkthrough](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md)
+**Related:** [Plain-English `merit.ps1` guide](merit.md) · [Choose a try path](TRY_BUNDLES.md) · [Start here](../README.md) · [Licensing](../LICENSING.md) · [merit-demo walkthrough](https://github.com/Mr-PI-Bala/merit-demo/blob/main/merit-demo%20docs/merit_demo_usage.md)
 
 ## Document map
 

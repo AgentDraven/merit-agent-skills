@@ -8,6 +8,8 @@ Every beginner pathway is explained in three layers: **Start**, **Make progress*
 
 **Quick index:** [Choose your adventure](#which-adventure-fits-you-) · [Start paths](#start-here--pick-your-adventure) · [Peel-The-Onion cards](#peel-the-onion-cards-three-steps-three-checks-each-) · [Additional options](#-for-additional-options) · [Public vs private SSOT](#public-vs-private-ssot) · [Quick install](#-quick-install) · [Dinner walkthrough](#-build-your-app-over-dinner)
 
+New to the command line? Read the [plain-English `merit.ps1` guide](docs/merit.md) for the learner, builder, tester, publisher, and caretaker paths.
+
 ## Which adventure fits you? 🧭
 
 Pick the outcome you want—not a command you have to decode. Every route is safe to repeat; the Hub keeps the setup work in one place.
