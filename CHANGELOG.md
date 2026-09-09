@@ -1,3 +1,8 @@
+## [0.5.201] - 2026-09-08
+
+### Fixed
+- Aligned the standalone launcher, Hub payload, CompatSet, bench template, and public release references with the tagged release.
+
 ## [0.5.200] - 2026-09-08
 
 ### Added
