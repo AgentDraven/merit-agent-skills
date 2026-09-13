@@ -148,6 +148,8 @@ Use the [dinner walkthrough](docs/howto/launch-over-dinner.md), [plain-English u
 
 **Do not** expect a public copy of the vault PRD. Implementers with vault access apply FR tables from the private PRD + provider IAR; builders follow **usage + Portal** only.
 
+**MERIT visual standard:** OSS portals and MERIT-powered examples should follow [`docs/MERIT_BRAND_SYSTEM.md`](docs/MERIT_BRAND_SYSTEM.md). The private footer wording, acceptance checklist, and governance boundary remain in the vault IAR.
+
 **Same names, different jobs** (not vestigial; do not overwrite each other):
 
 | File | What it is | What it is not |

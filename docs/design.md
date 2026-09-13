@@ -37,7 +37,7 @@ Legacy `merit-live` and `merit-*` shim scripts are intentionally not part of the
 
 The public skills call hosted MERIT providers through `https://merit-prod.vercel.app`. Public clones must not ship local usage-metering or Square billing bypass logic.
 
-The default promo path is `MERITAGENT`; the hosted provider owns credit budget, entitlement, Square configuration, and tenant separation.
+The intro promo path is platform-managed; the hosted provider owns code validation, credit budget, entitlement, Square configuration, and tenant separation. Promo values are confidential verification inputs and must never be displayed in UI, logs, docs, or public configuration.
 
 ## Device BootStrap (distinct from the CLI)
 

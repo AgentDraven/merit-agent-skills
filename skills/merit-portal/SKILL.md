@@ -7,7 +7,7 @@ description: >-
 
 # merit-portal
 
-here.now only — not Vercel app deploy. Operator white-label branding in `portal/` + `cfg/branding.json`.
+here.now only — not Vercel app deploy. Operator white-label branding in `portal/` + `cfg/branding.json`. Public MERIT visual guidance is in [`docs/MERIT_BRAND_SYSTEM.md`](../../docs/MERIT_BRAND_SYSTEM.md); use it for every MERIT-powered OSS portal.
 
 ## Law
 
@@ -26,7 +26,7 @@ here.now only — not Vercel app deploy. Operator white-label branding in `porta
 
 BYOK: `HERENOW_API_KEY` or `~/.herenow/credentials`.
 
-Footer: **MERIT Powered**. Include `portal/legal.html` and `portal/terms.html`.
+Footer: **MERIT Powered**. Include `portal/legal.html` and `portal/terms.html`. Apply the shared dark MERIT palette, card/divider system, responsive layout, visible legal-link separators, and small legalese block defined in `docs/MERIT_BRAND_SYSTEM.md` and the private footer IAR. When shared CSS or image assets change, cache-bust their URLs or use immutable filenames in the same release.
 
 ## Operator (plane C only)
 

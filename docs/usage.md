@@ -287,7 +287,7 @@ Optional non-secret cfg: copy [`cfg/consumer_attribution.json.template`](../cfg/
 |-------|------|
 | `consumer_id` | Stable consumer / tenant id |
 | `affiliate_code` | Checkout attribution on **meritstore** register URLs |
-| `default_promocode` | Usually `MERITAGENT` (platform-enforced) |
+| `default_promocode` | Optional platform-managed value; never display or commit the value |
 | `partner_kind` | Marketing hint only (`affiliate` \| `design_partner`) — cohort is granted on **meritsubs** |
 
 Register URL shape (gateway → meritstore for a provisioned app):
@@ -321,7 +321,7 @@ Three roles — do not conflate them:
 
 - **Cloning OSS does not open a payout account.** Apache-2.0 skills are free; revenue is a **platform commerce** concern.
 - **Plus payments** are collected through **meritstore** (Square in production today). Platform fee and tenant payout rules are per `consumer_id` (see product PRD FR-COM-09/10 in vault).
-- **Intro usage** defaults to promo `MERITAGENT`; the hosted provider controls the credit amount, currently $25 by default.
+- **Intro usage** may use a platform-managed promo; the hosted provider controls the credit amount. The code is confidential and must never be displayed in UI, logs, docs, screenshots, or public configuration.
 - **Your share** flows to the **tenant payment provider** configured for your meritstore tenant — after MERIT provisions the tenant (integration cert minimum) and you complete payment-provider onboarding (KYC as required by Square or successor).
 - Until that onboarding: subscribers may still pay on **existing provisioned demos** (e.g. `merit-demo`, `auravybe`); a **new** cloner does not automatically receive those funds.
 

@@ -2,7 +2,7 @@
   "schema": "merit.consumer_attribution.v1",
   "consumer_id": "YOUR_CONSUMER_ID",
   "referral_code": "YOUR_CONSUMER_ID",
-  "default_promocode": "MERITAGENT",
+  "default_promocode": "",
   "partner_kind": "affiliate",
   "source": "merit-utils",
   "register_url_template": "https://merit-prod.vercel.app/store/{consumer_id}/register?referral={referral_code}&utm_source={utm_source}&utm_medium={utm_medium}&utm_campaign={utm_campaign}"

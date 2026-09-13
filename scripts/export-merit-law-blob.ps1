@@ -39,6 +39,8 @@ Agents on merit-agent-skills follow public OSS law via merit.ps1 law (merit.blob
 
 merit.ps1 closeout --path = VALIDATE ONLY (verify + git diff --check).
 Full MERIT closeout = merit.ps1 law closeout then plain merit.ps1 closeout (OSS) or vault mXin (operator).
+
+Runtime resolution law: use MERIT_RUNTIME_HOME when set; otherwise use runtime.runtime_id from the vault configuration; then the sibling vault CLI; then public merit-agent-skills. MERIT_AFFILIATE, runtime.affiliate_id, MERIT_OWNER_NAME, and person-named runtime folders are unsupported. Design Partner, MeritSubs Affiliate, and Affinity are separate terms.
 '@
         }
         @{
@@ -103,6 +105,25 @@ Footer: MERIT Powered. Include portal/legal.html and portal/terms.html.
 OSS consumer: merit.ps1 deploy --path <repo> with cfg/flask_deploy.json vercel_scope.
 Operator catalog: operatorMeritCli deploy vercel -Project <id> [--sync-env].
 Cloud First: create lands on merit-prod /apps by default.
+'@
+        }
+        @{
+            id    = 'VERCEL-V01'
+            title = 'V01 Vercel deployment baseline'
+            body  = @'
+V01 provider and consumer deployments use deterministic Vercel configuration: explicit build/output settings, locked installs when a lockfile exists, V01-only provider destinations, server-side secrets, common security headers, a public health contract, and a daily Hobby-compatible history collector. Every repo emits the mandatory MERIT analytics contract through meritutils/meritanalytics; Vercel Web Analytics is optional and marketing-only, never the MERIT source of record. Track a migration bug for each active V00 fallback and each repo missing MERIT analytics instrumentation. Close only with hosted smoke evidence and an IAR acceptance row.
+'@
+        }
+        @{
+            id    = 'PROMO-SECURITY'
+            title = 'Promo-code confidentiality'
+            body  = @'
+Promo codes are confidential verification inputs, not a code directory.
+- Never display configured, unentered, future, default, example, invalid, or raw promo values in UI, APIs, logs, analytics, screenshots, docs, or chat.
+- After explicit entry and successful server validation, the registration surface may display that exact validated code with safe benefit metadata and the cumulative applied stack.
+- The applied stack must provide an accessible remove control and recompute the total immediately when a code is removed.
+- Collect codes in password-style fields; validate them server-side and return only safe applied/invalid status and non-secret discount metadata.
+- Keep operational test-code values in scoped operator environment configuration; never put them in public OSS defaults or browser bundles.
 '@
         }
         @{
@@ -187,6 +208,7 @@ $manifest = [ordered]@{
         'merit-onboard'      = @('SURFACE', 'CLI', 'VIII.F')
         'merit-portal'       = @('PORTAL', 'CLI')
         'merit-deploy-vercel'= @('DEPLOY', 'CLI')
+        'merit-v01-deploy' = @('VERCEL-V01', 'DEPLOY', 'CLI')
         'merit-admin-gate'   = @('GATE', 'CLI')
         'meritcert'          = @('CERT', 'CLI')
         'merit-iar'          = @('CERT', 'CLI')
@@ -214,3 +236,4 @@ Write-MeritLawBlob -PackObject $pack -OutPath $blobPath
 Write-Host "Wrote $blobPath ($((Get-Item $blobPath).Length) bytes)"
 Write-Host "Wrote $manifestPath"
 Write-Host "Sections: $($sections.Count)"
+

@@ -1,0 +1,7 @@
+/* MERIT public brand system: see ../../docs/MERIT_BRAND_SYSTEM.md */
+:root{--ink:#08090b;--panel:#111419;--line:#292e35;--gold:#f4bd4b;--green:#52ff28;--text:#f5f7f8;--muted:#a7afb8;--charcoal:#30343b}
+body{color:var(--text);background:var(--ink)}
+a{color:var(--gold)}a:hover{color:var(--green)}
+section{border-color:var(--line)}
+footer{border-color:var(--line);color:var(--muted)}
+.merit-footer-links{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}.merit-footer-links .sep{color:var(--charcoal);font-weight:700}.merit-legalese{font-size:.72rem;line-height:1.45;color:var(--muted)}

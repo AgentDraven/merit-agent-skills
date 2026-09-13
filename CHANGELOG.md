@@ -1,3 +1,8 @@
+## [0.5.205] - 2026-09-13
+
+### Fixed
+- Refreshed the public MERIT law blob for V01 runtime and terminology rules.
+
 ## [0.5.204] - 2026-09-08
 
 ### Docs

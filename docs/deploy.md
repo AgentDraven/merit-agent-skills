@@ -127,7 +127,7 @@ That command runs scaffold verification, `git diff --check`, and prints the git 
 The public consumer repo is not the billing or usage-metering authority.
 
 - Usage credits, promo validation, and Square checkout live behind `https://merit-prod.vercel.app`.
-- The default intro promo is `MERITAGENT`.
+- The default intro promo is platform-managed and confidential; never display, log, or document its value.
 - The default intro credit budget is $25 and is controlled by hosted provider configuration.
 - A consumer may display usage state, but changing local repo code must not create paid entitlements or bypass hosted metering.
 
