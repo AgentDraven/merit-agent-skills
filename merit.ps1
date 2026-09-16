@@ -681,6 +681,12 @@ Or set: vercel_scope= in .merit_launch.md, then: .\merit.ps1 deploy --path <repo
     return $scope
 }
 
+function Test-IsCanonicalDirt {
+    param([string]$TargetRoot)
+    $remote = (& git -C $TargetRoot remote get-url origin 2>$null).Trim()
+    return $remote -match 'github\.com/AgentDraven/dirt(?:\.git)?$'
+}
+
 function Ensure-VercelLinked {
     param([string]$TargetRoot, [string]$Scope)
     $project = Join-Path $TargetRoot '.vercel/project.json'
@@ -692,7 +698,16 @@ function Ensure-VercelLinked {
     Push-Location $TargetRoot
     try {
         Write-Host "vercel link: MERIT-managed project link"
-        & npx vercel link --yes --scope $Scope
+        $v01Wrapper = Join-Path $TargetRoot 'scripts/vercel-v01.ps1'
+        if (Test-Path -LiteralPath $v01Wrapper) {
+            Write-Host 'vercel auth: repository V01 wrapper (namespaced credential only)'
+            & $v01Wrapper link --yes --scope $Scope
+        } else {
+            if (Test-IsCanonicalDirt -TargetRoot $TargetRoot) {
+                throw 'Canonical DIRT requires scripts/vercel-v01.ps1; bare npx vercel is forbidden.'
+            }
+            & npx vercel link --yes --scope $Scope
+        }
         if ($LASTEXITCODE -ne 0) { throw "vercel link failed (exit $LASTEXITCODE). Log in with vercel login, check --vercel-scope / vercel_scope, then retry." }
     } finally {
         Pop-Location
@@ -718,7 +733,16 @@ function Invoke-Deploy {
             if ($LASTEXITCODE -ne 0) { throw "npm run build failed (exit $LASTEXITCODE). Fix build errors, then retry deploy or create." }
         }
         Write-Host "vercel deploy: MERIT-managed production publish"
-        & npx vercel --prod --scope $scope
+        $v01Wrapper = Join-Path $TargetRoot 'scripts/vercel-v01.ps1'
+        if (Test-Path -LiteralPath $v01Wrapper) {
+            Write-Host 'vercel auth: repository V01 wrapper (namespaced credential only)'
+            & $v01Wrapper deploy --prod --scope $scope
+        } else {
+            if (Test-IsCanonicalDirt -TargetRoot $TargetRoot) {
+                throw 'Canonical DIRT requires scripts/vercel-v01.ps1; bare npx vercel is forbidden.'
+            }
+            & npx vercel --prod --scope $scope
+        }
         if ($LASTEXITCODE -ne 0) { throw "vercel --prod failed (exit $LASTEXITCODE). Fix the Vercel error above, then: .\merit.ps1 deploy --path <repo>" }
     } finally {
         Pop-Location

@@ -1,3 +1,13 @@
+## [0.5.206] - 2026-09-16
+
+### Fixed
+- Aligned Hub Raw pin (`skillsPin` / launcher release) with VERSION so cold-start downloads the matching tagged tip.
+- Prefer repository `scripts/vercel-v01.ps1` for Vercel link/deploy; block bare `npx vercel` on canonical DIRT.
+
+### Docs
+- Synced README, Hub README, CompatSet, and OSS bench template pins to `skills-v0.5.206`.
+- Ignored local `test-results/` so closeout does not publish harness receipts.
+
 ## [0.5.205] - 2026-09-13
 
 ### Fixed

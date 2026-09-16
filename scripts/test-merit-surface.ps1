@@ -22,7 +22,7 @@ function Assert-Test {
     }
     catch {
         $script:failed++
-        Write-Host "FAIL $Name — $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "FAIL ${Name}: $($_.Exception.Message)" -ForegroundColor Red
     }
 }
 

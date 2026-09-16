@@ -1,4 +1,4 @@
-# Merit law pack — unpack merit.blob (OSS L1 excerpt). In-memory only.
+# Merit law pack - unpack merit.blob (OSS L1 excerpt). In-memory only.
 #Requires -Version 5.1
 
 $Script:MeritLawPackCache = $null
@@ -129,7 +129,7 @@ function Get-MeritLawForSkill {
 function Write-MeritLawSectionText {
     param($Section)
     Write-Host ''
-    Write-Host ("## {0} — {1}" -f $Section.id, $Section.title) -ForegroundColor Cyan
+    Write-Host ("## {0} - {1}" -f $Section.id, $Section.title) -ForegroundColor Cyan
     Write-Host $Section.body
 }
 
@@ -185,7 +185,7 @@ function Invoke-MeritLaw {
     if ($sub -eq 'closeout') {
         $secs = @('VIII.F', 'H', 'CLI')
         $pack = Read-MeritLawPack -RepoRoot $RepoRoot
-        Write-Host 'MERIT closeout law (from merit.blob — release closeout/mXin + 3-3)' -ForegroundColor Cyan
+        Write-Host 'MERIT closeout law (from merit.blob - release closeout/mXin + 3-3)' -ForegroundColor Cyan
         foreach ($sid in $secs) {
             foreach ($s in @($pack.sections)) {
                 if ([string]$s.id -eq $sid) { Write-MeritLawSectionText -Section $s }
