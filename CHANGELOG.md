@@ -1,3 +1,11 @@
+## [0.5.207] - 2026-09-16
+
+### Fixed
+- Exact-tag closeout after the receipt-only commit past `skills-v0.5.206`; Hub pin stayed aligned with VERSION.
+
+### Docs
+- Synced README, Hub README, CompatSet, law, and OSS bench template pins to `skills-v0.5.207`.
+
 ## [0.5.206] - 2026-09-16
 
 ### Fixed
